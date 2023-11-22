@@ -1,0 +1,25 @@
+[package]
+name = "composable-nft"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+gstd = { workspace = true }
+composable-nft-io.workspace = true
+
+[build-dependencies]
+gmeta.workspace = true
+composable-nft-io.workspace = true
+gear-wasm-builder.workspace = true
+
+[dev-dependencies]
+gstd = { workspace = true, features = ["debug"] }
+gtest.workspace = true
+gclient.workspace = true
+tokio.workspace = true
+gear-core.workspace = true
+

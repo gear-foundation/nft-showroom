@@ -1,0 +1,63 @@
+[workspace]
+
+members = [
+    "nft",
+    "composable-nft"
+]
+
+[package]
+name = "nft-marketplace"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+
+[dependencies]
+gstd.workspace = true
+hashbrown = "0.13"
+parity-scale-codec.workspace = true
+scale-info.workspace = true
+nft-marketplace-io = { path = "io" }
+nft-io = { path = "nft/io" }
+composable-nft-io = { path = "composable-nft/io" }
+gcore.workspace = true
+
+
+[dev-dependencies]
+gstd = { workspace = true, features = ["debug"] }
+gtest.workspace = true
+gclient.workspace = true
+tokio.workspace = true
+gear-core.workspace = true
+primitive-types.workspace = true
+
+
+[build-dependencies]
+nft-marketplace-io.workspace = true
+gear-wasm-builder.workspace = true
+gmeta.workspace = true
+
+[features]
+binary-vendor = []
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+license = "MIT"
+authors = ["Gear Technologies"]
+
+[workspace.dependencies]
+gstd = { git = "https://github.com/gear-tech/gear", tag = "v1.0.1" }
+gear-wasm-builder = { git = "https://github.com/gear-tech/gear", tag = "v1.0.1" }
+gmeta = { git = "https://github.com/gear-tech/gear", tag = "v1.0.1" }
+gclient = { git = "https://github.com/gear-tech/gear", tag = "v1.0.1" }
+gtest = { git = "https://github.com/gear-tech/gear", tag = "v1.0.1" }
+gear-core = { git = "https://github.com/gear-tech/gear", tag = "v1.0.1" }
+gcore = { git = "https://github.com/gear-tech/gear", tag = "v1.0.1" }
+primitive-types = { version = "0.12", default-features = false }
+nft-marketplace-io = { path = "io" }
+nft-io = { path = "nft/io" }
+composable-nft-io = { path = "composable-nft/io" }
+tokio = "1"
+scale-info = { version = "2", default-features = false }
+parity-scale-codec = { version = "3", default-features = false }
