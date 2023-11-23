@@ -69,6 +69,25 @@ fn successful_basics() {
         println!("Collection NFT info: {:?}", state);
     }
 
+    // Successful change config in the new collection 
+    let config = Config{
+        name: "My Collection".to_string(),
+        description: "My Collection".to_string(),
+        collection_img: "Collection image".to_string(),
+        mint_limit: 3.into(),
+        transferable: true,
+        approvable: true,
+        burnable: true,
+    };
+    let res = nft_collection.send(USERS[0], NftAction::ChangeConfig { config });
+    assert!(!res.main_failed());
+    let state_reply = nft_collection.read_state(StateQueryNft::All).expect("Unexpected invalid state.");
+    if let StateReplyNft::All(state) = state_reply {
+        assert_eq!(state.config.name, "My Collection".to_string());
+        assert_eq!(state.config.description, "My Collection".to_string());
+    }
+
+
     // Successful mint NFT in the new collection 
     let res = nft_collection.send(USERS[1], NftAction::Mint);
     assert!(!res.main_failed());
@@ -176,23 +195,103 @@ fn successful_basics() {
 
 }
 
-// #[test]
-// fn failures() {
-//     let sys = utils::initialize_system();
-//     let nft = Some(Nft::initialize(&sys).actor_id());
-//     let sft = Some(Sft::initialize(&sys).actor_id());
-//     let token_quantity: usize = 11;
-//     init_collection_factory(&sys, sft);
-//     let factory = sys.get_program(3);
-//     // must fail because the limit of tokens in the collection has been exceeded
-//     assert!(create_collection(&factory, USERS[0], nft, token_quantity).main_failed());
+#[test]
+fn failures() {
+    let sys = utils::initialize_system();
+    init_marketplace(&sys);
+    let marketplace = sys.get_program(1);
+    let nft_collection_code_id =
+        sys.submit_code("target/wasm32-unknown-unknown/debug/nft.opt.wasm");
 
-//     let token_quantity: usize = 10;
-//     assert!(!create_collection(&factory, USERS[0], nft, token_quantity).main_failed());
-//     // must fail since you cannot create NTF collection more than once
-//     assert!(create_collection(&factory, USERS[0], nft, token_quantity).main_failed());
-// }
+    let res = add_new_collection(&marketplace, ADMINS[0], nft_collection_code_id.into_bytes().into());
+    assert!(!res.main_failed());
+    
+    let img_links: Vec<(String, u128)> = (0..5)
+        .map(|i| (format!("Img-{}", i), 1 as u128))
+        .collect();
 
+    // The mint limit must be greater than zero
+    let mut init_nft_payload = NftInit{
+        owner: USERS[0].into(),
+        config: Config {
+            name: "User Collection".to_string(),
+            description: "User Collection".to_string(),
+            collection_img: "Collection image".to_string(),
+            mint_limit: 0.into(),
+            transferable: false,
+            approvable: false,
+            burnable: false,
+        },
+        img_links: img_links.clone(),
+    };
+    let res = create_collection(&marketplace, USERS[0], 1, init_nft_payload.encode());
+    assert!(res.main_failed());
+
+    // There must be at least one link to create a collection
+    init_nft_payload.config.mint_limit = 4.into();
+    init_nft_payload.img_links = vec![];
+    let res = create_collection(&marketplace, USERS[0], 1, init_nft_payload.encode());
+    assert!(res.main_failed());
+
+    // Limit of copies value is equal to 0
+    init_nft_payload.img_links = vec![("Img-0".to_owned(), 0)];
+    let res = create_collection(&marketplace, USERS[0], 1, init_nft_payload.encode());
+    assert!(res.main_failed());
+
+
+    init_nft_payload.img_links = img_links;
+    let res = create_collection(&marketplace, USERS[0], 1, init_nft_payload.encode());
+    assert!(!res.main_failed());
+
+    let state_reply = marketplace.read_state(StateQuery::AllCollections).expect("Unexpected invalid state.");
+    let address_nft = if let StateReply::AllCollections(state) = state_reply {
+        assert!(!state.is_empty(), "Collections shouldn't be empty");
+        println!("Collections: {:?}", state);
+        state[0].1[0]
+    }
+    else {
+        assert!(false, "Unexpected StateReply variant");
+        0.into()
+    };
+
+    let address_nft: [u8; 32] = address_nft.into(); 
+    let nft_collection = sys.get_program(address_nft);
+
+    for _ in 0..4 {
+        let res = nft_collection.send(USERS[1], NftAction::Mint);
+        assert!(!res.main_failed());
+    }
+    let res = nft_collection.send(USERS[1], NftAction::Mint);
+    let payload = res.log()[0].payload();
+    let expected_payload = NftEvent::Error("You've exhausted your limit.".to_owned()).encode();
+    assert_eq!(expected_payload, payload);
+    assert!(!res.main_failed());
+
+    let res = nft_collection.send(USERS[2], NftAction::Mint);
+    assert!(!res.main_failed());
+    let res = nft_collection.send(USERS[2], NftAction::Mint);
+    let payload = res.log()[0].payload();
+    let expected_payload = NftEvent::Error("All tokens are minted.".to_owned()).encode();
+    assert_eq!(expected_payload, payload);
+    assert!(!res.main_failed());
+
+    let config = Config{
+        name: "My Collection".to_string(),
+        description: "My Collection".to_string(),
+        collection_img: "Collection image".to_string(),
+        mint_limit: 3.into(),
+        transferable: true,
+        approvable: true,
+        burnable: true,
+    };
+    let res = nft_collection.send(USERS[0], NftAction::ChangeConfig { config });
+    let payload = res.log()[0].payload();
+    let expected_payload = NftEvent::Error("The collection configuration can no more be changed".to_owned()).encode();
+    assert_eq!(expected_payload, payload);
+    assert!(!res.main_failed());
+}
+
+// TODO
 // #[test]
 // fn admin_features() {
 

@@ -39,7 +39,8 @@ pub enum NftMarketplaceAction {
         user: ActorId
     },
     UpdateConfig{
-        config: Config
+        gas_for_creation: Option<u64>,
+        time_between_create_collections: Option<u64>
     },
 }
 
@@ -48,12 +49,6 @@ pub enum NftMarketplaceEvent {
     NewCollectionAdded { collection_info: CollectionInfo },
     CollectionCreated { collection_address: ActorId },
 }
-
-// #[derive(Debug, Encode, Decode, TypeInfo)]
-// pub struct State {
-//     pub owner_to_collection: Vec<(ActorId, CollectionInfo)>,
-//     pub collection_code_id: CodeId,
-// }
 
 #[derive(Encode, Decode, TypeInfo)]
 pub enum StateQuery {

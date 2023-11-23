@@ -80,9 +80,10 @@ async fn main() {
             nft_marketplace.delete_admin(user);
         }
         NftMarketplaceAction::UpdateConfig {
-            config,
+            gas_for_creation,
+            time_between_create_collections
         } => {
-            nft_marketplace.update_config(config);
+            nft_marketplace.update_config(gas_for_creation, time_between_create_collections);
         }
     }
 }
@@ -202,13 +203,15 @@ impl NftMarketplace {
     }
     pub fn update_config(
         &mut self,
-        config: Config
+        gas_for_creation: Option<u64>,
+        time_between_create_collections: Option<u64>
     ){
         let msg_src = msg::source();
         if !self.admins.contains(&msg_src) {
             panic!("You are not an admin");
         }
-        self.config = config;
+        gas_for_creation.map(|gas| self.config.gas_for_creation = gas);
+        time_between_create_collections.map(|time| self.config.time_between_create_collections = time);
     }
 }
 
