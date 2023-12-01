@@ -8,7 +8,6 @@ use gstd::{
     ActorId, CodeId,
 };
 use nft_marketplace_io::*;
-type Id = u128;
 
 #[derive(Default)]
 pub struct NftMarketplace {
@@ -16,6 +15,7 @@ pub struct NftMarketplace {
     pub owner_to_collection: HashMap<ActorId, HashSet<ActorId>>,
     pub time_creation: HashMap<ActorId, u64>,
     pub collections: HashMap<Id, CollectionInfo>,
+    pub sale: HashMap<(ActorId, u64), NftInfoForSale>,
     pub config: Config,
 }
 
@@ -63,6 +63,21 @@ async fn main() {
             nft_marketplace
                 .create_collection(id_collection, payload)
                 .await;
+        }
+        NftMarketplaceAction::SaleNft {
+            collection_address,
+            token_id,
+            price
+        } => {
+            nft_marketplace
+                .sell(collection_address, token_id, price).await;
+        }
+        NftMarketplaceAction::BuyNft {
+            collection_address,
+            token_id,
+        } => {
+            nft_marketplace
+                .buy(collection_address, token_id).await;
         }
         NftMarketplaceAction::DeleteCollection {
             id_collection,
@@ -132,7 +147,7 @@ impl NftMarketplace {
             .collections
             .get(&id_collection)
             .expect("Unable to get Nft collection info");
-        debug!("CODE ID {:?}", collection_info.code_id);
+        debug!("PAYLOAD {:?}", payload);
         let (address, _) = ProgramGenerator::create_program_bytes_with_gas_for_reply(
             collection_info.code_id,
             payload,
@@ -168,6 +183,134 @@ impl NftMarketplace {
         )
         .expect("Error during a reply `NftMarketplaceEvent::CollectionCreated`");
     }
+
+    pub async fn sell(&mut self, collection_address: ActorId, token_id: u64, price: u128) {
+
+        // user approve mp 
+        // user sell -> mp self-transfer () -> reply(to, token_id, owner)
+        // sell address_collection, token_id, msg::src
+
+        // check that this nft is not sale at this moment 
+        if self.sale.contains_key(&(collection_address, token_id)){
+            panic!("This nft isalready on sale");
+        }
+
+        // first we should check owner 
+        let msg_src = msg::source();
+        let owner_payload = NftAction::Owner { token_id: token_id.clone() };
+        let reply = msg::send_for_reply_as::<NftAction, NftEvent>(
+            collection_address,
+            owner_payload,
+            0,
+            0
+            )
+        .expect("Error during Collection program initialization")
+        .await
+        .expect("Program was not initialized");
+
+        debug!("reply: {:?}", reply);
+
+        match reply {
+            NftEvent::Owner { owner, ..} => {
+                if owner != msg::source(){
+                    panic!("Only the owner can put his NFT up for sale")
+                }
+            },
+            _ => panic!("Wrong received reply"),
+        }
+
+        // second we should check that user give approve to marketplace 
+        let address_marketplace = exec::program_id();
+        let is_approved_payload = NftAction::IsApproved { to: address_marketplace.clone(), token_id: token_id.clone() };
+        let reply = msg::send_for_reply_as::<NftAction, NftEvent>(
+            collection_address,
+            is_approved_payload,
+            0,
+            0
+            )
+        .expect("Error during Collection program initialization")
+        .await
+        .expect("Program was not initialized");
+
+        debug!("reply: {:?}", reply);
+        match reply {
+            NftEvent::IsApproved { approved , ..} => {
+                if !approved{
+                    panic!("You must give approve to the marketplace")
+                }
+            },
+            _ => panic!("Wrong received reply"),
+        }
+
+        // transfer nft to marketplace
+        debug!("!!!!!!!!!!!!!!!!!! {:?} {:?}", msg_src, address_marketplace);
+        let transfer_payload = NftAction::TransferFrom { from: msg_src, to: address_marketplace, token_id: token_id.clone() };
+        let reply = msg::send_for_reply_as::<NftAction, NftEvent>(
+            collection_address,
+            transfer_payload,
+            0,
+            0
+            )
+        .expect("Error during Collection program initialization")
+        .await
+        .expect("Program was problem with transfer");
+        debug!("reply: {:?}", reply);
+
+        match reply {
+            NftEvent::Transferred { owner, recipient, token_id } => {
+                // self.sale.insert((collection_address, token_id), NftInfoForSale{price: price.clone(), owner}).expect("Error during crate sale");
+                self.sale
+                    .entry((collection_address, token_id))
+                    .or_insert(NftInfoForSale{price: price.clone(), owner});
+            },
+            _ => panic!("Wrong received reply"),
+        }
+        
+        msg::reply(
+            NftMarketplaceEvent::SaleNft {
+                collection_address,
+                token_id,
+                price,
+                owner: msg_src,
+            },
+            0,
+        )
+        .expect("Error during a reply `NftMarketplaceEvent::SaleNft`");
+    }
+
+    pub async fn buy(&mut self, collection_address: ActorId, token_id: u64) {
+        let payment = msg::value();
+        let buyer = msg::source();
+        let nft = self.sale.get(&(collection_address, token_id)).expect("There is no sale with such data");
+        if payment < nft.price {
+            panic!("Less than the agreed price ");
+        }
+
+        // transfer nft to new owner
+        let transfer_payload = NftAction::Transfer { to: buyer, token_id: token_id.clone() };
+        let reply = msg::send_for_reply_as::<NftAction, NftEvent>(
+            collection_address,
+            transfer_payload,
+            0,
+            0
+            )
+            .expect("Error during Collection program initialization")
+            .await
+            .expect("Program was problem with transfer");
+
+
+        match reply {
+            NftEvent::Transferred { owner, recipient: _, token_id } => {
+            },
+            _ => panic!("Wrong received reply"),
+        }
+        
+        debug!("reply: {:?}", reply);
+        msg::send_with_gas(nft.owner.clone(), "", 0, nft.price).expect("Error in sending value");
+
+
+    }
+
     pub fn delete_collection(
         &mut self,
         id_collection: u128,
@@ -224,6 +367,12 @@ extern "C" fn state() {
     };
     let query: StateQuery = msg::load().expect("Unable to load the state query");
     match query {
+
+        StateQuery::All => {
+            msg::reply(StateReply::All(nft_marketplace.into()), 0)
+                .expect("Unable to share the state");
+        }
+
         StateQuery::Admins => {
             msg::reply(StateReply::Admins(nft_marketplace.admins), 0)
                 .expect("Unable to share the state");
@@ -260,6 +409,51 @@ extern "C" fn state() {
                 .collect();
             msg::reply(StateReply::AllCollections(owner_to_collection), 0)
                 .expect("Unable to share the state");
+        }
+    }
+}
+
+
+impl From<NftMarketplace> for State {
+    fn from(value: NftMarketplace) -> Self {
+        let NftMarketplace {
+            admins,
+            owner_to_collection,
+            time_creation,
+            collections,
+            sale,
+            config,
+        } = value;
+
+        let owner_to_collection = owner_to_collection
+            .iter()
+            .map(|(owner, collections)| (*owner, collections.iter().cloned().collect()))
+            .collect();
+
+        let time_creation = time_creation
+            .iter()
+            .map(|(id, time)| (*id, time.clone()))
+            .collect();
+
+        let collections = collections
+            .iter()
+            .map(|(id, collection_info)| (*id, collection_info.clone()))
+            .collect();
+
+        let sale = sale
+            .iter()
+            .map(|(id, info)| (*id, info.clone()))
+            .collect();
+
+
+
+        Self {
+            admins,
+            owner_to_collection,
+            time_creation,
+            collections,
+            sale,
+            config,
         }
     }
 }

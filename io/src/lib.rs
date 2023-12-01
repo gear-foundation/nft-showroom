@@ -2,6 +2,7 @@
 use gmeta::{In, InOut, Metadata};
 use gstd::{prelude::*, ActorId, CodeId};
 
+pub type Id = u128;
 pub struct NftMarketplaceMetadata;
 impl Metadata for NftMarketplaceMetadata {
     type Init = In<NftMarketplaceInit>;
@@ -29,6 +30,15 @@ pub enum NftMarketplaceAction {
         id_collection: u128,
         payload: Vec<u8>,
     },
+    SaleNft {
+        collection_address: ActorId,
+        token_id: u64,
+        price: u128,
+    },
+    BuyNft {
+        collection_address: ActorId,
+        token_id: u64,
+    },
     DeleteCollection{
         id_collection: u128,
     },
@@ -48,10 +58,24 @@ pub enum NftMarketplaceAction {
 pub enum NftMarketplaceEvent {
     NewCollectionAdded { collection_info: CollectionInfo },
     CollectionCreated { collection_address: ActorId },
+    SaleNft {
+        collection_address: ActorId,
+        token_id: u64,
+        price: u128,
+        owner: ActorId,
+    },
+    NftSold {
+        previous_owner: ActorId,
+        current_owner: ActorId,
+        token_id: u64,
+        price: u128,
+    }
+
 }
 
 #[derive(Encode, Decode, TypeInfo)]
 pub enum StateQuery {
+    All,
     Admins,
     CollectionsInfo,
     Config,
@@ -61,11 +85,22 @@ pub enum StateQuery {
 
 #[derive(Encode, Decode, TypeInfo)]
 pub enum StateReply {
+    All(State),
     Admins(Vec<ActorId>),
     CollectionsInfo(Vec<(u128, CollectionInfo)>),
     Config(Config),
     OwnerCollections(Vec<ActorId>),
     AllCollections(Vec<(ActorId, Vec<ActorId>)>),
+}
+
+#[derive(Debug, Encode, Decode, TypeInfo, Clone)]
+pub struct State {
+    pub admins: Vec<ActorId>,
+    pub owner_to_collection: Vec<(ActorId, Vec<ActorId>)>,
+    pub time_creation: Vec<(ActorId, u64)>,
+    pub collections: Vec<(Id, CollectionInfo)>,
+    pub sale: Vec<((ActorId, u64), NftInfoForSale)>,
+    pub config: Config,
 }
 
 #[derive(Debug, Encode, Decode, TypeInfo, Clone)]
@@ -80,4 +115,49 @@ pub struct CollectionInfo {
 pub struct Config {
     pub gas_for_creation: u64,
     pub time_between_create_collections: u64,
+}
+
+
+#[derive(Debug, Encode, Decode, TypeInfo, Clone)]
+pub struct NftInfoForSale {
+    pub price: u128,
+    pub owner: ActorId,
+}
+
+#[derive(Debug, Clone, Encode, Decode, TypeInfo)]
+pub enum NftAction {
+    Transfer {
+        to: ActorId,
+        token_id: u64,
+    },
+    TransferFrom {
+        from: ActorId,
+        to: ActorId,
+        token_id: u64,
+    },
+    Owner { 
+        token_id: u64,
+    },
+    IsApproved { 
+        to: ActorId,
+        token_id: u64,
+    },
+}
+
+#[derive(Debug, Clone, Encode, Decode, TypeInfo)]
+pub enum NftEvent {
+    Transferred {
+        owner: ActorId,
+        recipient: ActorId,
+        token_id: u64,
+    },
+    Owner { 
+        owner: ActorId,
+        token_id: u64,
+    },
+    IsApproved {
+        to: ActorId,
+        token_id: u64,
+        approved: bool,
+    },
 }

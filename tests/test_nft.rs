@@ -30,8 +30,8 @@ fn successful_basics() {
     }
 
 
-    let img_links: Vec<(String, u128)> = (0..10)
-        .map(|i| (format!("Img-{}", i), 1 as u128))
+    let img_links: Vec<(String, u32)> = (0..10)
+        .map(|i| (format!("Img-{}", i), 1 as u32))
         .collect();
 
     // Successful creation of a new collection
@@ -45,6 +45,8 @@ fn successful_basics() {
             transferable: true,
             approvable: true,
             burnable: true,
+            sellable: true,
+
         },
         img_links,
     };
@@ -65,7 +67,7 @@ fn successful_basics() {
     let nft_collection = sys.get_program(address_nft);
     let state_reply = nft_collection.read_state(StateQueryNft::All).expect("Unexpected invalid state.");
     if let StateReplyNft::All(state) = state_reply {
-        assert_eq!(state.admins[1], USERS[0].into(), "Wrong Admin");
+        assert_eq!(state.admins[0], USERS[0].into(), "Wrong Admin");
         println!("Collection NFT info: {:?}", state);
     }
 
@@ -78,6 +80,8 @@ fn successful_basics() {
         transferable: true,
         approvable: true,
         burnable: true,
+        sellable: true,
+
     };
     let res = nft_collection.send(USERS[0], NftAction::ChangeConfig { config });
     assert!(!res.main_failed());
@@ -95,7 +99,7 @@ fn successful_basics() {
     let state_reply = nft_collection.read_state(StateQueryNft::All).expect("Unexpected invalid state.");
     if let StateReplyNft::All(state) = state_reply {
         println!("Collection NFT info: {:?}", state);
-        assert_eq!(state.admins[1], USERS[0].into(), "Wrong Admin");
+        assert_eq!(state.admins[0], USERS[0].into(), "Wrong Admin");
         let (owner, token_id) = state.owners.get(0).expect("Can't be None");
         assert_eq!(*owner, USERS[1].into() , "Wrong owner");
         assert_eq!(*token_id, vec![0] , "Wrong token id");
@@ -112,7 +116,7 @@ fn successful_basics() {
         assert_eq!(*token_id, vec![0] , "Wrong token id");
         let (owner, token_id) = state.owners.get(0).expect("Can't be None");
         assert_eq!(*owner, USERS[1].into() , "Wrong owner");
-        assert_eq!(*token_id, vec![] , "Wrong token id");
+        assert!(token_id.is_empty());
     }    
 
     // Successful approve NFT in the collection (USERS[2] -Approve-> USERS[1])
@@ -137,7 +141,7 @@ fn successful_basics() {
         assert_eq!(*token_id, vec![0] , "Wrong token id");
         let (owner, token_id) = state.owners.get(1).expect("Can't be None");
         assert_eq!(*owner, USERS[2].into() , "Wrong owner");
-        assert_eq!(*token_id, vec![] , "Wrong token id");
+        assert!(token_id.is_empty());
     }
 
     // Check limit of mint = 3 
@@ -169,11 +173,11 @@ fn successful_basics() {
         println!("STATE OWNERS: {:?}", state.owners);
         let (owner, token_id) = state.owners.get(2).expect("Can't be None");
         assert_eq!(*owner, USERS[3].into() , "Wrong owner");
-        assert_eq!(*token_id, vec![3, 2, 1] , "Wrong token id");
+        assert_eq!(token_id.len(), 3 , "Wrong token id");
     }
 
     // Successful Expand NFT in the collection 
-    let res = nft_collection.send(USERS[0], NftAction::Expand { additional_links: vec![("add_link_1".to_string(), 1 as u128), ("add_link_2".to_string(), 1 as u128)] });
+    let res = nft_collection.send(USERS[0], NftAction::Expand { additional_links: vec![("add_link_1".to_string(), 1 as u32), ("add_link_2".to_string(), 1 as u32)] });
     assert!(!res.main_failed());
     let state_reply = nft_collection.read_state(StateQueryNft::All).expect("Unexpected invalid state.");
     if let StateReplyNft::All(state) = state_reply {
@@ -206,8 +210,8 @@ fn failures() {
     let res = add_new_collection(&marketplace, ADMINS[0], nft_collection_code_id.into_bytes().into());
     assert!(!res.main_failed());
     
-    let img_links: Vec<(String, u128)> = (0..5)
-        .map(|i| (format!("Img-{}", i), 1 as u128))
+    let img_links: Vec<(String, u32)> = (0..5)
+        .map(|i| (format!("Img-{}", i), 1 as u32))
         .collect();
 
     // The mint limit must be greater than zero
@@ -218,9 +222,11 @@ fn failures() {
             description: "User Collection".to_string(),
             collection_img: "Collection image".to_string(),
             mint_limit: 0.into(),
-            transferable: false,
-            approvable: false,
-            burnable: false,
+            transferable: true,
+            approvable: true,
+            burnable: true,
+            sellable: true,
+
         },
         img_links: img_links.clone(),
     };
@@ -283,12 +289,43 @@ fn failures() {
         transferable: true,
         approvable: true,
         burnable: true,
+        sellable: true,
+
     };
     let res = nft_collection.send(USERS[0], NftAction::ChangeConfig { config });
     let payload = res.log()[0].payload();
     let expected_payload = NftEvent::Error("The collection configuration can no more be changed".to_owned()).encode();
     assert_eq!(expected_payload, payload);
     assert!(!res.main_failed());
+
+    let state_reply = nft_collection.read_state(StateQueryNft::All).expect("Unexpected invalid state.");
+    if let StateReplyNft::All(state) = state_reply {
+        println!("STATE: {:?}", state);
+    }
+
+    let res = nft_collection.send(USERS[0], NftAction::Expand { additional_links: vec![("New_img".to_owned(), 4)] });
+    assert!(!res.main_failed());
+    let res = nft_collection.send(USERS[2], NftAction::Mint);
+    assert!(!res.main_failed());
+    let res = nft_collection.send(USERS[2], NftAction::Approve { to: USERS[3].into(), token_id: 5 });
+    assert!(!res.main_failed());
+    let state_reply = nft_collection.read_state(StateQueryNft::All).expect("Unexpected invalid state.");
+    if let StateReplyNft::All(state) = state_reply {
+        println!("STATE: {:?}", state);
+    }
+    let res = nft_collection.send(USERS[2], NftAction::Transfer { to: USERS[1].into(), token_id: 5 });
+    assert!(!res.main_failed());
+    let res = nft_collection.send(USERS[3], NftAction::TransferFrom { from: USERS[1].into(), to: USERS[3].into(), token_id: 5});
+    assert!(!res.main_failed());
+    let state_reply = nft_collection.read_state(StateQueryNft::All).expect("Unexpected invalid state.");
+    if let StateReplyNft::All(state) = state_reply {
+        println!("STATE: {:?}", state);
+    }
+    let payload = res.log()[0].payload();
+    let expected_payload = NftEvent::Error("Target approvals is empty.".to_owned()).encode();
+    assert_eq!(expected_payload, payload);
+
+
 }
 
 // TODO

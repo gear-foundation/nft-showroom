@@ -48,6 +48,40 @@ pub fn create_collection(
     )
 }
 
+pub fn sale(
+    marketplace: &Program,
+    user: u64,
+    collection_address: ActorId,
+    token_id: u64,
+    price: u128
+) -> RunResult {
+    marketplace.send(
+        user,
+        NftMarketplaceAction::SaleNft {
+            collection_address,
+            token_id,
+            price
+        },
+    )
+}
+
+pub fn buy(
+    marketplace: &Program,
+    user: u64,
+    collection_address: ActorId,
+    token_id: u64,
+    price: u128
+) -> RunResult {
+    marketplace.send_with_value(
+        user,
+        NftMarketplaceAction::BuyNft {
+            collection_address,
+            token_id,
+        },
+        price
+    )
+}
+
 pub fn add_admin(
     marketplace: &Program,
     admin: u64,
@@ -64,17 +98,14 @@ pub fn add_admin(
 pub fn update_config(
     marketplace: &Program,
     admin: u64,
-    gas_for_creation: u64,
-    time_between_create_collections: u64,
+    gas_for_creation: Option<u64>,
+    time_between_create_collections: Option<u64>,
 ) -> RunResult {
-    let config = Config{
-        gas_for_creation,
-        time_between_create_collections
-    };
     marketplace.send(
         admin,
         NftMarketplaceAction::UpdateConfig {
-            config
+            gas_for_creation,
+            time_between_create_collections
         }
     )
 }

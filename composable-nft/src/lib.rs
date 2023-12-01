@@ -14,14 +14,14 @@ use gstd::{
 struct ComposableNftContract {
     pub tokens: HashMap<NftId, Nft>,
     pub owners: HashMap<ActorId, HashSet<NftId>>,
-    pub restriction_mint: HashMap<ActorId, u128>,
+    pub restriction_mint: HashMap<ActorId, u32>,
     pub approvals: HashMap<NftId, ActorId>,
     pub config: Config,
     pub nonce: NftId,
     pub img_links: Vec<Vec<String>>,
     pub combinations: HashSet<Vec<u8>>,
     pub admins: Vec<ActorId>,
-    pub number_combination: u128,
+    pub number_combination: u64,
 }
 static mut NFT_CONTRACT: Option<ComposableNftContract> = None;
 
@@ -171,6 +171,9 @@ impl ComposableNftContract {
 
                         ids
                     });
+                
+                // 6. Remove old approve
+                self.approvals.remove(&token_id);
 
                 ComposableNftEvent::Transferred {
                     owner: *from,
@@ -240,7 +243,7 @@ impl ComposableNftContract {
         if let Some(nft_info) = self.tokens.clone().get(&token_id) {
             if nft_info.owner == *user {
                 self.tokens.remove(&token_id).expect("Can't be None");
-                let tokens: &mut HashSet<u128> =
+                let tokens: &mut HashSet<u64> =
                     self.owners.get_mut(&nft_info.owner).expect("Can't be None");
                 tokens.remove(&token_id);
                 // self.owners.remove(&nft_info.owner).expect("Can't be None");
@@ -254,7 +257,7 @@ impl ComposableNftContract {
 
         ComposableNftEvent::Burnt { token_id }
     }
-    fn change_config(&mut self, user: &ActorId, tokens_limit: Option<u128>) -> ComposableNftEvent {
+    fn change_config(&mut self, user: &ActorId, tokens_limit: Option<u64>) -> ComposableNftEvent {
 
         if let Some(limit) = tokens_limit {
             if limit <= self.nonce {
@@ -264,11 +267,15 @@ impl ComposableNftContract {
                     self.nonce
                 ));
             }
+            if limit > self.number_combination{
+                return ComposableNftEvent::Error("Exceeds the number of possible combinations".to_owned());
+            }
         }
 
         if !self.admins.contains(user) {
             return ComposableNftEvent::Error("Only admin can send this message".to_owned());
         }
+
         self.config.tokens_limit = tokens_limit;
 
         ComposableNftEvent::ConfigChanged
@@ -288,9 +295,9 @@ extern "C" fn init() {
     assert!(config.mint_limit.map(|limit| limit > 0).unwrap_or(true), "The mint limit must be greater than zero");
     assert!(config.tokens_limit.map(|limit| limit > 0).unwrap_or(true), "The tokens limit must be greater than zero");
 
-    let number_combination: u128 = img_links
+    let number_combination: u64 = img_links
         .iter()
-        .map(|inner_vec| inner_vec.len() as u128)
+        .map(|inner_vec| inner_vec.len() as u64)
         .product();
 
     assert!(config.tokens_limit.map(|limit| limit <= number_combination).unwrap_or(true), "The tokens limit must be greater than zero");

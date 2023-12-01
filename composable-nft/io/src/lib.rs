@@ -3,7 +3,7 @@
 use gmeta::{In, InOut, Metadata};
 use gstd::{prelude::*, ActorId};
 
-pub type NftId = u128;
+pub type NftId = u64;
 
 pub struct ContractMetadata;
 
@@ -28,8 +28,8 @@ pub struct Config {
     pub name: String,
     pub description: String,
     pub collection_img: String,
-    pub tokens_limit: Option<u128>,
-    pub mint_limit: Option<u128>,
+    pub tokens_limit: Option<u64>,
+    pub mint_limit: Option<u32>,
     pub transferable: bool,
     pub approvable: bool,
     pub burnable: bool,
@@ -61,7 +61,7 @@ pub enum ComposableNftAction {
         token_id: NftId,
     },
     ChangeConfig {
-        tokens_limit: Option<u128>,
+        tokens_limit: Option<u64>,
     },
 }
 
@@ -103,8 +103,8 @@ pub struct ComposableNftState {
     pub nonce: NftId,
     pub img_links: Vec<Vec<String>>,
     pub admins: Vec<ActorId>,
-    pub restriction_mint: Vec<(ActorId, u128)>,
-    pub number_combination: u128,
+    pub restriction_mint: Vec<(ActorId, u32)>,
+    pub number_combination: u64,
 }
 
 #[derive(Debug, Clone, Encode, Decode, TypeInfo)]

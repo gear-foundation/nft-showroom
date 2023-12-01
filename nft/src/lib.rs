@@ -11,12 +11,13 @@ use nft_io::{Config, Nft, NftAction, NftEvent, NftId, NftInit, NftState, StateQu
 struct NftContract {
     pub tokens: HashMap<NftId, Nft>,
     pub owners: HashMap<ActorId, HashSet<NftId>>,
-    pub restriction_mint: HashMap<ActorId, u128>, // made in order to track the number of mint nft
+    pub restriction_mint: HashMap<ActorId, u32>, // made in order to track the number of mint nft
     pub approvals: HashMap<NftId, ActorId>,
     pub config: Config,
     pub nonce: NftId,
-    pub img_links: Vec<(String, u128)>,
+    pub img_links: Vec<(String, u32)>,
     pub admins: Vec<ActorId>,
+    pub address_marketplace: ActorId,
 }
 static mut NFT_CONTRACT: Option<NftContract> = None;
 
@@ -43,7 +44,7 @@ impl NftContract {
             }
         }
 
-        let rand_index = get_random_value(self.img_links.len() as u128);
+        let rand_index = get_random_value(self.img_links.len() as u64);
 
         let mut img_link: Option<String> = None;
 
@@ -105,6 +106,7 @@ impl NftContract {
         to: &ActorId,
         token_id: NftId,
     ) -> NftEvent {
+        debug!("USER {:?}, FROM {:?}, TO {:?}", user, from, to);
         if !self.config.transferable {
             return NftEvent::Error("Nft is not transferable.".to_owned());
         }
@@ -150,6 +152,9 @@ impl NftContract {
 
                         ids
                     });
+
+                // 6. Remove old approve
+                self.approvals.remove(&token_id);
 
                 NftEvent::Transferred {
                     owner: *from,
@@ -219,7 +224,7 @@ impl NftContract {
         if let Some(nft_info) = self.tokens.clone().get(&token_id) {
             if nft_info.owner == *user {
                 self.tokens.remove(&token_id).expect("Can't be None");
-                let tokens: &mut HashSet<u128> = self.owners.get_mut(&nft_info.owner).expect("Can't be None");
+                let tokens: &mut HashSet<u64> = self.owners.get_mut(&nft_info.owner).expect("Can't be None");
                 tokens.remove(&token_id);
                 // self.owners.remove(&nft_info.owner).expect("Can't be None");
                 self.approvals.remove(&token_id);
@@ -232,7 +237,33 @@ impl NftContract {
 
         NftEvent::Burnt { token_id }
     }
-    fn expand(&mut self, user: &ActorId, additional_links: Vec<(String, u128)>) -> NftEvent {
+
+    fn is_approved_to(&self, to: &ActorId, token_id: NftId) -> NftEvent {
+        let approved = self
+            .approvals
+            .get(&token_id)
+            .expect("NonFungibleToken: token has no approvals")
+            .eq(to);
+        NftEvent::IsApproved {
+            to: *to,
+            token_id,
+            approved,
+        }
+    }
+    fn owner(&self, token_id: NftId) -> NftEvent {
+        let owner = self
+            .tokens
+            .get(&token_id)
+            .expect("NonFungibleToken: token does not exist")
+            .owner;
+
+        NftEvent::Owner {
+            owner: owner,
+            token_id,
+        }
+    }
+
+    fn expand(&mut self, user: &ActorId, additional_links: Vec<(String, u32)>) -> NftEvent {
 
         if !self.admins.contains(user) {
             return NftEvent::Error("Only admin can send this message".to_owned());
@@ -288,7 +319,8 @@ extern "C" fn init() {
             config,
             nonce: 0,
             img_links,
-            admins: vec![msg::source(), owner],
+            admins: vec![owner],
+            address_marketplace: msg::source(),
         })
     };
     msg::reply(
@@ -324,9 +356,11 @@ extern "C" fn handle() {
         NftAction::Burn { token_id } => nft_contract.burn(&user, token_id),
         NftAction::Expand { additional_links } => nft_contract.expand(&user, additional_links),
         NftAction::ChangeConfig { config } => nft_contract.change_config(&user, config),
+        NftAction::IsApproved { to, token_id } => nft_contract.is_approved_to(&to, token_id),
+        NftAction::Owner { token_id } => nft_contract.owner(token_id),
     };
 
-    msg::reply(result, 0).expect("Failed to encode or reply with `StudentNftEvent`.");
+    msg::reply(result, 0).expect("Failed to encode or reply with `NftEvent`.");
 }
 
 #[no_mangle]
@@ -395,17 +429,17 @@ impl From<NftContract> for NftState {
 
 static mut SEED: u8 = 0;
 
-pub fn get_random_value(range: u128) -> u128 {
+pub fn get_random_value(range: u64) -> u64 {
     let seed = unsafe { SEED };
     unsafe { SEED = SEED.wrapping_add(1) };
     let mut random_input: [u8; 32] = exec::program_id().into();
     let block_time = exec::block_timestamp() as u8;
     random_input[0] = random_input[0].wrapping_add(seed).wrapping_add(block_time);
     let (random, _) = exec::random(random_input).expect("Error in getting random number");
-    let mut result: u128 = 0;
+    let mut result: u64 = 0;
 
     for &byte in &random {
-        result = (result << 8) | u128::from(byte);
+        result = (result << 8) | u64::from(byte);
     }
 
     result % range

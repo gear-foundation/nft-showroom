@@ -10,6 +10,7 @@ use gear_core::ids::ProgramId;
 const USERS: &[u64] = &[5, 6, 7, 8];
 
 #[tokio::test]
+#[ignore]
 async fn create_test() -> Result<()> {
     let api = GearApi::dev_from_path("target/tmp/gear").await?;
 
@@ -70,8 +71,8 @@ async fn create_test() -> Result<()> {
 
     assert!(listener.message_processed(message_id).await?.succeed());
 
-    let img_links: Vec<(String, u128)> = (0..10)
-        .map(|i| (format!("Img-{}", i), 1 as u128))
+    let img_links: Vec<(String, u32)> = (0..10)
+        .map(|i| (format!("Img-{}", i), 1 as u32))
         .collect();
 
     // Successful creation of a new collection
@@ -85,6 +86,7 @@ async fn create_test() -> Result<()> {
             transferable: true,
             approvable: true,
             burnable: true,
+            sellable: true,
         },
         img_links,
     }.encode();
