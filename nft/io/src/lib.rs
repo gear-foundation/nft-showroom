@@ -45,20 +45,20 @@ pub enum NftAction {
         to: ActorId,
         token_id: NftId,
     },
-    Owner { 
+    Owner {
         token_id: NftId,
     },
-    IsApproved { 
+    IsApproved {
         to: ActorId,
         token_id: NftId,
     },
     Mint,
-
     Approve {
         to: ActorId,
         token_id: NftId,
     },
     RevokeApproval {
+        to: ActorId,
         token_id: NftId,
     },
     Burn {
@@ -82,7 +82,7 @@ pub enum NftEvent {
         recipient: ActorId,
         token_id: NftId,
     },
-    Owner { 
+    Owner {
         owner: ActorId,
         token_id: NftId,
     },
@@ -118,12 +118,16 @@ pub enum NftEvent {
 
     Error(String),
 }
+#[derive(Debug, Clone, Encode, Decode, TypeInfo)]
+pub enum NftError {
+    Error(String),
+}
 
 #[derive(Debug, Clone, Encode, Decode, TypeInfo)]
 pub struct NftState {
     pub tokens: Vec<(NftId, Nft)>,
     pub owners: Vec<(ActorId, Vec<NftId>)>,
-    pub approvals: Vec<(NftId, ActorId)>,
+    pub token_approvals: Vec<(NftId, Vec<ActorId>)>,
     pub config: Config,
     pub nonce: NftId,
     pub img_links: Vec<(String, u32)>,

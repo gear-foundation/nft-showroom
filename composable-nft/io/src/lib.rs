@@ -40,7 +40,9 @@ pub enum ComposableNftAction {
     AddAdmin {
         new_admin: ActorId,
     },
-    Mint {combination: Vec<u8>},
+    Mint {
+        combination: Vec<u8>,
+    },
     TransferFrom {
         from: ActorId,
         to: ActorId,

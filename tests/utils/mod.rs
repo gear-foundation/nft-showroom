@@ -1,6 +1,6 @@
-use gstd::{CodeId, ActorId};
+use gstd::{ActorId, CodeId};
 use gtest::{Program, RunResult, System};
-use nft_marketplace_io::{NftMarketplaceAction, NftMarketplaceInit, Config};
+use nft_marketplace_io::{NftMarketplaceAction, NftMarketplaceInit};
 
 mod common;
 pub mod prelude;
@@ -36,7 +36,7 @@ pub fn add_new_collection(marketplace: &Program, admin: u64, code_id: CodeId) ->
 pub fn create_collection(
     marketplace: &Program,
     user: u64,
-    id_collection: u128,
+    id_collection: u16,
     payload: Vec<u8>,
 ) -> RunResult {
     marketplace.send(
@@ -53,14 +53,14 @@ pub fn sale(
     user: u64,
     collection_address: ActorId,
     token_id: u64,
-    price: u128
+    price: u128,
 ) -> RunResult {
     marketplace.send(
         user,
         NftMarketplaceAction::SaleNft {
             collection_address,
             token_id,
-            price
+            price,
         },
     )
 }
@@ -70,7 +70,7 @@ pub fn buy(
     user: u64,
     collection_address: ActorId,
     token_id: u64,
-    price: u128
+    price: u128,
 ) -> RunResult {
     marketplace.send_with_value(
         user,
@@ -78,21 +78,12 @@ pub fn buy(
             collection_address,
             token_id,
         },
-        price
+        price,
     )
 }
 
-pub fn add_admin(
-    marketplace: &Program,
-    admin: u64,
-    users: Vec<ActorId>,
-) -> RunResult {
-    marketplace.send(
-        admin,
-        NftMarketplaceAction::AddAdmin {
-            users
-        },
-    )
+pub fn add_admin(marketplace: &Program, admin: u64, users: Vec<ActorId>) -> RunResult {
+    marketplace.send(admin, NftMarketplaceAction::AddAdmins { users })
 }
 
 pub fn update_config(
@@ -105,36 +96,19 @@ pub fn update_config(
         admin,
         NftMarketplaceAction::UpdateConfig {
             gas_for_creation,
-            time_between_create_collections
-        }
+            time_between_create_collections,
+        },
     )
 }
 
-pub fn delete_collection(
-    marketplace: &Program,
-    admin: u64,
-    id_collection: u128,
-
-) -> RunResult {
+pub fn delete_collection(marketplace: &Program, admin: u64, id_collection: u16) -> RunResult {
     marketplace.send(
         admin,
-        NftMarketplaceAction::DeleteCollection { 
-            id_collection
-        }
+        NftMarketplaceAction::DeleteCollection { id_collection },
     )
 }
-pub fn delete_admin(
-    marketplace: &Program,
-    admin: u64,
-    user: ActorId,
-
-) -> RunResult {
-    marketplace.send(
-        admin,
-        NftMarketplaceAction::DeleteAdmin {
-            user
-        } 
-    )
+pub fn delete_admin(marketplace: &Program, admin: u64, user: ActorId) -> RunResult {
+    marketplace.send(admin, NftMarketplaceAction::DeleteAdmin { user })
 }
 
 // pub fn get_state(

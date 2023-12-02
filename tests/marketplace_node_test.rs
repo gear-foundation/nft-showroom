@@ -1,11 +1,13 @@
-use nft_marketplace_io::*;
 use gclient::{
     errors::{Gear, ModuleError},
     Error as GclientError, EventListener, EventProcessor, GearApi, Result,
 };
-use gstd::{prelude::*, ActorId};
-use nft_io::{Config, NftAction, NftInit, StateQuery as StateQueryNft, StateReply as StateReplyNft, NftState};
 use gear_core::ids::ProgramId;
+use gstd::{prelude::*, ActorId};
+use nft_io::{
+    Config, NftAction, NftInit, NftState, StateQuery as StateQueryNft, StateReply as StateReplyNft,
+};
+use nft_marketplace_io::*;
 
 const USERS: &[u64] = &[5, 6, 7, 8];
 
@@ -22,7 +24,8 @@ async fn create_test() -> Result<()> {
     let init_marketplace = NftMarketplaceInit {
         gas_for_creation: 200_000_000_000,
         time_between_create_collections: 3_600_000, // 1 hour in milliseconds
-    }.encode();
+    }
+    .encode();
 
     let path = "target/wasm32-unknown-unknown/debug/nft_marketplace.opt.wasm";
 
@@ -48,10 +51,9 @@ async fn create_test() -> Result<()> {
 
     assert!(listener.message_processed(message_id).await?.succeed());
 
-    let (nft_code_id, _) = api.upload_code_by_path(
-        "target/wasm32-unknown-unknown/debug/nft.opt.wasm",
-    )
-    .await?;
+    let (nft_code_id, _) = api
+        .upload_code_by_path("target/wasm32-unknown-unknown/debug/nft.opt.wasm")
+        .await?;
 
     let nft_code_id: [u8; 32] = nft_code_id.into();
 
@@ -71,12 +73,10 @@ async fn create_test() -> Result<()> {
 
     assert!(listener.message_processed(message_id).await?.succeed());
 
-    let img_links: Vec<(String, u32)> = (0..10)
-        .map(|i| (format!("Img-{}", i), 1 as u32))
-        .collect();
+    let img_links: Vec<(String, u32)> = (0..10).map(|i| (format!("Img-{}", i), 1 as u32)).collect();
 
     // Successful creation of a new collection
-    let init_nft_payload = NftInit{
+    let init_nft_payload = NftInit {
         owner: USERS[0].into(),
         config: Config {
             name: "User Collection".to_string(),
@@ -89,14 +89,21 @@ async fn create_test() -> Result<()> {
             sellable: true,
         },
         img_links,
-    }.encode();
+    }
+    .encode();
 
     let create_collection_payload = NftMarketplaceAction::CreateCollection {
         id_collection: 1,
         payload: init_nft_payload,
     };
     let gas_info = api
-        .calculate_handle_gas(None, program_id, create_collection_payload.encode(), 0, true)
+        .calculate_handle_gas(
+            None,
+            program_id,
+            create_collection_payload.encode(),
+            0,
+            true,
+        )
         .await?;
 
     println!("GAS_INFO MIN LIMIT: {:?}", gas_info.min_limit.clone());
@@ -110,7 +117,6 @@ async fn create_test() -> Result<()> {
     let state = get_all_collection_state(&api, &program_id)
         .await
         .expect("Unexpected invalid state.");
-
 
     assert!(!state.is_empty(), "Collections shouldn't be empty");
     println!("Collections: {:?}", state);
@@ -162,7 +168,10 @@ pub async fn get_all_state_nft(api: &GearApi, program_id: &ProgramId) -> Option<
     }
 }
 
-pub async fn get_all_collection_state(api: &GearApi, program_id: &ProgramId) -> Option<Vec<(ActorId, Vec<ActorId>)>> {
+pub async fn get_all_collection_state(
+    api: &GearApi,
+    program_id: &ProgramId,
+) -> Option<Vec<(ActorId, Vec<ActorId>)>> {
     let reply = api
         .read_state(*program_id, StateQuery::AllCollections.encode())
         .await

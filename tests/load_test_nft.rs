@@ -1,11 +1,10 @@
-use gclient::{ EventProcessor, GearApi, Result, WSAddress};
-use gstd::{Encode, ActorId};
+use gclient::{EventProcessor, GearApi, Result, WSAddress};
 use gear_core::ids::ProgramId;
-use nft_io::{Config, NftInit, NftAction};
+use gstd::{ActorId, Encode};
+use nft_io::{Config, NftAction, NftInit};
 use std::fs::read_to_string;
 
 const USERS: &[u64] = &[5, 6, 7, 8];
-
 
 pub trait ApiUtils {
     fn get_actor_id(&self) -> ActorId;
@@ -103,7 +102,6 @@ async fn transfer_balances_to_account(accounts: &[String], nonce: u32) -> Result
     Ok(())
 }
 
-
 #[tokio::test]
 #[ignore]
 async fn load_testing_nft() -> Result<()> {
@@ -119,7 +117,7 @@ async fn load_testing_nft() -> Result<()> {
         .map(|i| (format!("Img-{}", i), 1 as u32))
         .collect();
 
-    let init_nft_payload = NftInit{
+    let init_nft_payload = NftInit {
         owner: USERS[0].into(),
         config: Config {
             name: "User Collection".to_string(),
@@ -132,8 +130,8 @@ async fn load_testing_nft() -> Result<()> {
             sellable: true,
         },
         img_links,
-    }.encode();
-
+    }
+    .encode();
 
     //println!("!!!!!! {:?}", init_nft_payload);
 
@@ -164,7 +162,6 @@ async fn load_testing_nft() -> Result<()> {
     println!("!!!!!!");
     assert!(listener.message_processed(message_id).await?.succeed());
     assert!(listener.blocks_running().await?);
-
 
     let users = read_lines("tests/accounts_50k.txt");
     let n = 350;
@@ -202,7 +199,6 @@ async fn load_testing_nft() -> Result<()> {
     }
 
     Ok(())
-
 }
 
 async fn mint_from_account(program_id: ProgramId, accounts: &[String]) -> Result<()> {
@@ -246,4 +242,3 @@ async fn mint_from_account(program_id: ProgramId, accounts: &[String]) -> Result
 
     Ok(())
 }
-
