@@ -52,6 +52,7 @@ pub enum NftAction {
         to: ActorId,
         token_id: NftId,
     },
+    IsSellable,
     Mint,
     Approve {
         to: ActorId,
@@ -91,6 +92,7 @@ pub enum NftEvent {
         token_id: NftId,
         approved: bool,
     },
+    IsSellable(bool),
     Initialized,
     AdminAdded,
     Minted {
@@ -141,7 +143,6 @@ pub struct Nft {
     pub description: String,
     pub media_url: String,
     pub attrib_url: String,
-    // pub sell: Option<price>
 }
 
 #[derive(Encode, Decode, TypeInfo)]

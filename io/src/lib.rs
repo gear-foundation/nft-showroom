@@ -160,6 +160,7 @@ pub enum NftAction {
         to: ActorId,
         token_id: u64,
     },
+    IsSellable,
 }
 
 #[derive(Debug, Clone, Encode, Decode, TypeInfo)]
@@ -178,6 +179,7 @@ pub enum NftEvent {
         token_id: u64,
         approved: bool,
     },
+    IsSellable(bool),
 }
 
 #[derive(Debug, Clone, Encode, Decode, TypeInfo)]

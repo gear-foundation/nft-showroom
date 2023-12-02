@@ -209,7 +209,9 @@ impl NftContract {
             "NonFungibleToken: token does not exist".to_owned(),
         ))
     }
-
+    fn is_sellable(&self) -> Result<NftEvent, NftError> {
+        Ok(NftEvent::IsSellable(self.config.sellable))
+    }
     fn expand(&mut self, additional_links: Vec<(String, u32)>) -> Result<NftEvent, NftError> {
         self.check_admin()?;
 
@@ -413,6 +415,7 @@ extern "C" fn handle() {
         NftAction::ChangeConfig { config } => nft_contract.change_config(config),
         NftAction::IsApproved { to, token_id } => nft_contract.is_approved_to(&to, token_id),
         NftAction::Owner { token_id } => nft_contract.owner(token_id),
+        NftAction::IsSellable => nft_contract.is_sellable(),
     };
 
     msg::reply(result, 0).expect("Failed to encode or reply with `Result<NftEvent, NftError>`.");

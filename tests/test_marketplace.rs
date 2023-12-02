@@ -278,6 +278,8 @@ fn sale_success() {
     assert!(!res.main_failed());
 
     let res = sale(&marketplace, USERS[1], address_nft, 0, 11_000_000_000_000);
+    let result = &res.decoded_log::<Result<NftMarketplaceEvent, NftMarketplaceError>>()[0];
+    println!("RES: {:?}", result);
     assert!(!res.main_failed());
 
     let state_reply = marketplace

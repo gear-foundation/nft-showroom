@@ -190,11 +190,29 @@ impl NftMarketplace {
             ));
         }
 
-        // first we should check owner
+        // check sellable
+        let sellable_payload = NftAction::IsSellable;
+        let reply = msg::send_for_reply_as::<NftAction, Result<NftEvent, NftError>>(
+            collection_address,
+            sellable_payload,
+            0,
+            0,
+        )
+        .expect("Error during Collection program initialization")
+        .await
+        .expect("Program was not initialized");
+
+        if let NftEvent::IsSellable(sellable) = self.check_reply(reply)? {
+            if sellable == false {
+                return Err(NftMarketplaceError::Error("Nft is not sellable".to_owned()));
+            }
+        } else {
+            panic!("Wrong received reply");
+        }
+
+        // check owner
         let msg_src = msg::source();
-        let owner_payload = NftAction::Owner {
-            token_id,
-        };
+        let owner_payload = NftAction::Owner { token_id };
         let reply = msg::send_for_reply_as::<NftAction, Result<NftEvent, NftError>>(
             collection_address,
             owner_payload,
@@ -215,7 +233,7 @@ impl NftMarketplace {
             panic!("Wrong received reply");
         }
 
-        // second we should check that user give approve to marketplace
+        // check that user give approve to marketplace
         let address_marketplace = exec::program_id();
         let is_approved_payload = NftAction::IsApproved {
             to: address_marketplace,
@@ -265,10 +283,7 @@ impl NftMarketplace {
         {
             self.sale
                 .entry((collection_address, token_id))
-                .or_insert(NftInfoForSale {
-                    price,
-                    owner,
-                });
+                .or_insert(NftInfoForSale { price, owner });
         } else {
             panic!("Wrong received reply");
         }
@@ -356,10 +371,10 @@ impl NftMarketplace {
         time_between_create_collections: Option<u64>,
     ) -> Result<NftMarketplaceEvent, NftMarketplaceError> {
         self.check_admin()?;
-        if let Some(gas) = gas_for_creation{
+        if let Some(gas) = gas_for_creation {
             self.config.gas_for_creation = gas;
         }
-        if let Some(time) = time_between_create_collections{
+        if let Some(time) = time_between_create_collections {
             self.config.time_between_create_collections = time;
         }
 
