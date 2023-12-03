@@ -2,20 +2,20 @@
 
 use gstd::{
     collections::{HashMap, HashSet},
-    debug, exec, msg,
+    exec, msg,
     prelude::*,
     prog::ProgramGenerator,
     ActorId, CodeId,
 };
 use nft_marketplace_io::*;
-type Id = u128;
 
 #[derive(Default)]
 pub struct NftMarketplace {
     pub admins: Vec<ActorId>,
     pub owner_to_collection: HashMap<ActorId, HashSet<ActorId>>,
     pub time_creation: HashMap<ActorId, u64>,
-    pub collections: HashMap<Id, CollectionInfo>,
+    pub collections: HashMap<u16, CollectionInfo>,
+    pub sale: HashMap<(ActorId, u64), NftInfoForSale>,
     pub config: Config,
 }
 
@@ -48,44 +48,47 @@ async fn main() {
             .as_mut()
             .expect("`Collection Factory` is not initialized.")
     };
-    match action {
+    let result = match action {
         NftMarketplaceAction::AddNewCollection {
             code_id,
             meta_link,
             description,
-        } => {
-            nft_marketplace.add_new_collection(code_id, meta_link, description);
-        }
+        } => nft_marketplace.add_new_collection(code_id, meta_link, description),
         NftMarketplaceAction::CreateCollection {
             id_collection,
             payload,
         } => {
             nft_marketplace
                 .create_collection(id_collection, payload)
-                .await;
+                .await
         }
-        NftMarketplaceAction::DeleteCollection {
-            id_collection,
+        NftMarketplaceAction::SaleNft {
+            collection_address,
+            token_id,
+            price,
         } => {
-            nft_marketplace.delete_collection(id_collection);
+            nft_marketplace
+                .sell(collection_address, token_id, price)
+                .await
         }
-        NftMarketplaceAction::AddAdmin {
-            users,
-        } => {
-            nft_marketplace.add_admin(users);
+        NftMarketplaceAction::BuyNft {
+            collection_address,
+            token_id,
+        } => nft_marketplace.buy(collection_address, token_id).await,
+        NftMarketplaceAction::DeleteCollection { id_collection } => {
+            nft_marketplace.delete_collection(id_collection)
         }
-        NftMarketplaceAction::DeleteAdmin {
-            user,
-        } => {
-            nft_marketplace.delete_admin(user);
-        }
+        NftMarketplaceAction::AddAdmins { users } => nft_marketplace.add_admins(users),
+        NftMarketplaceAction::DeleteAdmin { user } => nft_marketplace.delete_admin(user),
         NftMarketplaceAction::UpdateConfig {
             gas_for_creation,
-            time_between_create_collections
-        } => {
-            nft_marketplace.update_config(gas_for_creation, time_between_create_collections);
-        }
-    }
+            time_between_create_collections,
+        } => nft_marketplace.update_config(gas_for_creation, time_between_create_collections),
+    };
+
+    msg::reply(result, 0).expect(
+        "Failed to encode or reply with `Result<NftMarketplaceEvent, NftMarketplaceError>`.",
+    );
 }
 
 impl NftMarketplace {
@@ -94,45 +97,55 @@ impl NftMarketplace {
         code_id: CodeId,
         meta_link: String,
         description: String,
-    ) {
-        let msg_src = msg::source();
-        if !self.admins.contains(&msg_src) {
-            panic!("You are not an admin");
-        }
-        let max_key = *self.collections.keys().max().unwrap_or(&0);
+    ) -> Result<NftMarketplaceEvent, NftMarketplaceError> {
+        self.check_admin()?;
 
+        let max_key = *self.collections.keys().max().unwrap_or(&0);
 
         let collection_info = CollectionInfo {
             code_id,
-            collection_id: max_key + 1,
             meta_link,
             description,
         };
-        self.collections.insert(max_key + 1, collection_info.clone());
+        self.collections
+            .insert(max_key + 1, collection_info.clone());
 
-        msg::reply(
-            NftMarketplaceEvent::NewCollectionAdded { collection_info },
-            0,
-        )
-        .expect("Error during a reply `NftMarketplaceEvent::NewCollectionAdded`");
+        Ok(NftMarketplaceEvent::NewCollectionAdded { collection_info })
     }
-    pub async fn create_collection(&mut self, id_collection: u128, payload: Vec<u8>) {
-        let msg_src = msg::source();
-        debug!("Create collection");
 
+    fn check_time_creation(&self) -> Result<(), NftMarketplaceError> {
+        let msg_src = msg::source();
         if let Some(time) = self.time_creation.get(&msg_src) {
             if exec::block_timestamp() - time < self.config.time_between_create_collections
                 && !self.admins.contains(&msg_src)
             {
-                panic!("You can only create one collection per hour");
+                return Err(NftMarketplaceError::Error(
+                    "The time limit for creating a collection has not yet expired.".to_owned(),
+                ));
             }
+        }
+        Ok(())
+    }
+
+    pub async fn create_collection(
+        &mut self,
+        id_collection: u16,
+        payload: Vec<u8>,
+    ) -> Result<NftMarketplaceEvent, NftMarketplaceError> {
+        let msg_src = msg::source();
+        self.check_time_creation()?;
+
+        if !self.collections.contains_key(&id_collection) {
+            return Err(NftMarketplaceError::Error(
+                "There is no collection with this id_collection yet.".to_owned(),
+            ));
         }
 
         let collection_info = self
             .collections
             .get(&id_collection)
             .expect("Unable to get Nft collection info");
-        debug!("CODE ID {:?}", collection_info.code_id);
+
         let (address, _) = ProgramGenerator::create_program_bytes_with_gas_for_reply(
             collection_info.code_id,
             payload,
@@ -143,8 +156,6 @@ impl NftMarketplace {
         .expect("Error during Collection program initialization")
         .await
         .expect("Program was not initialized");
-
-        debug!("Create collection");
 
         self.owner_to_collection
             .entry(msg_src)
@@ -158,60 +169,258 @@ impl NftMarketplace {
                 collections
             });
 
-        self.time_creation.entry(msg_src).insert(exec::block_timestamp());
+        self.time_creation
+            .entry(msg_src)
+            .insert(exec::block_timestamp());
 
-        msg::reply(
-            NftMarketplaceEvent::CollectionCreated {
-                collection_address: address,
-            },
+        Ok(NftMarketplaceEvent::CollectionCreated {
+            collection_address: address,
+        })
+    }
+    pub async fn sell(
+        &mut self,
+        collection_address: ActorId,
+        token_id: u64,
+        price: u128,
+    ) -> Result<NftMarketplaceEvent, NftMarketplaceError> {
+        // check that this nft is not sale at this moment
+        if self.sale.contains_key(&(collection_address, token_id)) {
+            return Err(NftMarketplaceError::Error(
+                "This nft is already on sale.".to_owned(),
+            ));
+        }
+
+        // check sellable
+        let sellable_payload = NftAction::IsSellable;
+        let reply = msg::send_for_reply_as::<NftAction, Result<NftEvent, NftError>>(
+            collection_address,
+            sellable_payload,
+            0,
             0,
         )
-        .expect("Error during a reply `NftMarketplaceEvent::CollectionCreated`");
+        .expect("Error during Collection program initialization")
+        .await
+        .expect("Program was not initialized");
+
+        if let NftEvent::IsSellable(sellable) = self.check_reply(reply)? {
+            if sellable == false {
+                return Err(NftMarketplaceError::Error("Nft is not sellable".to_owned()));
+            }
+        } else {
+            panic!("Wrong received reply");
+        }
+
+        // check owner
+        let msg_src = msg::source();
+        let owner_payload = NftAction::Owner { token_id };
+        let reply = msg::send_for_reply_as::<NftAction, Result<NftEvent, NftError>>(
+            collection_address,
+            owner_payload,
+            0,
+            0,
+        )
+        .expect("Error during Collection program initialization")
+        .await
+        .expect("Program was not initialized");
+
+        if let NftEvent::Owner { owner, .. } = self.check_reply(reply)? {
+            if owner != msg::source() {
+                return Err(NftMarketplaceError::Error(
+                    "Only the owner can put his NFT up for sale.".to_owned(),
+                ));
+            }
+        } else {
+            panic!("Wrong received reply");
+        }
+
+        // check that user give approve to marketplace
+        let address_marketplace = exec::program_id();
+        let is_approved_payload = NftAction::IsApproved {
+            to: address_marketplace,
+            token_id,
+        };
+        let reply = msg::send_for_reply_as::<NftAction, Result<NftEvent, NftError>>(
+            collection_address,
+            is_approved_payload,
+            0,
+            0,
+        )
+        .expect("Error during Collection program initialization")
+        .await
+        .expect("Program was not initialized");
+
+        if let NftEvent::IsApproved { approved, .. } = self.check_reply(reply)? {
+            if !approved {
+                return Err(NftMarketplaceError::Error(
+                    "No approve to the marketplace".to_owned(),
+                ));
+            }
+        } else {
+            panic!("Wrong received reply");
+        }
+
+        // transfer nft to marketplace
+        let transfer_payload = NftAction::TransferFrom {
+            from: msg_src,
+            to: address_marketplace,
+            token_id,
+        };
+        let reply = msg::send_for_reply_as::<NftAction, Result<NftEvent, NftError>>(
+            collection_address,
+            transfer_payload,
+            0,
+            0,
+        )
+        .expect("Error during Collection program initialization")
+        .await
+        .expect("Program was problem with transfer");
+
+        if let NftEvent::Transferred {
+            owner,
+            recipient: _,
+            token_id,
+        } = self.check_reply(reply)?
+        {
+            self.sale
+                .entry((collection_address, token_id))
+                .or_insert(NftInfoForSale { price, owner });
+        } else {
+            panic!("Wrong received reply");
+        }
+
+        Ok(NftMarketplaceEvent::SaleNft {
+            collection_address,
+            token_id,
+            price,
+            owner: msg_src,
+        })
     }
+    pub async fn buy(
+        &mut self,
+        collection_address: ActorId,
+        token_id: u64,
+    ) -> Result<NftMarketplaceEvent, NftMarketplaceError> {
+        let buyer = msg::source();
+        self.check_sale(collection_address, token_id)?;
+
+        // transfer nft to new owner
+        let transfer_payload = NftAction::Transfer {
+            to: buyer,
+            token_id,
+        };
+        let reply = msg::send_for_reply_as::<NftAction, Result<NftEvent, NftError>>(
+            collection_address,
+            transfer_payload,
+            0,
+            0,
+        )
+        .expect("Error during Collection program initialization")
+        .await
+        .expect("Program was problem with transfer");
+
+        self.check_reply(reply)?;
+
+        let nft = self
+            .sale
+            .get(&(collection_address, token_id))
+            .expect("Can't be None")
+            .clone();
+        msg::send_with_gas(nft.owner, "", 0, nft.price).expect("Error in sending value");
+        self.sale
+            .remove(&(collection_address, token_id))
+            .expect("Can't be None");
+        Ok(NftMarketplaceEvent::NftSold {
+            previous_owner: nft.owner,
+            current_owner: buyer,
+            token_id,
+            price: nft.price,
+        })
+    }
+
     pub fn delete_collection(
         &mut self,
-        id_collection: u128,
-    ){
-        let msg_src = msg::source();
-        if !self.admins.contains(&msg_src) {
-            panic!("You are not an admin");
-        }
+        id_collection: u16,
+    ) -> Result<NftMarketplaceEvent, NftMarketplaceError> {
+        self.check_admin()?;
         if self.collections.remove(&id_collection).is_none() {
-            panic!("There is no collection with this id");
+            return Err(NftMarketplaceError::Error(
+                "There is no collection with this id".to_owned(),
+            ));
         }
-    
+        Ok(NftMarketplaceEvent::CollectionDeleted { id_collection })
     }
-    pub fn add_admin(
+    pub fn add_admins(
         &mut self,
-        users: Vec<ActorId>
-    ){
-        let msg_src = msg::source();
-        if !self.admins.contains(&msg_src) {
-            panic!("You are not an admin");
-        }
-        self.admins.extend(users);
+        users: Vec<ActorId>,
+    ) -> Result<NftMarketplaceEvent, NftMarketplaceError> {
+        self.check_admin()?;
+        self.admins.extend(users.clone());
+        Ok(NftMarketplaceEvent::AdminsAdded { users })
     }
     pub fn delete_admin(
         &mut self,
-        users: ActorId,
-    ){
-        let msg_src = msg::source();
-        if !self.admins.contains(&msg_src) {
-            panic!("You are not an admin");
-        }
-        self.admins.retain(|&admin| admin != users);
+        user: ActorId,
+    ) -> Result<NftMarketplaceEvent, NftMarketplaceError> {
+        self.check_admin()?;
+        self.admins.retain(|&admin| admin != user);
+        Ok(NftMarketplaceEvent::AdminDeleted { user })
     }
     pub fn update_config(
         &mut self,
         gas_for_creation: Option<u64>,
-        time_between_create_collections: Option<u64>
-    ){
-        let msg_src = msg::source();
-        if !self.admins.contains(&msg_src) {
-            panic!("You are not an admin");
+        time_between_create_collections: Option<u64>,
+    ) -> Result<NftMarketplaceEvent, NftMarketplaceError> {
+        self.check_admin()?;
+        if let Some(gas) = gas_for_creation {
+            self.config.gas_for_creation = gas;
         }
-        gas_for_creation.map(|gas| self.config.gas_for_creation = gas);
-        time_between_create_collections.map(|time| self.config.time_between_create_collections = time);
+        if let Some(time) = time_between_create_collections {
+            self.config.time_between_create_collections = time;
+        }
+
+        Ok(NftMarketplaceEvent::ConfigUpdated {
+            gas_for_creation,
+            time_between_create_collections,
+        })
+    }
+    fn check_admin(&self) -> Result<(), NftMarketplaceError> {
+        if !self.admins.contains(&msg::source()) {
+            return Err(NftMarketplaceError::Error(
+                "Only admin can send this message".to_owned(),
+            ));
+        }
+        Ok(())
+    }
+    fn check_sale(
+        &self,
+        collection_address: ActorId,
+        token_id: u64,
+    ) -> Result<(), NftMarketplaceError> {
+        let payment = msg::value();
+        let nft = self.sale.get(&(collection_address, token_id));
+        if let Some(nft) = nft {
+            if payment < nft.price {
+                return Err(NftMarketplaceError::Error(
+                    "Less than the agreed price.".to_owned(),
+                ));
+            }
+        } else {
+            return Err(NftMarketplaceError::Error(
+                "Wrong collection_address or token_id.".to_owned(),
+            ));
+        }
+        Ok(())
+    }
+    fn check_reply(
+        &self,
+        reply: Result<NftEvent, NftError>,
+    ) -> Result<NftEvent, NftMarketplaceError> {
+        match reply {
+            Ok(result) => Ok(result),
+            Err(NftError::Error(error_string)) => {
+                Err(NftMarketplaceError::Error(error_string.clone()))
+            }
+        }
     }
 }
 
@@ -224,6 +433,11 @@ extern "C" fn state() {
     };
     let query: StateQuery = msg::load().expect("Unable to load the state query");
     match query {
+        StateQuery::All => {
+            msg::reply(StateReply::All(nft_marketplace.into()), 0)
+                .expect("Unable to share the state");
+        }
+
         StateQuery::Admins => {
             msg::reply(StateReply::Admins(nft_marketplace.admins), 0)
                 .expect("Unable to share the state");
@@ -260,6 +474,45 @@ extern "C" fn state() {
                 .collect();
             msg::reply(StateReply::AllCollections(owner_to_collection), 0)
                 .expect("Unable to share the state");
+        }
+    }
+}
+
+impl From<NftMarketplace> for State {
+    fn from(value: NftMarketplace) -> Self {
+        let NftMarketplace {
+            admins,
+            owner_to_collection,
+            time_creation,
+            collections,
+            sale,
+            config,
+        } = value;
+
+        let owner_to_collection = owner_to_collection
+            .iter()
+            .map(|(owner, collections)| (*owner, collections.iter().cloned().collect()))
+            .collect();
+
+        let time_creation = time_creation
+            .iter()
+            .map(|(id, time)| (*id, *time))
+            .collect();
+
+        let collections = collections
+            .iter()
+            .map(|(id, collection_info)| (*id, collection_info.clone()))
+            .collect();
+
+        let sale = sale.iter().map(|(id, info)| (*id, info.clone())).collect();
+
+        Self {
+            admins,
+            owner_to_collection,
+            time_creation,
+            collections,
+            sale,
+            config,
         }
     }
 }

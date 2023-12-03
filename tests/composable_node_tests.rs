@@ -1,6 +1,6 @@
-use gclient::{ EventProcessor, GearApi, Result};
+use composable_nft_io::{ComposableNftInit, Config as ComposableConfig};
+use gclient::{EventProcessor, GearApi, Result};
 use gstd::Encode;
-use composable_nft_io::{Config as ComposableConfig, ComposableNftInit};
 
 #[tokio::test]
 #[ignore]
@@ -15,27 +15,26 @@ async fn create_test() -> Result<()> {
     let mut img_links: Vec<Vec<String>> = Vec::with_capacity(4);
 
     for k in 0..10 {
-        let inner_vec: Vec<String> = (0..10)
-            .map(|i| format!("Value{}-{}", k, i))
-            .collect();
+        let inner_vec: Vec<String> = (0..10).map(|i| format!("Value{}-{}", k, i)).collect();
 
-            img_links.push(inner_vec);
+        img_links.push(inner_vec);
     }
 
-    let init_nft_payload = ComposableNftInit{
+    let init_nft_payload = ComposableNftInit {
         owner: 100.into(),
         config: ComposableConfig {
             name: "User Collection".to_string(),
             description: "User Collection".to_string(),
             collection_img: "Collection image".to_string(),
-            tokens_limit:  Some(500),
+            tokens_limit: Some(500),
             mint_limit: 3.into(),
             transferable: true,
             approvable: true,
             burnable: true,
         },
         img_links,
-    }.encode();
+    }
+    .encode();
 
     println!("!!!!!!");
 
@@ -68,5 +67,4 @@ async fn create_test() -> Result<()> {
     assert!(listener.blocks_running().await?);
 
     Ok(())
-
 }

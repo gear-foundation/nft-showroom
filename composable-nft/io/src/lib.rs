@@ -3,7 +3,7 @@
 use gmeta::{In, InOut, Metadata};
 use gstd::{prelude::*, ActorId};
 
-pub type NftId = u128;
+pub type NftId = u64;
 
 pub struct ContractMetadata;
 
@@ -28,27 +28,38 @@ pub struct Config {
     pub name: String,
     pub description: String,
     pub collection_img: String,
-    pub tokens_limit: Option<u128>,
-    pub mint_limit: Option<u128>,
+    pub tokens_limit: Option<u64>,
+    pub mint_limit: Option<u32>,
     pub transferable: bool,
     pub approvable: bool,
     pub burnable: bool,
+    pub sellable: bool,
 }
 
 #[derive(Debug, Clone, Encode, Decode, TypeInfo)]
 pub enum ComposableNftAction {
-    AddAdmin {
-        new_admin: ActorId,
+    Transfer {
+        to: ActorId,
+        token_id: NftId,
     },
-    Mint {combination: Vec<u8>},
     TransferFrom {
         from: ActorId,
         to: ActorId,
         token_id: NftId,
     },
-    Transfer {
+    Owner {
+        token_id: NftId,
+    },
+    IsApproved {
         to: ActorId,
         token_id: NftId,
+    },
+    IsSellable,
+    AddAdmin {
+        new_admin: ActorId,
+    },
+    Mint {
+        combination: Vec<u8>,
     },
     Approve {
         to: ActorId,
@@ -61,12 +72,27 @@ pub enum ComposableNftAction {
         token_id: NftId,
     },
     ChangeConfig {
-        tokens_limit: Option<u128>,
+        tokens_limit: Option<u64>,
     },
 }
 
 #[derive(Debug, Clone, Encode, Decode, TypeInfo)]
 pub enum ComposableNftEvent {
+    Transferred {
+        owner: ActorId,
+        recipient: ActorId,
+        token_id: NftId,
+    },
+    Owner {
+        owner: ActorId,
+        token_id: NftId,
+    },
+    IsApproved {
+        to: ActorId,
+        token_id: NftId,
+        approved: bool,
+    },
+    IsSellable(bool),
     Initialized,
     AdminAdded,
     Minted {
@@ -74,11 +100,6 @@ pub enum ComposableNftEvent {
         token_id: NftId,
         media_url: Vec<String>,
         attrib_url: String,
-    },
-    Transferred {
-        owner: ActorId,
-        recipient: ActorId,
-        token_id: NftId,
     },
     Burnt {
         token_id: NftId,
@@ -91,6 +112,9 @@ pub enum ComposableNftEvent {
         token_id: NftId,
     },
     ConfigChanged,
+}
+#[derive(Debug, Clone, Encode, Decode, TypeInfo)]
+pub enum ComposableNftError {
     Error(String),
 }
 
@@ -98,13 +122,13 @@ pub enum ComposableNftEvent {
 pub struct ComposableNftState {
     pub tokens: Vec<(NftId, Nft)>,
     pub owners: Vec<(ActorId, Vec<NftId>)>,
-    pub approvals: Vec<(NftId, ActorId)>,
+    pub token_approvals: Vec<(NftId, ActorId)>,
     pub config: Config,
     pub nonce: NftId,
     pub img_links: Vec<Vec<String>>,
     pub admins: Vec<ActorId>,
-    pub restriction_mint: Vec<(ActorId, u128)>,
-    pub number_combination: u128,
+    pub restriction_mint: Vec<(ActorId, u32)>,
+    pub number_combination: u64,
 }
 
 #[derive(Debug, Clone, Encode, Decode, TypeInfo)]
