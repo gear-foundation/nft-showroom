@@ -154,7 +154,7 @@ fn successful_basics() {
     if let StateReplyNft::All(state) = state_reply {
         let (token_id, approval) = state.token_approvals.get(0).expect("Can't be None");
         assert_eq!(*token_id, 0, "Wrong owner");
-        assert_eq!(*approval, vec![USERS[1].into()], "Wrong token id");
+        assert_eq!(*approval, USERS[1].into(), "Wrong token id");
     }
     // Check approve (USERS[1] -Transfer-> USERS[3])
     let res = nft_collection.send(

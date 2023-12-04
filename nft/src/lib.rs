@@ -14,7 +14,7 @@ struct NftContract {
     pub tokens: HashMap<NftId, Nft>,
     pub owners: HashMap<ActorId, HashSet<NftId>>,
     pub restriction_mint: HashMap<ActorId, u32>, // made in order to track the number of mint nft
-    pub token_approvals: HashMap<NftId, HashSet<ActorId>>,
+    pub token_approvals: HashMap<NftId, ActorId>,
     pub config: Config,
     pub nonce: NftId,
     pub img_links: Vec<(String, u32)>,
@@ -133,12 +133,7 @@ impl NftContract {
     }
     fn approve(&mut self, to: &ActorId, token_id: NftId) -> Result<NftEvent, NftError> {
         self.can_approve(&token_id)?;
-        self.token_approvals
-            .entry(token_id)
-            .and_modify(|approvals| {
-                approvals.insert(*to);
-            })
-            .or_insert_with(|| HashSet::from([*to]));
+        self.token_approvals.insert(token_id, *to);
 
         Ok(NftEvent::Approved {
             account: *to,
@@ -146,16 +141,10 @@ impl NftContract {
         })
     }
 
-    fn revoke_approve(&mut self, to: &ActorId, token_id: NftId) -> Result<NftEvent, NftError> {
+    fn revoke_approve(&mut self, token_id: NftId) -> Result<NftEvent, NftError> {
         self.can_approve(&token_id)?;
-        if let Some(approvals) = self.token_approvals.get_mut(&token_id) {
-            if approvals.remove(to) {
-                return Err(NftError::Error("This user has no approvals".to_owned()));
-            }
-            if approvals.is_empty() {
-                self.token_approvals.remove(&token_id);
-            }
-        } else {
+        let res = self.token_approvals.remove(&token_id);
+        if res.is_none(){
             return Err(NftError::Error(
                 "No approve has been issued to this token".to_owned(),
             ));
@@ -184,8 +173,8 @@ impl NftContract {
 
     fn is_approved_to(&self, to: &ActorId, token_id: NftId) -> Result<NftEvent, NftError> {
         let approval = self.token_approvals.get(&token_id);
-        if let Some(approve) = approval {
-            let is_approved = approve.contains(to);
+        if let Some(approve_acc) = approval {
+            let is_approved = approve_acc == to;
             Ok(NftEvent::IsApproved {
                 to: *to,
                 token_id,
@@ -275,6 +264,11 @@ impl NftContract {
         if !self.config.approvable {
             return Err(NftError::Error("Nft is not approvable.".to_owned()));
         }
+        if self.token_approvals.contains_key(token_id) {
+            return Err(NftError::Error(
+                "Approve has already been issued".to_owned(),
+            ));
+        }
         if let Some(nft_info) = self.tokens.get(token_id) {
             if nft_info.owner != msg::source() {
                 return Err(NftError::Error(
@@ -291,7 +285,7 @@ impl NftContract {
     }
     fn check_approve(&self, user: &ActorId, token_id: &NftId) -> Result<(), NftError> {
         if let Some(approved_account) = self.token_approvals.get(token_id) {
-            if !approved_account.contains(user) {
+            if approved_account != user {
                 return Err(NftError::Error(
                     "Caller is not approved to perform transfer.".to_owned(),
                 ));
@@ -409,7 +403,7 @@ extern "C" fn handle() {
         }
         NftAction::Transfer { to, token_id } => nft_contract.transfer_from(&user, &to, token_id),
         NftAction::Approve { to, token_id } => nft_contract.approve(&to, token_id),
-        NftAction::RevokeApproval { to, token_id } => nft_contract.revoke_approve(&to, token_id),
+        NftAction::RevokeApproval { token_id } => nft_contract.revoke_approve(token_id),
         NftAction::Burn { token_id } => nft_contract.burn(token_id),
         NftAction::Expand { additional_links } => nft_contract.expand(additional_links),
         NftAction::ChangeConfig { config } => nft_contract.change_config(config),
@@ -470,7 +464,7 @@ impl From<NftContract> for NftState {
             .collect();
         let token_approvals = token_approvals
             .iter()
-            .map(|(nft_id, actor_set)| (*nft_id, actor_set.iter().copied().collect()))
+            .map(|(nft_id, actor_id)| (*nft_id, *actor_id))
             .collect();
 
         Self {

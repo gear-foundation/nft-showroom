@@ -131,7 +131,7 @@ async fn create_test() -> Result<()> {
         .await
         .expect("Unexpected invalid state.");
 
-    assert_eq!(state.admins[1], USERS[0].into(), "Wrong Admin");
+    assert_eq!(state.admins[0], USERS[0].into(), "Wrong Admin");
     println!("NFT Collection STATE: {:?}", state);
 
     let gas_info = api

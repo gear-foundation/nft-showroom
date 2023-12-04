@@ -59,7 +59,6 @@ pub enum NftAction {
         token_id: NftId,
     },
     RevokeApproval {
-        to: ActorId,
         token_id: NftId,
     },
     Burn {
@@ -129,7 +128,7 @@ pub enum NftError {
 pub struct NftState {
     pub tokens: Vec<(NftId, Nft)>,
     pub owners: Vec<(ActorId, Vec<NftId>)>,
-    pub token_approvals: Vec<(NftId, Vec<ActorId>)>,
+    pub token_approvals: Vec<(NftId, ActorId)>,
     pub config: Config,
     pub nonce: NftId,
     pub img_links: Vec<(String, u32)>,

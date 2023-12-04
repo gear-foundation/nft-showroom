@@ -31,6 +31,7 @@ async fn create_test() -> Result<()> {
             transferable: true,
             approvable: true,
             burnable: true,
+            sellable:true,
         },
         img_links,
     }
