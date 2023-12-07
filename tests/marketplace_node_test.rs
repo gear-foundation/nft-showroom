@@ -60,7 +60,7 @@ async fn create_test() -> Result<()> {
     let add_collection_payload = NftMarketplaceAction::AddNewCollection {
         code_id: nft_code_id.into(),
         meta_link: String::from("My Meta"),
-        description: String::from("My Collection"),
+        type_description: String::from("My Collection"),
     };
 
     let gas_info = api
@@ -82,11 +82,13 @@ async fn create_test() -> Result<()> {
             name: "User Collection".to_string(),
             description: "User Collection".to_string(),
             collection_img: "Collection Image".to_string(),
-            mint_limit: 3.into(),
+            collection_tags: vec!["tag1".to_string()],
+            user_mint_limit: 3.into(),
             transferable: true,
             approvable: true,
             burnable: true,
             sellable: true,
+            attendable: true,
         },
         img_links,
     }
@@ -120,7 +122,7 @@ async fn create_test() -> Result<()> {
 
     assert!(!state.is_empty(), "Collections shouldn't be empty");
     println!("Collections: {:?}", state);
-    let address_nft = state[0].1[0];
+    let address_nft = state[0].0;
 
     let address_nft = address_nft.as_ref();
     //let address_nft = hex::decode(address_nft).unwrap();
@@ -171,7 +173,7 @@ pub async fn get_all_state_nft(api: &GearApi, program_id: &ProgramId) -> Option<
 pub async fn get_all_collection_state(
     api: &GearApi,
     program_id: &ProgramId,
-) -> Option<Vec<(ActorId, Vec<ActorId>)>> {
+) -> Option<Vec<(ActorId, ActorId)>> {
     let reply = api
         .read_state(*program_id, StateQuery::AllCollections.encode())
         .await

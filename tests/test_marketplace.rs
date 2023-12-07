@@ -92,11 +92,13 @@ fn create_success() {
             name: "User Collection".to_string(),
             description: "User Collection".to_string(),
             collection_img: "Collection image".to_string(),
-            mint_limit: 3.into(),
+            collection_tags: vec!["tag1".to_string()],
+            user_mint_limit: 3.into(),
             transferable: true,
             approvable: true,
             burnable: true,
             sellable: true,
+            attendable: true,
         },
         img_links,
     };
@@ -109,7 +111,7 @@ fn create_success() {
         .expect("Unexpected invalid state.");
     if let StateReply::AllCollections(state) = state_reply {
         assert!(!state.is_empty(), "Collections shouldn't be empty");
-        assert_eq!(state[0].0, USERS[0].into(), "Wrong owner of collection");
+        assert_eq!(state[0].1, USERS[0].into(), "Wrong owner of collection");
     }
     sys.spend_blocks(7200);
     let res = create_collection(&marketplace, USERS[0], 1, init_nft_payload.encode());
@@ -119,17 +121,26 @@ fn create_success() {
         .expect("Unexpected invalid state.");
     if let StateReply::AllCollections(state) = state_reply {
         assert!(!state.is_empty(), "Collections shouldn't be empty");
-        assert_eq!(state[0].1.len(), 2, "The number of collection is wrong");
+        assert_eq!(state.len(), 2, "The number of collection is wrong");
     }
 
-    // Delete type of collection
-    let res = delete_collection(&marketplace, ADMINS[0], 1);
+    // Delete collection
+    let state_reply = marketplace
+        .read_state(StateQuery::AllCollections)
+        .expect("Unexpected invalid state.");
+    let address_nft = if let StateReply::AllCollections(state) = state_reply {
+        state[0].0
+    } else {
+        assert!(false, "Unexpected StateReply variant");
+        0.into()
+    };
+    let res = delete_collection(&marketplace, ADMINS[0], address_nft);
     assert!(!res.main_failed());
     let state_reply = marketplace
-        .read_state(StateQuery::CollectionsInfo)
+        .read_state(StateQuery::AllCollections)
         .expect("Unexpected invalid state.");
-    if let StateReply::CollectionsInfo(state) = state_reply {
-        assert!(state.is_empty(), "Collection info should be empty");
+    if let StateReply::AllCollections(state) = state_reply {
+        assert_eq!(state.len(), 1, "The number of collection is wrong");
     }
 }
 
@@ -180,11 +191,13 @@ fn create_failures() {
             name: "User Collection".to_string(),
             description: "User Collection".to_string(),
             collection_img: "Collection image".to_string(),
-            mint_limit: 3.into(),
+            collection_tags: vec!["tag1".to_string()],
+            user_mint_limit: 3.into(),
             transferable: true,
             approvable: true,
             burnable: true,
             sellable: true,
+            attendable: true,
         },
         img_links,
     };
@@ -236,11 +249,13 @@ fn sale_success() {
             name: "User Collection".to_string(),
             description: "User Collection".to_string(),
             collection_img: "Collection image".to_string(),
-            mint_limit: 3.into(),
+            collection_tags: vec!["tag1".to_string()],
+            user_mint_limit: 3.into(),
             transferable: true,
             approvable: true,
             burnable: true,
             sellable: true,
+            attendable: true,
         },
         img_links,
     };
@@ -253,7 +268,7 @@ fn sale_success() {
     let address_nft = if let StateReply::AllCollections(state) = state_reply {
         assert!(!state.is_empty(), "Collections shouldn't be empty");
         assert_eq!(state[0].0, USERS[0].into(), "Wrong owner of collection");
-        state[0].1[0]
+        state[0].0
     } else {
         assert!(false, "Unexpected StateReply variant");
         0.into()

@@ -1,4 +1,4 @@
-use crate::utils::{add_new_collection, create_collection, init_marketplace, sale, buy};
+use crate::utils::{add_new_collection, buy, create_collection, init_marketplace, sale};
 use utils::prelude::*;
 mod utils;
 use composable_nft_io::{
@@ -55,7 +55,8 @@ fn successful_basics() {
             name: "User Collection".to_string(),
             description: "User Collection".to_string(),
             collection_img: "Collection image".to_string(),
-            mint_limit: 3.into(),
+            collection_tags: vec!["tag1".to_string()],
+            user_mint_limit: 3.into(),
             tokens_limit: Some(500),
             transferable: true,
             approvable: true,
@@ -72,7 +73,7 @@ fn successful_basics() {
     let address_nft = if let StateReply::AllCollections(state) = state_reply {
         assert!(!state.is_empty(), "Collections shouldn't be empty");
         println!("Collections: {:?}", state);
-        state[0].1[0]
+        state[0].0
     } else {
         assert!(false, "Unexpected StateReply variant");
         0.into()
@@ -111,9 +112,6 @@ fn successful_basics() {
         println!("TOKEN INFO: {:?}", state.tokens);
     }
 }
-
-
-
 
 #[test]
 fn composable_sale_success() {
@@ -162,7 +160,8 @@ fn composable_sale_success() {
             name: "User Collection".to_string(),
             description: "User Collection".to_string(),
             collection_img: "Collection image".to_string(),
-            mint_limit: 3.into(),
+            collection_tags: vec!["tag1".to_string()],
+            user_mint_limit: 3.into(),
             tokens_limit: Some(500),
             transferable: true,
             approvable: true,
@@ -179,7 +178,7 @@ fn composable_sale_success() {
     let address_nft = if let StateReply::AllCollections(state) = state_reply {
         assert!(!state.is_empty(), "Collections shouldn't be empty");
         println!("Collections: {:?}", state);
-        state[0].1[0]
+        state[0].0
     } else {
         assert!(false, "Unexpected StateReply variant");
         0.into()

@@ -122,12 +122,14 @@ async fn load_testing_nft() -> Result<()> {
         config: Config {
             name: "User Collection".to_string(),
             description: "User Collection".to_string(),
-            collection_img: "Collection image".to_string(),
-            mint_limit: 3.into(),
+            collection_img: "Collection Image".to_string(),
+            collection_tags: vec!["tag1".to_string()],
+            user_mint_limit: 3.into(),
             transferable: true,
             approvable: true,
             burnable: true,
             sellable: true,
+            attendable: true,
         },
         img_links,
     }

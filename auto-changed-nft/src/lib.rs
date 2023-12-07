@@ -1,12 +1,13 @@
 #![no_std]
+use auto_changed_nft_io::{
+    AutoNftAction, AutoNftError, AutoNftEvent, AutoNftInit, AutoNftState, Config, Nft, NftId,
+    StateQuery, StateReply,
+};
 use gstd::{
     collections::{HashMap, HashSet},
     debug, exec, msg,
     prelude::*,
     ActorId,
-};
-use nft_io::{
-    Config, Nft, NftAction, NftError, NftEvent, NftId, NftInit, NftState, StateQuery, StateReply,
 };
 
 #[derive(Debug)]
@@ -17,24 +18,25 @@ struct NftContract {
     pub token_approvals: HashMap<NftId, ActorId>,
     pub config: Config,
     pub nonce: NftId,
-    pub img_links: Vec<(String, u32)>,
+    pub img_links: Vec<(Vec<String>, u32)>,
+    // pub reservations: HashMap<NftId, ReservationId>,
     pub admins: Vec<ActorId>,
 }
 static mut NFT_CONTRACT: Option<NftContract> = None;
 
 impl NftContract {
-    fn add_admin(&mut self, new_admin: &ActorId) -> Result<NftEvent, NftError> {
+    fn add_admin(&mut self, new_admin: &ActorId) -> Result<AutoNftEvent, AutoNftError> {
         self.check_admin()?;
         self.admins.push(*new_admin);
-        Ok(NftEvent::AdminAdded)
+        Ok(AutoNftEvent::AdminAdded)
     }
-    fn mint(&mut self) -> Result<NftEvent, NftError> {
+    fn mint(&mut self) -> Result<AutoNftEvent, AutoNftError> {
         let msg_src = msg::source();
         self.check_tokens()?;
         self.check_mint_limit(&msg_src)?;
 
         let rand_index = get_random_value(self.img_links.len() as u64);
-        let mut img_link: Option<String> = None;
+        let mut img_link: Option<Vec<String>> = None;
 
         if let Some((link, number_copies)) = self.img_links.get_mut(rand_index as usize) {
             *number_copies -= 1;
@@ -43,8 +45,9 @@ impl NftContract {
                 self.img_links.remove(rand_index as usize);
             }
         }
+
         let Some(next_nft_nonce) = self.nonce.checked_add(1) else {
-            return Err(NftError("Math overflow.".to_owned()));
+            return Err(AutoNftError("Math overflow.".to_owned()));
         };
         let token_id = self.nonce;
         self.nonce = next_nft_nonce;
@@ -68,7 +71,7 @@ impl NftContract {
                 owner: msg_src,
                 name,
                 description: self.config.description.clone(),
-                media_url: img_link.clone().unwrap(),
+                media_url: (0, img_link.clone().unwrap()),
             },
         );
         self.restriction_mint
@@ -78,7 +81,44 @@ impl NftContract {
             })
             .or_insert(1);
 
-        Ok(NftEvent::Minted {
+        // let reservation_id = ReservationId::reserve(self.config.reservation_amount, self.config.reservation_duration)
+        //     .expect("reservation across executions");
+        // self.reservations.insert(token_id, reservation_id);
+
+        // msg::send_with_gas_delayed(
+        //     exec::program_id(),
+        //     AutoNftAction::Update {
+        //         token_id,
+        //     },
+        //     self.config.reservation_amount,
+        //     0,
+        //     self.config.time_for_change)
+        //     .expect("Error in sending a delayed message `AutoNftAction::Update`");
+
+        // let number_message = 892800 / self.config.time_for_change;
+        // for i in 1..=number_message{
+        //     msg::send_delayed(
+        //         exec::program_id(),
+        //         AutoNftAction::Update {
+        //             token_id,
+        //         },
+        //         0,
+        //         self.config.time_for_change*i)
+        //         .expect("Error in sending a delayed message `AutoNftAction::Update`");
+        // }
+
+        // msg::send_delayed_from_reservation(
+        //     reservation_id,
+        //     exec::program_id(),
+        //     AutoNftAction::Update {
+        //         token_id,
+        //     },
+        //     0,
+        //     self.config.time_for_change,
+        // )
+        // .expect("Error in sending a delayed message `AutoNftAction::Update`");
+
+        Ok(AutoNftEvent::Minted {
             owner: msg_src,
             token_id,
             media_url: img_link.unwrap(),
@@ -89,7 +129,7 @@ impl NftContract {
         from: &ActorId,
         to: &ActorId,
         token_id: NftId,
-    ) -> Result<NftEvent, NftError> {
+    ) -> Result<AutoNftEvent, AutoNftError> {
         self.can_transfer(from, to, &token_id)?;
 
         let nft = self
@@ -105,7 +145,9 @@ impl NftContract {
                 self.owners.remove(from);
             }
         } else {
-            return Err(NftError("Fatal: owner does not contain nft id.".to_owned()));
+            return Err(AutoNftError(
+                "Fatal: owner does not contain nft id.".to_owned(),
+            ));
         }
 
         self.owners
@@ -121,156 +163,235 @@ impl NftContract {
 
         self.token_approvals.remove(&token_id);
 
-        Ok(NftEvent::Transferred {
+        Ok(AutoNftEvent::Transferred {
             owner: *from,
             recipient: *to,
             token_id,
         })
     }
-    fn approve(&mut self, to: &ActorId, token_id: NftId) -> Result<NftEvent, NftError> {
+    fn approve(&mut self, to: &ActorId, token_id: NftId) -> Result<AutoNftEvent, AutoNftError> {
         self.can_approve(&token_id)?;
         self.token_approvals.insert(token_id, *to);
 
-        Ok(NftEvent::Approved { to: *to, token_id })
+        Ok(AutoNftEvent::Approved {
+            account: *to,
+            token_id,
+        })
     }
 
-    fn revoke_approve(&mut self, token_id: NftId) -> Result<NftEvent, NftError> {
+    fn revoke_approve(&mut self, token_id: NftId) -> Result<AutoNftEvent, AutoNftError> {
         self.can_approve(&token_id)?;
         let res = self.token_approvals.remove(&token_id);
         if res.is_none() {
-            return Err(NftError(
+            return Err(AutoNftError(
                 "No approve has been issued to this token".to_owned(),
             ));
         }
-        Ok(NftEvent::ApprovalRevoked { token_id })
+        Ok(AutoNftEvent::ApprovalRevoked { token_id })
     }
-    fn burn(&mut self, token_id: NftId) -> Result<NftEvent, NftError> {
+    fn burn(&mut self, token_id: NftId) -> Result<AutoNftEvent, AutoNftError> {
         self.can_burn(&token_id)?;
         let nft = self.tokens.remove(&token_id).expect("Can't be None");
         if let Some(tokens) = self.owners.get_mut(&nft.owner) {
             if tokens.remove(&token_id) {
-                return Err(NftError("Fatal: owner does not contain nft id.".to_owned()));
+                return Err(AutoNftError(
+                    "Fatal: owner does not contain nft id.".to_owned(),
+                ));
             }
         } else {
-            return Err(NftError("Fatal: owner does not contain list.".to_owned()));
+            return Err(AutoNftError(
+                "Fatal: owner does not contain list.".to_owned(),
+            ));
         }
 
         self.token_approvals.remove(&token_id);
 
-        Ok(NftEvent::Burnt { token_id })
+        Ok(AutoNftEvent::Burnt { token_id })
     }
 
-    fn get_token_info(&self, token_id: NftId) -> Result<NftEvent, NftError> {
+    fn get_token_info(&self, token_id: NftId) -> Result<AutoNftEvent, AutoNftError> {
         let nft = self.tokens.get(&token_id);
         let owner = if let Some(nft) = nft {
             nft.owner
         } else {
-            return Err(NftError(
+            return Err(AutoNftError(
                 "NonFungibleToken: token does not exist".to_owned(),
             ));
         };
         let approval = self.token_approvals.get(&token_id).copied();
 
-        Ok(NftEvent::TokenInfoReceived {
+        Ok(AutoNftEvent::TokenInfoReceived {
             owner,
             approval,
             sellable: self.config.sellable,
         })
     }
-    fn expand(&mut self, additional_links: Vec<(String, u32)>) -> Result<NftEvent, NftError> {
+    fn expand(
+        &mut self,
+        additional_links: Vec<(Vec<String>, u32)>,
+    ) -> Result<AutoNftEvent, AutoNftError> {
         self.check_admin()?;
         if !self.config.attendable {
-            return Err(NftError("Nft is not attendable.".to_owned()));
+            return Err(AutoNftError("Nft is not attendable.".to_owned()));
         }
         if additional_links.iter().any(|&(_, value)| value == 0) {
-            return Err(NftError("Limit of copies value is equal to 0".to_owned()));
+            return Err(AutoNftError(
+                "Limit of copies value is equal to 0".to_owned(),
+            ));
         }
 
         self.img_links.extend(additional_links.clone());
 
-        Ok(NftEvent::Expanded { additional_links })
+        Ok(AutoNftEvent::Expanded { additional_links })
     }
 
-    fn change_config(&mut self, config: Config) -> Result<NftEvent, NftError> {
+    fn change_config(&mut self, config: Config) -> Result<AutoNftEvent, AutoNftError> {
         self.check_admin()?;
 
         if !self.tokens.is_empty() {
-            return Err(NftError(
+            return Err(AutoNftError(
                 "The collection configuration can no more be changed".to_owned(),
             ));
         }
 
         if let Some(limit) = config.user_mint_limit {
             if limit == 0 {
-                return Err(NftError(
+                return Err(AutoNftError(
                     "The mint limit must be greater than zero".to_owned(),
                 ));
             }
         }
         self.config = config.clone();
-        Ok(NftEvent::ConfigChanged { config })
+        Ok(AutoNftEvent::ConfigChanged { config })
     }
 
-    fn can_delete(&self) -> Result<NftEvent, NftError> {
-        Ok(NftEvent::CanDelete(self.tokens.is_empty()))
+    fn update(&mut self, token_id: NftId) -> Result<AutoNftEvent, AutoNftError> {
+        assert!(
+            msg::source() == exec::program_id() || self.admins.contains(&msg::source()),
+            "Only program or admin can send this message"
+        );
+        let nft = self
+            .tokens
+            .get_mut(&token_id)
+            .expect("AutoNft: token does not exist");
+
+        nft.media_url.0 = (nft.media_url.0 + 1) % nft.media_url.1.len() as u32;
+        // let gas = exec::gas_available() - 1_000_000_000;
+        // msg::send_with_gas_delayed(
+        //     exec::program_id(),
+        //     AutoNftAction::Update {
+        //         token_id,
+        //     },
+        //     gas,
+        //     0,
+        //     self.config.time_for_change)
+        //     .expect("Error in sending a delayed message `AutoNftAction::Update`");
+
+        Ok(AutoNftEvent::Updated)
     }
 
-    fn check_admin(&self) -> Result<(), NftError> {
+    fn start_auto_changing(
+        &mut self,
+        token_id: NftId,
+        duration_sec: u32,
+        interval_sec: u32,
+    ) -> Result<AutoNftEvent, AutoNftError> {
+        let nft = self
+            .tokens
+            .get_mut(&token_id)
+            .expect("AutoNft: token does not exist");
+
+        if nft.owner != msg::source() {
+            return Err(AutoNftError(
+                "Only the owner can send this message".to_owned(),
+            ));
+        }
+
+        nft.media_url.0 = (nft.media_url.0 + 1) % nft.media_url.1.len() as u32;
+
+        // 892800 blocks per month
+        // 201600 blocks per 7 days
+        // 28800 blocks per day
+        // 1200 blocks per hour
+        let duration_block = duration_sec / 3;
+        let interval_block = interval_sec / 3;
+        let number_message = duration_block / interval_block;
+        for i in 1..=number_message {
+            msg::send_delayed(
+                exec::program_id(),
+                AutoNftAction::Update { token_id },
+                0,
+                interval_block * i,
+            )
+            .expect("Error in sending a delayed message `AutoNftAction::Update`");
+        }
+
+        Ok(AutoNftEvent::ChangeStarted { token_id })
+    }
+
+    fn check_admin(&self) -> Result<(), AutoNftError> {
         if !self.admins.contains(&msg::source()) {
-            return Err(NftError("Only admin can send this message".to_owned()));
+            return Err(AutoNftError("Only admin can send this message".to_owned()));
         }
         Ok(())
     }
 
-    fn check_tokens(&self) -> Result<(), NftError> {
+    fn check_tokens(&self) -> Result<(), AutoNftError> {
         if self.img_links.is_empty() {
-            return Err(NftError("All tokens are minted.".to_owned()));
+            return Err(AutoNftError("All tokens are minted.".to_owned()));
         }
         Ok(())
     }
-    fn check_mint_limit(&self, user: &ActorId) -> Result<(), NftError> {
+    fn check_mint_limit(&self, user: &ActorId) -> Result<(), AutoNftError> {
         if let Some(limit) = self.config.user_mint_limit {
             if let Some(number_tokens) = self.restriction_mint.get(user) {
                 if number_tokens >= &limit && !self.admins.contains(user) {
-                    return Err(NftError("You've exhausted your limit.".to_owned()));
+                    return Err(AutoNftError("You've exhausted your limit.".to_owned()));
                 }
             }
         }
         Ok(())
     }
-    fn can_approve(&self, token_id: &NftId) -> Result<(), NftError> {
+    fn can_approve(&self, token_id: &NftId) -> Result<(), AutoNftError> {
         if !self.config.approvable {
-            return Err(NftError("Nft is not approvable.".to_owned()));
+            return Err(AutoNftError("Nft is not approvable.".to_owned()));
         }
         if self.token_approvals.contains_key(token_id) {
-            return Err(NftError("Approve has already been issued".to_owned()));
+            return Err(AutoNftError("Approve has already been issued".to_owned()));
         }
         if let Some(nft_info) = self.tokens.get(token_id) {
             if nft_info.owner != msg::source() {
-                return Err(NftError("Only nft owner can send this message".to_owned()));
+                return Err(AutoNftError(
+                    "Only nft owner can send this message".to_owned(),
+                ));
             }
         } else {
-            return Err(NftError("This nft id hasn't come out yet".to_owned()));
+            return Err(AutoNftError("This nft id hasn't come out yet".to_owned()));
         }
 
         Ok(())
     }
-    fn check_approve(&self, user: &ActorId, token_id: &NftId) -> Result<(), NftError> {
+    fn check_approve(&self, user: &ActorId, token_id: &NftId) -> Result<(), AutoNftError> {
         if let Some(approved_account) = self.token_approvals.get(token_id) {
             if approved_account != user {
-                return Err(NftError(
+                return Err(AutoNftError(
                     "Caller is not approved to perform transfer.".to_owned(),
                 ));
             }
         } else {
-            return Err(NftError("Target token_approvals is empty.".to_owned()));
+            return Err(AutoNftError("Target token_approvals is empty.".to_owned()));
         }
         Ok(())
     }
 
-    fn can_transfer(&self, from: &ActorId, to: &ActorId, token_id: &NftId) -> Result<(), NftError> {
+    fn can_transfer(
+        &self,
+        from: &ActorId,
+        to: &ActorId,
+        token_id: &NftId,
+    ) -> Result<(), AutoNftError> {
         if !self.config.transferable {
-            return Err(NftError("Nft is not transferable.".to_owned()));
+            return Err(AutoNftError("Nft is not transferable.".to_owned()));
         }
 
         let nft = self.tokens.get(token_id);
@@ -278,34 +399,36 @@ impl NftContract {
         if let Some(nft) = nft {
             let owner = nft.owner;
             if owner != *from {
-                return Err(NftError("NonFungibleToken: access denied".to_owned()));
+                return Err(AutoNftError("NonFungibleToken: access denied".to_owned()));
             }
             let msg_src = msg::source();
             if owner != msg_src {
                 self.check_approve(&msg_src, token_id)?;
             }
         } else {
-            return Err(NftError(
+            return Err(AutoNftError(
                 "NonFungibleToken: token does not exist".to_owned(),
             ));
         }
 
         if from == to {
-            return Err(NftError("Self transfer is not allowed.".to_owned()));
+            return Err(AutoNftError("Self transfer is not allowed.".to_owned()));
         }
         Ok(())
     }
 
-    fn can_burn(&self, token_id: &NftId) -> Result<(), NftError> {
+    fn can_burn(&self, token_id: &NftId) -> Result<(), AutoNftError> {
         if !self.config.burnable {
-            return Err(NftError("Nft is not burnable.".to_owned()));
+            return Err(AutoNftError("Nft is not burnable.".to_owned()));
         }
         if let Some(nft_info) = self.tokens.get(token_id) {
             if nft_info.owner != msg::source() {
-                return Err(NftError("Only nft owner can send this message".to_owned()));
+                return Err(AutoNftError(
+                    "Only nft owner can send this message".to_owned(),
+                ));
             }
         } else {
-            return Err(NftError("This nft id hasn't come out yet".to_owned()));
+            return Err(AutoNftError("This nft id hasn't come out yet".to_owned()));
         }
 
         Ok(())
@@ -314,11 +437,11 @@ impl NftContract {
 
 #[no_mangle]
 extern "C" fn init() {
-    let NftInit {
+    let AutoNftInit {
         owner,
         config,
         img_links,
-    } = msg::load().expect("Unable to decode `NftInit`.");
+    } = msg::load().expect("Unable to decode `AutoNftInit`.");
     debug!("INIT NFT");
 
     assert!(
@@ -345,24 +468,25 @@ extern "C" fn init() {
             config: config.clone(),
             nonce: 0,
             img_links,
+            // reservations: HashMap::new(),
             admins: vec![owner],
         })
     };
     msg::send(
         owner,
-        NftEvent::Initialized {
+        AutoNftEvent::Initialized {
             config: config.clone(),
         },
         0,
     )
-    .expect("Error during send to owner `NftEvent::Initialized`");
-    msg::reply(NftEvent::Initialized { config }, 0)
-        .expect("Error during send reply `NftEvent::Initialized`");
+    .expect("Error during send to owner `AutoNftEvent::Initialized`");
+    msg::reply(AutoNftEvent::Initialized { config }, 0)
+        .expect("Error during a reply `AutoNftEvent::Initialized`");
 }
 
 #[no_mangle]
 extern "C" fn handle() {
-    let action: NftAction = msg::load().expect("Could not load `NftAction`.");
+    let action: AutoNftAction = msg::load().expect("Could not load `AutoNftAction`.");
     let nft_contract: &mut NftContract = unsafe {
         NFT_CONTRACT
             .as_mut()
@@ -372,22 +496,30 @@ extern "C" fn handle() {
     let user = msg::source();
 
     let result = match action {
-        NftAction::AddAdmin { new_admin } => nft_contract.add_admin(&new_admin),
-        NftAction::Mint => nft_contract.mint(),
-        NftAction::TransferFrom { from, to, token_id } => {
+        AutoNftAction::AddAdmin { new_admin } => nft_contract.add_admin(&new_admin),
+        AutoNftAction::Mint => nft_contract.mint(),
+        AutoNftAction::TransferFrom { from, to, token_id } => {
             nft_contract.transfer_from(&from, &to, token_id)
         }
-        NftAction::Transfer { to, token_id } => nft_contract.transfer_from(&user, &to, token_id),
-        NftAction::Approve { to, token_id } => nft_contract.approve(&to, token_id),
-        NftAction::RevokeApproval { token_id } => nft_contract.revoke_approve(token_id),
-        NftAction::Burn { token_id } => nft_contract.burn(token_id),
-        NftAction::Expand { additional_links } => nft_contract.expand(additional_links),
-        NftAction::ChangeConfig { config } => nft_contract.change_config(config),
-        NftAction::GetTokenInfo { token_id } => nft_contract.get_token_info(token_id),
-        NftAction::CanDelete => nft_contract.can_delete(),
+        AutoNftAction::Transfer { to, token_id } => {
+            nft_contract.transfer_from(&user, &to, token_id)
+        }
+        AutoNftAction::Approve { to, token_id } => nft_contract.approve(&to, token_id),
+        AutoNftAction::RevokeApproval { token_id } => nft_contract.revoke_approve(token_id),
+        AutoNftAction::Burn { token_id } => nft_contract.burn(token_id),
+        AutoNftAction::Expand { additional_links } => nft_contract.expand(additional_links),
+        AutoNftAction::ChangeConfig { config } => nft_contract.change_config(config),
+        AutoNftAction::GetTokenInfo { token_id } => nft_contract.get_token_info(token_id),
+        AutoNftAction::Update { token_id } => nft_contract.update(token_id),
+        AutoNftAction::StartAutoChanging {
+            token_id,
+            duration_sec,
+            interval_sec,
+        } => nft_contract.start_auto_changing(token_id, duration_sec, interval_sec),
     };
 
-    msg::reply(result, 0).expect("Failed to encode or reply with `Result<NftEvent, NftError>`.");
+    msg::reply(result, 0)
+        .expect("Failed to encode or reply with `Result<AutoNftEvent, AutoNftError>`.");
 }
 
 #[no_mangle]
@@ -410,13 +542,13 @@ extern "C" fn state() {
             msg::reply(StateReply::Config(nft.config), 0).expect("Unable to share state");
         }
         StateQuery::All => {
-            let nft_state: NftState = nft.into();
+            let nft_state: AutoNftState = nft.into();
             msg::reply(StateReply::All(nft_state), 0).expect("Unable to share state");
         }
     }
 }
 
-impl From<NftContract> for NftState {
+impl From<NftContract> for AutoNftState {
     fn from(value: NftContract) -> Self {
         let NftContract {
             tokens,

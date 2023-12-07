@@ -25,13 +25,14 @@ async fn create_test() -> Result<()> {
         config: ComposableConfig {
             name: "User Collection".to_string(),
             description: "User Collection".to_string(),
-            collection_img: "Collection image".to_string(),
-            tokens_limit: Some(500),
-            mint_limit: 3.into(),
+            collection_img: "Collection Image".to_string(),
+            collection_tags: vec!["tag1".to_string()],
+            tokens_limit: None,
+            user_mint_limit: 3.into(),
             transferable: true,
             approvable: true,
             burnable: true,
-            sellable:true,
+            sellable: true,
         },
         img_links,
     }

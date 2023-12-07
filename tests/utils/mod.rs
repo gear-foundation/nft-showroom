@@ -20,7 +20,7 @@ pub fn init_marketplace(sys: &System) {
 }
 
 pub fn add_new_collection(marketplace: &Program, admin: u64, code_id: CodeId) -> RunResult {
-    let description = String::from("My Collection");
+    let type_description = String::from("My Collection");
     let meta_link = String::from("My Meta");
 
     marketplace.send(
@@ -28,7 +28,7 @@ pub fn add_new_collection(marketplace: &Program, admin: u64, code_id: CodeId) ->
         NftMarketplaceAction::AddNewCollection {
             code_id,
             meta_link,
-            description,
+            type_description,
         },
     )
 }
@@ -101,10 +101,14 @@ pub fn update_config(
     )
 }
 
-pub fn delete_collection(marketplace: &Program, admin: u64, id_collection: u16) -> RunResult {
+pub fn delete_collection(
+    marketplace: &Program,
+    admin: u64,
+    collection_address: ActorId,
+) -> RunResult {
     marketplace.send(
         admin,
-        NftMarketplaceAction::DeleteCollection { id_collection },
+        NftMarketplaceAction::DeleteCollection { collection_address },
     )
 }
 pub fn delete_admin(marketplace: &Program, admin: u64, user: ActorId) -> RunResult {

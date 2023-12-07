@@ -28,8 +28,9 @@ pub struct Config {
     pub name: String,
     pub description: String,
     pub collection_img: String,
+    pub collection_tags: Vec<String>,
     pub tokens_limit: Option<u64>,
-    pub mint_limit: Option<u32>,
+    pub user_mint_limit: Option<u32>,
     pub transferable: bool,
     pub approvable: bool,
     pub burnable: bool,
@@ -47,14 +48,10 @@ pub enum ComposableNftAction {
         to: ActorId,
         token_id: NftId,
     },
-    Owner {
+    GetTokenInfo {
         token_id: NftId,
     },
-    IsApproved {
-        to: ActorId,
-        token_id: NftId,
-    },
-    IsSellable,
+    CanDelete,
     AddAdmin {
         new_admin: ActorId,
     },
@@ -83,23 +80,20 @@ pub enum ComposableNftEvent {
         recipient: ActorId,
         token_id: NftId,
     },
-    Owner {
+    TokenInfoReceived {
         owner: ActorId,
-        token_id: NftId,
+        approval: Option<ActorId>,
+        sellable: bool,
     },
-    IsApproved {
-        to: ActorId,
-        token_id: NftId,
-        approved: bool,
+    CanDelete(bool),
+    Initialized {
+        config: Config,
     },
-    IsSellable(bool),
-    Initialized,
     AdminAdded,
     Minted {
         owner: ActorId,
         token_id: NftId,
         media_url: Vec<String>,
-        attrib_url: String,
     },
     Burnt {
         token_id: NftId,
@@ -111,12 +105,12 @@ pub enum ComposableNftEvent {
     ApprovalRevoked {
         token_id: NftId,
     },
-    ConfigChanged,
+    ConfigChanged {
+        tokens_limit: Option<u64>,
+    },
 }
 #[derive(Debug, Clone, Encode, Decode, TypeInfo)]
-pub enum ComposableNftError {
-    Error(String),
-}
+pub struct ComposableNftError(pub String);
 
 #[derive(Debug, Clone, Encode, Decode, TypeInfo)]
 pub struct ComposableNftState {
@@ -137,7 +131,6 @@ pub struct Nft {
     pub name: String,
     pub description: String,
     pub media_url: Vec<String>,
-    pub attrib_url: String,
 }
 
 #[derive(Encode, Decode, TypeInfo)]

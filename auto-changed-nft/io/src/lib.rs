@@ -7,8 +7,8 @@ pub type NftId = u64;
 pub struct ContractMetadata;
 
 impl Metadata for ContractMetadata {
-    type Init = In<NftInit>;
-    type Handle = InOut<NftAction, NftEvent>;
+    type Init = In<AutoNftInit>;
+    type Handle = InOut<AutoNftAction, AutoNftEvent>;
     type Others = ();
     type Reply = ();
     type Signal = ();
@@ -16,20 +16,22 @@ impl Metadata for ContractMetadata {
 }
 
 #[derive(Debug, Clone, Encode, Decode, TypeInfo)]
-pub struct NftInit {
+pub struct AutoNftInit {
     pub owner: ActorId,
     pub config: Config,
-    pub img_links: Vec<(String, u32)>,
+    pub img_links: Vec<(Vec<String>, u32)>,
 }
 
 #[derive(Debug, Clone, Encode, Decode, TypeInfo)]
 pub struct Config {
     pub name: String,
     pub description: String,
-    pub collection_tags: Vec<String>,
     pub collection_img: String,
-    // pub tokens_limit: Option<u64>,
+    pub collection_tags: Vec<String>,
     pub user_mint_limit: Option<u32>,
+    // pub reservation_duration: u32,
+    // pub reservation_amount: u64,
+    // pub time_for_change: u32,
     pub transferable: bool,
     pub approvable: bool,
     pub burnable: bool,
@@ -38,7 +40,7 @@ pub struct Config {
 }
 
 #[derive(Debug, Clone, Encode, Decode, TypeInfo)]
-pub enum NftAction {
+pub enum AutoNftAction {
     Transfer {
         to: ActorId,
         token_id: NftId,
@@ -51,7 +53,6 @@ pub enum NftAction {
     GetTokenInfo {
         token_id: NftId,
     },
-    CanDelete,
     Mint,
     Approve {
         to: ActorId,
@@ -64,7 +65,7 @@ pub enum NftAction {
         token_id: NftId,
     },
     Expand {
-        additional_links: Vec<(String, u32)>,
+        additional_links: Vec<(Vec<String>, u32)>,
     },
     ChangeConfig {
         config: Config,
@@ -72,10 +73,18 @@ pub enum NftAction {
     AddAdmin {
         new_admin: ActorId,
     },
+    Update {
+        token_id: NftId,
+    },
+    StartAutoChanging {
+        token_id: NftId,
+        duration_sec: u32,
+        interval_sec: u32,
+    },
 }
 
 #[derive(Debug, Clone, Encode, Decode, TypeInfo)]
-pub enum NftEvent {
+pub enum AutoNftEvent {
     Transferred {
         owner: ActorId,
         recipient: ActorId,
@@ -86,7 +95,6 @@ pub enum NftEvent {
         approval: Option<ActorId>,
         sellable: bool,
     },
-    CanDelete(bool),
     Initialized {
         config: Config,
     },
@@ -94,36 +102,40 @@ pub enum NftEvent {
     Minted {
         owner: ActorId,
         token_id: NftId,
-        media_url: String,
+        media_url: Vec<String>,
     },
     Burnt {
         token_id: NftId,
     },
     Approved {
-        to: ActorId,
+        account: ActorId,
         token_id: NftId,
     },
     ApprovalRevoked {
         token_id: NftId,
     },
     Expanded {
-        additional_links: Vec<(String, u32)>,
+        additional_links: Vec<(Vec<String>, u32)>,
     },
     ConfigChanged {
         config: Config,
     },
+    Updated,
+    ChangeStarted {
+        token_id: NftId,
+    },
 }
 #[derive(Debug, Clone, Encode, Decode, TypeInfo)]
-pub struct NftError(pub String);
+pub struct AutoNftError(pub String);
 
 #[derive(Debug, Clone, Encode, Decode, TypeInfo)]
-pub struct NftState {
+pub struct AutoNftState {
     pub tokens: Vec<(NftId, Nft)>,
     pub owners: Vec<(ActorId, Vec<NftId>)>,
     pub token_approvals: Vec<(NftId, ActorId)>,
     pub config: Config,
     pub nonce: NftId,
-    pub img_links: Vec<(String, u32)>,
+    pub img_links: Vec<(Vec<String>, u32)>,
     pub admins: Vec<ActorId>,
 }
 
@@ -132,7 +144,7 @@ pub struct Nft {
     pub owner: ActorId,
     pub name: String,
     pub description: String,
-    pub media_url: String,
+    pub media_url: (u32, Vec<String>),
 }
 
 #[derive(Encode, Decode, TypeInfo)]
@@ -148,5 +160,5 @@ pub enum StateReply {
     Name(String),
     Description(String),
     Config(Config),
-    All(NftState),
+    All(AutoNftState),
 }
