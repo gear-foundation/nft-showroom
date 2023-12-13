@@ -7,8 +7,8 @@ pub type NftId = u64;
 pub struct ContractMetadata;
 
 impl Metadata for ContractMetadata {
-    type Init = In<NftInit>;
-    type Handle = InOut<NftAction, NftEvent>;
+    type Init = In<MusicNftInit>;
+    type Handle = InOut<MusicNftAction, MusicNftEvent>;
     type Others = ();
     type Reply = ();
     type Signal = ();
@@ -16,20 +16,20 @@ impl Metadata for ContractMetadata {
 }
 
 #[derive(Debug, Clone, Encode, Decode, TypeInfo)]
-pub struct NftInit {
+pub struct MusicNftInit {
     pub owner: ActorId,
     pub config: Config,
-    pub img_links: Vec<(String, u32)>,
+    pub external_links: Vec<(Links, u32)>,
 }
 
 #[derive(Debug, Clone, Encode, Decode, TypeInfo)]
 pub struct Config {
     pub name: String,
     pub description: String,
-    pub collection_tags: Vec<String>,
     pub collection_img: String,
-    // pub tokens_limit: Option<u64>,
+    pub collection_tags: Vec<String>,
     pub user_mint_limit: Option<u32>,
+    pub listening_capabilities: ListenCapability,
     pub transferable: bool,
     pub approvable: bool,
     pub burnable: bool,
@@ -38,7 +38,14 @@ pub struct Config {
 }
 
 #[derive(Debug, Clone, Encode, Decode, TypeInfo)]
-pub enum NftAction {
+pub enum ListenCapability {
+    AvailableFull,
+    Demo,
+    NotAvailable,
+}
+
+#[derive(Debug, Clone, Encode, Decode, TypeInfo)]
+pub enum MusicNftAction {
     Transfer {
         to: ActorId,
         token_id: NftId,
@@ -64,7 +71,7 @@ pub enum NftAction {
         token_id: NftId,
     },
     Expand {
-        additional_links: Vec<(String, u32)>,
+        additional_links: Vec<(Links, u32)>,
     },
     ChangeConfig {
         config: Config,
@@ -75,7 +82,7 @@ pub enum NftAction {
 }
 
 #[derive(Debug, Clone, Encode, Decode, TypeInfo)]
-pub enum NftEvent {
+pub enum MusicNftEvent {
     Transferred {
         owner: ActorId,
         recipient: ActorId,
@@ -94,27 +101,27 @@ pub enum NftEvent {
     Minted {
         owner: ActorId,
         token_id: NftId,
-        media_url: String,
+        media_url: Links,
     },
     Burnt {
         token_id: NftId,
     },
     Approved {
-        to: ActorId,
+        account: ActorId,
         token_id: NftId,
     },
     ApprovalRevoked {
         token_id: NftId,
     },
     Expanded {
-        additional_links: Vec<(String, u32)>,
+        additional_links: Vec<(Links, u32)>,
     },
     ConfigChanged {
         config: Config,
     },
 }
 #[derive(Debug, Clone, Encode, Decode, TypeInfo)]
-pub struct NftError(pub String);
+pub struct MusicNftError(pub String);
 
 #[derive(Debug, Clone, Encode, Decode, TypeInfo)]
 pub struct NftState {
@@ -123,7 +130,7 @@ pub struct NftState {
     pub token_approvals: Vec<(NftId, ActorId)>,
     pub config: Config,
     pub nonce: NftId,
-    pub img_links: Vec<(String, u32)>,
+    pub external_links: Vec<(Links, u32)>,
     pub admins: Vec<ActorId>,
 }
 
@@ -132,7 +139,7 @@ pub struct Nft {
     pub owner: ActorId,
     pub name: String,
     pub description: String,
-    pub media_url: String,
+    pub media_url: Links,
 }
 
 #[derive(Encode, Decode, TypeInfo)]
@@ -149,4 +156,10 @@ pub enum StateReply {
     Description(String),
     Config(Config),
     All(NftState),
+}
+
+#[derive(Debug, Clone, Encode, Decode, TypeInfo)]
+pub struct Links {
+    pub img_link: String,
+    pub music_link: String,
 }

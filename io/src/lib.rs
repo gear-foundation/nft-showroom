@@ -23,7 +23,7 @@ pub enum NftMarketplaceAction {
     AddNewCollection {
         code_id: CodeId,
         meta_link: String,
-        description: String,
+        type_description: String,
     },
     CreateCollection {
         id_collection: u16,
@@ -34,12 +34,16 @@ pub enum NftMarketplaceAction {
         token_id: u64,
         price: u128,
     },
+    CancelSaleNft {
+        collection_address: ActorId,
+        token_id: u64,
+    },
     BuyNft {
         collection_address: ActorId,
         token_id: u64,
     },
     DeleteCollection {
-        id_collection: u16,
+        collection_address: ActorId,
     },
     AddAdmins {
         users: Vec<ActorId>,
@@ -56,9 +60,13 @@ pub enum NftMarketplaceAction {
 #[derive(Encode, Decode, Debug, TypeInfo)]
 pub enum NftMarketplaceEvent {
     NewCollectionAdded {
-        collection_info: CollectionInfo,
+        code_id: CodeId,
+        meta_link: String,
+        description: String,
+        id_collection: u16,
     },
     CollectionCreated {
+        id_collection: u16,
         collection_address: ActorId,
     },
     SaleNft {
@@ -67,14 +75,17 @@ pub enum NftMarketplaceEvent {
         price: u128,
         owner: ActorId,
     },
+    SaleNftCanceled {
+        collection_address: ActorId,
+        token_id: u64,
+    },
     NftSold {
-        previous_owner: ActorId,
         current_owner: ActorId,
         token_id: u64,
         price: u128,
     },
     CollectionDeleted {
-        id_collection: u16,
+        collection_address: ActorId,
     },
     AdminsAdded {
         users: Vec<ActorId>,
@@ -89,9 +100,7 @@ pub enum NftMarketplaceEvent {
 }
 
 #[derive(Debug, Clone, Encode, Decode, TypeInfo)]
-pub enum NftMarketplaceError {
-    Error(String),
-}
+pub struct NftMarketplaceError(pub String);
 
 #[derive(Encode, Decode, TypeInfo)]
 pub enum StateQuery {
@@ -99,7 +108,6 @@ pub enum StateQuery {
     Admins,
     CollectionsInfo,
     Config,
-    GetOwnerCollections(ActorId),
     AllCollections,
 }
 
@@ -109,16 +117,15 @@ pub enum StateReply {
     Admins(Vec<ActorId>),
     CollectionsInfo(Vec<(u16, CollectionInfo)>),
     Config(Config),
-    OwnerCollections(Vec<ActorId>),
-    AllCollections(Vec<(ActorId, Vec<ActorId>)>),
+    AllCollections(Vec<(ActorId, ActorId)>),
 }
 
 #[derive(Debug, Encode, Decode, TypeInfo, Clone)]
 pub struct State {
     pub admins: Vec<ActorId>,
-    pub owner_to_collection: Vec<(ActorId, Vec<ActorId>)>,
+    pub collection_to_owner: Vec<(ActorId, ActorId)>,
     pub time_creation: Vec<(ActorId, u64)>,
-    pub collections: Vec<(u16, CollectionInfo)>,
+    pub type_collections: Vec<(u16, CollectionInfo)>,
     pub sale: Vec<((ActorId, u64), NftInfoForSale)>,
     pub config: Config,
 }
@@ -153,14 +160,10 @@ pub enum NftAction {
         to: ActorId,
         token_id: u64,
     },
-    Owner {
+    GetTokenInfo {
         token_id: u64,
     },
-    IsApproved {
-        to: ActorId,
-        token_id: u64,
-    },
-    IsSellable,
+    CanDelete,
 }
 
 #[derive(Debug, Clone, Encode, Decode, TypeInfo)]
@@ -170,16 +173,12 @@ pub enum NftEvent {
         recipient: ActorId,
         token_id: u64,
     },
-    Owner {
+    TokenInfoReceived {
         owner: ActorId,
-        token_id: u64,
+        approval: Option<ActorId>,
+        sellable: bool,
     },
-    IsApproved {
-        to: ActorId,
-        token_id: u64,
-        approved: bool,
-    },
-    IsSellable(bool),
+    CanDelete(bool),
 }
 
 #[derive(Debug, Clone, Encode, Decode, TypeInfo)]

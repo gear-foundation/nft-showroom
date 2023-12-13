@@ -48,17 +48,19 @@ fn successful_basics() {
             name: "User Collection".to_string(),
             description: "User Collection".to_string(),
             collection_img: "Collection image".to_string(),
-            mint_limit: 3.into(),
+            collection_tags: vec!["tag1".to_string()],
+            user_mint_limit: 3.into(),
             transferable: true,
             approvable: true,
             burnable: true,
             sellable: true,
+            attendable: true,
         },
         img_links,
     };
     let res = create_collection(&marketplace, USERS[0], 1, init_nft_payload.encode());
     assert!(!res.main_failed());
-    let result = &res.decoded_log::<Result<NftMarketplaceEvent, NftMarketplaceError>>()[0];
+    let result = &res.decoded_log::<Result<NftMarketplaceEvent, NftMarketplaceError>>();
     println!("RES: {:?}", result);
     let state_reply = marketplace
         .read_state(StateQuery::AllCollections)
@@ -66,7 +68,7 @@ fn successful_basics() {
     let address_nft = if let StateReply::AllCollections(state) = state_reply {
         assert!(!state.is_empty(), "Collections shouldn't be empty");
         println!("Collections: {:?}", state);
-        state[0].1[0]
+        state[0].0
     } else {
         assert!(false, "Unexpected StateReply variant");
         0.into()
@@ -87,11 +89,13 @@ fn successful_basics() {
         name: "My Collection".to_string(),
         description: "My Collection".to_string(),
         collection_img: "Collection image".to_string(),
-        mint_limit: 3.into(),
+        collection_tags: vec!["tag1".to_string()],
+        user_mint_limit: 3.into(),
         transferable: true,
         approvable: true,
         burnable: true,
         sellable: true,
+        attendable: true,
     };
     let res = nft_collection.send(USERS[0], NftAction::ChangeConfig { config });
     assert!(!res.main_failed());
@@ -189,7 +193,7 @@ fn successful_basics() {
     // let res = res.decoded_log::<Result<NftEvent, NftError>>()[0];
     //println!("RES {:?}", res);
     let message: Result<NftEvent, NftError> =
-        Err(NftError::Error("You've exhausted your limit.".to_owned()));
+        Err(NftError("You've exhausted your limit.".to_owned()));
     assert!(res.contains(&(USERS[3], message.encode())));
 
     // Successful burn NFT in the collection
@@ -269,11 +273,13 @@ fn failures() {
             name: "User Collection".to_string(),
             description: "User Collection".to_string(),
             collection_img: "Collection image".to_string(),
-            mint_limit: 0.into(),
+            collection_tags: vec!["tag1".to_string()],
+            user_mint_limit: 3.into(),
             transferable: true,
             approvable: true,
             burnable: true,
             sellable: true,
+            attendable: true,
         },
         img_links: img_links.clone(),
     };
@@ -281,7 +287,7 @@ fn failures() {
     assert!(res.main_failed());
 
     // There must be at least one link to create a collection
-    init_nft_payload.config.mint_limit = 4.into();
+    init_nft_payload.config.user_mint_limit = 4.into();
     init_nft_payload.img_links = vec![];
     let res = create_collection(&marketplace, USERS[0], 1, init_nft_payload.encode());
     assert!(res.main_failed());
@@ -301,7 +307,7 @@ fn failures() {
     let address_nft = if let StateReply::AllCollections(state) = state_reply {
         assert!(!state.is_empty(), "Collections shouldn't be empty");
         println!("Collections: {:?}", state);
-        state[0].1[0]
+        state[0].0
     } else {
         assert!(false, "Unexpected StateReply variant");
         0.into()
@@ -316,7 +322,7 @@ fn failures() {
     }
     let res = nft_collection.send(USERS[1], NftAction::Mint);
     let payload = res.log()[0].payload();
-    let expected_payload = NftEvent::Error("You've exhausted your limit.".to_owned()).encode();
+    let expected_payload = NftError("You've exhausted your limit.".to_owned()).encode();
     assert_eq!(expected_payload, payload);
     assert!(!res.main_failed());
 
@@ -324,24 +330,26 @@ fn failures() {
     assert!(!res.main_failed());
     let res = nft_collection.send(USERS[2], NftAction::Mint);
     let payload = res.log()[0].payload();
-    let expected_payload = NftEvent::Error("All tokens are minted.".to_owned()).encode();
+    let expected_payload = NftError("All tokens are minted.".to_owned()).encode();
     assert_eq!(expected_payload, payload);
     assert!(!res.main_failed());
 
     let config = Config {
-        name: "My Collection".to_string(),
-        description: "My Collection".to_string(),
+        name: "User Collection".to_string(),
+        description: "User Collection".to_string(),
         collection_img: "Collection image".to_string(),
-        mint_limit: 3.into(),
+        collection_tags: vec!["tag1".to_string()],
+        user_mint_limit: 3.into(),
         transferable: true,
         approvable: true,
         burnable: true,
         sellable: true,
+        attendable: true,
     };
     let res = nft_collection.send(USERS[0], NftAction::ChangeConfig { config });
     let payload = res.log()[0].payload();
     let expected_payload =
-        NftEvent::Error("The collection configuration can no more be changed".to_owned()).encode();
+        NftError("The collection configuration can no more be changed".to_owned()).encode();
     assert_eq!(expected_payload, payload);
     assert!(!res.main_failed());
 
@@ -399,7 +407,7 @@ fn failures() {
         println!("STATE: {:?}", state);
     }
     let payload = res.log()[0].payload();
-    let expected_payload = NftEvent::Error("Target approvals is empty.".to_owned()).encode();
+    let expected_payload = NftError("Target approvals is empty.".to_owned()).encode();
     assert_eq!(expected_payload, payload);
 }
 

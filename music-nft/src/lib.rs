@@ -5,9 +5,7 @@ use gstd::{
     prelude::*,
     ActorId,
 };
-use nft_io::{
-    Config, Nft, NftAction, NftError, NftEvent, NftId, NftInit, NftState, StateQuery, StateReply,
-};
+use music_nft_io::*;
 
 #[derive(Debug)]
 struct NftContract {
@@ -17,34 +15,35 @@ struct NftContract {
     pub token_approvals: HashMap<NftId, ActorId>,
     pub config: Config,
     pub nonce: NftId,
-    pub img_links: Vec<(String, u32)>,
+    pub external_links: Vec<(Links, u32)>,
     pub admins: Vec<ActorId>,
 }
 static mut NFT_CONTRACT: Option<NftContract> = None;
 
 impl NftContract {
-    fn add_admin(&mut self, new_admin: &ActorId) -> Result<NftEvent, NftError> {
+    fn add_admin(&mut self, new_admin: &ActorId) -> Result<MusicNftEvent, MusicNftError> {
         self.check_admin()?;
         self.admins.push(*new_admin);
-        Ok(NftEvent::AdminAdded)
+        Ok(MusicNftEvent::AdminAdded)
     }
-    fn mint(&mut self) -> Result<NftEvent, NftError> {
+    fn mint(&mut self) -> Result<MusicNftEvent, MusicNftError> {
         let msg_src = msg::source();
         self.check_tokens()?;
         self.check_mint_limit(&msg_src)?;
 
-        let rand_index = get_random_value(self.img_links.len() as u64);
-        let mut img_link: Option<String> = None;
+        let rand_index = get_random_value(self.external_links.len() as u64);
+        let mut token_links: Option<Links> = None;
 
-        if let Some((link, number_copies)) = self.img_links.get_mut(rand_index as usize) {
+        if let Some((links, number_copies)) = self.external_links.get_mut(rand_index as usize) {
             *number_copies -= 1;
-            img_link = Some(link.clone());
+            token_links = Some(links.clone());
             if *number_copies == 0 {
-                self.img_links.remove(rand_index as usize);
+                self.external_links.remove(rand_index as usize);
             }
         }
+
         let Some(next_nft_nonce) = self.nonce.checked_add(1) else {
-            return Err(NftError("Math overflow.".to_owned()));
+            return Err(MusicNftError("Math overflow.".to_owned()));
         };
         let token_id = self.nonce;
         self.nonce = next_nft_nonce;
@@ -68,7 +67,7 @@ impl NftContract {
                 owner: msg_src,
                 name,
                 description: self.config.description.clone(),
-                media_url: img_link.clone().unwrap(),
+                media_url: token_links.clone().unwrap(),
             },
         );
         self.restriction_mint
@@ -78,10 +77,10 @@ impl NftContract {
             })
             .or_insert(1);
 
-        Ok(NftEvent::Minted {
+        Ok(MusicNftEvent::Minted {
             owner: msg_src,
             token_id,
-            media_url: img_link.unwrap(),
+            media_url: token_links.unwrap(),
         })
     }
     fn transfer_from(
@@ -89,7 +88,7 @@ impl NftContract {
         from: &ActorId,
         to: &ActorId,
         token_id: NftId,
-    ) -> Result<NftEvent, NftError> {
+    ) -> Result<MusicNftEvent, MusicNftError> {
         self.can_transfer(from, to, &token_id)?;
 
         let nft = self
@@ -105,7 +104,9 @@ impl NftContract {
                 self.owners.remove(from);
             }
         } else {
-            return Err(NftError("Fatal: owner does not contain nft id.".to_owned()));
+            return Err(MusicNftError(
+                "Fatal: owner does not contain nft id.".to_owned(),
+            ));
         }
 
         self.owners
@@ -121,156 +122,176 @@ impl NftContract {
 
         self.token_approvals.remove(&token_id);
 
-        Ok(NftEvent::Transferred {
+        Ok(MusicNftEvent::Transferred {
             owner: *from,
             recipient: *to,
             token_id,
         })
     }
-    fn approve(&mut self, to: &ActorId, token_id: NftId) -> Result<NftEvent, NftError> {
+    fn approve(&mut self, to: &ActorId, token_id: NftId) -> Result<MusicNftEvent, MusicNftError> {
         self.can_approve(&token_id)?;
         self.token_approvals.insert(token_id, *to);
 
-        Ok(NftEvent::Approved { to: *to, token_id })
+        Ok(MusicNftEvent::Approved {
+            account: *to,
+            token_id,
+        })
     }
 
-    fn revoke_approve(&mut self, token_id: NftId) -> Result<NftEvent, NftError> {
+    fn revoke_approve(&mut self, token_id: NftId) -> Result<MusicNftEvent, MusicNftError> {
         self.can_approve(&token_id)?;
         let res = self.token_approvals.remove(&token_id);
         if res.is_none() {
-            return Err(NftError(
+            return Err(MusicNftError(
                 "No approve has been issued to this token".to_owned(),
             ));
         }
-        Ok(NftEvent::ApprovalRevoked { token_id })
+        Ok(MusicNftEvent::ApprovalRevoked { token_id })
     }
-    fn burn(&mut self, token_id: NftId) -> Result<NftEvent, NftError> {
+    fn burn(&mut self, token_id: NftId) -> Result<MusicNftEvent, MusicNftError> {
         self.can_burn(&token_id)?;
         let nft = self.tokens.remove(&token_id).expect("Can't be None");
         if let Some(tokens) = self.owners.get_mut(&nft.owner) {
             if tokens.remove(&token_id) {
-                return Err(NftError("Fatal: owner does not contain nft id.".to_owned()));
+                return Err(MusicNftError(
+                    "Fatal: owner does not contain nft id.".to_owned(),
+                ));
             }
         } else {
-            return Err(NftError("Fatal: owner does not contain list.".to_owned()));
+            return Err(MusicNftError(
+                "Fatal: owner does not contain list.".to_owned(),
+            ));
         }
 
         self.token_approvals.remove(&token_id);
 
-        Ok(NftEvent::Burnt { token_id })
+        Ok(MusicNftEvent::Burnt { token_id })
     }
 
-    fn get_token_info(&self, token_id: NftId) -> Result<NftEvent, NftError> {
+    fn get_token_info(&self, token_id: NftId) -> Result<MusicNftEvent, MusicNftError> {
         let nft = self.tokens.get(&token_id);
         let owner = if let Some(nft) = nft {
             nft.owner
         } else {
-            return Err(NftError(
+            return Err(MusicNftError(
                 "NonFungibleToken: token does not exist".to_owned(),
             ));
         };
         let approval = self.token_approvals.get(&token_id).copied();
 
-        Ok(NftEvent::TokenInfoReceived {
+        Ok(MusicNftEvent::TokenInfoReceived {
             owner,
             approval,
             sellable: self.config.sellable,
         })
     }
-    fn expand(&mut self, additional_links: Vec<(String, u32)>) -> Result<NftEvent, NftError> {
+    fn expand(
+        &mut self,
+        additional_links: Vec<(Links, u32)>,
+    ) -> Result<MusicNftEvent, MusicNftError> {
         self.check_admin()?;
         if !self.config.attendable {
-            return Err(NftError("Nft is not attendable.".to_owned()));
+            return Err(MusicNftError("MusicNft is not attendable.".to_owned()));
         }
+
         if additional_links.iter().any(|&(_, value)| value == 0) {
-            return Err(NftError("Limit of copies value is equal to 0".to_owned()));
+            return Err(MusicNftError(
+                "Limit of copies value is equal to 0".to_owned(),
+            ));
         }
 
-        self.img_links.extend(additional_links.clone());
+        self.external_links.extend(additional_links.clone());
 
-        Ok(NftEvent::Expanded { additional_links })
+        Ok(MusicNftEvent::Expanded { additional_links })
     }
 
-    fn change_config(&mut self, config: Config) -> Result<NftEvent, NftError> {
+    fn change_config(&mut self, config: Config) -> Result<MusicNftEvent, MusicNftError> {
         self.check_admin()?;
 
         if !self.tokens.is_empty() {
-            return Err(NftError(
+            return Err(MusicNftError(
                 "The collection configuration can no more be changed".to_owned(),
             ));
         }
 
         if let Some(limit) = config.user_mint_limit {
             if limit == 0 {
-                return Err(NftError(
+                return Err(MusicNftError(
                     "The mint limit must be greater than zero".to_owned(),
                 ));
             }
         }
         self.config = config.clone();
-        Ok(NftEvent::ConfigChanged { config })
+        Ok(MusicNftEvent::ConfigChanged { config })
     }
 
-    fn can_delete(&self) -> Result<NftEvent, NftError> {
-        Ok(NftEvent::CanDelete(self.tokens.is_empty()))
+    fn can_delete(&self) -> Result<MusicNftEvent, MusicNftError> {
+        Ok(MusicNftEvent::CanDelete(self.tokens.is_empty()))
     }
 
-    fn check_admin(&self) -> Result<(), NftError> {
+    fn check_admin(&self) -> Result<(), MusicNftError> {
         if !self.admins.contains(&msg::source()) {
-            return Err(NftError("Only admin can send this message".to_owned()));
+            return Err(MusicNftError("Only admin can send this message".to_owned()));
         }
         Ok(())
     }
 
-    fn check_tokens(&self) -> Result<(), NftError> {
-        if self.img_links.is_empty() {
-            return Err(NftError("All tokens are minted.".to_owned()));
+    fn check_tokens(&self) -> Result<(), MusicNftError> {
+        if self.external_links.is_empty() {
+            return Err(MusicNftError("All tokens are minted.".to_owned()));
         }
         Ok(())
     }
-    fn check_mint_limit(&self, user: &ActorId) -> Result<(), NftError> {
+    fn check_mint_limit(&self, user: &ActorId) -> Result<(), MusicNftError> {
         if let Some(limit) = self.config.user_mint_limit {
             if let Some(number_tokens) = self.restriction_mint.get(user) {
                 if number_tokens >= &limit && !self.admins.contains(user) {
-                    return Err(NftError("You've exhausted your limit.".to_owned()));
+                    return Err(MusicNftError("You've exhausted your limit.".to_owned()));
                 }
             }
         }
         Ok(())
     }
-    fn can_approve(&self, token_id: &NftId) -> Result<(), NftError> {
+    fn can_approve(&self, token_id: &NftId) -> Result<(), MusicNftError> {
         if !self.config.approvable {
-            return Err(NftError("Nft is not approvable.".to_owned()));
+            return Err(MusicNftError("Nft is not approvable.".to_owned()));
         }
         if self.token_approvals.contains_key(token_id) {
-            return Err(NftError("Approve has already been issued".to_owned()));
+            return Err(MusicNftError("Approve has already been issued".to_owned()));
         }
         if let Some(nft_info) = self.tokens.get(token_id) {
             if nft_info.owner != msg::source() {
-                return Err(NftError("Only nft owner can send this message".to_owned()));
+                return Err(MusicNftError(
+                    "Only nft owner can send this message".to_owned(),
+                ));
             }
         } else {
-            return Err(NftError("This nft id hasn't come out yet".to_owned()));
+            return Err(MusicNftError("This nft id hasn't come out yet".to_owned()));
         }
 
         Ok(())
     }
-    fn check_approve(&self, user: &ActorId, token_id: &NftId) -> Result<(), NftError> {
+    fn check_approve(&self, user: &ActorId, token_id: &NftId) -> Result<(), MusicNftError> {
         if let Some(approved_account) = self.token_approvals.get(token_id) {
             if approved_account != user {
-                return Err(NftError(
+                return Err(MusicNftError(
                     "Caller is not approved to perform transfer.".to_owned(),
                 ));
             }
         } else {
-            return Err(NftError("Target token_approvals is empty.".to_owned()));
+            return Err(MusicNftError("Target token_approvals is empty.".to_owned()));
         }
         Ok(())
     }
 
-    fn can_transfer(&self, from: &ActorId, to: &ActorId, token_id: &NftId) -> Result<(), NftError> {
+    fn can_transfer(
+        &self,
+        from: &ActorId,
+        to: &ActorId,
+        token_id: &NftId,
+    ) -> Result<(), MusicNftError> {
         if !self.config.transferable {
-            return Err(NftError("Nft is not transferable.".to_owned()));
+            return Err(MusicNftError("Nft is not transferable.".to_owned()));
         }
 
         let nft = self.tokens.get(token_id);
@@ -278,34 +299,36 @@ impl NftContract {
         if let Some(nft) = nft {
             let owner = nft.owner;
             if owner != *from {
-                return Err(NftError("NonFungibleToken: access denied".to_owned()));
+                return Err(MusicNftError("NonFungibleToken: access denied".to_owned()));
             }
             let msg_src = msg::source();
             if owner != msg_src {
                 self.check_approve(&msg_src, token_id)?;
             }
         } else {
-            return Err(NftError(
+            return Err(MusicNftError(
                 "NonFungibleToken: token does not exist".to_owned(),
             ));
         }
 
         if from == to {
-            return Err(NftError("Self transfer is not allowed.".to_owned()));
+            return Err(MusicNftError("Self transfer is not allowed.".to_owned()));
         }
         Ok(())
     }
 
-    fn can_burn(&self, token_id: &NftId) -> Result<(), NftError> {
+    fn can_burn(&self, token_id: &NftId) -> Result<(), MusicNftError> {
         if !self.config.burnable {
-            return Err(NftError("Nft is not burnable.".to_owned()));
+            return Err(MusicNftError("Nft is not burnable.".to_owned()));
         }
         if let Some(nft_info) = self.tokens.get(token_id) {
             if nft_info.owner != msg::source() {
-                return Err(NftError("Only nft owner can send this message".to_owned()));
+                return Err(MusicNftError(
+                    "Only nft owner can send this message".to_owned(),
+                ));
             }
         } else {
-            return Err(NftError("This nft id hasn't come out yet".to_owned()));
+            return Err(MusicNftError("This nft id hasn't come out yet".to_owned()));
         }
 
         Ok(())
@@ -314,11 +337,11 @@ impl NftContract {
 
 #[no_mangle]
 extern "C" fn init() {
-    let NftInit {
+    let MusicNftInit {
         owner,
         config,
-        img_links,
-    } = msg::load().expect("Unable to decode `NftInit`.");
+        external_links,
+    } = msg::load().expect("Unable to decode `MusicNftInit`.");
     debug!("INIT NFT");
 
     assert!(
@@ -329,10 +352,10 @@ extern "C" fn init() {
         "The mint limit must be greater than zero"
     );
     assert!(
-        !img_links.is_empty(),
+        !external_links.is_empty(),
         "There must be at least one link to create a collection"
     );
-    if img_links.iter().any(|&(_, value)| value == 0) {
+    if external_links.iter().any(|&(_, value)| value == 0) {
         panic!("Limit of copies value is equal to 0");
     }
 
@@ -344,50 +367,58 @@ extern "C" fn init() {
             restriction_mint: HashMap::new(),
             config: config.clone(),
             nonce: 0,
-            img_links,
+            external_links,
             admins: vec![owner],
         })
     };
     msg::send(
         owner,
-        NftEvent::Initialized {
+        MusicNftEvent::Initialized {
             config: config.clone(),
         },
         0,
     )
-    .expect("Error during send to owner `NftEvent::Initialized`");
-    msg::reply(NftEvent::Initialized { config }, 0)
-        .expect("Error during send reply `NftEvent::Initialized`");
+    .expect("Error during send to owner `MusicNftEvent::Initialized`");
+    msg::reply(
+        MusicNftEvent::Initialized {
+            config: config.clone(),
+        },
+        0,
+    )
+    .expect("Error during a reply `MusicNftEvent::Initialized`");
 }
 
 #[no_mangle]
 extern "C" fn handle() {
-    let action: NftAction = msg::load().expect("Could not load `NftAction`.");
+    let action: MusicNftAction = msg::load().expect("Could not load `MusicNftAction`.");
     let nft_contract: &mut NftContract = unsafe {
         NFT_CONTRACT
             .as_mut()
-            .expect("Unexpected uninitialized `NftContract`.")
+            .expect("Unexpected uninitialized `MusicNftContract`.")
     };
 
     let user = msg::source();
 
     let result = match action {
-        NftAction::AddAdmin { new_admin } => nft_contract.add_admin(&new_admin),
-        NftAction::Mint => nft_contract.mint(),
-        NftAction::TransferFrom { from, to, token_id } => {
+        MusicNftAction::AddAdmin { new_admin } => nft_contract.add_admin(&new_admin),
+        MusicNftAction::Mint => nft_contract.mint(),
+        MusicNftAction::TransferFrom { from, to, token_id } => {
             nft_contract.transfer_from(&from, &to, token_id)
         }
-        NftAction::Transfer { to, token_id } => nft_contract.transfer_from(&user, &to, token_id),
-        NftAction::Approve { to, token_id } => nft_contract.approve(&to, token_id),
-        NftAction::RevokeApproval { token_id } => nft_contract.revoke_approve(token_id),
-        NftAction::Burn { token_id } => nft_contract.burn(token_id),
-        NftAction::Expand { additional_links } => nft_contract.expand(additional_links),
-        NftAction::ChangeConfig { config } => nft_contract.change_config(config),
-        NftAction::GetTokenInfo { token_id } => nft_contract.get_token_info(token_id),
-        NftAction::CanDelete => nft_contract.can_delete(),
+        MusicNftAction::Transfer { to, token_id } => {
+            nft_contract.transfer_from(&user, &to, token_id)
+        }
+        MusicNftAction::Approve { to, token_id } => nft_contract.approve(&to, token_id),
+        MusicNftAction::RevokeApproval { token_id } => nft_contract.revoke_approve(token_id),
+        MusicNftAction::Burn { token_id } => nft_contract.burn(token_id),
+        MusicNftAction::Expand { additional_links } => nft_contract.expand(additional_links),
+        MusicNftAction::ChangeConfig { config } => nft_contract.change_config(config),
+        MusicNftAction::GetTokenInfo { token_id } => nft_contract.get_token_info(token_id),
+        MusicNftAction::CanDelete => nft_contract.can_delete(),
     };
 
-    msg::reply(result, 0).expect("Failed to encode or reply with `Result<NftEvent, NftError>`.");
+    msg::reply(result, 0)
+        .expect("Failed to encode or reply with `Result<MusicNftEvent, MusicNftError>`.");
 }
 
 #[no_mangle]
@@ -424,7 +455,7 @@ impl From<NftContract> for NftState {
             token_approvals,
             config,
             nonce,
-            img_links,
+            external_links,
             admins,
             ..
         } = value;
@@ -448,7 +479,7 @@ impl From<NftContract> for NftState {
             token_approvals,
             config,
             nonce,
-            img_links,
+            external_links,
             admins,
         }
     }
