@@ -1,5 +1,5 @@
 import { FunctionComponent, SVGProps } from 'react';
-import styles from './wallet-item.module.css';
+import styles from './wallet-item.module.scss';
 
 type Props = {
   SVG: FunctionComponent<SVGProps<SVGSVGElement> & { title?: string | undefined }>;

@@ -7,7 +7,7 @@ import { WALLETS } from '../../consts';
 import { useWallet } from '../../hooks';
 import { AccountButton } from '../account-button';
 import { WalletItem } from '../wallet-item';
-import styles from './wallet-modal.module.css';
+import styles from './wallet-modal.module.scss';
 import { Button, Modal } from '@gear-js/vara-ui';
 
 type Props = {
@@ -32,23 +32,19 @@ function WalletModal({ close }: Props) {
       return (
         <li key={id}>
           <Button
-            // className={clsx(
-            //   buttonStyles.button,
-            //   buttonStyles.large,
-            //   buttonStyles.light,
-            //   buttonStyles.block,
-            //   styles.walletButton,
-            //   isEnabled && styles.enabled,
-            // )}
+            className={styles.walletButton}
+            color="light"
+            size="small"
             onClick={onClick}
-            disabled={!isEnabled}>
+            disabled={!isEnabled}
+            block>
             <WalletItem SVG={SVG} name={name} />
 
-            <div className={styles.status}>
+            <span className={styles.status}>
               <p className={styles.statusText}>{status}</p>
 
               {isEnabled && <p className={styles.statusAccounts}>{accountsStatus}</p>}
-            </div>
+            </span>
           </Button>
         </li>
       );
@@ -82,7 +78,7 @@ function WalletModal({ close }: Props) {
 
       return (
         <li key={address} className={styles.account}>
-          <AccountButton address={address} name={meta.name} onClick={handleClick} />
+          <AccountButton size="small" address={address} name={meta.name} color={color} onClick={handleClick} block />
           <Button icon={CopySVG} color="transparent" onClick={handleCopyClick} />
         </li>
       );
@@ -100,14 +96,11 @@ function WalletModal({ close }: Props) {
       footer={
         wallet ? (
           <div className={styles.footer}>
-            <button
-              type="button"
-              // className={cx(buttonStyles.button, buttonStyles.transparent)}
-              onClick={resetWalletId}>
+            <Button color="transparent" onClick={resetWalletId}>
               <WalletItem SVG={wallet.SVG} name={wallet.name} />
 
               <span className={styles.changeText}>Change</span>
-            </button>
+            </Button>
 
             {account && <Button icon={ExitSVG} text="Logout" color="transparent" onClick={handleLogoutButtonClick} />}
           </div>

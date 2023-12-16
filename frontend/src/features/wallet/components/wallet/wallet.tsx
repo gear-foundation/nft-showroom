@@ -5,7 +5,7 @@ import { useState } from 'react';
 import VaraSVG from '../../assets/vara.svg?react';
 import { AccountButton } from '../account-button';
 import { WalletModal } from '../wallet-modal';
-import styles from './wallet.module.css';
+import styles from './wallet.module.scss';
 
 function Wallet() {
   const { isApiReady } = useApi();
@@ -34,7 +34,7 @@ function Wallet() {
         )}
 
         {account ? (
-          <AccountButton address={account.address} name={account.meta.name} onClick={openModal} />
+          <AccountButton color="dark" address={account.address} name={account.meta.name} onClick={openModal} />
         ) : (
           <Button text="Connect Wallet" onClick={openModal} />
         )}
