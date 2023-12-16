@@ -1,4 +1,22 @@
 body {
+  font-size: 14px;
+  font-weight: 400;
   color: #000;
   background-color: #f7f9fa;
+}
+
+// resets
+
+a {
+  text-decoration: none;
+  color: inherit;
+  transition: opacity 0.25s;
+
+  &:hover {
+    opacity: 0.5;
+  }
+}
+
+small {
+  font: inherit;
 }

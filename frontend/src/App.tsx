@@ -1,10 +1,12 @@
-import { Header } from './components';
+import { Footer, Header } from './components';
 import { withProviders } from './providers';
 
 function Component() {
   return (
     <>
       <Header />
+      <main>App</main>
+      <Footer />
     </>
   );
 }
