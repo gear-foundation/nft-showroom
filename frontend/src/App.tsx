@@ -1,11 +1,15 @@
-import { Footer, Header } from './components';
+import { Container, Footer, Header } from './components';
 import { withProviders } from './providers';
 
 function Component() {
   return (
     <>
       <Header />
-      <main>App</main>
+
+      <main>
+        <Container>App</Container>
+      </main>
+
       <Footer />
     </>
   );

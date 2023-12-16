@@ -5,6 +5,17 @@ body {
   background-color: #f7f9fa;
 }
 
+#root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+main {
+  flex: 1;
+  padding: 24px 0;
+}
+
 // resets
 
 a {
