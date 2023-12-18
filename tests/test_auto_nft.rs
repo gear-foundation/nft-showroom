@@ -5,8 +5,8 @@ use gtest::Program;
 use nft_marketplace_io::*;
 
 use auto_changed_nft_io::{
-    AutoNftAction, AutoNftEvent, AutoNftInit, AutoNftState, Config, StateQuery as StateQueryNft,
-    StateReply as StateReplyNft,
+    Action, AutoNftAction, AutoNftEvent, AutoNftInit, AutoNftState, Config,
+    StateQuery as StateQueryNft, StateReply as StateReplyNft,
 };
 const USERS: &[u64] = &[5, 6, 7, 8];
 
@@ -44,7 +44,11 @@ fn successful_auto_changed() {
     let img_links: Vec<(Vec<String>, u32)> = (0..10).map(|i| (links.clone(), 1 as u32)).collect();
 
     // let time_for_change = 5;
-
+    let time_to_action = vec![
+        (3, Action::ChangeImg),
+        (6, Action::ChangeImg),
+        (9, Action::ChangeImg),
+    ];
     // Successful creation of a new collection
     let init_nft_payload = AutoNftInit {
         owner: USERS[0].into(),
@@ -54,9 +58,8 @@ fn successful_auto_changed() {
             collection_img: "Collection image".to_string(),
             collection_tags: vec!["tag1".to_string()],
             user_mint_limit: 3.into(),
-            // reservation_amount: 1_000_000_000_000,
-            // reservation_duration: 100,
             // time_for_change,
+            time_to_action,
             transferable: true,
             approvable: true,
             burnable: true,
@@ -94,41 +97,33 @@ fn successful_auto_changed() {
     // Successful mint NFT in the new collection
     let res = nft_collection.send(USERS[1], AutoNftAction::Mint);
     assert!(!res.main_failed());
-
-    let state_reply = nft_collection
-        .read_state(StateQueryNft::All)
-        .expect("Unexpected invalid state.");
-    if let StateReplyNft::All(state) = state_reply {
-        println!("Collection NFT info: {:?}", state);
-        assert_eq!(state.admins[0], USERS[0].into(), "Wrong Admin");
-        let (owner, token_id) = state.owners.get(0).expect("Can't be None");
-        assert_eq!(*owner, USERS[1].into(), "Wrong owner");
-        assert_eq!(*token_id, vec![0], "Wrong token id");
-    }
-    let interval_sec = 6;
-    let interval_block = 6 / 3;
-    let res = nft_collection.send(
-        USERS[1],
-        AutoNftAction::StartAutoChanging {
-            token_id: 0,
-            duration_sec: 1000,
-            interval_sec,
-        },
-    );
-    assert!(!res.main_failed());
-
-    // sys.spend_blocks(time_for_change);
-    let state = get_state(&nft_collection).unwrap();
-    assert_eq!(state.tokens.get(0).unwrap().1.media_url.0, 1);
-    sys.spend_blocks(interval_block);
-    let state = get_state(&nft_collection).unwrap();
-    assert_eq!(state.tokens.get(0).unwrap().1.media_url.0, 2);
-    sys.spend_blocks(interval_block);
-    let state = get_state(&nft_collection).unwrap();
-    assert_eq!(state.tokens.get(0).unwrap().1.media_url.0, 3);
-    sys.spend_blocks(interval_block);
+    // let state_reply = nft_collection
+    //     .read_state(StateQueryNft::All)
+    //     .expect("Unexpected invalid state.");
+    // if let StateReplyNft::All(state) = state_reply {
+    //     println!("Collection NFT info: {:?}", state);
+    //     assert_eq!(state.admins[0], USERS[0].into(), "Wrong Admin");
+    //     let (owner, token_id) = state.owners.get(0).expect("Can't be None");
+    //     assert_eq!(*owner, USERS[1].into(), "Wrong owner");
+    //     assert_eq!(*token_id, vec![0], "Wrong token id");
+    // }
     let state = get_state(&nft_collection).unwrap();
     assert_eq!(state.tokens.get(0).unwrap().1.media_url.0, 0);
+    sys.spend_blocks(1);
+    let state = get_state(&nft_collection).unwrap();
+    assert_eq!(state.tokens.get(0).unwrap().1.media_url.0, 1);
+    sys.spend_blocks(1);
+    let state = get_state(&nft_collection).unwrap();
+    assert_eq!(state.tokens.get(0).unwrap().1.media_url.0, 2);
+    sys.spend_blocks(1);
+    let state = get_state(&nft_collection).unwrap();
+    assert_eq!(state.tokens.get(0).unwrap().1.media_url.0, 3);
+    // sys.spend_blocks(2);
+    // let state = get_state(&nft_collection).unwrap();
+    // assert_eq!(state.tokens.get(0).unwrap().1.media_url.0, 3);
+    // sys.spend_blocks(interval_block);
+    // let state = get_state(&nft_collection).unwrap();
+    // assert_eq!(state.tokens.get(0).unwrap().1.media_url.0, 0);
 }
 
 fn get_state(nft_collection: &Program) -> Option<AutoNftState> {

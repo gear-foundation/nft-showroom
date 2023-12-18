@@ -6,6 +6,8 @@ pub type NftId = u64;
 
 pub struct ContractMetadata;
 
+pub const BLOCK_DURATION_IN_SECS: u32 = 3;
+
 impl Metadata for ContractMetadata {
     type Init = In<AutoNftInit>;
     type Handle = InOut<AutoNftAction, AutoNftEvent>;
@@ -29,14 +31,20 @@ pub struct Config {
     pub collection_img: String,
     pub collection_tags: Vec<String>,
     pub user_mint_limit: Option<u32>,
-    // pub reservation_duration: u32,
-    // pub reservation_amount: u64,
     // pub time_for_change: u32,
+    pub time_to_action: Vec<(u32, Action)>,
     pub transferable: bool,
     pub approvable: bool,
     pub burnable: bool,
     pub sellable: bool,
     pub attendable: bool,
+}
+
+#[derive(Debug, Clone, Encode, Decode, TypeInfo)]
+pub enum Action {
+    ChangeImg,
+    // ChangeMeta(String),
+    // AddMeta(String),
 }
 
 #[derive(Debug, Clone, Encode, Decode, TypeInfo)]
@@ -73,13 +81,8 @@ pub enum AutoNftAction {
     AddAdmin {
         new_admin: ActorId,
     },
-    Update {
+    ChangeImg {
         token_id: NftId,
-    },
-    StartAutoChanging {
-        token_id: NftId,
-        duration_sec: u32,
-        interval_sec: u32,
     },
 }
 
@@ -120,8 +123,10 @@ pub enum AutoNftEvent {
     ConfigChanged {
         config: Config,
     },
-    Updated,
     ChangeStarted {
+        token_id: NftId,
+    },
+    ImageChanged {
         token_id: NftId,
     },
 }
@@ -144,7 +149,7 @@ pub struct Nft {
     pub owner: ActorId,
     pub name: String,
     pub description: String,
-    pub media_url: (u32, Vec<String>),
+    pub media_url: (u32, Vec<String>), // (number current image, vector of all image)
 }
 
 #[derive(Encode, Decode, TypeInfo)]
