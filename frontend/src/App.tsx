@@ -1,3 +1,5 @@
+import { Outlet } from 'react-router-dom';
+
 import { Container, Footer, Header } from './components';
 import { withProviders } from './providers';
 
@@ -7,7 +9,9 @@ function Component() {
       <Header />
 
       <main>
-        <Container>App</Container>
+        <Container>
+          <Outlet />
+        </Container>
       </main>
 
       <Footer />

@@ -14,9 +14,18 @@ dependencies:
   '@gear-js/vara-ui':
     specifier: 0.0.5
     version: 0.0.5(react-dom@18.2.0)(react@18.2.0)
+  '@polkadot/api':
+    specifier: 10.10.1
+    version: 10.10.1
+  '@polkadot/api-derive':
+    specifier: 10.10.1
+    version: 10.10.1
   '@polkadot/react-identicon':
     specifier: 3.6.4
     version: 3.6.4(@polkadot/keyring@12.6.1)(@polkadot/networks@12.6.1)(@polkadot/util-crypto@12.6.1)(@polkadot/util@12.6.1)(react-dom@18.2.0)(react-is@18.2.0)(react@18.2.0)
+  '@polkadot/types':
+    specifier: 10.10.1
+    version: 10.10.1
   kubo-rpc-client:
     specifier: 3.0.2
     version: 3.0.2
@@ -1315,9 +1324,9 @@ packages:
       '@polkadot/networks': 12.6.1
       '@polkadot/util': 12.5.1
       '@polkadot/wasm-crypto': 7.3.2(@polkadot/util@12.5.1)(@polkadot/x-randomvalues@12.6.1)
-      '@polkadot/wasm-util': 7.3.2(@polkadot/util@12.6.1)
+      '@polkadot/wasm-util': 7.3.2(@polkadot/util@12.5.1)
       '@polkadot/x-bigint': 12.6.1
-      '@polkadot/x-randomvalues': 12.6.1(@polkadot/util@12.6.1)(@polkadot/wasm-util@7.3.2)
+      '@polkadot/x-randomvalues': 12.6.1(@polkadot/util@12.5.1)(@polkadot/wasm-util@7.3.2)
       '@scure/base': 1.1.5
       tslib: 2.6.2
     dev: false
@@ -1388,7 +1397,7 @@ packages:
     dependencies:
       '@polkadot/util': 12.5.1
       '@polkadot/wasm-util': 7.3.2(@polkadot/util@12.5.1)
-      '@polkadot/x-randomvalues': 12.6.1(@polkadot/util@12.6.1)(@polkadot/wasm-util@7.3.2)
+      '@polkadot/x-randomvalues': 12.6.1(@polkadot/util@12.5.1)(@polkadot/wasm-util@7.3.2)
       tslib: 2.6.2
     dev: false
 
@@ -1463,7 +1472,7 @@ packages:
       '@polkadot/wasm-crypto-asmjs': 7.3.2(@polkadot/util@12.5.1)
       '@polkadot/wasm-crypto-wasm': 7.3.2(@polkadot/util@12.5.1)
       '@polkadot/wasm-util': 7.3.2(@polkadot/util@12.5.1)
-      '@polkadot/x-randomvalues': 12.6.1(@polkadot/util@12.6.1)(@polkadot/wasm-util@7.3.2)
+      '@polkadot/x-randomvalues': 12.6.1(@polkadot/util@12.5.1)(@polkadot/wasm-util@7.3.2)
       tslib: 2.6.2
     dev: false
 
@@ -1546,7 +1555,7 @@ packages:
       '@polkadot/wasm-crypto-init': 7.3.2(@polkadot/util@12.5.1)(@polkadot/x-randomvalues@12.6.1)
       '@polkadot/wasm-crypto-wasm': 7.3.2(@polkadot/util@12.5.1)
       '@polkadot/wasm-util': 7.3.2(@polkadot/util@12.5.1)
-      '@polkadot/x-randomvalues': 12.6.1(@polkadot/util@12.6.1)(@polkadot/wasm-util@7.3.2)
+      '@polkadot/x-randomvalues': 12.6.1(@polkadot/util@12.5.1)(@polkadot/wasm-util@7.3.2)
       tslib: 2.6.2
     dev: false
 
@@ -1633,6 +1642,19 @@ packages:
     resolution: {integrity: sha512-w5t19HIdBPuyu7X/AiCyH2DsKqxBF0KpF4Ymolnx8PfcSIgnq9ZOmgs74McPR6FgEmeEkr9uNKujZrsfURi1ug==}
     engines: {node: '>=18'}
     dependencies:
+      tslib: 2.6.2
+    dev: false
+
+  /@polkadot/x-randomvalues@12.6.1(@polkadot/util@12.5.1)(@polkadot/wasm-util@7.3.2):
+    resolution: {integrity: sha512-1uVKlfYYbgIgGV5v1Dgn960cGovenWm5pmg+aTMeUGXVYiJwRD2zOpLyC1i/tP454iA74j74pmWb8Nkn0tJZUQ==}
+    engines: {node: '>=18'}
+    peerDependencies:
+      '@polkadot/util': 12.6.1
+      '@polkadot/wasm-util': '*'
+    dependencies:
+      '@polkadot/util': 12.5.1
+      '@polkadot/wasm-util': 7.3.2(@polkadot/util@12.5.1)
+      '@polkadot/x-global': 12.6.1
       tslib: 2.6.2
     dev: false
 

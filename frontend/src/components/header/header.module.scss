@@ -3,8 +3,21 @@
   padding: 18px 0;
 }
 
-.container {
+.container,
+.buttons,
+.wallet {
   display: flex;
   align-items: center;
+}
+
+.container {
   justify-content: space-between;
+}
+
+.buttons {
+  gap: 12px;
+}
+
+.wallet {
+  gap: 24px;
 }

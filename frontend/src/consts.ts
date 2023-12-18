@@ -5,6 +5,7 @@ const ADDRESS = {
 
 const ROUTE = {
   HOME: '/',
+  CREATE_COLLECTION: 'create',
 };
 
 export { ADDRESS, ROUTE };
