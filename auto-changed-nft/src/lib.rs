@@ -1,8 +1,5 @@
 #![no_std]
-use auto_changed_nft_io::{
-    AutoNftAction, AutoNftError, AutoNftEvent, AutoNftInit, AutoNftState, Config, Nft, NftId,
-    StateQuery, StateReply,
-};
+use auto_changed_nft_io::*;
 use gstd::{
     collections::{HashMap, HashSet},
     debug, exec, msg,
@@ -81,42 +78,18 @@ impl NftContract {
             })
             .or_insert(1);
 
-        // let reservation_id = ReservationId::reserve(self.config.reservation_amount, self.config.reservation_duration)
-        //     .expect("reservation across executions");
-        // self.reservations.insert(token_id, reservation_id);
-
-        // msg::send_with_gas_delayed(
-        //     exec::program_id(),
-        //     AutoNftAction::Update {
-        //         token_id,
-        //     },
-        //     self.config.reservation_amount,
-        //     0,
-        //     self.config.time_for_change)
-        //     .expect("Error in sending a delayed message `AutoNftAction::Update`");
-
-        // let number_message = 892800 / self.config.time_for_change;
-        // for i in 1..=number_message{
-        //     msg::send_delayed(
-        //         exec::program_id(),
-        //         AutoNftAction::Update {
-        //             token_id,
-        //         },
-        //         0,
-        //         self.config.time_for_change*i)
-        //         .expect("Error in sending a delayed message `AutoNftAction::Update`");
-        // }
-
-        // msg::send_delayed_from_reservation(
-        //     reservation_id,
-        //     exec::program_id(),
-        //     AutoNftAction::Update {
-        //         token_id,
-        //     },
-        //     0,
-        //     self.config.time_for_change,
-        // )
-        // .expect("Error in sending a delayed message `AutoNftAction::Update`");
+        self.config.time_to_action.iter().for_each(|event| {
+            let action = match event.1 {
+                Action::ChangeImg => AutoNftAction::ChangeImg { token_id },
+            };
+            msg::send_delayed(
+                exec::program_id(),
+                action,
+                0,
+                event.0 / BLOCK_DURATION_IN_SECS,
+            )
+            .expect("Error in sending a delayed message `AutoNftAction`");
+        });
 
         Ok(AutoNftEvent::Minted {
             owner: msg_src,
@@ -265,68 +238,59 @@ impl NftContract {
         Ok(AutoNftEvent::ConfigChanged { config })
     }
 
-    fn update(&mut self, token_id: NftId) -> Result<AutoNftEvent, AutoNftError> {
-        assert!(
-            msg::source() == exec::program_id() || self.admins.contains(&msg::source()),
-            "Only program or admin can send this message"
-        );
-        let nft = self
-            .tokens
-            .get_mut(&token_id)
-            .expect("AutoNft: token does not exist");
+    // fn start_auto_changing(
+    //     &mut self,
+    //     token_id: NftId,
+    //     duration_sec: u32,
+    //     interval_sec: u32,
+    // ) -> Result<AutoNftEvent, AutoNftError> {
+    //     let nft = self
+    //         .tokens
+    //         .get_mut(&token_id)
+    //         .expect("AutoNft: token does not exist");
 
-        nft.media_url.0 = (nft.media_url.0 + 1) % nft.media_url.1.len() as u32;
-        // let gas = exec::gas_available() - 1_000_000_000;
-        // msg::send_with_gas_delayed(
-        //     exec::program_id(),
-        //     AutoNftAction::Update {
-        //         token_id,
-        //     },
-        //     gas,
-        //     0,
-        //     self.config.time_for_change)
-        //     .expect("Error in sending a delayed message `AutoNftAction::Update`");
+    //     if nft.owner != msg::source() {
+    //         return Err(AutoNftError(
+    //             "Only the owner can send this message".to_owned(),
+    //         ));
+    //     }
 
-        Ok(AutoNftEvent::Updated)
-    }
+    //     nft.media_url.0 = (nft.media_url.0 + 1) % nft.media_url.1.len() as u32;
 
-    fn start_auto_changing(
-        &mut self,
-        token_id: NftId,
-        duration_sec: u32,
-        interval_sec: u32,
-    ) -> Result<AutoNftEvent, AutoNftError> {
-        let nft = self
-            .tokens
-            .get_mut(&token_id)
-            .expect("AutoNft: token does not exist");
+    //     // 892800 blocks per month
+    //     // 201600 blocks per 7 days
+    //     // 28800 blocks per day
+    //     // 1200 blocks per hour
+    //     let duration_block = duration_sec / 3;
+    //     let interval_block = interval_sec / 3;
+    //     let number_message = duration_block / interval_block;
+    //     for i in 1..=number_message {
+    //         msg::send_delayed(
+    //             exec::program_id(),
+    //             AutoNftAction::Update { token_id },
+    //             0,
+    //             interval_block * i,
+    //         )
+    //         .expect("Error in sending a delayed message `AutoNftAction::Update`");
+    //     }
 
-        if nft.owner != msg::source() {
+    //     Ok(AutoNftEvent::ChangeStarted { token_id })
+    // }
+
+    fn change_image(&mut self, token_id: NftId) -> Result<AutoNftEvent, AutoNftError> {
+        if exec::program_id() != msg::source() {
             return Err(AutoNftError(
-                "Only the owner can send this message".to_owned(),
+                "Only program can send this message".to_owned(),
             ));
         }
+        let nft = self
+            .tokens
+            .get_mut(&token_id)
+            .expect("AutoNft: token does not exist");
 
         nft.media_url.0 = (nft.media_url.0 + 1) % nft.media_url.1.len() as u32;
 
-        // 892800 blocks per month
-        // 201600 blocks per 7 days
-        // 28800 blocks per day
-        // 1200 blocks per hour
-        let duration_block = duration_sec / 3;
-        let interval_block = interval_sec / 3;
-        let number_message = duration_block / interval_block;
-        for i in 1..=number_message {
-            msg::send_delayed(
-                exec::program_id(),
-                AutoNftAction::Update { token_id },
-                0,
-                interval_block * i,
-            )
-            .expect("Error in sending a delayed message `AutoNftAction::Update`");
-        }
-
-        Ok(AutoNftEvent::ChangeStarted { token_id })
+        Ok(AutoNftEvent::ImageChanged { token_id })
     }
 
     fn check_admin(&self) -> Result<(), AutoNftError> {
@@ -510,12 +474,7 @@ extern "C" fn handle() {
         AutoNftAction::Expand { additional_links } => nft_contract.expand(additional_links),
         AutoNftAction::ChangeConfig { config } => nft_contract.change_config(config),
         AutoNftAction::GetTokenInfo { token_id } => nft_contract.get_token_info(token_id),
-        AutoNftAction::Update { token_id } => nft_contract.update(token_id),
-        AutoNftAction::StartAutoChanging {
-            token_id,
-            duration_sec,
-            interval_sec,
-        } => nft_contract.start_auto_changing(token_id, duration_sec, interval_sec),
+        AutoNftAction::ChangeImg { token_id } => nft_contract.change_image(token_id),
     };
 
     msg::reply(result, 0)

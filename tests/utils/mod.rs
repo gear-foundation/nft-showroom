@@ -1,3 +1,5 @@
+use std::time::Duration;
+
 use gstd::{ActorId, CodeId};
 use gtest::{Program, RunResult, System};
 use nft_marketplace_io::{NftMarketplaceAction, NftMarketplaceInit};
@@ -64,7 +66,40 @@ pub fn sale(
         },
     )
 }
-
+pub fn create_auction(
+    marketplace: &Program,
+    user: u64,
+    collection_address: ActorId,
+    token_id: u64,
+    min_price: u128,
+    duration_ms: u32,
+) -> RunResult {
+    marketplace.send(
+        user,
+        NftMarketplaceAction::CreateAuction {
+            collection_address,
+            token_id,
+            min_price,
+            duration_ms,
+        },
+    )
+}
+pub fn add_bid(
+    marketplace: &Program,
+    user: u64,
+    collection_address: ActorId,
+    token_id: u64,
+    price: u128,
+) -> RunResult {
+    marketplace.send_with_value(
+        user,
+        NftMarketplaceAction::AddBid {
+            collection_address,
+            token_id,
+        },
+        price,
+    )
+}
 pub fn buy(
     marketplace: &Program,
     user: u64,

@@ -1,5 +1,5 @@
 use auto_changed_nft_io::{
-    AutoNftAction, AutoNftInit, AutoNftState, Config, StateQuery, StateReply,
+    Action, AutoNftAction, AutoNftInit, AutoNftState, Config, StateQuery, StateReply,
 };
 use gclient::{EventProcessor, GearApi, Result};
 use gear_core::ids::ProgramId;
@@ -19,6 +19,7 @@ async fn create_test() -> Result<()> {
     let img_links: Vec<(Vec<String>, u32)> = (0..10).map(|_| (links.clone(), 1 as u32)).collect();
 
     // let time_for_change = 5;
+    let time_to_action = vec![(15, Action::ChangeImg), (30, Action::ChangeImg)];
 
     let init_nft_payload = AutoNftInit {
         owner: 100.into(),
@@ -28,9 +29,8 @@ async fn create_test() -> Result<()> {
             collection_img: "Collection image".to_string(),
             collection_tags: vec!["tag1".to_string()],
             user_mint_limit: 3.into(),
-            // reservation_amount: 100_000_000_000,
-            // reservation_duration: 20,
             // time_for_change,
+            time_to_action,
             transferable: true,
             approvable: true,
             burnable: true,
@@ -82,46 +82,22 @@ async fn create_test() -> Result<()> {
 
     assert!(listener.message_processed(message_id).await?.succeed());
 
-    let interval_sec = 15;
-
-    let gas_info = api
-        .calculate_handle_gas(
-            None,
-            program_id,
-            AutoNftAction::StartAutoChanging {
-                token_id: 0,
-                duration_sec: 1000,
-                interval_sec,
-            }
-            .encode(),
-            0,
-            true,
-        )
-        .await?;
-
-    println!("GAS_INFO MIN LIMIT: {:?}", gas_info.min_limit.clone());
-
-    let (message_id, _) = api
-        .send_message(
-            program_id,
-            AutoNftAction::StartAutoChanging {
-                token_id: 0,
-                duration_sec: 1000,
-                interval_sec,
-            },
-            2 * gas_info.min_limit,
-            0,
-        )
-        .await?;
-
-    assert!(listener.message_processed(message_id).await?.succeed());
+    let interval_sec: u64 = 15;
 
     let state = get_all_state_nft(&api, &program_id)
         .await
         .expect("Unexpected invalid state.");
 
     // println!("STATE: {:?}", state);
+    assert_eq!(state.tokens.get(0).unwrap().1.media_url.0, 0);
+    std::thread::sleep(std::time::Duration::from_secs(interval_sec.into()));
+    let state = get_all_state_nft(&api, &program_id)
+        .await
+        .expect("Unexpected invalid state.");
+
+    // println!("STATE: {:?}", state);
     assert_eq!(state.tokens.get(0).unwrap().1.media_url.0, 1);
+
     std::thread::sleep(std::time::Duration::from_secs(interval_sec.into()));
     let state = get_all_state_nft(&api, &program_id)
         .await
@@ -129,22 +105,6 @@ async fn create_test() -> Result<()> {
 
     // println!("STATE: {:?}", state);
     assert_eq!(state.tokens.get(0).unwrap().1.media_url.0, 2);
-
-    std::thread::sleep(std::time::Duration::from_secs(interval_sec.into()));
-    let state = get_all_state_nft(&api, &program_id)
-        .await
-        .expect("Unexpected invalid state.");
-
-    // println!("STATE: {:?}", state);
-    assert_eq!(state.tokens.get(0).unwrap().1.media_url.0, 3);
-
-    std::thread::sleep(std::time::Duration::from_secs(interval_sec.into()));
-    let state = get_all_state_nft(&api, &program_id)
-        .await
-        .expect("Unexpected invalid state.");
-
-    // println!("STATE: {:?}", state);
-    assert_eq!(state.tokens.get(0).unwrap().1.media_url.0, 0);
 
     Ok(())
 }

@@ -42,6 +42,20 @@ pub enum NftMarketplaceAction {
         collection_address: ActorId,
         token_id: u64,
     },
+    CreateAuction {
+        collection_address: ActorId,
+        token_id: u64,
+        min_price: u128,
+        duration_ms: u32,
+    },
+    AddBid {
+        collection_address: ActorId,
+        token_id: u64,
+    },
+    CloseAuction {
+        collection_address: ActorId,
+        token_id: u64,
+    },
     DeleteCollection {
         collection_address: ActorId,
     },
@@ -83,6 +97,22 @@ pub enum NftMarketplaceEvent {
         current_owner: ActorId,
         token_id: u64,
         price: u128,
+    },
+    AuctionCreated {
+        collection_address: ActorId,
+        token_id: u64,
+        min_price: u128,
+        duration_ms: u32,
+    },
+    AuctionClosed {
+        collection_address: ActorId,
+        token_id: u64,
+        price: u128,
+        current_owner: ActorId,
+    },
+    BidAdded {
+        collection_address: ActorId,
+        token_id: u64,
     },
     CollectionDeleted {
         collection_address: ActorId,
@@ -127,6 +157,7 @@ pub struct State {
     pub time_creation: Vec<(ActorId, u64)>,
     pub type_collections: Vec<(u16, CollectionInfo)>,
     pub sale: Vec<((ActorId, u64), NftInfoForSale)>,
+    pub auction: Vec<((ActorId, u64), Auction)>,
     pub config: Config,
 }
 
@@ -149,6 +180,14 @@ pub struct NftInfoForSale {
     pub owner: ActorId,
 }
 
+#[derive(Debug, Encode, Decode, TypeInfo, Clone)]
+pub struct Auction {
+    pub owner: ActorId,
+    pub started_at: u64,
+    pub ended_at: u64,
+    pub current_price: u128,
+    pub current_winner: ActorId,
+}
 #[derive(Debug, Clone, Encode, Decode, TypeInfo)]
 pub enum NftAction {
     Transfer {
