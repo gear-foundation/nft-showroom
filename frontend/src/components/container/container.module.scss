@@ -1,6 +1,13 @@
 .container {
-  max-width: 1200px;
   margin: 0 auto;
   padding: 0 16px;
   box-sizing: content-box;
+}
+
+.xl {
+  max-width: 1200px;
+}
+
+.sm {
+  max-width: 585px;
 }

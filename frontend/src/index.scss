@@ -24,6 +24,13 @@ a {
   transition: opacity 0.25s;
 }
 
+button {
+  border: none;
+  outline: none;
+  cursor: pointer;
+}
+
+button,
 small {
   font: inherit;
 }

@@ -1,6 +1,6 @@
 import { Outlet } from 'react-router-dom';
 
-import { Container, Footer, Header } from './components';
+import { Footer, Header } from './components';
 import { withProviders } from './providers';
 
 function Component() {
@@ -9,9 +9,7 @@ function Component() {
       <Header />
 
       <main>
-        <Container>
-          <Outlet />
-        </Container>
+        <Outlet />
       </main>
 
       <Footer />
