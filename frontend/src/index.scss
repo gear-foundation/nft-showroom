@@ -13,7 +13,7 @@ body {
 
 main {
   flex: 1;
-  padding: 24px 0;
+  padding: 50px 0;
 }
 
 // resets
@@ -25,6 +25,7 @@ a {
 }
 
 button {
+  padding: 0;
   border: none;
   outline: none;
   cursor: pointer;

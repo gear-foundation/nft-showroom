@@ -8,11 +8,12 @@ type Props = {
   tag: string;
   text: string;
   SVG: FunctionComponent<SVGProps<SVGSVGElement> & { title?: string | undefined }>;
+  onClick: () => void;
 };
 
-function CollectionTypeButton({ heading, tag, text, SVG }: Props) {
+function CollectionTypeButton({ heading, tag, text, SVG, onClick }: Props) {
   return (
-    <button className={styles.button} onClick={() => {}}>
+    <button className={styles.button} onClick={onClick}>
       <span>
         <span className={styles.header}>
           <SVG />

@@ -1,0 +1,42 @@
+.header {
+  padding: 62px;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  gap: 16px;
+  text-align: center;
+  background-color: #e7e9eb;
+  border-radius: 15px;
+  position: relative;
+}
+
+.heading {
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 20px;
+  letter-spacing: 0.01em;
+}
+
+.text {
+  font-weight: 300;
+  line-height: 18px;
+}
+
+.logoButton {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  transform: translate(48px, 50%);
+  width: 196px;
+  height: 196px;
+  background-color: #e7e9eb;
+  border: 1px solid #fff;
+  border-radius: 50%;
+}
+
+// TODO: remove after @gear-js/vara-ui input z-index fix
+.input {
+  > div:first-child {
+    z-index: 1;
+  }
+}

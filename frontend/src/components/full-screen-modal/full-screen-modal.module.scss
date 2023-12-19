@@ -1,0 +1,56 @@
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.header {
+  background-color: #fff;
+  padding: 18px 0;
+
+  .container {
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .headingWrapper,
+  .progressWrapper,
+  .balanceWrapper {
+    display: flex;
+    align-items: center;
+  }
+
+  .headingWrapper {
+    gap: 16px;
+  }
+
+  .progressWrapper {
+    gap: 32px;
+  }
+
+  .balanceWrapper {
+    gap: 44px;
+  }
+
+  .heading {
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 22px;
+    letter-spacing: 0.02em;
+  }
+
+  .progress {
+    display: flex;
+    gap: 32px;
+    font-weight: 700;
+    line-height: 24px;
+  }
+}
+
+.body {
+  height: 100%;
+  padding: 50px 0;
+  background-color: #f7f9fa;
+}
