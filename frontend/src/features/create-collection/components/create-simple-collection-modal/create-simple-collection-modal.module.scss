@@ -32,6 +32,11 @@
   background-color: #e7e9eb;
   border: 1px solid #fff;
   border-radius: 50%;
+  transition: background-color 0.25s;
+
+  &:hover {
+    background-color: #dcdee0;
+  }
 }
 
 // TODO: remove after @gear-js/vara-ui input z-index fix

@@ -1,6 +1,6 @@
 import { FunctionComponent, SVGProps } from 'react';
 
-import ArrowSVG from './right-arrow.svg?react';
+import ArrowSVG from '../../assets/right-arrow.svg?react';
 import styles from './collection-type-button.module.scss';
 
 type Props = {

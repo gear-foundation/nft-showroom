@@ -1,11 +1,11 @@
 import { Button } from '@gear-js/vara-ui';
 import { ReactNode } from 'react';
 
+import { Container } from '@/components';
 import { Balance } from '@/features/wallet';
+import { cx } from '@/utils';
 
-import { Container } from '../container';
-import CrossSVG from './cross.svg?react';
-import { Step } from './step';
+import CrossSVG from '../../assets/cross.svg?react';
 import styles from './full-screen-modal.module.scss';
 
 type Props = {
@@ -26,7 +26,11 @@ function FullScreenModal({ heading, steps, stepIndex, children, renderSubmitButt
   };
 
   const getSteps = () =>
-    steps.map((step, index) => <Step key={step} text={step} number={index + 1} status={getStepStatus(index)} />);
+    steps.map((step, index) => (
+      <li key={step} className={cx(styles.step, styles[getStepStatus(index)])} data-number={index + 1}>
+        {step}
+      </li>
+    ));
 
   return (
     <div className={styles.modal}>

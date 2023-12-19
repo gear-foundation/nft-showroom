@@ -49,6 +49,48 @@
   }
 }
 
+.step {
+  display: flex;
+
+  &::before {
+    width: 24px;
+    height: 24px;
+    margin-right: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    border-radius: 50%;
+  }
+
+  &.active {
+    color: #0ed3a3;
+
+    &::before {
+      content: attr(data-number);
+      background-color: #0ed3a3;
+    }
+  }
+
+  &.awaiting {
+    color: #93989a;
+
+    &::before {
+      content: attr(data-number);
+      background-color: #93989a;
+    }
+  }
+
+  &.complete {
+    color: #000;
+
+    &::before {
+      content: url(../../assets/check.svg);
+      background-color: #000;
+    }
+  }
+}
+
 .body {
   height: 100%;
   padding: 50px 0;

@@ -1,12 +1,12 @@
 import { Button, Input, ModalProps } from '@gear-js/vara-ui';
 import { useState } from 'react';
 
-import { Container, FullScreenModal } from '@/components';
-import CameraSVG from './camera.svg?react';
+import { Container } from '@/components';
 
+import CameraSVG from '../../assets/camera.svg?react';
+import { STEPS } from '../../consts';
+import { FullScreenModal } from '../full-screen-modal';
 import styles from './create-simple-collection-modal.module.scss';
-
-const STEPS = ['Fill info', 'Set parameters', 'Add NFTs'];
 
 function CreateSimpleCollectionModal({ close }: Pick<ModalProps, 'close'>) {
   const [stepIndex, setStepIndex] = useState(0);
@@ -16,12 +16,10 @@ function CreateSimpleCollectionModal({ close }: Pick<ModalProps, 'close'>) {
   return (
     <FullScreenModal
       heading="Create Simple NFT Collection"
-      steps={STEPS}
+      steps={STEPS.SIMPLE_COLLECTION}
       stepIndex={stepIndex}
       renderSubmitButton={getSubmitButton}
       close={close}>
-      <Input label="Name" />
-
       <Container>
         <header className={styles.header}>
           <h4 className={styles.heading}>Collection Cover</h4>
