@@ -39,7 +39,7 @@ function FullScreenModal({ heading, steps, stepIndex, children, className, rende
         <Container className={styles.container}>
           <div className={styles.headingWrapper}>
             <Button icon={CrossSVG} color="transparent" onClick={close} />
-            <h3 className={styles.heading}>{heading}</h3>
+            <h2 className={styles.heading}>{heading}</h2>
           </div>
 
           <div className={styles.balanceWrapper}>

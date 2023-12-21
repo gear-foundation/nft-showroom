@@ -1,0 +1,44 @@
+.heading,
+.text {
+  text-align: center;
+}
+
+.heading {
+  margin-bottom: 16px;
+
+  font-size: 32px;
+  font-weight: 700;
+  line-height: 38px;
+  letter-spacing: 0.02em;
+}
+
+.text {
+  margin-bottom: 56px;
+
+  font-size: 16px;
+  line-height: 26px;
+  color: #535352;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+// TODO: remove after @gear-js/vara-ui input z-index fix
+.input {
+  legend {
+    max-height: 1em;
+  }
+
+  > div:first-child {
+    z-index: 1;
+  }
+}
+
+.buttons {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}

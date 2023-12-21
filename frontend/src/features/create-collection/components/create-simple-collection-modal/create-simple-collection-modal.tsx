@@ -1,18 +1,17 @@
 import { Button, ModalProps } from '@gear-js/vara-ui';
 import { useState } from 'react';
 
-import { DEFAULT_SUMMARY_VALUES, STEPS } from '../../consts';
-import { SummaryValues } from '../../types';
+import { DEFAULT_PARAMETERS_VALUES, DEFAULT_SUMMARY_VALUES, STEPS } from '../../consts';
 import { FullScreenModal } from '../full-screen-modal';
 import { SummaryForm } from '../summary-form';
-import styles from './create-simple-collection-modal.module.scss';
+import { ParametersForm } from '../parameters-form/parameters-form';
 
-const FORMS = [SummaryForm];
+const FORMS = [SummaryForm, ParametersForm];
 
 function CreateSimpleCollectionModal({ close }: Pick<ModalProps, 'close'>) {
   const [stepIndex, setStepIndex] = useState(0);
 
-  const [formValues, setFormValues] = useState([DEFAULT_SUMMARY_VALUES]);
+  const [formValues, setFormValues] = useState([DEFAULT_SUMMARY_VALUES, DEFAULT_PARAMETERS_VALUES]);
   console.log('formValues: ', formValues);
 
   const handleSubmit = (data: unknown) => {
@@ -32,6 +31,8 @@ function CreateSimpleCollectionModal({ close }: Pick<ModalProps, 'close'>) {
       stepIndex={stepIndex}
       renderSubmitButton={() => <Button text="Continue" />}
       close={close}>
+      {/* eslint-disable-next-line @typescript-eslint/ban-ts-comment */}
+      {/* @ts-ignore */}
       <Form defaultValues={defaultValues} onSubmit={handleSubmit} />
     </FullScreenModal>
   );

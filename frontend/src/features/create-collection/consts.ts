@@ -34,4 +34,10 @@ const DEFAULT_SUMMARY_VALUES = {
   description: '',
 };
 
-export { COLLECTION_TYPES, STEPS, DEFAULT_SUMMARY_VALUES };
+const DEFAULT_PARAMETERS_VALUES = {
+  mintPrice: '',
+  mintLimit: '',
+  royalty: '',
+};
+
+export { COLLECTION_TYPES, STEPS, DEFAULT_SUMMARY_VALUES, DEFAULT_PARAMETERS_VALUES };
