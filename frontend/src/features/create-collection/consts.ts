@@ -28,4 +28,10 @@ const STEPS = {
   SIMPLE_COLLECTION: ['Fill info', 'Set parameters', 'Add NFTs'],
 };
 
-export { COLLECTION_TYPES, STEPS };
+const DEFAULT_SUMMARY_VALUES = {
+  cover: undefined,
+  name: '',
+  description: '',
+};
+
+export { COLLECTION_TYPES, STEPS, DEFAULT_SUMMARY_VALUES };

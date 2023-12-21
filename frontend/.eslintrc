@@ -46,7 +46,10 @@
         "no-shadow-restricted-names": "error",
 
         // dx
-        "@typescript-eslint/no-unused-vars": "warn"
+        "@typescript-eslint/no-unused-vars": "warn",
+
+        // react-hook-form onSubmit
+        "@typescript-eslint/no-misused-promises": [2, { "checksVoidReturn": { "attributes": false } }]
       }
     }
   ]
