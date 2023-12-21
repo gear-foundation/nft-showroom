@@ -1,5 +1,5 @@
 import { Button } from '@gear-js/vara-ui';
-import { ReactNode } from 'react';
+import { ReactNode, useEffect } from 'react';
 
 import { Container } from '@/components';
 import { Balance } from '@/features/wallet';
@@ -32,6 +32,14 @@ function FullScreenModal({ heading, steps, stepIndex, children, className, rende
         {step}
       </li>
     ));
+
+  useEffect(() => {
+    document.body.classList.add(styles.disabledScroll);
+
+    return () => {
+      document.body.classList.remove(styles.disabledScroll);
+    };
+  }, []);
 
   return (
     <div className={styles.modal}>
