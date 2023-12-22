@@ -8,4 +8,14 @@ type SummaryValues = {
 
 type ParametersValues = typeof DEFAULT_PARAMETERS_VALUES;
 
-export type { SummaryValues, ParametersValues };
+type NFT = {
+  url: string;
+  limit: string;
+};
+
+type NFTsValues = {
+  image: FileList | undefined;
+  nfts: NFT[];
+};
+
+export type { SummaryValues, ParametersValues, NFTsValues };

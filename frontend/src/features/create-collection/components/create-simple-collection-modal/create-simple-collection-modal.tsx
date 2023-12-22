@@ -1,17 +1,19 @@
 import { Button, ModalProps } from '@gear-js/vara-ui';
 import { useState } from 'react';
 
-import { DEFAULT_PARAMETERS_VALUES, DEFAULT_SUMMARY_VALUES, STEPS } from '../../consts';
+import { DEFAULT_NFTS_VALUES, DEFAULT_PARAMETERS_VALUES, DEFAULT_SUMMARY_VALUES, STEPS } from '../../consts';
 import { FullScreenModal } from '../full-screen-modal';
 import { SummaryForm } from '../summary-form';
-import { ParametersForm } from '../parameters-form/parameters-form';
+import { ParametersForm } from '../parameters-form';
+import { NFTForm } from '../nft-form';
 
-const FORMS = [SummaryForm, ParametersForm];
+const FORMS = [SummaryForm, ParametersForm, NFTForm] as const;
+const DEFAULT_VALUES = [DEFAULT_SUMMARY_VALUES, DEFAULT_PARAMETERS_VALUES, DEFAULT_NFTS_VALUES] as const;
 
 function CreateSimpleCollectionModal({ close }: Pick<ModalProps, 'close'>) {
   const [stepIndex, setStepIndex] = useState(0);
 
-  const [formValues, setFormValues] = useState([DEFAULT_SUMMARY_VALUES, DEFAULT_PARAMETERS_VALUES]);
+  const [formValues, setFormValues] = useState(DEFAULT_VALUES);
   console.log('formValues: ', formValues);
 
   const handleSubmit = (data: unknown) => {

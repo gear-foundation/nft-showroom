@@ -23,7 +23,6 @@ function ParametersForm({ defaultValues, onSubmit }: Props) {
 
       <form onSubmit={handleSubmit(onSubmit)} className={styles.form}>
         <Input label={`Minting price (${unit})`} className={styles.input} {...register('mintPrice')} />
-        <Input label="Minting limit per user" className={styles.input} {...register('mintLimit')} />
         <Input label="Creator royalties (%)" className={styles.input} {...register('royalty')} />
 
         <div className={styles.buttons}>

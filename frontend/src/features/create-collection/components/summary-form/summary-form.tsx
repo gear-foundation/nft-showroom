@@ -1,39 +1,17 @@
 import { Button, Input } from '@gear-js/vara-ui';
-import { useRef, useImperativeHandle, useEffect, useState } from 'react';
-import { UseFormRegisterReturn, useForm, useWatch } from 'react-hook-form';
+import { useForm, useWatch } from 'react-hook-form';
 
 import { Container } from '@/components';
 
-import TrashSVG from '../../assets/trash.svg?react';
 import { SummaryValues } from '../../types';
+import { useFileUrl, useRegisterRef } from '../../hooks';
+import { DeleteButton } from '../delete-button';
 import styles from './summary-form.module.scss';
 
 type Props = {
   defaultValues: SummaryValues;
   onSubmit: (values: SummaryValues) => void;
 };
-
-function useFileUrl(fileList: FileList | undefined) {
-  const [url, setUrl] = useState('');
-
-  useEffect(() => {
-    if (!fileList || !fileList.length) return setUrl('');
-
-    const [file] = fileList;
-    const result = URL.createObjectURL(file);
-
-    setUrl(result);
-  }, [fileList]);
-
-  return url;
-}
-
-function useRegisterRef<T extends string>({ ref: registerRef, ...props }: UseFormRegisterReturn<T>) {
-  const ref = useRef<HTMLInputElement>(null);
-  useImperativeHandle(registerRef, () => ref.current as HTMLInputElement);
-
-  return [ref, props] as const;
-}
 
 function SummaryForm({ defaultValues, onSubmit }: Props) {
   const { register, setValue, handleSubmit, control } = useForm({ defaultValues });
@@ -44,19 +22,14 @@ function SummaryForm({ defaultValues, onSubmit }: Props) {
   const style = { backgroundImage: `url(${url})` };
 
   const handleFileButtonClick = () => ref.current?.click();
-  const handleResetFileButtonClick = () => setValue('cover', undefined);
+  const handleDeleteFileButtonClick = () => setValue('cover', undefined);
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
       <Container>
         <header className={styles.cover} style={style}>
           {url ? (
-            <Button
-              icon={TrashSVG}
-              color="transparent"
-              className={styles.resetButton}
-              onClick={handleResetFileButtonClick}
-            />
+            <DeleteButton className={styles.deleteButton} onClick={handleDeleteFileButtonClick} />
           ) : (
             <>
               <h4 className={styles.heading}>Collection Cover</h4>
