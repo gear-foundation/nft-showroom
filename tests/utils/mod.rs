@@ -1,8 +1,7 @@
-use std::time::Duration;
-
 use gstd::{ActorId, CodeId};
 use gtest::{Program, RunResult, System};
-use nft_marketplace_io::{NftMarketplaceAction, NftMarketplaceInit};
+use nft_io::{Config, ImageData, NftInit};
+use nft_marketplace_io::{NftMarketplaceAction, NftMarketplaceInit, Offer};
 
 mod common;
 pub mod prelude;
@@ -16,12 +15,18 @@ pub fn init_marketplace(sys: &System) {
     let init_payload = NftMarketplaceInit {
         gas_for_creation: 1_000_000_000_000_000,
         time_between_create_collections: 3_600_000, // 1 hour in milliseconds
+        minimum_transfer_value: 10_000_000_000_000,
     };
     let res = marketplace.send(ADMINS[0], init_payload);
     assert!(!res.main_failed());
 }
 
-pub fn add_new_collection(marketplace: &Program, admin: u64, code_id: CodeId) -> RunResult {
+pub fn add_new_collection(
+    marketplace: &Program,
+    admin: u64,
+    code_id: CodeId,
+    type_name: String,
+) -> RunResult {
     let type_description = String::from("My Collection");
     let meta_link = String::from("My Meta");
 
@@ -30,6 +35,7 @@ pub fn add_new_collection(marketplace: &Program, admin: u64, code_id: CodeId) ->
         NftMarketplaceAction::AddNewCollection {
             code_id,
             meta_link,
+            type_name,
             type_description,
         },
     )
@@ -38,15 +44,12 @@ pub fn add_new_collection(marketplace: &Program, admin: u64, code_id: CodeId) ->
 pub fn create_collection(
     marketplace: &Program,
     user: u64,
-    id_collection: u16,
+    type_name: String,
     payload: Vec<u8>,
 ) -> RunResult {
     marketplace.send(
         user,
-        NftMarketplaceAction::CreateCollection {
-            id_collection,
-            payload,
-        },
+        NftMarketplaceAction::CreateCollection { type_name, payload },
     )
 }
 
@@ -66,6 +69,20 @@ pub fn sale(
         },
     )
 }
+pub fn cancel_sale(
+    marketplace: &Program,
+    user: u64,
+    collection_address: ActorId,
+    token_id: u64,
+) -> RunResult {
+    marketplace.send(
+        user,
+        NftMarketplaceAction::CancelSaleNft {
+            collection_address,
+            token_id,
+        },
+    )
+}
 pub fn create_auction(
     marketplace: &Program,
     user: u64,
@@ -81,6 +98,20 @@ pub fn create_auction(
             token_id,
             min_price,
             duration_ms,
+        },
+    )
+}
+pub fn cancel_auction(
+    marketplace: &Program,
+    user: u64,
+    collection_address: ActorId,
+    token_id: u64,
+) -> RunResult {
+    marketplace.send(
+        user,
+        NftMarketplaceAction::CancelAuction {
+            collection_address,
+            token_id,
         },
     )
 }
@@ -117,6 +148,38 @@ pub fn buy(
     )
 }
 
+pub fn create_offer(
+    marketplace: &Program,
+    user: u64,
+    collection_address: ActorId,
+    token_id: u64,
+    value: u128,
+) -> RunResult {
+    marketplace.send_with_value(
+        user,
+        NftMarketplaceAction::CreateOffer {
+            collection_address,
+            token_id,
+        },
+        value,
+    )
+}
+
+pub fn accept_offer(
+    marketplace: &Program,
+    user: u64,
+    collection_address: ActorId,
+    token_id: u64,
+    creator: ActorId,
+) -> RunResult {
+    let offer = Offer {
+        collection_address,
+        token_id,
+        creator,
+    };
+    marketplace.send(user, NftMarketplaceAction::AcceptOffer { offer })
+}
+
 pub fn add_admin(marketplace: &Program, admin: u64, users: Vec<ActorId>) -> RunResult {
     marketplace.send(admin, NftMarketplaceAction::AddAdmins { users })
 }
@@ -149,7 +212,47 @@ pub fn delete_collection(
 pub fn delete_admin(marketplace: &Program, admin: u64, user: ActorId) -> RunResult {
     marketplace.send(admin, NftMarketplaceAction::DeleteAdmin { user })
 }
+pub fn check_payload(result: &RunResult, message: String) -> bool {
+    result.log()[0]
+        .payload()
+        .windows(message.as_bytes().len())
+        .any(|window| window == message.as_bytes())
+    // result.log()[0].payload()[2..] == *message.as_bytes()
+}
 
+pub fn get_init_nft_payload(
+    collection_owner: ActorId,
+    royalty: u16,
+    user_mint_limit: Option<u32>,
+    payment_for_mint: u128,
+) -> NftInit {
+    let img_data = ImageData {
+        limit_copies: 1,
+        auto_changing_rules: None,
+    };
+    let img_links: Vec<(String, ImageData)> = (0..10)
+        .map(|i| (format!("Img-{}", i), img_data.clone()))
+        .collect();
+
+    NftInit {
+        collection_owner,
+        config: Config {
+            name: "User Collection".to_string(),
+            description: "User Collection".to_string(),
+            collection_img: "Collection image".to_string(),
+            collection_logo: "Collection logo".to_string(),
+            collection_tags: vec!["tag1".to_string()],
+            additional_links: None,
+            royalty,
+            user_mint_limit,
+            payment_for_mint,
+            transferable: Some(0),
+            sellable: Some(0),
+
+        },
+        img_links,
+    }
+}
 // pub fn get_state(
 //     marketplace: &Program,
 //     admin: u64,

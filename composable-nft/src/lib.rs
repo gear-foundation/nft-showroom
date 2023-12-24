@@ -8,7 +8,7 @@ use gstd::{
     collections::{HashMap, HashSet},
     debug, msg,
     prelude::*,
-    ActorId,
+    ActorId, exec,
 };
 
 #[derive(Debug)]
@@ -21,17 +21,12 @@ struct ComposableNftContract {
     pub nonce: NftId,
     pub img_links: Vec<Vec<String>>,
     pub combinations: HashSet<Vec<u8>>,
-    pub admins: Vec<ActorId>,
+    pub collection_owner: ActorId,
     pub number_combination: u64,
 }
 static mut NFT_CONTRACT: Option<ComposableNftContract> = None;
 
 impl ComposableNftContract {
-    fn add_admin(&mut self, new_admin: &ActorId) -> Result<ComposableNftEvent, ComposableNftError> {
-        self.check_admin()?;
-        self.admins.push(*new_admin);
-        Ok(ComposableNftEvent::AdminAdded)
-    }
 
     fn mint(&mut self, combination: Vec<u8>) -> Result<ComposableNftEvent, ComposableNftError> {
         let msg_src = msg::source();
@@ -41,6 +36,8 @@ impl ComposableNftContract {
         let Some(next_nft_nonce) = self.nonce.checked_add(1) else {
             return Err(ComposableNftError("Math overflow.".to_owned()));
         };
+        self.payment_for_mint()?;
+
         let token_id = self.nonce;
         self.nonce = next_nft_nonce;
 
@@ -64,14 +61,17 @@ impl ComposableNftContract {
             .map(|(index, &comb_value)| self.img_links[index][comb_value as usize].clone())
             .collect();
 
+        let nft_data = Nft {
+            owner: msg_src,
+            name,
+            description: self.config.description.clone(),
+            metadata: vec![],
+            media_url: media_url.clone(),
+            mint_time: exec::block_timestamp(),
+        };
         self.tokens.insert(
             token_id,
-            Nft {
-                owner: msg_src,
-                name,
-                description: self.config.description.clone(),
-                media_url: media_url.clone(),
-            },
+            nft_data.clone()
         );
         self.restriction_mint
             .entry(msg_src)
@@ -85,9 +85,8 @@ impl ComposableNftContract {
         self.combinations.insert(current_combination);
 
         Ok(ComposableNftEvent::Minted {
-            owner: msg_src,
             token_id,
-            media_url,
+            nft_data,
         })
     }
     fn transfer_from(
@@ -164,38 +163,28 @@ impl ComposableNftContract {
         Ok(ComposableNftEvent::ApprovalRevoked { token_id })
     }
 
-    fn burn(&mut self, token_id: NftId) -> Result<ComposableNftEvent, ComposableNftError> {
-        self.can_burn(&token_id)?;
-        let nft = self.tokens.remove(&token_id).expect("Can't be None");
-        if let Some(tokens) = self.owners.get_mut(&nft.owner) {
-            if tokens.remove(&token_id) {
-                return Err(ComposableNftError(
-                    "Fatal: owner does not contain nft id.".to_owned(),
-                ));
-            }
-        } else {
-            return Err(ComposableNftError(
-                "Fatal: owner does not contain list.".to_owned(),
-            ));
-        }
-
-        self.token_approvals.remove(&token_id);
-
-        Ok(ComposableNftEvent::Burnt { token_id })
-    }
     fn change_config(
         &mut self,
-        user: &ActorId,
-        tokens_limit: Option<u64>,
+        config: Config,
     ) -> Result<ComposableNftEvent, ComposableNftError> {
-        if let Some(limit) = tokens_limit {
-            if limit <= self.nonce {
-                return Err(ComposableNftError(format!(
-                    "The specified limit ({}) is less than or equal to the current nonce value ({})",
-                    limit,
-                    self.nonce
-                )));
-            }
+        self.check_collection_owner()?;
+
+        if !self.tokens.is_empty() {
+            return Err(ComposableNftError(
+                "The collection configuration can no more be changed".to_owned(),
+            ));
+        }
+        if config.royalty > 10_000 {
+            return Err(ComposableNftError(
+                "Royalty percent must be less than 100%".to_owned(),
+            ));
+        }
+        if config.transferable.is_none() && config.sellable.is_some(){
+            return Err(ComposableNftError(
+                "Tokens must be transferable".to_owned(),
+            ));
+        }
+        if let Some(limit) = config.tokens_limit {
             if limit > self.number_combination {
                 return Err(ComposableNftError(
                     "Exceeds the number of possible combinations".to_owned(),
@@ -203,20 +192,25 @@ impl ComposableNftContract {
             }
         }
 
-        if !self.admins.contains(user) {
-            return Err(ComposableNftError(
-                "Only admin can send this message".to_owned(),
-            ));
-        }
+        self.config = config.clone();
 
-        self.config.tokens_limit = tokens_limit;
-
-        Ok(ComposableNftEvent::ConfigChanged { tokens_limit })
+        Ok(ComposableNftEvent::ConfigChanged { config })
     }
     fn get_token_info(&self, token_id: NftId) -> Result<ComposableNftEvent, ComposableNftError> {
         let nft = self.tokens.get(&token_id);
-        let owner = if let Some(nft) = nft {
-            nft.owner
+        let (token_owner, can_sell) = if let Some(nft) = nft {
+            let can_sell = if let Some(time) = self.config.sellable {
+                if exec::block_timestamp() < nft.mint_time + time {
+                    false
+                }
+                else{
+                    true
+                }
+            }
+            else{
+                false
+            };
+            (nft.owner, can_sell)
         } else {
             return Err(ComposableNftError(
                 "ComposableNft: token does not exist".to_owned(),
@@ -225,10 +219,24 @@ impl ComposableNftContract {
         let approval = self.token_approvals.get(&token_id).copied();
 
         Ok(ComposableNftEvent::TokenInfoReceived {
-            owner,
+            token_owner,
             approval,
-            sellable: self.config.sellable,
+            sellable: can_sell,
+            collection_owner: self.collection_owner,
+            royalty: self.config.royalty,
         })
+    }
+
+    fn payment_for_mint(&self) -> Result<(), ComposableNftError> {
+        if self.config.payment_for_mint != 0 {
+            if msg::value() != self.config.payment_for_mint {
+                return Err(ComposableNftError("Incorrectly entered mint fee .".to_owned()));
+            }
+            msg::send(self.collection_owner, "", self.config.payment_for_mint)
+                .expect("Error in sending value");
+        }
+
+        Ok(())
     }
 
     fn can_delete(&self) -> Result<ComposableNftEvent, ComposableNftError> {
@@ -236,11 +244,7 @@ impl ComposableNftContract {
     }
 
     fn can_approve(&self, token_id: &NftId) -> Result<(), ComposableNftError> {
-        if !self.config.approvable {
-            return Err(ComposableNftError(
-                "ComposableNft is not approvable.".to_owned(),
-            ));
-        }
+
         if self.token_approvals.contains_key(token_id) {
             return Err(ComposableNftError(
                 "Approve has already been issued".to_owned(),
@@ -260,10 +264,10 @@ impl ComposableNftContract {
 
         Ok(())
     }
-    fn check_admin(&self) -> Result<(), ComposableNftError> {
-        if !self.admins.contains(&msg::source()) {
+    fn check_collection_owner(&self) -> Result<(), ComposableNftError> {
+        if self.collection_owner != msg::source() {
             return Err(ComposableNftError(
-                "Only admin can send this message".to_owned(),
+                "Only collection owner can send this message".to_owned(),
             ));
         }
         Ok(())
@@ -302,7 +306,7 @@ impl ComposableNftContract {
 
         if let Some(limit) = self.config.user_mint_limit {
             if let Some(number_tokens) = self.restriction_mint.get(&msg_src) {
-                if number_tokens >= &limit && !self.admins.contains(&msg_src) {
+                if number_tokens >= &limit && self.collection_owner != msg::source() {
                     return Err(ComposableNftError(
                         "You've exhausted your limit.".to_owned(),
                     ));
@@ -332,11 +336,6 @@ impl ComposableNftContract {
         to: &ActorId,
         token_id: &NftId,
     ) -> Result<(), ComposableNftError> {
-        if !self.config.transferable {
-            return Err(ComposableNftError(
-                "ComposableNft is not transferable.".to_owned(),
-            ));
-        }
 
         let nft = self.tokens.get(token_id);
 
@@ -351,6 +350,14 @@ impl ComposableNftContract {
             if owner != msg_src {
                 self.check_approve(&msg_src, token_id)?;
             }
+            if let Some(time) = self.config.transferable {
+                if exec::block_timestamp() < nft.mint_time + time {
+                    return Err(ComposableNftError("ComposableNft: transfer will be available after the deadline".to_owned()));
+                }
+            }
+            else {
+                return Err(ComposableNftError("ComposableNft: token is not transferable".to_owned()));
+            }
         } else {
             return Err(ComposableNftError(
                 "ComposableNftToken: token does not exist".to_owned(),
@@ -364,26 +371,7 @@ impl ComposableNftContract {
         }
         Ok(())
     }
-    fn can_burn(&self, token_id: &NftId) -> Result<(), ComposableNftError> {
-        if !self.config.burnable {
-            return Err(ComposableNftError(
-                "ComposableNft is not burnable.".to_owned(),
-            ));
-        }
-        if let Some(nft_info) = self.tokens.get(token_id) {
-            if nft_info.owner != msg::source() {
-                return Err(ComposableNftError(
-                    "Only nft owner can send this message".to_owned(),
-                ));
-            }
-        } else {
-            return Err(ComposableNftError(
-                "This nft id hasn't come out yet".to_owned(),
-            ));
-        }
-
-        Ok(())
-    }
+    
 }
 
 #[no_mangle]
@@ -430,7 +418,7 @@ extern "C" fn init() {
             nonce: 0,
             img_links,
             combinations: HashSet::new(),
-            admins: vec![owner],
+            collection_owner: owner,
             number_combination,
         })
     };
@@ -459,7 +447,6 @@ extern "C" fn handle() {
     let user = msg::source();
 
     let result = match action {
-        ComposableNftAction::AddAdmin { new_admin } => nft_contract.add_admin(&new_admin),
         ComposableNftAction::Mint { combination } => nft_contract.mint(combination),
         ComposableNftAction::TransferFrom { from, to, token_id } => {
             nft_contract.transfer_from(&from, &to, token_id)
@@ -469,9 +456,8 @@ extern "C" fn handle() {
         }
         ComposableNftAction::Approve { to, token_id } => nft_contract.approve(&to, token_id),
         ComposableNftAction::RevokeApproval { token_id } => nft_contract.revoke_approve(token_id),
-        ComposableNftAction::Burn { token_id } => nft_contract.burn(token_id),
-        ComposableNftAction::ChangeConfig { tokens_limit } => {
-            nft_contract.change_config(&user, tokens_limit)
+        ComposableNftAction::ChangeConfig { config } => {
+            nft_contract.change_config(config)
         }
         ComposableNftAction::GetTokenInfo { token_id } => nft_contract.get_token_info(token_id),
         ComposableNftAction::CanDelete => nft_contract.can_delete(),
@@ -514,7 +500,7 @@ impl From<ComposableNftContract> for ComposableNftState {
             token_approvals,
             config,
             nonce,
-            admins,
+            collection_owner,
             img_links,
             restriction_mint,
             number_combination,
@@ -547,7 +533,7 @@ impl From<ComposableNftContract> for ComposableNftState {
             config,
             nonce,
             img_links,
-            admins,
+            collection_owner,
             restriction_mint,
             number_combination,
         }

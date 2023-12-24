@@ -16,6 +16,7 @@ impl Metadata for NftMarketplaceMetadata {
 pub struct NftMarketplaceInit {
     pub gas_for_creation: u64,
     pub time_between_create_collections: u64,
+    pub minimum_transfer_value: u128,
 }
 
 #[derive(Encode, Decode, TypeInfo)]
@@ -23,10 +24,11 @@ pub enum NftMarketplaceAction {
     AddNewCollection {
         code_id: CodeId,
         meta_link: String,
+        type_name: String,
         type_description: String,
     },
     CreateCollection {
-        id_collection: u16,
+        type_name: String,
         payload: Vec<u8>,
     },
     SaleNft {
@@ -56,6 +58,21 @@ pub enum NftMarketplaceAction {
         collection_address: ActorId,
         token_id: u64,
     },
+    CancelAuction {
+        collection_address: ActorId,
+        token_id: u64,
+    },
+    CreateOffer {
+        collection_address: ActorId,
+        token_id: u64,
+    },
+    CancelOffer {
+        collection_address: ActorId,
+        token_id: u64,
+    },
+    AcceptOffer {
+        offer: Offer,
+    },
     DeleteCollection {
         collection_address: ActorId,
     },
@@ -76,11 +93,11 @@ pub enum NftMarketplaceEvent {
     NewCollectionAdded {
         code_id: CodeId,
         meta_link: String,
-        description: String,
-        id_collection: u16,
+        type_name: String,
+        type_description: String,
     },
     CollectionCreated {
-        id_collection: u16,
+        type_name: String,
         collection_address: ActorId,
     },
     SaleNft {
@@ -114,6 +131,22 @@ pub enum NftMarketplaceEvent {
         collection_address: ActorId,
         token_id: u64,
     },
+    AuctionCanceled {
+        collection_address: ActorId,
+        token_id: u64,
+    },
+    OfferCreated {
+        collection_address: ActorId,
+        token_id: u64,
+        price: u128,
+    },
+    OfferCanceled {
+        collection_address: ActorId,
+        token_id: u64,
+    },
+    OfferAccepted {
+        offer: Offer,
+    },
     CollectionDeleted {
         collection_address: ActorId,
     },
@@ -145,7 +178,7 @@ pub enum StateQuery {
 pub enum StateReply {
     All(State),
     Admins(Vec<ActorId>),
-    CollectionsInfo(Vec<(u16, CollectionInfo)>),
+    CollectionsInfo(Vec<(String, CollectionInfo)>),
     Config(Config),
     AllCollections(Vec<(ActorId, ActorId)>),
 }
@@ -155,9 +188,10 @@ pub struct State {
     pub admins: Vec<ActorId>,
     pub collection_to_owner: Vec<(ActorId, ActorId)>,
     pub time_creation: Vec<(ActorId, u64)>,
-    pub type_collections: Vec<(u16, CollectionInfo)>,
-    pub sale: Vec<((ActorId, u64), NftInfoForSale)>,
-    pub auction: Vec<((ActorId, u64), Auction)>,
+    pub type_collections: Vec<(String, CollectionInfo)>,
+    pub sales: Vec<((ActorId, u64), NftInfoForSale)>,
+    pub auctions: Vec<((ActorId, u64), Auction)>,
+    pub offers: Vec<(Offer, u128)>,
     pub config: Config,
 }
 
@@ -165,19 +199,22 @@ pub struct State {
 pub struct CollectionInfo {
     pub code_id: CodeId,
     pub meta_link: String,
-    pub description: String,
+    pub type_description: String,
 }
 
 #[derive(Default, Debug, Encode, Decode, TypeInfo, Clone)]
 pub struct Config {
     pub gas_for_creation: u64,
     pub time_between_create_collections: u64,
+    pub minimum_transfer_value: u128,
 }
 
 #[derive(Debug, Encode, Decode, TypeInfo, Clone)]
 pub struct NftInfoForSale {
     pub price: u128,
-    pub owner: ActorId,
+    pub token_owner: ActorId,
+    pub collection_owner: ActorId,
+    pub royalty: u16,
 }
 
 #[derive(Debug, Encode, Decode, TypeInfo, Clone)]
@@ -187,6 +224,14 @@ pub struct Auction {
     pub ended_at: u64,
     pub current_price: u128,
     pub current_winner: ActorId,
+    pub collection_owner: ActorId,
+    pub royalty: u16,
+}
+#[derive(Debug, Encode, Decode, TypeInfo, Clone, PartialEq, Eq, Hash)]
+pub struct Offer {
+    pub collection_address: ActorId,
+    pub token_id: u64,
+    pub creator: ActorId,
 }
 #[derive(Debug, Clone, Encode, Decode, TypeInfo)]
 pub enum NftAction {
@@ -213,9 +258,11 @@ pub enum NftEvent {
         token_id: u64,
     },
     TokenInfoReceived {
-        owner: ActorId,
+        token_owner: ActorId,
         approval: Option<ActorId>,
         sellable: bool,
+        collection_owner: ActorId,
+        royalty: u16,
     },
     CanDelete(bool),
 }
