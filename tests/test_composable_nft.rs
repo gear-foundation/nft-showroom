@@ -25,10 +25,12 @@ fn successful_basics() {
         println!("Collection info: {:?}", state);
     }
     // Successful addition of a new collection
+    let name_composable_nft = "Composable NFT".to_string();
     let res = add_new_collection(
         &marketplace,
         ADMINS[0],
         nft_collection_code_id.into_bytes().into(),
+        name_composable_nft.clone()
     );
     assert!(!res.main_failed());
     let state_reply = marketplace
@@ -55,17 +57,19 @@ fn successful_basics() {
             name: "User Collection".to_string(),
             description: "User Collection".to_string(),
             collection_img: "Collection image".to_string(),
+            collection_logo: "Collection logo".to_string(),
             collection_tags: vec!["tag1".to_string()],
+            additional_links: None,
+            royalty: 0,
+            payment_for_mint: 0,
             user_mint_limit: 3.into(),
             tokens_limit: Some(500),
-            transferable: true,
-            approvable: true,
-            burnable: true,
-            sellable: true,
+            transferable: Some(0),
+            sellable: Some(0),
         },
         img_links,
     };
-    let res = create_collection(&marketplace, USERS[0], 1, init_nft_payload.encode());
+    let res = create_collection(&marketplace, USERS[0], name_composable_nft, init_nft_payload.encode());
     assert!(!res.main_failed());
     let state_reply = marketplace
         .read_state(StateQuery::AllCollections)
@@ -85,7 +89,7 @@ fn successful_basics() {
         .read_state(StateQueryNft::All)
         .expect("Unexpected invalid state.");
     if let StateReplyNft::All(state) = state_reply {
-        assert_eq!(state.admins[0], USERS[0].into(), "Wrong Admin");
+        assert_eq!(state.collection_owner, USERS[0].into(), "Wrong Admin");
         println!("Collection NFT info: {:?}", state);
     }
 
@@ -105,7 +109,7 @@ fn successful_basics() {
         .read_state(StateQueryNft::All)
         .expect("Unexpected invalid state.");
     if let StateReplyNft::All(state) = state_reply {
-        assert_eq!(state.admins[0], USERS[0].into(), "Wrong Admin");
+        assert_eq!(state.collection_owner, USERS[0].into(), "Wrong Admin");
         let (owner, token_id) = state.owners.get(0).expect("Can't be None");
         assert_eq!(*owner, USERS[1].into(), "Wrong owner");
         assert_eq!(*token_id, vec![0], "Wrong token id");
@@ -129,10 +133,13 @@ fn composable_sale_success() {
         println!("Collection info: {:?}", state);
     }
     // Сreating a new type of collection
+    let name_composable_nft = "Composable NFT".to_string();
+
     let res = add_new_collection(
         &marketplace,
         ADMINS[0],
         nft_collection_code_id.into_bytes().into(),
+        name_composable_nft.clone(),
     );
     assert!(!res.main_failed());
     let state_reply = marketplace
@@ -160,17 +167,19 @@ fn composable_sale_success() {
             name: "User Collection".to_string(),
             description: "User Collection".to_string(),
             collection_img: "Collection image".to_string(),
+            collection_logo: "Collection logo".to_string(),
             collection_tags: vec!["tag1".to_string()],
+            additional_links: None,
+            royalty: 0,
+            payment_for_mint: 0,
             user_mint_limit: 3.into(),
             tokens_limit: Some(500),
-            transferable: true,
-            approvable: true,
-            burnable: true,
-            sellable: true,
+            transferable: Some(0),
+            sellable: Some(0),
         },
         img_links,
     };
-    let res = create_collection(&marketplace, USERS[0], 1, init_nft_payload.encode());
+    let res = create_collection(&marketplace, USERS[0], name_composable_nft, init_nft_payload.encode());
     assert!(!res.main_failed());
     let state_reply = marketplace
         .read_state(StateQuery::AllCollections)

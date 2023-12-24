@@ -3,6 +3,9 @@
 use gmeta::{In, InOut, Metadata};
 use gstd::{prelude::*, ActorId};
 pub type NftId = u64;
+pub type TimeSec = u32;
+
+pub const BLOCK_DURATION_IN_SECS: u32 = 3;
 
 pub struct ContractMetadata;
 
@@ -17,9 +20,21 @@ impl Metadata for ContractMetadata {
 
 #[derive(Debug, Clone, Encode, Decode, TypeInfo)]
 pub struct NftInit {
-    pub owner: ActorId,
+    pub collection_owner: ActorId,
     pub config: Config,
-    pub img_links: Vec<(String, u32)>,
+    pub img_links: Vec<(String, ImageData)>,
+}
+
+#[derive(Debug, Clone, Encode, Decode, TypeInfo)]
+pub struct ImageData {
+    pub limit_copies: u32,
+    pub auto_changing_rules: Option<Vec<(TimeSec, Action)>>,
+}
+
+#[derive(Debug, Clone, Encode, Decode, TypeInfo)]
+pub enum Action {
+    ChangeImg(String),
+    AddMeta(String),
 }
 
 #[derive(Debug, Clone, Encode, Decode, TypeInfo)]
@@ -28,13 +43,22 @@ pub struct Config {
     pub description: String,
     pub collection_tags: Vec<String>,
     pub collection_img: String,
-    // pub tokens_limit: Option<u64>,
+    pub collection_logo: String,
     pub user_mint_limit: Option<u32>,
-    pub transferable: bool,
-    pub approvable: bool,
-    pub burnable: bool,
-    pub sellable: bool,
-    pub attendable: bool,
+    pub additional_links: Option<AdditionalLinks>,
+    pub royalty: u16,
+    pub payment_for_mint: u128,
+    pub transferable: Option<u64>,
+    pub sellable: Option<u64>,
+}
+
+#[derive(Debug, Clone, Encode, Decode, TypeInfo)]
+pub struct AdditionalLinks {
+    pub external_url: Option<String>,
+    pub telegram: Option<String>,
+    pub xcom: Option<String>,
+    pub medium: Option<String>,
+    pub discord: Option<String>,
 }
 
 #[derive(Debug, Clone, Encode, Decode, TypeInfo)]
@@ -60,17 +84,19 @@ pub enum NftAction {
     RevokeApproval {
         token_id: NftId,
     },
-    Burn {
-        token_id: NftId,
-    },
     Expand {
-        additional_links: Vec<(String, u32)>,
+        additional_links: Vec<(String, ImageData)>,
     },
     ChangeConfig {
         config: Config,
     },
-    AddAdmin {
-        new_admin: ActorId,
+    ChangeImg {
+        token_id: NftId,
+        img_link: String,
+    },
+    AddMetadata {
+        token_id: NftId,
+        metadata: String,
     },
 }
 
@@ -82,22 +108,19 @@ pub enum NftEvent {
         token_id: NftId,
     },
     TokenInfoReceived {
-        owner: ActorId,
+        token_owner: ActorId,
         approval: Option<ActorId>,
         sellable: bool,
+        collection_owner: ActorId,
+        royalty: u16,
     },
     CanDelete(bool),
     Initialized {
         config: Config,
     },
-    AdminAdded,
     Minted {
-        owner: ActorId,
         token_id: NftId,
-        media_url: String,
-    },
-    Burnt {
-        token_id: NftId,
+        nft_data: Nft,
     },
     Approved {
         to: ActorId,
@@ -107,10 +130,18 @@ pub enum NftEvent {
         token_id: NftId,
     },
     Expanded {
-        additional_links: Vec<(String, u32)>,
+        additional_links: Vec<(String, ImageData)>,
     },
     ConfigChanged {
         config: Config,
+    },
+    ImageChanged {
+        token_id: NftId,
+        img_link: String,
+    },
+    MetadataAdded {
+        token_id: NftId,
+        metadata: String,
     },
 }
 #[derive(Debug, Clone, Encode, Decode, TypeInfo)]
@@ -123,8 +154,8 @@ pub struct NftState {
     pub token_approvals: Vec<(NftId, ActorId)>,
     pub config: Config,
     pub nonce: NftId,
-    pub img_links: Vec<(String, u32)>,
-    pub admins: Vec<ActorId>,
+    pub img_links: Vec<(String, ImageData)>,
+    pub collection_owner: ActorId,
 }
 
 #[derive(Debug, Clone, Encode, Decode, TypeInfo)]
@@ -132,7 +163,9 @@ pub struct Nft {
     pub owner: ActorId,
     pub name: String,
     pub description: String,
+    pub metadata: Vec<String>,
     pub media_url: String,
+    pub mint_time: u64,
 }
 
 #[derive(Encode, Decode, TypeInfo)]

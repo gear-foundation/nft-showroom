@@ -10,9 +10,10 @@ pub struct NftMarketplace {
     pub admins: Vec<ActorId>,
     pub collection_to_owner: HashMap<ActorId, ActorId>,
     pub time_creation: HashMap<ActorId, u64>,
-    pub type_collections: HashMap<u16, CollectionInfo>,
-    pub sale: HashMap<(ActorId, u64), NftInfoForSale>,
-    pub auction: HashMap<(ActorId, u64), Auction>,
+    pub type_collections: HashMap<String, CollectionInfo>,
+    pub sales: HashMap<(ActorId, u64), NftInfoForSale>,
+    pub auctions: HashMap<(ActorId, u64), Auction>,
+    pub offers: HashMap<Offer, u128>, // <Offer, price>
     pub config: Config,
 }
 
@@ -23,6 +24,7 @@ extern "C" fn init() {
     let NftMarketplaceInit {
         gas_for_creation,
         time_between_create_collections,
+        minimum_transfer_value,
     } = msg::load().expect("Unable to decode `NftMarketplaceInit`");
 
     let nft_marketplace = NftMarketplace {
@@ -30,6 +32,7 @@ extern "C" fn init() {
         config: Config {
             gas_for_creation,
             time_between_create_collections,
+            minimum_transfer_value,
         },
         ..Default::default()
     };
@@ -49,15 +52,11 @@ async fn main() {
         NftMarketplaceAction::AddNewCollection {
             code_id,
             meta_link,
+            type_name,
             type_description,
-        } => nft_marketplace.add_new_collection(code_id, meta_link, type_description),
-        NftMarketplaceAction::CreateCollection {
-            id_collection,
-            payload,
-        } => {
-            nft_marketplace
-                .create_collection(id_collection, payload)
-                .await
+        } => nft_marketplace.add_new_collection(code_id, meta_link, type_name, type_description),
+        NftMarketplaceAction::CreateCollection { type_name, payload } => {
+            nft_marketplace.create_collection(type_name, payload).await
         }
         NftMarketplaceAction::SaleNft {
             collection_address,
@@ -102,6 +101,23 @@ async fn main() {
                 .close_auction(collection_address, token_id)
                 .await
         }
+        NftMarketplaceAction::CancelAuction {
+            collection_address,
+            token_id,
+        } => {
+            nft_marketplace
+                .cancel_auction(collection_address, token_id)
+                .await
+        }
+        NftMarketplaceAction::CreateOffer {
+            collection_address,
+            token_id,
+        } => nft_marketplace.create_offer(collection_address, token_id),
+        NftMarketplaceAction::CancelOffer {
+            collection_address,
+            token_id,
+        } => nft_marketplace.cancel_offer(collection_address, token_id),
+        NftMarketplaceAction::AcceptOffer { offer } => nft_marketplace.accept_offer(offer).await,
         NftMarketplaceAction::DeleteCollection { collection_address } => {
             nft_marketplace.delete_collection(collection_address).await
         }
@@ -123,25 +139,24 @@ impl NftMarketplace {
         &mut self,
         code_id: CodeId,
         meta_link: String,
-        description: String,
+        type_name: String,
+        type_description: String,
     ) -> Result<NftMarketplaceEvent, NftMarketplaceError> {
         self.check_admin()?;
-
-        let max_key = *self.type_collections.keys().max().unwrap_or(&0);
 
         let collection_info = CollectionInfo {
             code_id,
             meta_link: meta_link.clone(),
-            description: description.clone(),
+            type_description: type_description.clone(),
         };
         self.type_collections
-            .insert(max_key + 1, collection_info.clone());
+            .insert(type_name.clone(), collection_info.clone());
 
         Ok(NftMarketplaceEvent::NewCollectionAdded {
             code_id,
             meta_link,
-            description,
-            id_collection: max_key + 1,
+            type_name,
+            type_description,
         })
     }
 
@@ -161,21 +176,21 @@ impl NftMarketplace {
 
     pub async fn create_collection(
         &mut self,
-        id_collection: u16,
+        type_name: String,
         payload: Vec<u8>,
     ) -> Result<NftMarketplaceEvent, NftMarketplaceError> {
         let msg_src = msg::source();
         self.check_time_creation()?;
 
-        if !self.type_collections.contains_key(&id_collection) {
+        if !self.type_collections.contains_key(&type_name) {
             return Err(NftMarketplaceError(
-                "There is no collection with this id_collection yet.".to_owned(),
+                "There is no collection with this name yet.".to_owned(),
             ));
         }
 
         let collection_info = self
             .type_collections
-            .get(&id_collection)
+            .get(&type_name)
             .expect("Unable to get Nft collection info");
 
         debug!("PAYLOAD: {:?}", payload);
@@ -198,7 +213,7 @@ impl NftMarketplace {
             .insert(exec::block_timestamp());
 
         Ok(NftMarketplaceEvent::CollectionCreated {
-            id_collection,
+            type_name,
             collection_address: address,
         })
     }
@@ -209,9 +224,16 @@ impl NftMarketplace {
         price: u128,
     ) -> Result<NftMarketplaceEvent, NftMarketplaceError> {
         // check that this nft is not sale at this moment
-        if self.sale.contains_key(&(collection_address, token_id)) {
+        if self.sales.contains_key(&(collection_address, token_id)) {
             return Err(NftMarketplaceError(
                 "This nft is already on sale.".to_owned(),
+            ));
+        }
+
+        if self.auctions.contains_key(&(collection_address, token_id)) {
+            return Err(NftMarketplaceError(
+                "This token is on auction, cancel the auction if you wish to sale the nft"
+                    .to_owned(),
             ));
         }
 
@@ -229,16 +251,18 @@ impl NftMarketplace {
 
         let address_marketplace = exec::program_id();
         let msg_src = msg::source();
-        if let NftEvent::TokenInfoReceived {
-            owner,
+        let (collection_owner, royalty) = if let NftEvent::TokenInfoReceived {
+            token_owner,
             approval,
             sellable,
+            collection_owner,
+            royalty,
         } = self.check_reply(reply)?
         {
             if !sellable {
                 return Err(NftMarketplaceError("Nft is not sellable".to_owned()));
             }
-            if owner != msg_src {
+            if token_owner != msg_src {
                 return Err(NftMarketplaceError(
                     "Only the owner can put his NFT up for sale.".to_owned(),
                 ));
@@ -254,9 +278,10 @@ impl NftMarketplace {
                     "No approve to the marketplace".to_owned(),
                 ));
             }
+            (collection_owner, royalty)
         } else {
             panic!("Wrong received reply");
-        }
+        };
 
         // transfer nft to marketplace
         let transfer_payload = NftAction::TransferFrom {
@@ -280,9 +305,15 @@ impl NftMarketplace {
             token_id,
         } = self.check_reply(reply)?
         {
-            self.sale
-                .entry((collection_address, token_id))
-                .or_insert(NftInfoForSale { price, owner });
+            self.sales.insert(
+                (collection_address, token_id),
+                NftInfoForSale {
+                    price,
+                    token_owner: owner,
+                    collection_owner,
+                    royalty,
+                },
+            );
         } else {
             panic!("Wrong received reply");
         }
@@ -299,10 +330,10 @@ impl NftMarketplace {
         collection_address: ActorId,
         token_id: u64,
     ) -> Result<NftMarketplaceEvent, NftMarketplaceError> {
-        if let Some(nft_info) = self.sale.get(&(collection_address, token_id)) {
-            if nft_info.owner == msg::source() {
+        if let Some(nft_info) = self.sales.get(&(collection_address, token_id)) {
+            if nft_info.token_owner == msg::source() {
                 let transfer_payload = NftAction::Transfer {
-                    to: nft_info.owner,
+                    to: nft_info.token_owner,
                     token_id,
                 };
                 let reply = msg::send_for_reply_as::<NftAction, Result<NftEvent, NftError>>(
@@ -321,7 +352,7 @@ impl NftMarketplace {
                     token_id,
                 } = self.check_reply(reply)?
                 {
-                    self.sale.remove(&(collection_address, token_id));
+                    self.sales.remove(&(collection_address, token_id));
                 } else {
                     panic!("Wrong received reply");
                 }
@@ -367,12 +398,26 @@ impl NftMarketplace {
         self.check_reply(reply)?;
 
         let nft = self
-            .sale
+            .sales
             .get(&(collection_address, token_id))
             .expect("Can't be None")
             .clone();
-        msg::send_with_gas(nft.owner, "", 0, nft.price).expect("Error in sending value");
-        self.sale
+
+        let percent_to_collection_creator = nft.price * (nft.royalty as u128) / 10_000u128;
+        if percent_to_collection_creator > self.config.minimum_transfer_value {
+            msg::send(nft.collection_owner, "", percent_to_collection_creator)
+                .expect("Error in sending value");
+            msg::send(
+                nft.token_owner,
+                "",
+                nft.price - percent_to_collection_creator,
+            )
+            .expect("Error in sending value");
+        } else {
+            msg::send(nft.token_owner, "", nft.price).expect("Error in sending value");
+        }
+
+        self.sales
             .remove(&(collection_address, token_id))
             .expect("Can't be None");
         Ok(NftMarketplaceEvent::NftSold {
@@ -389,11 +434,18 @@ impl NftMarketplace {
         min_price: u128,
         duration_ms: u32,
     ) -> Result<NftMarketplaceEvent, NftMarketplaceError> {
-        if self.auction.contains_key(&(collection_address, token_id)) {
+        if self.auctions.contains_key(&(collection_address, token_id)) {
             return Err(NftMarketplaceError(
                 "This nft is already on auction".to_owned(),
             ));
         }
+        if self.sales.contains_key(&(collection_address, token_id)) {
+            return Err(NftMarketplaceError(
+                "This token is on sale, cancel the sale if you wish to create the auction"
+                    .to_owned(),
+            ));
+        }
+
         if min_price == 0 {
             return Err(NftMarketplaceError("Auction min price is zero".to_owned()));
         }
@@ -412,16 +464,19 @@ impl NftMarketplace {
 
         let address_marketplace = exec::program_id();
         let msg_src = msg::source();
-        if let NftEvent::TokenInfoReceived {
-            owner,
+
+        let (collection_owner, royalty) = if let NftEvent::TokenInfoReceived {
+            token_owner,
             approval,
             sellable,
+            collection_owner,
+            royalty,
         } = self.check_reply(reply)?
         {
             if !sellable {
                 return Err(NftMarketplaceError("Nft is not sellable".to_owned()));
             }
-            if owner != msg_src {
+            if token_owner != msg_src {
                 return Err(NftMarketplaceError(
                     "Only the owner can put his NFT up for auction.".to_owned(),
                 ));
@@ -437,9 +492,10 @@ impl NftMarketplace {
                     "No approve to the marketplace".to_owned(),
                 ));
             }
+            (collection_owner, royalty)
         } else {
             panic!("Wrong received reply");
-        }
+        };
 
         // transfer nft to marketplace
         let transfer_payload = NftAction::TransferFrom {
@@ -463,7 +519,7 @@ impl NftMarketplace {
             token_id,
         } = self.check_reply(reply)?
         {
-            self.auction
+            self.auctions
                 .entry((collection_address, token_id))
                 .or_insert(Auction {
                     owner: msg_src,
@@ -471,17 +527,20 @@ impl NftMarketplace {
                     ended_at: exec::block_timestamp() + duration_ms as u64,
                     current_price: min_price,
                     current_winner: ActorId::zero(),
+                    collection_owner,
+                    royalty,
                 });
         } else {
             panic!("Wrong received reply");
         }
 
-        msg::send_delayed(
+        msg::send_with_gas_delayed(
             address_marketplace,
             NftMarketplaceAction::CloseAuction {
                 collection_address,
                 token_id,
             },
+            5_000_000_000,
             0,
             duration_ms / 3_000,
         )
@@ -502,12 +561,12 @@ impl NftMarketplace {
     ) -> Result<NftMarketplaceEvent, NftMarketplaceError> {
         self.check_auction(&collection_address, &token_id)?;
         let auction = self
-            .auction
+            .auctions
             .get_mut(&(collection_address, token_id))
             .expect("Can't be None");
 
         if auction.current_winner != ActorId::zero() {
-            msg::send_with_gas(auction.current_winner, "", 0, auction.current_price)
+            msg::send(auction.current_winner, "", auction.current_price)
                 .expect("Error in sending value");
         }
         auction.current_winner = msg::source();
@@ -531,7 +590,7 @@ impl NftMarketplace {
         }
 
         let auction = self
-            .auction
+            .auctions
             .get(&(collection_address, token_id))
             .expect("There is no such auction");
         if auction.current_winner == ActorId::zero() {
@@ -566,14 +625,28 @@ impl NftMarketplace {
             .expect("Program was problem with transfer");
 
             self.check_reply(reply)?;
-            msg::send_with_gas(auction.owner, "", 0, auction.current_price)
+
+            let percent_to_collection_creator =
+                auction.current_price * (auction.royalty as u128) / 10_000u128;
+            if percent_to_collection_creator > self.config.minimum_transfer_value {
+                msg::send(auction.collection_owner, "", percent_to_collection_creator)
+                    .expect("Error in sending value");
+                msg::send(
+                    auction.owner,
+                    "",
+                    auction.current_price - percent_to_collection_creator,
+                )
                 .expect("Error in sending value");
+            } else {
+                msg::send(auction.owner, "", auction.current_price)
+                    .expect("Error in sending value");
+            }
         }
 
         let price = auction.current_price;
         let current_owner = auction.current_winner;
 
-        self.auction
+        self.auctions
             .remove(&(collection_address, token_id))
             .expect("Can't be None");
 
@@ -583,6 +656,216 @@ impl NftMarketplace {
             price,
             current_owner,
         })
+    }
+
+    pub async fn cancel_auction(
+        &mut self,
+        collection_address: ActorId,
+        token_id: u64,
+    ) -> Result<NftMarketplaceEvent, NftMarketplaceError> {
+        let auction = self
+            .auctions
+            .get(&(collection_address, token_id))
+            .expect("There is no such auction");
+
+        if auction.owner != msg::source() {
+            return Err(NftMarketplaceError(
+                "Only the creator of the auction can send this message.".to_owned(),
+            ));
+        }
+        let transfer_payload = NftAction::Transfer {
+            to: auction.owner,
+            token_id,
+        };
+        let reply = msg::send_for_reply_as::<NftAction, Result<NftEvent, NftError>>(
+            collection_address,
+            transfer_payload,
+            0,
+            0,
+        )
+        .expect("Error during Collection program initialization")
+        .await
+        .expect("Program was problem with transfer");
+
+        self.check_reply(reply)?;
+
+        if auction.current_winner != ActorId::zero() {
+            msg::send(auction.current_winner, "", auction.current_price)
+                .expect("Error in sending value");
+        }
+
+        self.auctions
+            .remove(&(collection_address, token_id))
+            .expect("Can't be None");
+
+        Ok(NftMarketplaceEvent::AuctionCanceled {
+            collection_address,
+            token_id,
+        })
+    }
+
+    pub fn create_offer(
+        &mut self,
+        collection_address: ActorId,
+        token_id: u64,
+    ) -> Result<NftMarketplaceEvent, NftMarketplaceError> {
+        let current_price = msg::value();
+        if current_price == 0 {
+            return Err(NftMarketplaceError("msg::value is zero".to_owned()));
+        }
+        let offer = Offer {
+            collection_address,
+            token_id,
+            creator: msg::source(),
+        };
+        self.offers
+            .entry(offer.clone())
+            .and_modify(|price| {
+                msg::send(offer.creator, "", *price).expect("Error in sending value");
+                *price = current_price;
+            })
+            .or_insert(current_price);
+
+        Ok(NftMarketplaceEvent::OfferCreated {
+            collection_address,
+            token_id,
+            price: current_price,
+        })
+    }
+
+    pub fn cancel_offer(
+        &mut self,
+        collection_address: ActorId,
+        token_id: u64,
+    ) -> Result<NftMarketplaceEvent, NftMarketplaceError> {
+        let offer = Offer {
+            collection_address,
+            token_id,
+            creator: msg::source(),
+        };
+
+        if let Some((offer, price)) = self.offers.get_key_value(&offer) {
+            msg::send(offer.creator, "", *price).expect("Error in sending value");
+        } else {
+            return Err(NftMarketplaceError(
+                "This offer does not exist or you are not the creator of the offer".to_owned(),
+            ));
+        }
+        self.offers.remove(&offer);
+
+        Ok(NftMarketplaceEvent::OfferCanceled {
+            collection_address,
+            token_id,
+        })
+    }
+
+    pub async fn accept_offer(
+        &mut self,
+        offer: Offer,
+    ) -> Result<NftMarketplaceEvent, NftMarketplaceError> {
+        if self
+            .sales
+            .contains_key(&(offer.collection_address, offer.token_id))
+        {
+            return Err(NftMarketplaceError(
+                "This token is on sale, cancel the sale if you wish to accept the offer".to_owned(),
+            ));
+        }
+        if self
+            .auctions
+            .contains_key(&(offer.collection_address, offer.token_id))
+        {
+            return Err(NftMarketplaceError(
+                "This token is on auction, cancel the auction if you wish to accept the offer"
+                    .to_owned(),
+            ));
+        }
+        if !self.offers.contains_key(&offer) {
+            return Err(NftMarketplaceError("This offer does not exist".to_owned()));
+        }
+
+        // get token info
+        let get_token_info_payload = NftAction::GetTokenInfo {
+            token_id: offer.token_id,
+        };
+        let reply = msg::send_for_reply_as::<NftAction, Result<NftEvent, NftError>>(
+            offer.collection_address,
+            get_token_info_payload,
+            0,
+            0,
+        )
+        .expect("Error during Collection program initialization")
+        .await
+        .expect("Program was not initialized");
+
+        let address_marketplace = exec::program_id();
+        let msg_src = msg::source();
+
+        let (collection_owner, royalty) = if let NftEvent::TokenInfoReceived {
+            token_owner,
+            approval,
+            sellable,
+            collection_owner,
+            royalty,
+        } = self.check_reply(reply)?
+        {
+            if !sellable {
+                return Err(NftMarketplaceError("Nft is not sellable".to_owned()));
+            }
+            if token_owner != msg_src {
+                return Err(NftMarketplaceError(
+                    "Only the owner nft can accept the offer.".to_owned(),
+                ));
+            }
+            if let Some(approve_acc) = approval {
+                if approve_acc != address_marketplace {
+                    return Err(NftMarketplaceError(
+                        "No approve to the marketplace".to_owned(),
+                    ));
+                }
+            } else {
+                return Err(NftMarketplaceError(
+                    "No approve to the marketplace".to_owned(),
+                ));
+            }
+            (collection_owner, royalty)
+        } else {
+            panic!("Wrong received reply");
+        };
+
+        // transfer nft to new owner
+        let transfer_payload = NftAction::TransferFrom {
+            from: msg_src,
+            to: offer.creator,
+            token_id: offer.token_id,
+        };
+        let reply = msg::send_for_reply_as::<NftAction, Result<NftEvent, NftError>>(
+            offer.collection_address,
+            transfer_payload,
+            0,
+            0,
+        )
+        .expect("Error during Collection program initialization")
+        .await
+        .expect("Program was problem with transfer");
+
+        self.check_reply(reply)?;
+
+        let price = self.offers.get(&offer).expect("Can't be None");
+
+        let percent_to_collection_creator = price * (royalty as u128) / 10_000u128;
+        if percent_to_collection_creator > self.config.minimum_transfer_value {
+            msg::send(collection_owner, "", percent_to_collection_creator)
+                .expect("Error in sending value");
+            msg::send(msg_src, "", *price - percent_to_collection_creator)
+                .expect("Error in sending value");
+        } else {
+            msg::send(msg_src, "", *price).expect("Error in sending value");
+        }
+
+        self.offers.remove(&offer);
+
+        Ok(NftMarketplaceEvent::OfferAccepted { offer })
     }
 
     pub async fn delete_collection(
@@ -676,7 +959,7 @@ impl NftMarketplace {
         token_id: &u64,
     ) -> Result<(), NftMarketplaceError> {
         let payment = msg::value();
-        let nft = self.sale.get(&(*collection_address, *token_id));
+        let nft = self.sales.get(&(*collection_address, *token_id));
         if let Some(nft) = nft {
             if payment < nft.price {
                 return Err(NftMarketplaceError(
@@ -696,7 +979,7 @@ impl NftMarketplace {
         token_id: &u64,
     ) -> Result<(), NftMarketplaceError> {
         let payment = msg::value();
-        let auction = self.auction.get(&(*collection_address, *token_id));
+        let auction = self.auctions.get(&(*collection_address, *token_id));
         if let Some(auction) = auction {
             if auction.ended_at < exec::block_timestamp() {
                 return Err(NftMarketplaceError("Auction is already ended.".to_owned()));
@@ -745,8 +1028,8 @@ extern "C" fn state() {
         StateQuery::CollectionsInfo => {
             let type_collections = nft_marketplace
                 .type_collections
-                .iter()
-                .map(|(id, collection_info)| (*id, collection_info.clone()))
+                .into_iter()
+                .map(|(id, collection_info)| (id, collection_info))
                 .collect();
             msg::reply(StateReply::CollectionsInfo(type_collections), 0)
                 .expect("Unable to share the state");
@@ -758,8 +1041,8 @@ extern "C" fn state() {
         StateQuery::AllCollections => {
             let collection_to_owner = nft_marketplace
                 .collection_to_owner
-                .iter()
-                .map(|(owner, collections)| (*owner, *collections))
+                .into_iter()
+                .map(|(owner, collections)| (owner, collections))
                 .collect();
             msg::reply(StateReply::AllCollections(collection_to_owner), 0)
                 .expect("Unable to share the state");
@@ -774,8 +1057,9 @@ impl From<NftMarketplace> for State {
             collection_to_owner,
             time_creation,
             type_collections,
-            sale,
-            auction,
+            sales,
+            auctions,
+            offers,
             config,
         } = value;
 
@@ -794,10 +1078,15 @@ impl From<NftMarketplace> for State {
             .map(|(id, collection_info)| (id, collection_info))
             .collect();
 
-        let sale = sale.iter().map(|(id, info)| (*id, info.clone())).collect();
-        let auction = auction
+        let sales = sales.into_iter().map(|(id, info)| (id, info)).collect();
+        let auctions = auctions
             .into_iter()
             .map(|(id, auction)| (id, auction))
+            .collect();
+
+        let offers = offers
+            .into_iter()
+            .map(|(offer, price)| (offer, price))
             .collect();
 
         Self {
@@ -805,8 +1094,9 @@ impl From<NftMarketplace> for State {
             collection_to_owner,
             time_creation,
             type_collections,
-            sale,
-            auction,
+            sales,
+            auctions,
+            offers,
             config,
         }
     }
