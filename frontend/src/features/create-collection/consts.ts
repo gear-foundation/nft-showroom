@@ -40,8 +40,12 @@ const DEFAULT_SUMMARY_VALUES: SummaryValues = {
 };
 
 const DEFAULT_PARAMETERS_VALUES: ParametersValues = {
+  mintLimit: '',
   mintPrice: '',
   royalty: '',
+  tags: [],
+  isSellable: false,
+  isTransferable: false,
 };
 
 const DEFAULT_NFTS_VALUES: NFTsValues = {

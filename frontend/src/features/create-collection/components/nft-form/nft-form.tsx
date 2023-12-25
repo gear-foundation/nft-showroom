@@ -16,8 +16,8 @@ type Props = {
 };
 
 function NFTForm({ defaultValues, onSubmit, onBack }: Props) {
-  const { control, register, setValue, handleSubmit } = useForm<NFTsValues>({ defaultValues });
-  const { fields, append, remove } = useFieldArray({ name: 'nfts', control });
+  const { control, register, setValue, handleSubmit } = useForm({ defaultValues });
+  const { fields, append, remove } = useFieldArray({ control, name: 'nfts' });
   const nftsCount = fields.length;
 
   const [ref, inputProps] = useRegisterRef(register('image'));
@@ -67,12 +67,11 @@ function NFTForm({ defaultValues, onSubmit, onBack }: Props) {
 
         <ul className={styles.nfts}>{getNfts()}</ul>
 
-        {nftsCount > 0 && (
-          <Container maxWidth="sm" className={styles.buttons}>
-            <Button text="Back" color="border" onClick={onBack} />
-            <Button type="submit" text="Submit" />
-          </Container>
-        )}
+        <Container maxWidth="sm" className={styles.buttons}>
+          <Button text="Back" color="border" onClick={onBack} />
+
+          {nftsCount > 0 && <Button type="submit" text="Submit" />}
+        </Container>
       </form>
     </Container>
   );

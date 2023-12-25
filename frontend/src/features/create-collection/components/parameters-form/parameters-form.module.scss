@@ -42,3 +42,24 @@
   grid-template-columns: 1fr 1fr;
   gap: 24px;
 }
+
+.tags {
+  margin-top: 8px;
+
+  display: flex;
+  gap: 4px;
+
+  .tag {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    padding: 6px 12px;
+
+    font-size: 12px;
+
+    background-color: #e7e9eb;
+
+    border-radius: 20px;
+  }
+}

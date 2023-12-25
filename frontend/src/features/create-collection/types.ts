@@ -11,8 +11,12 @@ type SummaryValues = {
 };
 
 type ParametersValues = {
+  mintLimit: string;
   mintPrice: string;
+  tags: { value: string }[];
   royalty: string;
+  isSellable: boolean;
+  isTransferable: boolean;
 };
 
 type NFT = {
