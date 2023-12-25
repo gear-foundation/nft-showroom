@@ -15,7 +15,7 @@
 
 .header {
   background-color: #fff;
-  padding: 18px 0;
+  padding: 31px 0;
 
   .container {
     display: flex;
@@ -23,7 +23,7 @@
   }
 
   .headingWrapper,
-  .progressWrapper,
+  .progress,
   .balanceWrapper {
     display: flex;
     align-items: center;
@@ -31,10 +31,6 @@
 
   .headingWrapper {
     gap: 16px;
-  }
-
-  .progressWrapper {
-    gap: 32px;
   }
 
   .balanceWrapper {

@@ -12,11 +12,13 @@ import styles from './nft-form.module.scss';
 type Props = {
   defaultValues: NFTsValues;
   onSubmit: (values: NFTsValues) => void;
+  onBack: () => void;
 };
 
-function NFTForm({ defaultValues, onSubmit }: Props) {
+function NFTForm({ defaultValues, onSubmit, onBack }: Props) {
   const { control, register, setValue, handleSubmit } = useForm<NFTsValues>({ defaultValues });
   const { fields, append, remove } = useFieldArray({ name: 'nfts', control });
+  const nftsCount = fields.length;
 
   const [ref, inputProps] = useRegisterRef(register('image'));
   const imageValue = useWatch({ control, name: 'image' });
@@ -53,7 +55,7 @@ function NFTForm({ defaultValues, onSubmit }: Props) {
     <Container>
       <form onSubmit={handleSubmit((data) => onSubmit({ ...data, image: undefined }))}>
         <header className={styles.header}>
-          <h4 className={styles.heading}>NFTs added: {fields.length}</h4>
+          <h4 className={styles.heading}>NFTs added: {nftsCount}</h4>
 
           <div className={styles.file}>
             <input type="file" className={styles.fileInput} ref={ref} {...inputProps} />
@@ -64,6 +66,13 @@ function NFTForm({ defaultValues, onSubmit }: Props) {
         </header>
 
         <ul className={styles.nfts}>{getNfts()}</ul>
+
+        {nftsCount > 0 && (
+          <Container maxWidth="sm" className={styles.buttons}>
+            <Button text="Back" color="border" onClick={onBack} />
+            <Button type="submit" text="Submit" />
+          </Container>
+        )}
       </form>
     </Container>
   );

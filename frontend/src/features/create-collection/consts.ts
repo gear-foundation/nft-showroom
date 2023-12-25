@@ -1,6 +1,7 @@
 import PictureSVG from './assets/picture.svg?react';
 import NoteSVG from './assets/note.svg?react';
 import PuzzleSVG from './assets/puzzle.svg?react';
+import { NFTsValues, ParametersValues, SummaryValues } from './types';
 
 const COLLECTION_TYPES = [
   {
@@ -24,22 +25,20 @@ const COLLECTION_TYPES = [
   },
 ];
 
-const STEPS = {
-  SIMPLE_COLLECTION: ['Fill info', 'Set parameters', 'Add NFTs'],
-};
+const STEPS = ['Fill info', 'Set parameters', 'Add NFTs'];
 
-const DEFAULT_SUMMARY_VALUES = {
+const DEFAULT_SUMMARY_VALUES: SummaryValues = {
   cover: undefined,
   name: '',
   description: '',
 };
 
-const DEFAULT_PARAMETERS_VALUES = {
+const DEFAULT_PARAMETERS_VALUES: ParametersValues = {
   mintPrice: '',
   royalty: '',
 };
 
-const DEFAULT_NFTS_VALUES = {
+const DEFAULT_NFTS_VALUES: NFTsValues = {
   image: undefined,
   nfts: [],
 };

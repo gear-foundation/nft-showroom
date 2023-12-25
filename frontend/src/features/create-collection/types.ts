@@ -1,12 +1,13 @@
-import { DEFAULT_PARAMETERS_VALUES } from './consts';
-
 type SummaryValues = {
   cover: FileList | undefined;
   name: string;
   description: string;
 };
 
-type ParametersValues = typeof DEFAULT_PARAMETERS_VALUES;
+type ParametersValues = {
+  mintPrice: string;
+  royalty: string;
+};
 
 type NFT = {
   url: string;

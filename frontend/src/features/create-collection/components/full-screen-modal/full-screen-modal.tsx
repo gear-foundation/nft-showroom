@@ -14,11 +14,10 @@ type Props = {
   stepIndex: number;
   children: ReactNode;
   className?: string;
-  renderSubmitButton: () => JSX.Element;
   close: () => void;
 };
 
-function FullScreenModal({ heading, steps, stepIndex, children, className, renderSubmitButton, close }: Props) {
+function FullScreenModal({ heading, steps, stepIndex, children, className, close }: Props) {
   const getStepStatus = (index: number) => {
     if (index > stepIndex) return 'awaiting';
     if (index < stepIndex) return 'complete';
@@ -51,10 +50,7 @@ function FullScreenModal({ heading, steps, stepIndex, children, className, rende
           </div>
 
           <div className={styles.balanceWrapper}>
-            <div className={styles.progressWrapper}>
-              <ul className={styles.progress}>{getSteps()}</ul>
-              {renderSubmitButton()}
-            </div>
+            <ul className={styles.progress}>{getSteps()}</ul>
 
             <Balance />
           </div>

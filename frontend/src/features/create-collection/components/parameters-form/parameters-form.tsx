@@ -8,9 +8,10 @@ import { useApi } from '@gear-js/react-hooks';
 type Props = {
   defaultValues: ParametersValues;
   onSubmit: (values: ParametersValues) => void;
+  onBack: () => void;
 };
 
-function ParametersForm({ defaultValues, onSubmit }: Props) {
+function ParametersForm({ defaultValues, onSubmit, onBack }: Props) {
   const { api } = useApi();
   const [unit] = api?.registry.chainTokens || ['Unit'];
 
@@ -26,7 +27,7 @@ function ParametersForm({ defaultValues, onSubmit }: Props) {
         <Input label="Creator royalties (%)" className={styles.input} {...register('royalty')} />
 
         <div className={styles.buttons}>
-          <Button text="Back" color="border" />
+          <Button text="Back" color="border" onClick={onBack} />
           <Button type="submit" text="Continue" />
         </div>
       </form>

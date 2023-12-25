@@ -11,9 +11,10 @@ import styles from './summary-form.module.scss';
 type Props = {
   defaultValues: SummaryValues;
   onSubmit: (values: SummaryValues) => void;
+  onBack: () => void;
 };
 
-function SummaryForm({ defaultValues, onSubmit }: Props) {
+function SummaryForm({ defaultValues, onSubmit, onBack }: Props) {
   const { register, setValue, handleSubmit, control } = useForm({ defaultValues });
   const [ref, inputProps] = useRegisterRef(register('cover'));
 
@@ -55,7 +56,7 @@ function SummaryForm({ defaultValues, onSubmit }: Props) {
         <Input label="Description" className={styles.input} {...register('description')} />
 
         <div className={styles.buttons}>
-          <Button text="Cancel" color="border" onClick={close} />
+          <Button text="Cancel" color="border" onClick={onBack} />
           <Button type="submit" text="Continue" />
         </div>
       </Container>

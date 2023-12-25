@@ -1,5 +1,7 @@
-import { Button, ModalProps } from '@gear-js/vara-ui';
+import { ModalProps } from '@gear-js/vara-ui';
 import { useState } from 'react';
+
+import { Container } from '@/components';
 
 import { DEFAULT_NFTS_VALUES, DEFAULT_PARAMETERS_VALUES, DEFAULT_SUMMARY_VALUES, STEPS } from '../../consts';
 import { FullScreenModal } from '../full-screen-modal';
@@ -7,35 +9,67 @@ import { SummaryForm } from '../summary-form';
 import { ParametersForm } from '../parameters-form';
 import { NFTForm } from '../nft-form';
 
-const FORMS = [SummaryForm, ParametersForm, NFTForm] as const;
-const DEFAULT_VALUES = [DEFAULT_SUMMARY_VALUES, DEFAULT_PARAMETERS_VALUES, DEFAULT_NFTS_VALUES] as const;
+const DEFAULT_VALUES = {
+  0: DEFAULT_SUMMARY_VALUES,
+  1: DEFAULT_PARAMETERS_VALUES,
+  2: DEFAULT_NFTS_VALUES,
+};
 
 function CreateSimpleCollectionModal({ close }: Pick<ModalProps, 'close'>) {
   const [stepIndex, setStepIndex] = useState(0);
-
   const [formValues, setFormValues] = useState(DEFAULT_VALUES);
+
   console.log('formValues: ', formValues);
 
-  const handleSubmit = (data: unknown) => {
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    setFormValues((prevValues) => [...prevValues.slice(0, stepIndex), data, ...prevValues.slice(stepIndex + 1)]);
-    setStepIndex((prevIndex) => prevIndex + 1);
+  const getForm = () => {
+    switch (stepIndex) {
+      case 0:
+        return (
+          <SummaryForm
+            defaultValues={formValues[0]}
+            onBack={close}
+            onSubmit={(values) => {
+              setFormValues((prevValues) => ({ ...prevValues, [0]: values }));
+              setStepIndex(1);
+            }}
+          />
+        );
+
+      case 1:
+        return (
+          <ParametersForm
+            defaultValues={formValues[1]}
+            onBack={() => setStepIndex(1)}
+            onSubmit={(values) => {
+              setFormValues((prevValues) => ({ ...prevValues, [1]: values }));
+              setStepIndex(2);
+            }}
+          />
+        );
+
+      case 2:
+        return (
+          <NFTForm
+            defaultValues={formValues[2]}
+            onBack={() => setStepIndex(2)}
+            onSubmit={(values) => {
+              setFormValues((prevValues) => ({ ...prevValues, [2]: values }));
+            }}
+          />
+        );
+
+      default:
+        return (
+          <Container>
+            <p>Unexpected error occured.</p>
+          </Container>
+        );
+    }
   };
 
-  const defaultValues = formValues[stepIndex];
-  const Form = FORMS[stepIndex];
-
   return (
-    <FullScreenModal
-      heading="Create Simple NFT Collection"
-      steps={STEPS.SIMPLE_COLLECTION}
-      stepIndex={stepIndex}
-      renderSubmitButton={() => <Button text="Continue" />}
-      close={close}>
-      {/* eslint-disable-next-line @typescript-eslint/ban-ts-comment */}
-      {/* @ts-ignore */}
-      <Form defaultValues={defaultValues} onSubmit={handleSubmit} />
+    <FullScreenModal heading="Create Simple NFT Collection" steps={STEPS} stepIndex={stepIndex} close={close}>
+      {getForm()}
     </FullScreenModal>
   );
 }
