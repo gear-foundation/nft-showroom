@@ -1,7 +1,13 @@
 type SummaryValues = {
   cover: FileList | undefined;
+  logo: FileList | undefined;
   name: string;
   description: string;
+  url: string;
+  telegram: string;
+  x: string;
+  medium: string;
+  discord: string;
 };
 
 type ParametersValues = {

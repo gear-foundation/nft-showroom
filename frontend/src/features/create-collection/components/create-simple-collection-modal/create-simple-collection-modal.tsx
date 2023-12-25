@@ -39,7 +39,7 @@ function CreateSimpleCollectionModal({ close }: Pick<ModalProps, 'close'>) {
         return (
           <ParametersForm
             defaultValues={formValues[1]}
-            onBack={() => setStepIndex(1)}
+            onBack={() => setStepIndex(0)}
             onSubmit={(values) => {
               setFormValues((prevValues) => ({ ...prevValues, [1]: values }));
               setStepIndex(2);
@@ -51,7 +51,7 @@ function CreateSimpleCollectionModal({ close }: Pick<ModalProps, 'close'>) {
         return (
           <NFTForm
             defaultValues={formValues[2]}
-            onBack={() => setStepIndex(2)}
+            onBack={() => setStepIndex(1)}
             onSubmit={(values) => {
               setFormValues((prevValues) => ({ ...prevValues, [2]: values }));
             }}

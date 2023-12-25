@@ -1,8 +1,9 @@
-import { Button, Input } from '@gear-js/vara-ui';
+import { Button, Input, Textarea } from '@gear-js/vara-ui';
 import { useForm, useWatch } from 'react-hook-form';
 
 import { Container } from '@/components';
 
+import CameraSVG from '../../assets/camera.svg?react';
 import { SummaryValues } from '../../types';
 import { useFileUrl, useRegisterRef } from '../../hooks';
 import { DeleteButton } from '../delete-button';
@@ -16,21 +17,27 @@ type Props = {
 
 function SummaryForm({ defaultValues, onSubmit, onBack }: Props) {
   const { register, setValue, handleSubmit, control } = useForm({ defaultValues });
-  const [ref, inputProps] = useRegisterRef(register('cover'));
 
-  const fileList = useWatch({ name: 'cover', control });
-  const url = useFileUrl(fileList);
-  const style = { backgroundImage: `url(${url})` };
+  const [coverRef, coverInputProps] = useRegisterRef(register('cover'));
+  const coverFileList = useWatch({ name: 'cover', control });
+  const coverUrl = useFileUrl(coverFileList);
+  const coverStyle = { backgroundImage: `url(${coverUrl})` };
+  const handleCoverButtonClick = () => coverRef.current?.click();
+  const handleDeleteCoverButtonClick = () => setValue('cover', undefined);
 
-  const handleFileButtonClick = () => ref.current?.click();
-  const handleDeleteFileButtonClick = () => setValue('cover', undefined);
+  const [logoRef, logoInputProps] = useRegisterRef(register('logo'));
+  const logoFileList = useWatch({ name: 'logo', control });
+  const logoUrl = useFileUrl(logoFileList);
+  const logoStyle = { backgroundImage: `url(${logoUrl})` };
+  const handleLogoButtonClick = () => logoRef.current?.click();
+  const handleDeleteLogoButtonClick = () => setValue('logo', undefined);
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
+    <form onSubmit={handleSubmit(onSubmit)} className={styles.form}>
       <Container>
-        <header className={styles.cover} style={style}>
-          {url ? (
-            <DeleteButton className={styles.deleteButton} onClick={handleDeleteFileButtonClick} />
+        <header className={styles.cover} style={coverStyle}>
+          {coverUrl ? (
+            <DeleteButton className={styles.deleteButton} onClick={handleDeleteCoverButtonClick} />
           ) : (
             <>
               <h4 className={styles.heading}>Collection Cover</h4>
@@ -40,20 +47,36 @@ function SummaryForm({ defaultValues, onSubmit, onBack }: Props) {
                 <p>File formats: .jpg, .jpeg, .png. Max size: 5mb</p>
               </div>
 
-              <input type="file" className={styles.fileInput} ref={ref} {...inputProps} />
-              <Button text="Select File" size="small" color="dark" onClick={handleFileButtonClick} />
+              <input type="file" className={styles.fileInput} ref={coverRef} {...coverInputProps} />
+              <Button text="Select File" size="small" color="dark" onClick={handleCoverButtonClick} />
             </>
           )}
 
-          {/* <button type="button" className={styles.logoButton}>
-            <CameraSVG />
-          </button> */}
+          <div className={styles.logo}>
+            <input type="file" className={styles.fileInput} ref={logoRef} {...logoInputProps} />
+            <button type="button" className={styles.button} onClick={handleLogoButtonClick} style={logoStyle}>
+              {!logoUrl && <CameraSVG />}
+            </button>
+
+            {logoUrl && <DeleteButton className={styles.deleteButton} onClick={handleDeleteLogoButtonClick} />}
+          </div>
         </header>
       </Container>
 
       <Container maxWidth="sm" className={styles.inputs}>
-        <Input label="Name" className={styles.input} {...register('name')} />
-        <Input label="Description" className={styles.input} {...register('description')} />
+        <div className={styles.inputs}>
+          <Input label="Name" className={styles.input} {...register('name')} />
+          <Textarea label="Description" rows={2} className={styles.input} {...register('description')} />
+        </div>
+
+        <div className={styles.inputs}>
+          <h4 className={styles.heading}>Links (optional):</h4>
+          <Input label="URL" className={styles.input} />
+          <Input label="Telegram" className={styles.input} />
+          <Input label="X.com" className={styles.input} />
+          <Input label="Medium" className={styles.input} />
+          <Input label="Discord" className={styles.input} />
+        </div>
 
         <div className={styles.buttons}>
           <Button text="Cancel" color="border" onClick={onBack} />

@@ -29,8 +29,14 @@ const STEPS = ['Fill info', 'Set parameters', 'Add NFTs'];
 
 const DEFAULT_SUMMARY_VALUES: SummaryValues = {
   cover: undefined,
+  logo: undefined,
   name: '',
   description: '',
+  url: '',
+  telegram: '',
+  x: '',
+  medium: '',
+  discord: '',
 };
 
 const DEFAULT_PARAMETERS_VALUES: ParametersValues = {
