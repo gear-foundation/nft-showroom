@@ -9,7 +9,7 @@ pub struct ContractMetadata;
 
 impl Metadata for ContractMetadata {
     type Init = In<ComposableNftInit>;
-    type Handle = InOut<ComposableNftAction, ComposableNftEvent>;
+    type Handle = InOut<ComposableNftAction, Result<ComposableNftEvent, ComposableNftError>>;
     type Others = ();
     type Reply = ();
     type Signal = ();
@@ -28,7 +28,7 @@ pub struct Config {
     pub name: String,
     pub description: String,
     pub collection_tags: Vec<String>,
-    pub collection_img: String,
+    pub collection_banner: String,
     pub collection_logo: String,
     pub user_mint_limit: Option<u32>,
     pub tokens_limit: Option<u64>,

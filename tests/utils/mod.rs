@@ -189,12 +189,14 @@ pub fn update_config(
     admin: u64,
     gas_for_creation: Option<u64>,
     time_between_create_collections: Option<u64>,
+    minimum_transfer_value: Option<u128>,
 ) -> RunResult {
     marketplace.send(
         admin,
         NftMarketplaceAction::UpdateConfig {
             gas_for_creation,
             time_between_create_collections,
+            minimum_transfer_value,
         },
     )
 }
@@ -239,7 +241,7 @@ pub fn get_init_nft_payload(
         config: Config {
             name: "User Collection".to_string(),
             description: "User Collection".to_string(),
-            collection_img: "Collection image".to_string(),
+            collection_banner: "Collection banner".to_string(),
             collection_logo: "Collection logo".to_string(),
             collection_tags: vec!["tag1".to_string()],
             additional_links: None,
@@ -248,7 +250,6 @@ pub fn get_init_nft_payload(
             payment_for_mint,
             transferable: Some(0),
             sellable: Some(0),
-
         },
         img_links,
     }

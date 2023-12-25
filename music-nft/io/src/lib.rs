@@ -11,7 +11,7 @@ pub struct ContractMetadata;
 
 impl Metadata for ContractMetadata {
     type Init = In<MusicNftInit>;
-    type Handle = InOut<MusicNftAction, MusicNftEvent>;
+    type Handle = InOut<MusicNftAction, Result<MusicNftEvent, MusicNftError>>;
     type Others = ();
     type Reply = ();
     type Signal = ();
@@ -43,9 +43,10 @@ pub struct Config {
     pub name: String,
     pub description: String,
     pub collection_tags: Vec<String>,
-    pub collection_img: String,
+    pub collection_banner: String,
     pub collection_logo: String,
     pub user_mint_limit: Option<u32>,
+    pub listening_capabilities: ListenCapability,
     pub additional_links: Option<AdditionalLinks>,
     pub royalty: u16,
     pub payment_for_mint: u128,

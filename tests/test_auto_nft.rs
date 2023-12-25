@@ -55,7 +55,7 @@ fn successful_auto_changed() {
         config: Config {
             name: "User Collection".to_string(),
             description: "User Collection".to_string(),
-            collection_img: "Collection image".to_string(),
+            collection_banner: "Collection banner".to_string(),
             collection_tags: vec!["tag1".to_string()],
             user_mint_limit: 3.into(),
             // time_for_change,

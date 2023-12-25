@@ -25,7 +25,7 @@ async fn create_test() -> Result<()> {
         config: ComposableConfig {
             name: "User Collection".to_string(),
             description: "User Collection".to_string(),
-            collection_img: "Collection image".to_string(),
+            collection_banner: "Collection banner".to_string(),
             collection_logo: "Collection logo".to_string(),
             collection_tags: vec!["tag1".to_string()],
             additional_links: None,

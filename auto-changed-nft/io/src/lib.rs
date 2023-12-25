@@ -28,7 +28,7 @@ pub struct AutoNftInit {
 pub struct Config {
     pub name: String,
     pub description: String,
-    pub collection_img: String,
+    pub collection_banner: String,
     pub collection_tags: Vec<String>,
     pub user_mint_limit: Option<u32>,
     // pub time_for_change: u32,

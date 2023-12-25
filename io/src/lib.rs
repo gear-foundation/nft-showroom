@@ -5,7 +5,7 @@ use gstd::{prelude::*, ActorId, CodeId};
 pub struct NftMarketplaceMetadata;
 impl Metadata for NftMarketplaceMetadata {
     type Init = In<NftMarketplaceInit>;
-    type Handle = InOut<NftMarketplaceAction, NftMarketplaceEvent>;
+    type Handle = InOut<NftMarketplaceAction, Result<NftMarketplaceEvent, NftMarketplaceError>>;
     type Reply = ();
     type Others = ();
     type Signal = ();
@@ -85,6 +85,7 @@ pub enum NftMarketplaceAction {
     UpdateConfig {
         gas_for_creation: Option<u64>,
         time_between_create_collections: Option<u64>,
+        minimum_transfer_value: Option<u128>,
     },
 }
 
@@ -159,6 +160,7 @@ pub enum NftMarketplaceEvent {
     ConfigUpdated {
         gas_for_creation: Option<u64>,
         time_between_create_collections: Option<u64>,
+        minimum_transfer_value: Option<u128>,
     },
 }
 

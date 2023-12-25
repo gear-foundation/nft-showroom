@@ -3,8 +3,8 @@ use utils::prelude::*;
 mod utils;
 use gtest::Program;
 use nft_io::{
-    AdditionalLinks, Config, ImageData, NftAction, NftError, NftEvent, NftInit,
-    StateQuery as StateQueryNft, StateReply as StateReplyNft, Action, NftState
+    Action, AdditionalLinks, Config, ImageData, NftAction, NftError, NftEvent, NftInit, NftState,
+    StateQuery as StateQueryNft, StateReply as StateReplyNft,
 };
 use nft_marketplace_io::*;
 
@@ -44,7 +44,12 @@ fn successful_basics() {
     // Successful creation of a new collection
     let init_nft_payload = get_init_nft_payload(USERS[0].into(), 0, Some(3), 0);
 
-    let res = create_collection(&marketplace, USERS[0], name_simple_nft.clone(), init_nft_payload.encode());
+    let res = create_collection(
+        &marketplace,
+        USERS[0],
+        name_simple_nft.clone(),
+        init_nft_payload.encode(),
+    );
     assert!(!res.main_failed());
     let result = &res.decoded_log::<Result<NftMarketplaceEvent, NftMarketplaceError>>();
     println!("RES: {:?}", result);
@@ -74,7 +79,7 @@ fn successful_basics() {
     let config = Config {
         name: "My Collection".to_string(),
         description: "My Collection".to_string(),
-        collection_img: "Collection image".to_string(),
+        collection_banner: "Collection banner".to_string(),
         collection_logo: "Collection logo".to_string(),
         collection_tags: vec!["tag1".to_string()],
         additional_links: None,
@@ -205,7 +210,6 @@ fn successful_basics() {
         assert_eq!(state.img_links.len(), 8, "Wrong length of img_links");
         println!("STATE: {:?}", state);
     }
-
 }
 
 #[test]
@@ -221,20 +225,30 @@ fn failures() {
         &marketplace,
         ADMINS[0],
         nft_collection_code_id.into_bytes().into(),
-        name_simple_nft.clone()
+        name_simple_nft.clone(),
     );
     assert!(!res.main_failed());
 
     // The mint limit must be greater than zero
     let mut init_nft_payload = get_init_nft_payload(USERS[0].into(), 0, Some(0), 0);
 
-    let res = create_collection(&marketplace, USERS[0], name_simple_nft.clone(), init_nft_payload.encode());
+    let res = create_collection(
+        &marketplace,
+        USERS[0],
+        name_simple_nft.clone(),
+        init_nft_payload.encode(),
+    );
     assert!(res.main_failed());
 
     // There must be at least one link to create a collection
     init_nft_payload.config.user_mint_limit = 4.into();
     init_nft_payload.img_links = vec![];
-    let res = create_collection(&marketplace, USERS[0], name_simple_nft.clone(), init_nft_payload.encode());
+    let res = create_collection(
+        &marketplace,
+        USERS[0],
+        name_simple_nft.clone(),
+        init_nft_payload.encode(),
+    );
     assert!(res.main_failed());
 
     // Limit of copies value is equal to 0
@@ -243,7 +257,12 @@ fn failures() {
         auto_changing_rules: None,
     };
     init_nft_payload.img_links = vec![("Img-0".to_owned(), img_data.clone())];
-    let res = create_collection(&marketplace, USERS[0], name_simple_nft.clone(), init_nft_payload.encode());
+    let res = create_collection(
+        &marketplace,
+        USERS[0],
+        name_simple_nft.clone(),
+        init_nft_payload.encode(),
+    );
     assert!(res.main_failed());
 
     let img_data = ImageData {
@@ -255,7 +274,12 @@ fn failures() {
         .collect();
 
     init_nft_payload.img_links = img_links;
-    let res = create_collection(&marketplace, USERS[0], name_simple_nft.clone(), init_nft_payload.encode());
+    let res = create_collection(
+        &marketplace,
+        USERS[0],
+        name_simple_nft.clone(),
+        init_nft_payload.encode(),
+    );
     assert!(!res.main_failed());
 
     let state_reply = marketplace
@@ -288,16 +312,13 @@ fn failures() {
     let res = nft_collection.send(USERS[2], NftAction::Mint);
     assert!(!res.main_failed());
     let res = nft_collection.send(USERS[2], NftAction::Mint);
-    assert!(check_payload(
-        &res,
-        "All tokens are minted.".to_string()
-    ));
+    assert!(check_payload(&res, "All tokens are minted.".to_string()));
     assert!(!res.main_failed());
 
     let config = Config {
         name: "User Collection".to_string(),
         description: "User Collection".to_string(),
-        collection_img: "Collection image".to_string(),
+        collection_banner: "Collection banner".to_string(),
         collection_logo: "Collection logo".to_string(),
         collection_tags: vec!["tag1".to_string()],
         additional_links: None,
@@ -378,7 +399,6 @@ fn failures() {
     ));
 }
 
-
 #[test]
 fn check_auto_changing_rules() {
     let sys = utils::initialize_system();
@@ -412,7 +432,10 @@ fn check_auto_changing_rules() {
     }
     let img_data = ImageData {
         limit_copies: 1,
-        auto_changing_rules: Some(vec![(9, Action::ChangeImg("Auto change image".to_string())), (18, Action::AddMeta("Auto change metadata".to_string()))]),
+        auto_changing_rules: Some(vec![
+            (9, Action::ChangeImg("Auto change image".to_string())),
+            (18, Action::AddMeta("Auto change metadata".to_string())),
+        ]),
     };
     let img_links: Vec<(String, ImageData)> = (0..10)
         .map(|i| (format!("Img-{}", i), img_data.clone()))
@@ -432,7 +455,7 @@ fn check_auto_changing_rules() {
         config: Config {
             name: "User Collection".to_string(),
             description: "User Collection".to_string(),
-            collection_img: "Collection image".to_string(),
+            collection_banner: "Collection banner".to_string(),
             collection_logo: "Collection logo".to_string(),
             collection_tags: vec!["tag1".to_string()],
             additional_links,
@@ -444,7 +467,12 @@ fn check_auto_changing_rules() {
         },
         img_links,
     };
-    let res = create_collection(&marketplace, USERS[0], name_simple_nft.clone(), init_nft_payload.encode());
+    let res = create_collection(
+        &marketplace,
+        USERS[0],
+        name_simple_nft.clone(),
+        init_nft_payload.encode(),
+    );
     assert!(!res.main_failed());
     let result = &res.decoded_log::<Result<NftMarketplaceEvent, NftMarketplaceError>>();
     println!("RES: {:?}", result);
@@ -487,16 +515,24 @@ fn check_auto_changing_rules() {
 
     let state = get_state(&nft_collection).unwrap();
     assert_ne!(state.tokens[0].1.media_url, "Auto change image".to_string());
-    assert_ne!(state.tokens[0].1.metadata, vec!["Auto change metadata".to_string()]);
+    assert_ne!(
+        state.tokens[0].1.metadata,
+        vec!["Auto change metadata".to_string()]
+    );
     sys.spend_blocks(3);
     let state = get_state(&nft_collection).unwrap();
     assert_eq!(state.tokens[0].1.media_url, "Auto change image".to_string());
-    assert_ne!(state.tokens[0].1.metadata, vec!["Auto change metadata".to_string()]);
+    assert_ne!(
+        state.tokens[0].1.metadata,
+        vec!["Auto change metadata".to_string()]
+    );
     sys.spend_blocks(6);
     let state = get_state(&nft_collection).unwrap();
     assert_eq!(state.tokens[0].1.media_url, "Auto change image".to_string());
-    assert_eq!(state.tokens[0].1.metadata, vec!["Auto change metadata".to_string()]);
-
+    assert_eq!(
+        state.tokens[0].1.metadata,
+        vec!["Auto change metadata".to_string()]
+    );
 }
 
 #[test]
@@ -520,7 +556,12 @@ fn check_transferable() {
     let mut init_nft_payload = get_init_nft_payload(USERS[0].into(), 0, Some(3), 0);
     let transferable_time = 9_000;
     init_nft_payload.config.transferable = Some(transferable_time);
-    let res = create_collection(&marketplace, USERS[0], name_simple_nft.clone(), init_nft_payload.encode());
+    let res = create_collection(
+        &marketplace,
+        USERS[0],
+        name_simple_nft.clone(),
+        init_nft_payload.encode(),
+    );
     assert!(!res.main_failed());
     let result = &res.decoded_log::<Result<NftMarketplaceEvent, NftMarketplaceError>>();
     println!("RES: {:?}", result);
@@ -583,8 +624,6 @@ fn check_transferable() {
         assert_eq!(*owner, USERS[2].into(), "Wrong owner");
         assert_eq!(*token_id, vec![0], "Wrong token id");
     }
-
-
 }
 
 fn get_state(nft_collection: &Program) -> Option<NftState> {
@@ -596,7 +635,6 @@ fn get_state(nft_collection: &Program) -> Option<NftState> {
     }
     None
 }
-
 
 // TODO
 // #[test]

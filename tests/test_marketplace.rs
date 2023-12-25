@@ -70,6 +70,7 @@ fn create_success() {
         ADMINS[0],
         Some(200_000_000_000),
         Some(7_200_000),
+        Some(11_000_000_000_000),
     );
     assert!(!res.main_failed());
     let state_reply = marketplace
@@ -177,6 +178,7 @@ fn create_failures() {
         USERS[0],
         Some(200_000_000_000),
         Some(7_200_000),
+        Some(11_000_000_000_000),
     );
     assert!(check_payload(
         &res,

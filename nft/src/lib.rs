@@ -170,12 +170,10 @@ impl NftContract {
             let can_sell = if let Some(time) = self.config.sellable {
                 if exec::block_timestamp() < nft.mint_time + time {
                     false
-                }
-                else{
+                } else {
                     true
                 }
-            }
-            else{
+            } else {
                 false
             };
             (nft.owner, can_sell)
@@ -220,7 +218,7 @@ impl NftContract {
         if config.royalty > 10_000 {
             panic!("Royalty percent must be less than 100%");
         }
-        if config.transferable.is_none() && config.sellable.is_some(){
+        if config.transferable.is_none() && config.sellable.is_some() {
             panic!("Tokens must be transferable");
         }
 
@@ -361,26 +359,27 @@ impl NftContract {
             }
             if let Some(time) = self.config.transferable {
                 if exec::block_timestamp() < nft.mint_time + time {
-                    return Err(NftError("NonFungibleToken: transfer will be available after the deadline".to_owned()));
+                    return Err(NftError(
+                        "NonFungibleToken: transfer will be available after the deadline"
+                            .to_owned(),
+                    ));
                 }
+            } else {
+                return Err(NftError(
+                    "NonFungibleToken: token is not transferable".to_owned(),
+                ));
             }
-            else {
-                return Err(NftError("NonFungibleToken: token is not transferable".to_owned()));
-            }
-            
         } else {
             return Err(NftError(
                 "NonFungibleToken: token does not exist".to_owned(),
             ));
         }
 
-
         if from == to {
             return Err(NftError("Self transfer is not allowed.".to_owned()));
         }
         Ok(())
     }
-
 }
 
 #[no_mangle]
@@ -403,7 +402,7 @@ extern "C" fn init() {
     if config.royalty > 10_000 {
         panic!("Royalty percent must be less than 100%");
     }
-    if config.transferable.is_none() && config.sellable.is_some(){
+    if config.transferable.is_none() && config.sellable.is_some() {
         panic!("Tokens must be transferable");
     }
     assert!(

@@ -182,12 +182,10 @@ impl NftContract {
             let can_sell = if let Some(time) = self.config.sellable {
                 if exec::block_timestamp() < nft.mint_time + time {
                     false
-                }
-                else{
+                } else {
                     true
                 }
-            }
-            else{
+            } else {
                 false
             };
             (nft.owner, can_sell)
@@ -377,7 +375,6 @@ impl NftContract {
         to: &ActorId,
         token_id: &NftId,
     ) -> Result<(), MusicNftError> {
-
         let nft = self.tokens.get(token_id);
 
         if let Some(nft) = nft {
@@ -391,11 +388,15 @@ impl NftContract {
             }
             if let Some(time) = self.config.transferable {
                 if exec::block_timestamp() < nft.mint_time + time {
-                    return Err(MusicNftError("NonFungibleToken: transfer will be available after the deadline".to_owned()));
+                    return Err(MusicNftError(
+                        "NonFungibleToken: transfer will be available after the deadline"
+                            .to_owned(),
+                    ));
                 }
-            }
-            else {
-                return Err(MusicNftError("NonFungibleToken: token is not transferable".to_owned()));
+            } else {
+                return Err(MusicNftError(
+                    "NonFungibleToken: token is not transferable".to_owned(),
+                ));
             }
         } else {
             return Err(MusicNftError(
@@ -408,7 +409,6 @@ impl NftContract {
         }
         Ok(())
     }
-
 }
 
 #[no_mangle]
@@ -431,7 +431,7 @@ extern "C" fn init() {
         !nft_data.is_empty(),
         "There must be at least one link to create a collection"
     );
-    if config.transferable.is_none() && config.sellable.is_some(){
+    if config.transferable.is_none() && config.sellable.is_some() {
         panic!("Tokens must be transferable");
     }
     if nft_data
