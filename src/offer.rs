@@ -1,4 +1,5 @@
 use crate::nft_messages::*;
+use crate::payment::*;
 use crate::NftMarketplace;
 use gstd::{exec, msg, prelude::*, ActorId};
 use nft_marketplace_io::*;
@@ -10,9 +11,13 @@ impl NftMarketplace {
         token_id: u64,
     ) -> Result<NftMarketplaceEvent, NftMarketplaceError> {
         let current_price = msg::value();
-        if current_price == 0 {
-            return Err(NftMarketplaceError("msg::value is zero".to_owned()));
+        if current_price < self.config.minimum_transfer_value {
+            return Err(NftMarketplaceError(format!(
+                "The price must be greater than existential deposit ({})",
+                self.config.minimum_transfer_value
+            )));
         }
+
         let offer = Offer {
             collection_address,
             token_id,
@@ -21,7 +26,7 @@ impl NftMarketplace {
         self.offers
             .entry(offer.clone())
             .and_modify(|price| {
-                msg::send(offer.creator, "", *price).expect("Error in sending value");
+                msg::send_with_gas(offer.creator, "", 0, *price).expect("Error in sending value");
                 *price = current_price;
             })
             .or_insert(current_price);
@@ -45,7 +50,8 @@ impl NftMarketplace {
         };
 
         if let Some((offer, price)) = self.offers.get_key_value(&offer) {
-            msg::send(offer.creator, "", *price).expect("Error in sending value");
+            // use send_with_gas to transfer the value directly to the balance, not to the mailbox.
+            msg::send_with_gas(offer.creator, "", 0, *price).expect("Error in sending value");
         } else {
             return Err(NftMarketplaceError(
                 "This offer does not exist or you are not the creator of the offer".to_owned(),
@@ -84,63 +90,37 @@ impl NftMarketplace {
             return Err(NftMarketplaceError("This offer does not exist".to_owned()));
         }
 
-        // get token info
-
+        // check token info
         let address_marketplace = exec::program_id();
         let msg_src = msg::source();
-
-        let (collection_owner, royalty) = if let NftEvent::TokenInfoReceived {
-            token_owner,
-            approval,
-            sellable,
-            collection_owner,
-            royalty,
-        } =
-            get_token_info(offer.collection_address, offer.token_id).await?
-        {
-            if !sellable {
-                return Err(NftMarketplaceError("Nft is not sellable".to_owned()));
-            }
-            if token_owner != msg_src {
-                return Err(NftMarketplaceError(
-                    "Only the owner nft can accept the offer.".to_owned(),
-                ));
-            }
-            if let Some(approve_acc) = approval {
-                if approve_acc != address_marketplace {
-                    return Err(NftMarketplaceError(
-                        "No approve to the marketplace".to_owned(),
-                    ));
-                }
-            } else {
-                return Err(NftMarketplaceError(
-                    "No approve to the marketplace".to_owned(),
-                ));
-            }
-            (collection_owner, royalty)
-        } else {
-            panic!("Wrong received reply");
-        };
+        let (collection_owner, royalty) = check_token_info(
+            &offer.collection_address,
+            offer.token_id,
+            self.config.gas_for_get_token_info,
+            &msg_src,
+            &address_marketplace,
+        )
+        .await?;
 
         transfer_from_token(
             offer.collection_address,
             msg_src,
             offer.creator,
             offer.token_id,
+            self.config.gas_for_transfer_token,
         )
         .await?;
 
         let price = self.offers.get(&offer).expect("Can't be None");
 
-        let percent_to_collection_creator = price * (royalty as u128) / 10_000u128;
-        if percent_to_collection_creator > self.config.minimum_transfer_value {
-            msg::send(collection_owner, "", percent_to_collection_creator)
-                .expect("Error in sending value");
-            msg::send(msg_src, "", *price - percent_to_collection_creator)
-                .expect("Error in sending value");
-        } else {
-            msg::send(msg_src, "", *price).expect("Error in sending value");
-        }
+        // transfer value to token owner and percent to collection creator
+        currency_transfer(
+            collection_owner,
+            msg_src,
+            *price,
+            royalty,
+            self.config.minimum_transfer_value,
+        );
 
         self.offers.remove(&offer);
 

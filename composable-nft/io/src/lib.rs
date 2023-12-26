@@ -4,6 +4,7 @@ use gmeta::{In, InOut, Metadata};
 use gstd::{prelude::*, ActorId};
 
 pub type NftId = u64;
+pub const EXISTENTIAL_DEPOSIT: u128 = 10_000_000_000_000;
 
 pub struct ContractMetadata;
 

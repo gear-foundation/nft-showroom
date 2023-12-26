@@ -190,7 +190,7 @@ fn successful_basics() {
 
     // Successful Expand NFT in the collection
     let img_data = ImageData {
-        limit_copies: 1,
+        limit_copies: Some(1),
         auto_changing_rules: None,
     };
     let res = nft_collection.send(
@@ -253,7 +253,7 @@ fn failures() {
 
     // Limit of copies value is equal to 0
     let img_data = ImageData {
-        limit_copies: 0,
+        limit_copies: Some(0),
         auto_changing_rules: None,
     };
     init_nft_payload.img_links = vec![("Img-0".to_owned(), img_data.clone())];
@@ -266,7 +266,7 @@ fn failures() {
     assert!(res.main_failed());
 
     let img_data = ImageData {
-        limit_copies: 1,
+        limit_copies: Some(1),
         auto_changing_rules: None,
     };
     let img_links: Vec<(String, ImageData)> = (0..5)
@@ -343,7 +343,7 @@ fn failures() {
     }
 
     let img_data = ImageData {
-        limit_copies: 4,
+        limit_copies: Some(4),
         auto_changing_rules: None,
     };
     let res = nft_collection.send(
@@ -431,7 +431,7 @@ fn check_auto_changing_rules() {
         println!("Collection info: {:?}", state);
     }
     let img_data = ImageData {
-        limit_copies: 1,
+        limit_copies: Some(1),
         auto_changing_rules: Some(vec![
             (9, Action::ChangeImg("Auto change image".to_string())),
             (18, Action::AddMeta("Auto change metadata".to_string())),
@@ -624,6 +624,102 @@ fn check_transferable() {
         assert_eq!(*owner, USERS[2].into(), "Wrong owner");
         assert_eq!(*token_id, vec![0], "Wrong token id");
     }
+}
+
+#[test]
+fn check_payment_for_mint() {
+    let sys = utils::initialize_system();
+    init_marketplace(&sys);
+    let marketplace = sys.get_program(1);
+    let nft_collection_code_id =
+        sys.submit_code("target/wasm32-unknown-unknown/debug/nft.opt.wasm");
+
+    let state_reply = marketplace
+        .read_state(StateQuery::CollectionsInfo)
+        .expect("Unexpected invalid state.");
+    if let StateReply::CollectionsInfo(state) = state_reply {
+        assert!(state.is_empty(), "Collection info should be empty");
+        println!("Collection info: {:?}", state);
+    }
+    // Successful addition of a new collection
+    let name_simple_nft = "Simple NFT".to_string();
+    let res = add_new_collection(
+        &marketplace,
+        ADMINS[0],
+        nft_collection_code_id.into_bytes().into(),
+        name_simple_nft.clone(),
+    );
+    assert!(!res.main_failed());
+    let state_reply = marketplace
+        .read_state(StateQuery::CollectionsInfo)
+        .expect("Unexpected invalid state.");
+    if let StateReply::CollectionsInfo(state) = state_reply {
+        assert!(!state.is_empty(), "Collection info shouldn't be empty");
+        println!("Collection info: {:?}", state);
+    }
+
+    // The payment for mint must be greater than existential deposit (10000000000000)
+    let mut init_nft_payload = get_init_nft_payload(USERS[0].into(), 0, Some(3), 0);
+    let payment_for_mint = 9_000_000_000_000;
+    init_nft_payload.config.payment_for_mint = payment_for_mint;
+    let res = create_collection(
+        &marketplace,
+        USERS[0],
+        name_simple_nft.clone(),
+        init_nft_payload.encode(),
+    );
+    assert!(res.main_failed());
+
+    // Successful creation of a new collection
+    let payment_for_mint = 11_000_000_000_000;
+    init_nft_payload.config.payment_for_mint = payment_for_mint;
+    let res = create_collection(
+        &marketplace,
+        USERS[0],
+        name_simple_nft.clone(),
+        init_nft_payload.encode(),
+    );
+    assert!(!res.main_failed());
+
+    let result = &res.decoded_log::<Result<NftMarketplaceEvent, NftMarketplaceError>>();
+    println!("RES: {:?}", result);
+    let state_reply = marketplace
+        .read_state(StateQuery::AllCollections)
+        .expect("Unexpected invalid state.");
+    let address_nft = if let StateReply::AllCollections(state) = state_reply {
+        assert!(!state.is_empty(), "Collections shouldn't be empty");
+        println!("Collections: {:?}", state);
+        state[0].0
+    } else {
+        assert!(false, "Unexpected StateReply variant");
+        0.into()
+    };
+
+    let address_nft: [u8; 32] = address_nft.into();
+    let nft_collection = sys.get_program(address_nft);
+    let state_reply = nft_collection
+        .read_state(StateQueryNft::All)
+        .expect("Unexpected invalid state.");
+    if let StateReplyNft::All(state) = state_reply {
+        assert_eq!(state.collection_owner, USERS[0].into(), "Wrong Admin");
+        println!("Collection NFT info: {:?}", state);
+    }
+
+    // Successful mint NFT in the new collection
+    sys.mint_to(USERS[1], 2 * payment_for_mint);
+    let res = nft_collection.send_with_value(USERS[1], NftAction::Mint, payment_for_mint);
+    assert!(!res.main_failed());
+
+    sys.claim_value_from_mailbox(USERS[0]);
+    let balance = sys.balance_of(USERS[0]);
+    assert_eq!(balance, payment_for_mint, "Wrong balance");
+    let res = nft_collection.send_with_value(USERS[1], NftAction::Mint, payment_for_mint - 1);
+    assert!(!res.main_failed());
+
+    assert!(check_payload(
+        &res,
+        "Incorrectly entered mint fee.".to_string()
+    ));
 }
 
 fn get_state(nft_collection: &Program) -> Option<NftState> {

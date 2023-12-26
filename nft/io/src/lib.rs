@@ -6,6 +6,7 @@ pub type NftId = u64;
 pub type TimeSec = u32;
 
 pub const BLOCK_DURATION_IN_SECS: u32 = 3;
+pub const EXISTENTIAL_DEPOSIT: u128 = 10_000_000_000_000;
 
 pub struct ContractMetadata;
 
@@ -27,7 +28,7 @@ pub struct NftInit {
 
 #[derive(Debug, Clone, Encode, Decode, TypeInfo)]
 pub struct ImageData {
-    pub limit_copies: u32,
+    pub limit_copies: Option<u32>,
     pub auto_changing_rules: Option<Vec<(TimeSec, Action)>>,
 }
 
