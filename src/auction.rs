@@ -182,28 +182,29 @@ impl NftMarketplace {
         collection_address: ActorId,
         token_id: u64,
     ) -> Result<NftMarketplaceEvent, NftMarketplaceError> {
-        let auction = self
-            .auctions
-            .get(&(collection_address, token_id))
-            .expect("There is no such auction");
+        if let Some(auction) = self.auctions.get(&(collection_address, token_id)) {
+            if auction.owner != msg::source() {
+                return Err(NftMarketplaceError(
+                    "Only the creator of the auction can send this message".to_owned(),
+                ));
+            }
+            transfer_token(
+                collection_address,
+                auction.owner,
+                token_id,
+                self.config.gas_for_transfer_token,
+            )
+            .await?;
 
-        if auction.owner != msg::source() {
+            if auction.current_winner != ActorId::zero() {
+                // use send_with_gas to transfer the value directly to the balance, not to the mailbox.
+                msg::send_with_gas(auction.current_winner, "", 0, auction.current_price)
+                    .expect("Error in sending value");
+            }
+        } else {
             return Err(NftMarketplaceError(
-                "Only the creator of the auction can send this message.".to_owned(),
+                "There is no auction with this collection address and token id".to_owned(),
             ));
-        }
-        transfer_token(
-            collection_address,
-            auction.owner,
-            token_id,
-            self.config.gas_for_transfer_token,
-        )
-        .await?;
-
-        if auction.current_winner != ActorId::zero() {
-            // use send_with_gas to transfer the value directly to the balance, not to the mailbox.
-            msg::send_with_gas(auction.current_winner, "", 0, auction.current_price)
-                .expect("Error in sending value");
         }
 
         self.auctions
@@ -235,7 +236,7 @@ impl NftMarketplace {
                 auction
             } else {
                 return Err(NftMarketplaceError(
-                    "Wrong collection_address or token_id.".to_owned(),
+                    "There is no auction with this collection address and token id".to_owned(),
                 ));
             };
         Ok(auction)

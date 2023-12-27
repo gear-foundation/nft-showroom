@@ -7,7 +7,7 @@ use gstd::{
 };
 use nft_io::{
     Action, Config, ImageData, Nft, NftAction, NftError, NftEvent, NftId, NftInit, NftState,
-    StateQuery, StateReply, BLOCK_DURATION_IN_SECS, EXISTENTIAL_DEPOSIT,
+    StateQuery, StateReply, BLOCK_DURATION_IN_SECS, EXISTENTIAL_DEPOSIT, GAS_AUTO_CHANGING,
 };
 
 #[derive(Debug)]
@@ -60,7 +60,7 @@ impl NftContract {
                         msg::send_with_gas_delayed(
                             exec::program_id(),
                             action,
-                            5_000_000_000,
+                            GAS_AUTO_CHANGING,
                             0,
                             *trigger_time / BLOCK_DURATION_IN_SECS,
                         )
@@ -68,9 +68,10 @@ impl NftContract {
                     });
             }
 
-            img_info.limit_copies.filter(|&limit| limit == 0).map(|_| {
+            if let Some(0) = img_info.limit_copies {
                 self.img_links.remove(rand_index as usize);
-            });
+            }
+
         } else {
             return Err(NftError("Error with getting a random nft".to_owned()));
         }

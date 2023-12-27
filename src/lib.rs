@@ -244,34 +244,33 @@ impl NftMarketplace {
 
         if self.admins.contains(&msg_src) {
             self.collection_to_owner.remove(&collection_address);
-        } else {
-            if collection_owner == msg_src {
-                let reply =
-                    msg::send_with_gas_for_reply_as::<NftAction, Result<NftEvent, NftError>>(
-                        collection_address,
-                        NftAction::CanDelete,
-                        self.config.gas_for_delete_collection,
-                        0,
-                        0,
-                    )
-                    .expect("Error during get info about deleting")
-                    .await
-                    .expect("The program had a problem getting information about the deletion");
+        } else if collection_owner == msg_src {
 
-                if let NftEvent::CanDelete(answer) = self.check_reply(reply)? {
-                    if answer {
-                        self.collection_to_owner.remove(&collection_address);
-                    } else {
-                        return Err(NftMarketplaceError("Removal denied".to_owned()));
-                    }
+            let reply =
+                msg::send_with_gas_for_reply_as::<NftAction, Result<NftEvent, NftError>>(
+                    collection_address,
+                    NftAction::CanDelete,
+                    self.config.gas_for_delete_collection,
+                    0,
+                    0,
+                )
+                .expect("Error during get info about deleting")
+                .await
+                .expect("The program had a problem getting information about the deletion");
+
+            if let NftEvent::CanDelete(answer) = self.check_reply(reply)? {
+                if answer {
+                    self.collection_to_owner.remove(&collection_address);
                 } else {
-                    return Err(NftMarketplaceError("Wrong received reply".to_owned()));
+                    return Err(NftMarketplaceError("Removal denied".to_owned()));
                 }
             } else {
-                return Err(NftMarketplaceError(
-                    "Only the owner of the collection can send this message".to_owned(),
-                ));
+                return Err(NftMarketplaceError("Wrong received reply".to_owned()));
             }
+        } else {
+            return Err(NftMarketplaceError(
+                "Only the owner of the collection can send this message".to_owned(),
+            ));
         }
 
         Ok(NftMarketplaceEvent::CollectionDeleted { collection_address })
@@ -376,11 +375,11 @@ impl NftMarketplace {
 
     fn get_collection_info(&self, type_name: &str) -> Result<&CollectionInfo, NftMarketplaceError> {
         if let Some(collection_info) = self.type_collections.get(type_name) {
-            return Ok(collection_info);
+            Ok(collection_info)
         } else {
-            return Err(NftMarketplaceError(
+            Err(NftMarketplaceError(
                 "There is no collection with this name yet.".to_owned(),
-            ));
+            ))
         }
     }
 }

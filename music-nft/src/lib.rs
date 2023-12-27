@@ -66,7 +66,7 @@ impl NftContract {
                         msg::send_with_gas_delayed(
                             exec::program_id(),
                             action,
-                            5_000_000_000,
+                            GAS_AUTO_CHANGING,
                             0,
                             *trigger_time / BLOCK_DURATION_IN_SECS,
                         )
@@ -74,9 +74,9 @@ impl NftContract {
                     });
             }
 
-            img_info.limit_copies.filter(|&limit| limit == 0).map(|_| {
+            if let Some(0) = img_info.limit_copies {
                 self.nft_data.remove(rand_index as usize);
-            });
+            }
         } else {
             return Err(MusicNftError("Error with getting a random nft".to_owned()));
         }
@@ -359,7 +359,7 @@ impl NftContract {
     fn payment_for_mint(&self) -> Result<(), MusicNftError> {
         if self.config.payment_for_mint != 0 {
             if msg::value() != self.config.payment_for_mint {
-                return Err(MusicNftError("Incorrectly entered mint fee .".to_owned()));
+                return Err(MusicNftError("Incorrectly entered mint fee.".to_owned()));
             }
             // use send_with_gas to transfer the value directly to the balance, not to the mailbox.
             msg::send_with_gas(self.collection_owner, "", 0, self.config.payment_for_mint)

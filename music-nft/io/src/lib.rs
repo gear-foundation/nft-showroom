@@ -7,6 +7,7 @@ pub type TimeSec = u32;
 
 pub const BLOCK_DURATION_IN_SECS: u32 = 3;
 pub const EXISTENTIAL_DEPOSIT: u128 = 10_000_000_000_000;
+pub const GAS_AUTO_CHANGING: u64 = 5_000_000_000;
 
 pub struct ContractMetadata;
 

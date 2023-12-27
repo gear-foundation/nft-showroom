@@ -78,7 +78,7 @@ pub async fn check_token_info(
         }
         if token_owner != *msg_src {
             return Err(NftMarketplaceError(
-                "Only the owner can put his NFT up for auction.".to_owned(),
+                "Only the owner of the token can perform this action.".to_owned(),
             ));
         }
         if let Some(approve_acc) = approval {

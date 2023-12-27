@@ -122,7 +122,7 @@ impl NftMarketplace {
         token_id: u64,
     ) -> Result<NftMarketplaceEvent, NftMarketplaceError> {
         let buyer = msg::source();
-        self.check_sale(&collection_address, &token_id)?;
+        self.check_sale(&collection_address, &token_id, &buyer)?;
 
         transfer_token(
             collection_address,
@@ -161,13 +161,15 @@ impl NftMarketplace {
         &self,
         collection_address: &ActorId,
         token_id: &u64,
+        buyer: &ActorId,
     ) -> Result<(), NftMarketplaceError> {
         let payment = msg::value();
         let nft = self.sales.get(&(*collection_address, *token_id));
         if let Some(nft) = nft {
             if payment < nft.price {
+                msg::send(*buyer, "", payment).expect("Error in sending value");
                 return Err(NftMarketplaceError(
-                    "Less than the agreed price.".to_owned(),
+                    "The specified value is less than the price of the token".to_owned(),
                 ));
             }
         } else {

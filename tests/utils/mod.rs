@@ -229,12 +229,11 @@ pub fn delete_collection(
 pub fn delete_admin(marketplace: &Program, admin: u64, user: ActorId) -> RunResult {
     marketplace.send(admin, NftMarketplaceAction::DeleteAdmin { user })
 }
-pub fn check_payload(result: &RunResult, message: String) -> bool {
-    result.log()[0]
+pub fn check_payload(log_number: usize, result: &RunResult, message: String) -> bool {
+    result.log()[log_number]
         .payload()
         .windows(message.as_bytes().len())
         .any(|window| window == message.as_bytes())
-    // result.log()[0].payload()[2..] == *message.as_bytes()
 }
 
 pub fn get_init_nft_payload(
