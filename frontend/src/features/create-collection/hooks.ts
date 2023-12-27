@@ -1,3 +1,5 @@
+import { ProgramMetadata } from '@gear-js/api';
+import { useAlert } from '@gear-js/react-hooks';
 import { useRef, useImperativeHandle, useEffect, useState } from 'react';
 import { UseFormRegisterReturn } from 'react-hook-form';
 
@@ -23,4 +25,21 @@ function useRegisterRef<T extends string>({ ref: registerRef, ...props }: UseFor
   return [ref, props] as const;
 }
 
-export { useFileUrl, useRegisterRef };
+function useProgramMetadata(source: string) {
+  const alert = useAlert();
+
+  const [metadata, setMetadata] = useState<ProgramMetadata>();
+
+  useEffect(() => {
+    fetch(source)
+      .then((response) => response.text())
+      .then((metaRaw) => setMetadata(ProgramMetadata.from(`0x${metaRaw}`)))
+      .catch(({ message }: Error) => alert.error(message));
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  return metadata;
+}
+
+export { useFileUrl, useRegisterRef, useProgramMetadata };

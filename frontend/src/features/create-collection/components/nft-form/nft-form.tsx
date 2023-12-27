@@ -4,46 +4,46 @@ import { useFieldArray, useForm, useWatch } from 'react-hook-form';
 
 import { Container } from '@/components';
 
-import { useFileUrl, useRegisterRef } from '../../hooks';
+import { useRegisterRef } from '../../hooks';
 import { NFTsValues } from '../../types';
 import { NFT } from '../nft';
 import styles from './nft-form.module.scss';
 
 type Props = {
   defaultValues: NFTsValues;
+  isLoading: boolean;
   onSubmit: (values: NFTsValues) => void;
   onBack: () => void;
 };
 
-function NFTForm({ defaultValues, onSubmit, onBack }: Props) {
+function NFTForm({ defaultValues, isLoading, onSubmit, onBack }: Props) {
   const { control, register, setValue, handleSubmit } = useForm({ defaultValues });
   const { fields, append, remove } = useFieldArray({ control, name: 'nfts' });
   const nftsCount = fields.length;
 
   const [ref, inputProps] = useRegisterRef(register('image'));
   const imageValue = useWatch({ control, name: 'image' });
-  const imageUrl = useFileUrl(imageValue);
 
   useEffect(() => {
-    if (!imageUrl) return;
+    if (!imageValue || !imageValue.length) return;
 
-    const url = imageUrl;
+    const [file] = imageValue;
     const limit = '';
 
-    append({ url, limit });
+    append({ file, limit });
     setValue('image', undefined);
-  }, [imageUrl, append, setValue]);
+  }, [imageValue, append, setValue]);
 
   const handleFileButtonClick = () => ref.current?.click();
 
   const getNfts = () =>
-    fields.map(({ id, url }, index) => {
+    fields.map(({ id, file }, index) => {
       const inputName = `nfts.${index}.limit` as const;
 
       return (
         <NFT
           key={id}
-          src={url}
+          src={URL.createObjectURL(file)}
           inputProps={register(inputName)}
           onDelete={() => remove(index)}
           onCheckboxChange={() => setValue(inputName, '')}
@@ -70,7 +70,7 @@ function NFTForm({ defaultValues, onSubmit, onBack }: Props) {
         <Container maxWidth="sm" className={styles.buttons}>
           <Button text="Back" color="border" onClick={onBack} />
 
-          {nftsCount > 0 && <Button type="submit" text="Submit" />}
+          {nftsCount > 0 && <Button type="submit" text="Submit" isLoading={isLoading} />}
         </Container>
       </form>
     </Container>

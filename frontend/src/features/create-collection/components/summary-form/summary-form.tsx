@@ -71,11 +71,11 @@ function SummaryForm({ defaultValues, onSubmit, onBack }: Props) {
 
         <div className={styles.inputs}>
           <h4 className={styles.heading}>Links (optional):</h4>
-          <Input label="URL" className={styles.input} />
-          <Input label="Telegram" className={styles.input} />
-          <Input label="X.com" className={styles.input} />
-          <Input label="Medium" className={styles.input} />
-          <Input label="Discord" className={styles.input} />
+          <Input label="URL" className={styles.input} {...register('url')} />
+          <Input label="Telegram" className={styles.input} {...register('telegram')} />
+          <Input label="X.com" className={styles.input} {...register('x')} />
+          <Input label="Medium" className={styles.input} {...register('medium')} />
+          <Input label="Discord" className={styles.input} {...register('discord')} />
         </div>
 
         <div className={styles.buttons}>

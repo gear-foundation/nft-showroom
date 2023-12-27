@@ -20,7 +20,7 @@ type ParametersValues = {
 };
 
 type NFT = {
-  url: string;
+  file: File;
   limit: string;
 };
 
@@ -29,4 +29,4 @@ type NFTsValues = {
   nfts: NFT[];
 };
 
-export type { SummaryValues, ParametersValues, NFTsValues };
+export type { SummaryValues, ParametersValues, NFT, NFTsValues };
