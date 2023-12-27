@@ -5,7 +5,7 @@ use gstd::{prelude::*, ActorId, CodeId};
 pub struct NftMarketplaceMetadata;
 impl Metadata for NftMarketplaceMetadata {
     type Init = In<NftMarketplaceInit>;
-    type Handle = InOut<NftMarketplaceAction, NftMarketplaceEvent>;
+    type Handle = InOut<NftMarketplaceAction, Result<NftMarketplaceEvent, NftMarketplaceError>>;
     type Reply = ();
     type Others = ();
     type Signal = ();
@@ -15,8 +15,13 @@ impl Metadata for NftMarketplaceMetadata {
 #[derive(Encode, Decode, TypeInfo)]
 pub struct NftMarketplaceInit {
     pub gas_for_creation: u64,
+    pub gas_for_transfer_token: u64,
+    pub gas_for_close_auction: u64,
+    pub gas_for_delete_collection: u64,
+    pub gas_for_get_token_info: u64,
     pub time_between_create_collections: u64,
     pub minimum_transfer_value: u128,
+    pub ms_in_block: u32,
 }
 
 #[derive(Encode, Decode, TypeInfo)]
@@ -84,7 +89,13 @@ pub enum NftMarketplaceAction {
     },
     UpdateConfig {
         gas_for_creation: Option<u64>,
+        gas_for_transfer_token: Option<u64>,
+        gas_for_close_auction: Option<u64>,
+        gas_for_delete_collection: Option<u64>,
+        gas_for_get_token_info: Option<u64>,
         time_between_create_collections: Option<u64>,
+        minimum_transfer_value: Option<u128>,
+        ms_in_block: Option<u32>,
     },
 }
 
@@ -158,7 +169,13 @@ pub enum NftMarketplaceEvent {
     },
     ConfigUpdated {
         gas_for_creation: Option<u64>,
+        gas_for_transfer_token: Option<u64>,
+        gas_for_close_auction: Option<u64>,
+        gas_for_delete_collection: Option<u64>,
+        gas_for_get_token_info: Option<u64>,
         time_between_create_collections: Option<u64>,
+        minimum_transfer_value: Option<u128>,
+        ms_in_block: Option<u32>,
     },
 }
 
@@ -205,8 +222,13 @@ pub struct CollectionInfo {
 #[derive(Default, Debug, Encode, Decode, TypeInfo, Clone)]
 pub struct Config {
     pub gas_for_creation: u64,
+    pub gas_for_transfer_token: u64,
+    pub gas_for_close_auction: u64,
+    pub gas_for_delete_collection: u64,
+    pub gas_for_get_token_info: u64,
     pub time_between_create_collections: u64,
     pub minimum_transfer_value: u128,
+    pub ms_in_block: u32,
 }
 
 #[derive(Debug, Encode, Decode, TypeInfo, Clone)]

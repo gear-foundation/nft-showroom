@@ -30,7 +30,7 @@ fn successful_basics() {
         &marketplace,
         ADMINS[0],
         nft_collection_code_id.into_bytes().into(),
-        name_composable_nft.clone()
+        name_composable_nft.clone(),
     );
     assert!(!res.main_failed());
     let state_reply = marketplace
@@ -56,7 +56,7 @@ fn successful_basics() {
         config: Config {
             name: "User Collection".to_string(),
             description: "User Collection".to_string(),
-            collection_img: "Collection image".to_string(),
+            collection_banner: "Collection banner".to_string(),
             collection_logo: "Collection logo".to_string(),
             collection_tags: vec!["tag1".to_string()],
             additional_links: None,
@@ -69,7 +69,12 @@ fn successful_basics() {
         },
         img_links,
     };
-    let res = create_collection(&marketplace, USERS[0], name_composable_nft, init_nft_payload.encode());
+    let res = create_collection(
+        &marketplace,
+        USERS[0],
+        name_composable_nft,
+        init_nft_payload.encode(),
+    );
     assert!(!res.main_failed());
     let state_reply = marketplace
         .read_state(StateQuery::AllCollections)
@@ -166,7 +171,7 @@ fn composable_sale_success() {
         config: Config {
             name: "User Collection".to_string(),
             description: "User Collection".to_string(),
-            collection_img: "Collection image".to_string(),
+            collection_banner: "Collection banner".to_string(),
             collection_logo: "Collection logo".to_string(),
             collection_tags: vec!["tag1".to_string()],
             additional_links: None,
@@ -179,7 +184,12 @@ fn composable_sale_success() {
         },
         img_links,
     };
-    let res = create_collection(&marketplace, USERS[0], name_composable_nft, init_nft_payload.encode());
+    let res = create_collection(
+        &marketplace,
+        USERS[0],
+        name_composable_nft,
+        init_nft_payload.encode(),
+    );
     assert!(!res.main_failed());
     let state_reply = marketplace
         .read_state(StateQuery::AllCollections)

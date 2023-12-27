@@ -6,12 +6,14 @@ pub type NftId = u64;
 pub type TimeSec = u32;
 
 pub const BLOCK_DURATION_IN_SECS: u32 = 3;
+pub const EXISTENTIAL_DEPOSIT: u128 = 10_000_000_000_000;
+pub const GAS_AUTO_CHANGING: u64 = 5_000_000_000;
 
 pub struct ContractMetadata;
 
 impl Metadata for ContractMetadata {
     type Init = In<MusicNftInit>;
-    type Handle = InOut<MusicNftAction, MusicNftEvent>;
+    type Handle = InOut<MusicNftAction, Result<MusicNftEvent, MusicNftError>>;
     type Others = ();
     type Reply = ();
     type Signal = ();
@@ -27,7 +29,7 @@ pub struct MusicNftInit {
 
 #[derive(Debug, Clone, Encode, Decode, TypeInfo)]
 pub struct ImageData {
-    pub limit_copies: u32,
+    pub limit_copies: Option<u32>,
     pub description: Option<String>,
     pub auto_changing_rules: Option<Vec<(TimeSec, Action)>>,
 }
@@ -43,9 +45,10 @@ pub struct Config {
     pub name: String,
     pub description: String,
     pub collection_tags: Vec<String>,
-    pub collection_img: String,
+    pub collection_banner: String,
     pub collection_logo: String,
     pub user_mint_limit: Option<u32>,
+    pub listening_capabilities: ListenCapability,
     pub additional_links: Option<AdditionalLinks>,
     pub royalty: u16,
     pub payment_for_mint: u128,

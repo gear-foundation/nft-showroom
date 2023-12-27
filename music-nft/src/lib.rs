@@ -23,7 +23,7 @@ static mut NFT_CONTRACT: Option<NftContract> = None;
 impl NftContract {
     fn mint(&mut self) -> Result<MusicNftEvent, MusicNftError> {
         let msg_src = msg::source();
-        self.check_tokens()?;
+        self.check_available_amount_of_tokens()?;
         self.check_mint_limit(&msg_src)?;
         let Some(next_nft_nonce) = self.nonce.checked_add(1) else {
             return Err(MusicNftError("Math overflow.".to_owned()));
@@ -35,10 +35,11 @@ impl NftContract {
         let mut img_link = self.config.collection_logo.clone();
         let mut token_description = self.config.description.clone();
         let token_id = self.nonce;
-        self.nonce = next_nft_nonce;
 
         if let Some((links, img_info)) = self.nft_data.get_mut(rand_index as usize) {
-            img_info.limit_copies -= 1;
+            if let Some(limit) = img_info.limit_copies.as_mut() {
+                *limit -= 1;
+            }
             music_link = links.music_link.clone();
 
             if let Some(description) = &img_info.description {
@@ -49,29 +50,31 @@ impl NftContract {
             }
 
             if let Some(auto_changing_rules) = &img_info.auto_changing_rules {
-                auto_changing_rules.iter().for_each(|event| {
-                    let action = match &event.1 {
-                        Action::ChangeImg(img_link) => MusicNftAction::ChangeImg {
-                            token_id,
-                            img_link: img_link.to_string(),
-                        },
-                        Action::AddMeta(metadata) => MusicNftAction::AddMetadata {
-                            token_id,
-                            metadata: metadata.to_string(),
-                        },
-                    };
-                    msg::send_bytes_with_gas_delayed(
-                        exec::program_id(),
-                        action.encode(),
-                        5_000_000_000,
-                        0,
-                        event.0 / BLOCK_DURATION_IN_SECS,
-                    )
-                    .expect("Error in sending a delayed message `NftAction`");
-                });
+                auto_changing_rules
+                    .iter()
+                    .for_each(|(trigger_time, auto_action)| {
+                        let action = match auto_action {
+                            Action::ChangeImg(img_link) => MusicNftAction::ChangeImg {
+                                token_id,
+                                img_link: img_link.to_string(),
+                            },
+                            Action::AddMeta(metadata) => MusicNftAction::AddMetadata {
+                                token_id,
+                                metadata: metadata.to_string(),
+                            },
+                        };
+                        msg::send_with_gas_delayed(
+                            exec::program_id(),
+                            action,
+                            GAS_AUTO_CHANGING,
+                            0,
+                            *trigger_time / BLOCK_DURATION_IN_SECS,
+                        )
+                        .expect("Error in sending a delayed message `NftAction`");
+                    });
             }
 
-            if img_info.limit_copies == 0 {
+            if let Some(0) = img_info.limit_copies {
                 self.nft_data.remove(rand_index as usize);
             }
         } else {
@@ -83,12 +86,7 @@ impl NftContract {
             .and_modify(|ids| {
                 ids.insert(token_id);
             })
-            .or_insert_with(|| {
-                let mut ids = HashSet::new();
-                ids.insert(token_id);
-
-                ids
-            });
+            .or_insert_with(|| HashSet::from([token_id]));
 
         let name = format!("{} - {}", self.config.name, token_id);
         let nft_data = Nft {
@@ -100,6 +98,8 @@ impl NftContract {
             music_link: music_link.clone(),
             mint_time: exec::block_timestamp(),
         };
+
+        self.nonce = next_nft_nonce;
         self.tokens.insert(token_id, nft_data.clone());
         self.restriction_mint
             .entry(msg_src)
@@ -141,11 +141,7 @@ impl NftContract {
             .and_modify(|ids| {
                 ids.insert(token_id);
             })
-            .or_insert_with(|| {
-                let mut ids = HashSet::new();
-                ids.insert(token_id);
-                ids
-            });
+            .or_insert_with(|| HashSet::from([token_id]));
 
         self.token_approvals.remove(&token_id);
 
@@ -166,7 +162,15 @@ impl NftContract {
     }
 
     fn revoke_approve(&mut self, token_id: NftId) -> Result<MusicNftEvent, MusicNftError> {
-        self.can_approve(&token_id)?;
+        if let Some(nft_info) = self.tokens.get(&token_id) {
+            if nft_info.owner != msg::source() {
+                return Err(MusicNftError(
+                    "Only nft owner can send this message".to_owned(),
+                ));
+            }
+        } else {
+            return Err(MusicNftError("This nft id hasn't come out yet".to_owned()));
+        }
         let res = self.token_approvals.remove(&token_id);
         if res.is_none() {
             return Err(MusicNftError(
@@ -180,14 +184,8 @@ impl NftContract {
         let nft = self.tokens.get(&token_id);
         let (token_owner, can_sell) = if let Some(nft) = nft {
             let can_sell = if let Some(time) = self.config.sellable {
-                if exec::block_timestamp() < nft.mint_time + time {
-                    false
-                }
-                else{
-                    true
-                }
-            }
-            else{
+                exec::block_timestamp() >= nft.mint_time + time
+            } else {
                 false
             };
             (nft.owner, can_sell)
@@ -214,7 +212,7 @@ impl NftContract {
 
         if additional_links
             .iter()
-            .any(|(_, img_data)| img_data.limit_copies == 0)
+            .any(|(_, img_data)| img_data.limit_copies.map_or(false, |limit| limit == 0))
         {
             return Err(MusicNftError(
                 "Limit of copies value is equal to 0".to_owned(),
@@ -233,6 +231,17 @@ impl NftContract {
             return Err(MusicNftError(
                 "The collection configuration can no more be changed".to_owned(),
             ));
+        }
+
+        // made 10_000 so you can enter hundredths of a percent.
+        if config.royalty > 10_000 {
+            return Err(MusicNftError(
+                "Royalty percent must be less than 100%".to_owned(),
+            ));
+        }
+
+        if config.transferable.is_none() && config.sellable.is_some() {
+            return Err(MusicNftError("Tokens must be transferable".to_owned()));
         }
 
         if let Some(limit) = config.user_mint_limit {
@@ -315,7 +324,7 @@ impl NftContract {
         Ok(())
     }
 
-    fn check_tokens(&self) -> Result<(), MusicNftError> {
+    fn check_available_amount_of_tokens(&self) -> Result<(), MusicNftError> {
         if self.nft_data.is_empty() {
             return Err(MusicNftError("All tokens are minted.".to_owned()));
         }
@@ -350,9 +359,10 @@ impl NftContract {
     fn payment_for_mint(&self) -> Result<(), MusicNftError> {
         if self.config.payment_for_mint != 0 {
             if msg::value() != self.config.payment_for_mint {
-                return Err(MusicNftError("Incorrectly entered mint fee .".to_owned()));
+                return Err(MusicNftError("Incorrectly entered mint fee.".to_owned()));
             }
-            msg::send(self.collection_owner, "", self.config.payment_for_mint)
+            // use send_with_gas to transfer the value directly to the balance, not to the mailbox.
+            msg::send_with_gas(self.collection_owner, "", 0, self.config.payment_for_mint)
                 .expect("Error in sending value");
         }
 
@@ -377,10 +387,7 @@ impl NftContract {
         to: &ActorId,
         token_id: &NftId,
     ) -> Result<(), MusicNftError> {
-
-        let nft = self.tokens.get(token_id);
-
-        if let Some(nft) = nft {
+        if let Some(nft) = self.tokens.get(token_id) {
             let owner = nft.owner;
             if owner != *from {
                 return Err(MusicNftError("NonFungibleToken: access denied".to_owned()));
@@ -391,11 +398,15 @@ impl NftContract {
             }
             if let Some(time) = self.config.transferable {
                 if exec::block_timestamp() < nft.mint_time + time {
-                    return Err(MusicNftError("NonFungibleToken: transfer will be available after the deadline".to_owned()));
+                    return Err(MusicNftError(
+                        "NonFungibleToken: transfer will be available after the deadline"
+                            .to_owned(),
+                    ));
                 }
-            }
-            else {
-                return Err(MusicNftError("NonFungibleToken: token is not transferable".to_owned()));
+            } else {
+                return Err(MusicNftError(
+                    "NonFungibleToken: token is not transferable".to_owned(),
+                ));
             }
         } else {
             return Err(MusicNftError(
@@ -408,7 +419,6 @@ impl NftContract {
         }
         Ok(())
     }
-
 }
 
 #[no_mangle]
@@ -427,16 +437,30 @@ extern "C" fn init() {
             .unwrap_or(true),
         "The mint limit must be greater than zero"
     );
+    if config.payment_for_mint > 0 && config.payment_for_mint < EXISTENTIAL_DEPOSIT {
+        panic!(
+            "{}",
+            format!(
+                "The payment for mint must be greater than existential deposit ({})",
+                EXISTENTIAL_DEPOSIT
+            )
+        );
+    }
+
+    // made 10_000 so you can enter hundredths of a percent.
+    if config.royalty > 10_000 {
+        panic!("Royalty percent must be less than 100%");
+    }
     assert!(
         !nft_data.is_empty(),
         "There must be at least one link to create a collection"
     );
-    if config.transferable.is_none() && config.sellable.is_some(){
+    if config.transferable.is_none() && config.sellable.is_some() {
         panic!("Tokens must be transferable");
     }
     if nft_data
         .iter()
-        .any(|(_, img_data)| img_data.limit_copies == 0)
+        .any(|(_, img_data)| img_data.limit_copies.map_or(false, |limit| limit == 0))
     {
         panic!("Limit of copies value is equal to 0");
     }
@@ -481,15 +505,13 @@ extern "C" fn handle() {
             .expect("Unexpected uninitialized `MusicNftContract`.")
     };
 
-    let user = msg::source();
-
     let result = match action {
         MusicNftAction::Mint => nft_contract.mint(),
         MusicNftAction::TransferFrom { from, to, token_id } => {
             nft_contract.transfer_from(&from, &to, token_id)
         }
         MusicNftAction::Transfer { to, token_id } => {
-            nft_contract.transfer_from(&user, &to, token_id)
+            nft_contract.transfer_from(&msg::source(), &to, token_id)
         }
         MusicNftAction::Approve { to, token_id } => nft_contract.approve(&to, token_id),
         MusicNftAction::RevokeApproval { token_id } => nft_contract.revoke_approve(token_id),
@@ -517,22 +539,16 @@ extern "C" fn state() {
             .expect("Unexpected: The contract is not initialized")
     };
     let query: StateQuery = msg::load().expect("Unable to load the state query");
-    match query {
-        StateQuery::Name => {
-            msg::reply(StateReply::Name(nft.config.name), 0).expect("Unable to share state");
-        }
-        StateQuery::Description => {
-            msg::reply(StateReply::Description(nft.config.description), 0)
-                .expect("Unable to share state");
-        }
-        StateQuery::Config => {
-            msg::reply(StateReply::Config(nft.config), 0).expect("Unable to share state");
-        }
+    let reply = match query {
+        StateQuery::Name => StateReply::Name(nft.config.name),
+        StateQuery::Description => StateReply::Description(nft.config.description),
+        StateQuery::Config => StateReply::Config(nft.config),
         StateQuery::All => {
             let nft_state: NftState = nft.into();
-            msg::reply(StateReply::All(nft_state), 0).expect("Unable to share state");
+            StateReply::All(nft_state)
         }
-    }
+    };
+    msg::reply(reply, 0).expect("Unable to share state");
 }
 
 impl From<NftContract> for NftState {

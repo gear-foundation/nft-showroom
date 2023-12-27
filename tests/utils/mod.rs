@@ -14,8 +14,13 @@ pub fn init_marketplace(sys: &System) {
     let marketplace = Program::current(sys);
     let init_payload = NftMarketplaceInit {
         gas_for_creation: 1_000_000_000_000_000,
+        gas_for_transfer_token: 5_000_000_000,
+        gas_for_close_auction: 10_000_000_000,
+        gas_for_delete_collection: 5_000_000_000,
+        gas_for_get_token_info: 5_000_000_000,
         time_between_create_collections: 3_600_000, // 1 hour in milliseconds
         minimum_transfer_value: 10_000_000_000_000,
+        ms_in_block: 3_000,
     };
     let res = marketplace.send(ADMINS[0], init_payload);
     assert!(!res.main_failed());
@@ -188,13 +193,25 @@ pub fn update_config(
     marketplace: &Program,
     admin: u64,
     gas_for_creation: Option<u64>,
+    gas_for_transfer_token: Option<u64>,
+    gas_for_close_auction: Option<u64>,
+    gas_for_delete_collection: Option<u64>,
+    gas_for_get_token_info: Option<u64>,
     time_between_create_collections: Option<u64>,
+    minimum_transfer_value: Option<u128>,
+    ms_in_block: Option<u32>,
 ) -> RunResult {
     marketplace.send(
         admin,
         NftMarketplaceAction::UpdateConfig {
             gas_for_creation,
+            gas_for_transfer_token,
+            gas_for_close_auction,
+            gas_for_delete_collection,
+            gas_for_get_token_info,
             time_between_create_collections,
+            minimum_transfer_value,
+            ms_in_block,
         },
     )
 }
@@ -212,12 +229,11 @@ pub fn delete_collection(
 pub fn delete_admin(marketplace: &Program, admin: u64, user: ActorId) -> RunResult {
     marketplace.send(admin, NftMarketplaceAction::DeleteAdmin { user })
 }
-pub fn check_payload(result: &RunResult, message: String) -> bool {
-    result.log()[0]
+pub fn check_payload(log_number: usize, result: &RunResult, message: String) -> bool {
+    result.log()[log_number]
         .payload()
         .windows(message.as_bytes().len())
         .any(|window| window == message.as_bytes())
-    // result.log()[0].payload()[2..] == *message.as_bytes()
 }
 
 pub fn get_init_nft_payload(
@@ -227,7 +243,7 @@ pub fn get_init_nft_payload(
     payment_for_mint: u128,
 ) -> NftInit {
     let img_data = ImageData {
-        limit_copies: 1,
+        limit_copies: Some(1),
         auto_changing_rules: None,
     };
     let img_links: Vec<(String, ImageData)> = (0..10)
@@ -239,7 +255,7 @@ pub fn get_init_nft_payload(
         config: Config {
             name: "User Collection".to_string(),
             description: "User Collection".to_string(),
-            collection_img: "Collection image".to_string(),
+            collection_banner: "Collection banner".to_string(),
             collection_logo: "Collection logo".to_string(),
             collection_tags: vec!["tag1".to_string()],
             additional_links: None,
@@ -248,7 +264,6 @@ pub fn get_init_nft_payload(
             payment_for_mint,
             transferable: Some(0),
             sellable: Some(0),
-
         },
         img_links,
     }

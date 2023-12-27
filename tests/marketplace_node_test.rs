@@ -53,8 +53,13 @@ async fn create_test() -> Result<()> {
 
     let init_marketplace = NftMarketplaceInit {
         gas_for_creation: 200_000_000_000,
+        gas_for_transfer_token: 5_000_000_000,
+        gas_for_close_auction: 10_000_000_000,
+        gas_for_delete_collection: 5_000_000_000,
+        gas_for_get_token_info: 5_000_000_000,
         time_between_create_collections: 3_600_000, // 1 hour in milliseconds
         minimum_transfer_value: 10_000_000_000_000,
+        ms_in_block: 3_000,
     }
     .encode();
 
@@ -106,7 +111,7 @@ async fn create_test() -> Result<()> {
     assert!(listener.message_processed(message_id).await?.succeed());
 
     let img_data = ImageData {
-        limit_copies: 1,
+        limit_copies: Some(1),
         auto_changing_rules: None,
     };
     let img_links: Vec<(String, ImageData)> = (0..10)
@@ -119,7 +124,7 @@ async fn create_test() -> Result<()> {
         config: Config {
             name: "User Collection".to_string(),
             description: "User Collection".to_string(),
-            collection_img: "Collection image".to_string(),
+            collection_banner: "Collection banner".to_string(),
             collection_logo: "Collection logo".to_string(),
             collection_tags: vec!["tag1".to_string()],
             additional_links: None,
@@ -181,7 +186,7 @@ async fn create_test() -> Result<()> {
 
     println!("GAS_INFO MIN LIMIT: {:?}", gas_info.min_limit.clone());
     let (message_id, _) = api
-        .send_message(nft_pid, NftAction::Mint, gas_info.min_limit, 0)
+        .send_message(nft_pid, NftAction::Mint, gas_info.min_limit * 2, 0)
         .await?;
 
     assert!(listener.message_processed(message_id).await?.succeed());
@@ -209,8 +214,13 @@ async fn sale_test() -> Result<()> {
 
     let init_marketplace = NftMarketplaceInit {
         gas_for_creation: 200_000_000_000,
+        gas_for_transfer_token: 5_000_000_000,
+        gas_for_close_auction: 10_000_000_000,
+        gas_for_delete_collection: 5_000_000_000,
+        gas_for_get_token_info: 5_000_000_000,
         time_between_create_collections: 3_600_000, // 1 hour in milliseconds
         minimum_transfer_value: 10_000_000_000_000,
+        ms_in_block: 3_000,
     }
     .encode();
 
@@ -262,7 +272,7 @@ async fn sale_test() -> Result<()> {
     assert!(listener.message_processed(message_id).await?.succeed());
 
     let img_data = ImageData {
-        limit_copies: 1,
+        limit_copies: Some(1),
         auto_changing_rules: None,
     };
     let img_links: Vec<(String, ImageData)> = (0..10)
@@ -275,7 +285,7 @@ async fn sale_test() -> Result<()> {
         config: Config {
             name: "User Collection".to_string(),
             description: "User Collection".to_string(),
-            collection_img: "Collection image".to_string(),
+            collection_banner: "Collection banner".to_string(),
             collection_logo: "Collection logo".to_string(),
             collection_tags: vec!["tag1".to_string()],
             additional_links: None,
@@ -433,12 +443,7 @@ async fn sale_test() -> Result<()> {
 
     println!("GAS_INFO MIN LIMIT: {:?}", gas_info.min_limit.clone());
     let (message_id, _) = client
-        .send_message(
-            program_id,
-            buy_payload,
-            gas_info.min_limit * 2,
-            150_000_000_000_000,
-        )
+        .send_message(program_id, buy_payload, 10_000_000_000, 150_000_000_000_000)
         .await?;
     println!("!!!!!!!!!!!!!!!!!!!!");
     // assert!(client_listener.message_processed(message_id).await?.succeed());
@@ -467,8 +472,13 @@ async fn auction_test() -> Result<()> {
 
     let init_marketplace = NftMarketplaceInit {
         gas_for_creation: 200_000_000_000,
+        gas_for_transfer_token: 5_000_000_000,
+        gas_for_close_auction: 10_000_000_000,
+        gas_for_delete_collection: 5_000_000_000,
+        gas_for_get_token_info: 5_000_000_000,
         time_between_create_collections: 3_600_000, // 1 hour in milliseconds
         minimum_transfer_value: 10_000_000_000_000,
+        ms_in_block: 3_000,
     }
     .encode();
 
@@ -520,7 +530,7 @@ async fn auction_test() -> Result<()> {
     assert!(listener.message_processed(message_id).await?.succeed());
 
     let img_data = ImageData {
-        limit_copies: 1,
+        limit_copies: Some(1),
         auto_changing_rules: None,
     };
     let img_links: Vec<(String, ImageData)> = (0..10)
@@ -533,7 +543,7 @@ async fn auction_test() -> Result<()> {
         config: Config {
             name: "User Collection".to_string(),
             description: "User Collection".to_string(),
-            collection_img: "Collection image".to_string(),
+            collection_banner: "Collection banner".to_string(),
             collection_logo: "Collection logo".to_string(),
             collection_tags: vec!["tag1".to_string()],
             additional_links: None,
@@ -650,12 +660,7 @@ async fn auction_test() -> Result<()> {
 
     println!("GAS_INFO MIN LIMIT: {:?}", gas_info.min_limit.clone());
     let (message_id, _) = api
-        .send_message(
-            program_id,
-            create_auction_payload,
-            gas_info.min_limit * 2,
-            0,
-        )
+        .send_message(program_id, create_auction_payload, 30_000_000_000, 0)
         .await?;
 
     assert!(listener.message_processed(message_id).await?.succeed());
@@ -732,8 +737,13 @@ async fn offer_test() -> Result<()> {
 
     let init_marketplace = NftMarketplaceInit {
         gas_for_creation: 200_000_000_000,
+        gas_for_transfer_token: 5_000_000_000,
+        gas_for_close_auction: 10_000_000_000,
+        gas_for_delete_collection: 5_000_000_000,
+        gas_for_get_token_info: 5_000_000_000,
         time_between_create_collections: 3_600_000, // 1 hour in milliseconds
         minimum_transfer_value: 10_000_000_000_000,
+        ms_in_block: 3_000,
     }
     .encode();
 
@@ -785,7 +795,7 @@ async fn offer_test() -> Result<()> {
     assert!(listener.message_processed(message_id).await?.succeed());
 
     let img_data = ImageData {
-        limit_copies: 1,
+        limit_copies: Some(1),
         auto_changing_rules: None,
     };
     let img_links: Vec<(String, ImageData)> = (0..10)
@@ -798,7 +808,7 @@ async fn offer_test() -> Result<()> {
         config: Config {
             name: "User Collection".to_string(),
             description: "User Collection".to_string(),
-            collection_img: "Collection image".to_string(),
+            collection_banner: "Collection banner".to_string(),
             collection_logo: "Collection logo".to_string(),
             collection_tags: vec!["tag1".to_string()],
             additional_links: None,
@@ -968,7 +978,7 @@ async fn offer_test() -> Result<()> {
 
     println!("GAS_INFO MIN LIMIT: {:?}", gas_info.min_limit.clone());
     let (message_id, _) = api
-        .send_message(program_id, accept_offer_payload, gas_info.min_limit, 0)
+        .send_message(program_id, accept_offer_payload, 15_000_000_000, 0)
         .await?;
 
     assert!(listener.message_processed(message_id).await?.succeed());
