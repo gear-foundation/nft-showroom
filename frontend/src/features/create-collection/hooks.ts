@@ -1,6 +1,6 @@
 import { ProgramMetadata } from '@gear-js/api';
 import { useAlert } from '@gear-js/react-hooks';
-import { useRef, useImperativeHandle, useEffect, useState, ChangeEvent } from 'react';
+import { useRef, useImperativeHandle, useEffect, useState, ChangeEvent, DependencyList, EffectCallback } from 'react';
 import { UseFormRegisterReturn } from 'react-hook-form';
 
 import { MAX_IMAGE_SIZE_MB } from './consts';
@@ -45,10 +45,10 @@ function useProgramMetadata(source: string) {
   return metadata;
 }
 
-function useImageInput(types: string[]) {
+function useImageInput(defaultValue: File | undefined, types: string[]) {
   const alert = useAlert();
 
-  const [value, setValue] = useState<File>();
+  const [value, setValue] = useState(defaultValue);
   const ref = useRef<HTMLInputElement>(null);
 
   const handleClick = () => ref.current?.click();
@@ -92,4 +92,22 @@ function useImageInput(types: string[]) {
   return { value, props, handleClick, handleReset };
 }
 
-export { useFileUrl, useRegisterRef, useProgramMetadata, useImageInput };
+function useChangeEffect(callback: EffectCallback, dependencies?: DependencyList) {
+  const mounted = useRef(false);
+
+  useEffect(
+    () => () => {
+      mounted.current = false;
+    },
+    [],
+  );
+
+  useEffect(() => {
+    if (mounted.current) return callback();
+
+    mounted.current = true;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, dependencies);
+}
+
+export { useFileUrl, useRegisterRef, useProgramMetadata, useImageInput, useChangeEffect };

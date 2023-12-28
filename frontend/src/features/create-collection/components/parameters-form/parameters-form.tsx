@@ -1,11 +1,14 @@
 import { Button, Checkbox, Input, Select } from '@gear-js/vara-ui';
 import { useApi } from '@gear-js/react-hooks';
-import { ChangeEvent, useEffect } from 'react';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { ChangeEvent } from 'react';
 import { useFieldArray, useForm, useWatch } from 'react-hook-form';
+import { z } from 'zod';
 
 import { Container } from '@/components';
 
 import CrossSVG from '../../assets/cross-tag.svg?react';
+import { useChangeEffect } from '../../hooks';
 import { ParametersValues } from '../../types';
 import styles from './parameters-form.module.scss';
 
@@ -18,15 +21,31 @@ type Props = {
 const PLACEHOLDER_TAG = { value: '', label: 'Select tag' };
 const TAGS = ['Game', 'Metaverse', 'Hero'];
 
+const schema = z.object({
+  mintLimit: z.string().trim(),
+  mintPrice: z.string().trim(),
+  tags: z.array(z.object({ value: z.string() })),
+  royalty: z.coerce
+    .number()
+    .max(100)
+    .transform((value) => value.toString()),
+  isSellable: z.boolean(),
+  isTransferable: z.boolean(),
+});
+
+const resolver = zodResolver(schema);
+
 function ParametersForm({ defaultValues, onSubmit, onBack }: Props) {
   const { api } = useApi();
   const [unit] = api?.registry.chainTokens || ['Unit'];
 
-  const { control, register, handleSubmit, setValue } = useForm({ defaultValues });
+  const { control, formState, register, handleSubmit, setValue } = useForm({ defaultValues, resolver });
+  const { errors } = formState;
   const isSellable = useWatch({ control, name: 'isSellable' });
 
-  useEffect(() => {
+  useChangeEffect(() => {
     setValue('royalty', '');
+    setValue('isTransferable', isSellable);
   }, [isSellable, setValue]);
 
   const { fields, append, remove } = useFieldArray({ control, name: 'tags' });
@@ -53,8 +72,8 @@ function ParametersForm({ defaultValues, onSubmit, onBack }: Props) {
       <p className={styles.text}>Once the collection is created, they cannot be modified.</p>
 
       <form onSubmit={handleSubmit(onSubmit)} className={styles.form}>
-        <Input label={`Minting limit per user`} className={styles.input} {...register('mintLimit')} />
-        <Input label={`Minting price (${unit})`} className={styles.input} {...register('mintPrice')} />
+        <Input type="number" label={`Minting limit per user`} className={styles.input} {...register('mintLimit')} />
+        <Input type="number" label={`Minting price (${unit})`} className={styles.input} {...register('mintPrice')} />
 
         <div>
           <Select
@@ -68,10 +87,17 @@ function ParametersForm({ defaultValues, onSubmit, onBack }: Props) {
           <ul className={styles.tags}>{getTags()}</ul>
         </div>
 
+        <Checkbox label="Allow transferring" type="switch" {...register('isTransferable')} disabled={isSellable} />
         <Checkbox label="Allow selling" type="switch" {...register('isSellable')} />
-        <Checkbox label="Allow transferring" type="switch" {...register('isTransferable')} />
 
-        <Input label="Creator royalties (%)" className={styles.input} disabled={!isSellable} {...register('royalty')} />
+        <Input
+          type="number"
+          label="Creator royalties (%)"
+          className={styles.input}
+          disabled={!isSellable}
+          {...register('royalty')}
+          error={errors.royalty?.message}
+        />
 
         <div className={styles.buttons}>
           <Button text="Back" color="border" onClick={onBack} />

@@ -20,8 +20,13 @@ type Props = {
 };
 
 const schema = z.object({
-  name: z.string().min(1),
-  description: z.string().min(1),
+  name: z.string().trim().min(1),
+  description: z.string().trim().min(1),
+  url: z.string().trim(),
+  telegram: z.string().trim(),
+  x: z.string().trim(),
+  medium: z.string().trim(),
+  discord: z.string().trim(),
 });
 
 const resolver = zodResolver(schema);
@@ -30,11 +35,10 @@ function SummaryForm({ defaultValues, onSubmit, onBack }: Props) {
   const { register, handleSubmit, formState } = useForm({ defaultValues, resolver });
   const { errors } = formState;
 
-  const cover = useImageInput(IMAGE_TYPES);
-
+  const cover = useImageInput(defaultValues.cover, IMAGE_TYPES);
   const coverStyle = cover.value ? { backgroundImage: `url(${getFileUrl(cover.value)})` } : undefined;
 
-  const logo = useImageInput(IMAGE_TYPES);
+  const logo = useImageInput(defaultValues.logo, IMAGE_TYPES);
   const logoStyle = logo.value ? { backgroundImage: `url(${getFileUrl(logo.value)})` } : undefined;
 
   return (

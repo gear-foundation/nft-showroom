@@ -17,6 +17,8 @@ function CreateSimpleCollectionModal({ close }: Pick<ModalProps, 'close'>) {
   const [stepIndex, setStepIndex] = useState(0);
   const [summaryValues, setSummaryValues] = useState(DEFAULT_SUMMARY_VALUES);
   const [parametersValues, setParametersValues] = useState(DEFAULT_PARAMETERS_VALUES);
+  console.log('summaryValues: ', summaryValues);
+  console.log('parametersValues: ', parametersValues);
   const [isLoading, setIsLoading] = useState(false);
 
   const { account } = useAccount();
@@ -35,12 +37,6 @@ function CreateSimpleCollectionModal({ close }: Pick<ModalProps, 'close'>) {
     nextStep();
   };
 
-  const getTrimmedValues = <T extends Record<string, string>>(values: T) => {
-    const trimmedEntries = Object.entries(values).map(([key, value]) => [key, value.trim()]);
-
-    return Object.fromEntries(trimmedEntries) as T;
-  };
-
   const uploadToIpfs = async (file: File) => {
     const { cid } = await ipfs.add(file);
 
@@ -50,7 +46,7 @@ function CreateSimpleCollectionModal({ close }: Pick<ModalProps, 'close'>) {
   const getNftPayload = async ({ file, limit }: NFT) => {
     const cid = await uploadToIpfs(file);
 
-    const limitCopies = limit.trim() || null;
+    const limitCopies = limit || null;
     const autoChangingRules = null;
 
     return [cid, { limitCopies, autoChangingRules }];
@@ -59,18 +55,14 @@ function CreateSimpleCollectionModal({ close }: Pick<ModalProps, 'close'>) {
   const getPayload = async (nfts: NFT[]) => {
     const collectionOwner = account?.decodedAddress;
 
-    const { cover, logo, ...summaryTextValues } = summaryValues;
-    const trimmedSummaryValues = getTrimmedValues(summaryTextValues);
-    const { name, description, telegram, medium, discord, url: externalUrl, x: xcom } = trimmedSummaryValues;
-
-    const { isTransferable, isSellable, tags, ...parametersTextValues } = parametersValues;
-    const trimmedParametersValues = getTrimmedValues(parametersTextValues);
-    const { royalty, mintLimit: userMintLimit, mintPrice: paymentForMint } = trimmedParametersValues;
+    const { cover, logo, name, description, telegram, medium, discord, url: externalUrl, x: xcom } = summaryValues;
+    const { isTransferable, isSellable, tags, royalty, mintLimit, mintPrice: paymentForMint } = parametersValues;
 
     const collectionBanner = cover ? await uploadToIpfs(cover) : null;
     const collectionLogo = logo ? await uploadToIpfs(logo) : null;
     const additionalLinks = { telegram, medium, discord, externalUrl, xcom };
 
+    const userMintLimit = mintLimit || null;
     const transferable = isTransferable ? '0' : null;
     const sellable = isSellable ? '0' : null;
 
