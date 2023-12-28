@@ -48,7 +48,7 @@ fn successful_basics() {
         description: None,
         auto_changing_rules: None,
     };
-    let nft_data: Vec<(Links, ImageData)> = (0..10)
+    let links_and_data: Vec<(Links, ImageData)> = (0..10)
         .map(|i| {
             (
                 Links {
@@ -85,7 +85,7 @@ fn successful_basics() {
             transferable: Some(0),
             sellable: Some(0),
         },
-        nft_data,
+        links_and_data,
     };
 
     let res = create_collection(
@@ -265,7 +265,11 @@ fn successful_basics() {
         .read_state(StateQueryNft::All)
         .expect("Unexpected invalid state.");
     if let StateReplyNft::All(state) = state_reply {
-        assert_eq!(state.nft_data.len(), 8, "Wrong length of nft_data");
+        assert_eq!(
+            state.links_and_data.len(),
+            8,
+            "Wrong length of links_and_data"
+        );
         println!("STATE: {:?}", state);
     }
 }
@@ -293,7 +297,7 @@ fn failures() {
         description: None,
         auto_changing_rules: None,
     };
-    let nft_data: Vec<(Links, ImageData)> = (0..10)
+    let links_and_data: Vec<(Links, ImageData)> = (0..10)
         .map(|i| {
             (
                 Links {
@@ -330,7 +334,7 @@ fn failures() {
             transferable: Some(0),
             sellable: Some(0),
         },
-        nft_data,
+        links_and_data,
     };
 
     let res = create_collection(
@@ -343,7 +347,7 @@ fn failures() {
 
     // There must be at least one link to create a collection
     init_nft_payload.config.user_mint_limit = 4.into();
-    init_nft_payload.nft_data = vec![];
+    init_nft_payload.links_and_data = vec![];
     let res = create_collection(
         &marketplace,
         USERS[0],
@@ -358,7 +362,7 @@ fn failures() {
         description: None,
         auto_changing_rules: None,
     };
-    init_nft_payload.nft_data = vec![(
+    init_nft_payload.links_and_data = vec![(
         Links {
             img_link: None,
             music_link: "add_link_1".to_string(),
@@ -379,7 +383,7 @@ fn failures() {
         description: None,
         auto_changing_rules: None,
     };
-    let nft_data: Vec<(Links, ImageData)> = (0..5)
+    let links_and_data: Vec<(Links, ImageData)> = (0..5)
         .map(|i| {
             (
                 Links {
@@ -391,7 +395,7 @@ fn failures() {
         })
         .collect();
 
-    init_nft_payload.nft_data = nft_data;
+    init_nft_payload.links_and_data = links_and_data;
     let res = create_collection(
         &marketplace,
         USERS[0],
@@ -567,7 +571,7 @@ fn check_auto_changing_rules() {
             (18, Action::AddMeta("Auto change metadata".to_string())),
         ]),
     };
-    let nft_data: Vec<(Links, ImageData)> = (0..10)
+    let links_and_data: Vec<(Links, ImageData)> = (0..10)
         .map(|i| {
             (
                 Links {
@@ -604,7 +608,7 @@ fn check_auto_changing_rules() {
             transferable: Some(0),
             sellable: Some(0),
         },
-        nft_data,
+        links_and_data,
     };
     let res = create_collection(
         &marketplace,
@@ -697,7 +701,7 @@ fn check_transferable() {
         description: None,
         auto_changing_rules: None,
     };
-    let nft_data: Vec<(Links, ImageData)> = (0..10)
+    let links_and_data: Vec<(Links, ImageData)> = (0..10)
         .map(|i| {
             (
                 Links {
@@ -734,7 +738,7 @@ fn check_transferable() {
             transferable: Some(0),
             sellable: Some(0),
         },
-        nft_data,
+        links_and_data,
     };
 
     let transferable_time = 9_000;
@@ -848,7 +852,7 @@ fn check_payment_for_mint() {
         description: None,
         auto_changing_rules: None,
     };
-    let nft_data: Vec<(Links, ImageData)> = (0..10)
+    let links_and_data: Vec<(Links, ImageData)> = (0..10)
         .map(|i| {
             (
                 Links {
@@ -885,7 +889,7 @@ fn check_payment_for_mint() {
             transferable: Some(0),
             sellable: Some(0),
         },
-        nft_data,
+        links_and_data,
     };
 
     let payment_for_mint = 9_000_000_000_000;

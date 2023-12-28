@@ -24,7 +24,7 @@ impl Metadata for ContractMetadata {
 pub struct NftInit {
     pub collection_owner: ActorId,
     pub config: Config,
-    pub img_links: Vec<(String, ImageData)>,
+    pub img_links_and_data: Vec<(String, ImageData)>,
 }
 
 #[derive(Debug, Clone, Encode, Decode, TypeInfo)]
@@ -156,7 +156,7 @@ pub struct NftState {
     pub token_approvals: Vec<(NftId, ActorId)>,
     pub config: Config,
     pub nonce: NftId,
-    pub img_links: Vec<(String, ImageData)>,
+    pub img_links_and_data: Vec<(String, ImageData)>,
     pub collection_owner: ActorId,
 }
 

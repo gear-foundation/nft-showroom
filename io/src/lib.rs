@@ -290,6 +290,4 @@ pub enum NftEvent {
 }
 
 #[derive(Debug, Clone, Encode, Decode, TypeInfo)]
-pub enum NftError {
-    Error(String),
-}
+pub struct NftError(pub String);

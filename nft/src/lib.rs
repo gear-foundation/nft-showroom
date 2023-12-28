@@ -18,7 +18,7 @@ struct NftContract {
     pub token_approvals: HashMap<NftId, ActorId>,
     pub config: Config,
     pub nonce: NftId,
-    pub img_links: Vec<(String, ImageData)>,
+    pub img_links_and_data: Vec<(String, ImageData)>,
     pub collection_owner: ActorId,
 }
 static mut NFT_CONTRACT: Option<NftContract> = None;
@@ -33,11 +33,11 @@ impl NftContract {
         };
         self.payment_for_mint()?;
 
-        let rand_index = get_random_value(self.img_links.len() as u64);
+        let rand_index = get_random_value(self.img_links_and_data.len() as u64);
         let img_link: String;
         let token_id = self.nonce;
 
-        if let Some((link, img_info)) = self.img_links.get_mut(rand_index as usize) {
+        if let Some((link, img_info)) = self.img_links_and_data.get_mut(rand_index as usize) {
             if let Some(limit) = img_info.limit_copies.as_mut() {
                 *limit -= 1;
             }
@@ -69,9 +69,8 @@ impl NftContract {
             }
 
             if let Some(0) = img_info.limit_copies {
-                self.img_links.remove(rand_index as usize);
+                self.img_links_and_data.remove(rand_index as usize);
             }
-
         } else {
             return Err(NftError("Error with getting a random nft".to_owned()));
         }
@@ -200,7 +199,7 @@ impl NftContract {
             return Err(NftError("Limit of copies value is equal to 0".to_owned()));
         }
 
-        self.img_links.extend(additional_links.clone());
+        self.img_links_and_data.extend(additional_links.clone());
 
         Ok(NftEvent::Expanded { additional_links })
     }
@@ -294,7 +293,7 @@ impl NftContract {
     }
 
     fn check_available_amount_of_tokens(&self) -> Result<(), NftError> {
-        if self.img_links.is_empty() {
+        if self.img_links_and_data.is_empty() {
             return Err(NftError("All tokens are minted.".to_owned()));
         }
         Ok(())
@@ -388,7 +387,7 @@ extern "C" fn init() {
     let NftInit {
         collection_owner,
         config,
-        img_links,
+        img_links_and_data,
     } = msg::load().expect("Unable to decode `NftInit`.");
     debug!("INIT NFT");
 
@@ -418,10 +417,10 @@ extern "C" fn init() {
         panic!("Tokens must be transferable");
     }
     assert!(
-        !img_links.is_empty(),
+        !img_links_and_data.is_empty(),
         "There must be at least one link to create a collection"
     );
-    if img_links
+    if img_links_and_data
         .iter()
         .any(|(_, img_data)| img_data.limit_copies.map_or(false, |limit| limit == 0))
     {
@@ -436,7 +435,7 @@ extern "C" fn init() {
             restriction_mint: HashMap::new(),
             config: config.clone(),
             nonce: 0,
-            img_links,
+            img_links_and_data,
             collection_owner,
         })
     };
@@ -514,7 +513,7 @@ impl From<NftContract> for NftState {
             token_approvals,
             config,
             nonce,
-            img_links,
+            img_links_and_data,
             collection_owner,
             ..
         } = value;
@@ -538,7 +537,7 @@ impl From<NftContract> for NftState {
             token_approvals,
             config,
             nonce,
-            img_links,
+            img_links_and_data,
             collection_owner,
         }
     }

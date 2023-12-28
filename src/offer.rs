@@ -5,7 +5,7 @@ use gstd::{exec, msg, prelude::*, ActorId};
 use nft_marketplace_io::*;
 
 impl NftMarketplace {
-    pub fn create_offer(
+    pub async fn create_offer(
         &mut self,
         collection_address: ActorId,
         token_id: u64,
@@ -17,6 +17,35 @@ impl NftMarketplace {
                 self.config.minimum_transfer_value
             )));
         }
+        if !self.collection_to_owner.contains_key(&collection_address) {
+            return Err(NftMarketplaceError(
+                "This collection address is not in the marketplace".to_owned(),
+            ));
+        }
+
+        let get_token_info_payload = NftAction::GetTokenInfo { token_id };
+        let reply = msg::send_with_gas_for_reply_as::<NftAction, Result<NftEvent, NftError>>(
+            collection_address,
+            get_token_info_payload,
+            self.config.gas_for_get_token_info,
+            0,
+            0,
+        )
+        .expect("Error during `NftAction::GetTokenInfo`")
+        .await
+        .expect("Problem with get token info");
+
+        match reply {
+            Err(NftError(error_string)) => Err(NftMarketplaceError(error_string.clone())),
+            Ok(NftEvent::TokenInfoReceived { sellable, .. }) => {
+                if !sellable {
+                    Err(NftMarketplaceError("Nft is not sellable".to_owned()))
+                } else {
+                    Ok(())
+                }
+            }
+            _ => Err(NftMarketplaceError("Wrong received reply".to_owned())),
+        }?;
 
         let offer = Offer {
             collection_address,

@@ -130,7 +130,11 @@ async fn main() {
         NftMarketplaceAction::CreateOffer {
             collection_address,
             token_id,
-        } => nft_marketplace.create_offer(collection_address, token_id),
+        } => {
+            nft_marketplace
+                .create_offer(collection_address, token_id)
+                .await
+        }
         NftMarketplaceAction::CancelOffer {
             collection_address,
             token_id,
@@ -245,18 +249,16 @@ impl NftMarketplace {
         if self.admins.contains(&msg_src) {
             self.collection_to_owner.remove(&collection_address);
         } else if collection_owner == msg_src {
-
-            let reply =
-                msg::send_with_gas_for_reply_as::<NftAction, Result<NftEvent, NftError>>(
-                    collection_address,
-                    NftAction::CanDelete,
-                    self.config.gas_for_delete_collection,
-                    0,
-                    0,
-                )
-                .expect("Error during get info about deleting")
-                .await
-                .expect("The program had a problem getting information about the deletion");
+            let reply = msg::send_with_gas_for_reply_as::<NftAction, Result<NftEvent, NftError>>(
+                collection_address,
+                NftAction::CanDelete,
+                self.config.gas_for_delete_collection,
+                0,
+                0,
+            )
+            .expect("Error during get info about deleting")
+            .await
+            .expect("The program had a problem getting information about the deletion");
 
             if let NftEvent::CanDelete(answer) = self.check_reply(reply)? {
                 if answer {
@@ -369,7 +371,7 @@ impl NftMarketplace {
     ) -> Result<NftEvent, NftMarketplaceError> {
         match reply {
             Ok(result) => Ok(result),
-            Err(NftError::Error(error_string)) => Err(NftMarketplaceError(error_string.clone())),
+            Err(NftError(error_string)) => Err(NftMarketplaceError(error_string.clone())),
         }
     }
 

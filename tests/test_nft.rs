@@ -207,7 +207,11 @@ fn successful_basics() {
         .read_state(StateQueryNft::All)
         .expect("Unexpected invalid state.");
     if let StateReplyNft::All(state) = state_reply {
-        assert_eq!(state.img_links.len(), 8, "Wrong length of img_links");
+        assert_eq!(
+            state.img_links_and_data.len(),
+            8,
+            "Wrong length of img_links_and_data"
+        );
         println!("STATE: {:?}", state);
     }
 }
@@ -242,7 +246,7 @@ fn failures() {
 
     // There must be at least one link to create a collection
     init_nft_payload.config.user_mint_limit = 4.into();
-    init_nft_payload.img_links = vec![];
+    init_nft_payload.img_links_and_data = vec![];
     let res = create_collection(
         &marketplace,
         USERS[0],
@@ -256,7 +260,7 @@ fn failures() {
         limit_copies: Some(0),
         auto_changing_rules: None,
     };
-    init_nft_payload.img_links = vec![("Img-0".to_owned(), img_data.clone())];
+    init_nft_payload.img_links_and_data = vec![("Img-0".to_owned(), img_data.clone())];
     let res = create_collection(
         &marketplace,
         USERS[0],
@@ -269,11 +273,11 @@ fn failures() {
         limit_copies: Some(1),
         auto_changing_rules: None,
     };
-    let img_links: Vec<(String, ImageData)> = (0..5)
+    let img_links_and_data: Vec<(String, ImageData)> = (0..5)
         .map(|i| (format!("Img-{}", i), img_data.clone()))
         .collect();
 
-    init_nft_payload.img_links = img_links;
+    init_nft_payload.img_links_and_data = img_links_and_data;
     let res = create_collection(
         &marketplace,
         USERS[0],
@@ -440,7 +444,7 @@ fn check_auto_changing_rules() {
             (18, Action::AddMeta("Auto change metadata".to_string())),
         ]),
     };
-    let img_links: Vec<(String, ImageData)> = (0..10)
+    let img_links_and_data: Vec<(String, ImageData)> = (0..10)
         .map(|i| (format!("Img-{}", i), img_data.clone()))
         .collect();
 
@@ -468,7 +472,7 @@ fn check_auto_changing_rules() {
             transferable: Some(0),
             sellable: Some(0),
         },
-        img_links,
+        img_links_and_data,
     };
     let res = create_collection(
         &marketplace,

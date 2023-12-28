@@ -24,7 +24,7 @@ impl Metadata for ContractMetadata {
 pub struct MusicNftInit {
     pub collection_owner: ActorId,
     pub config: Config,
-    pub nft_data: Vec<(Links, ImageData)>,
+    pub links_and_data: Vec<(Links, ImageData)>,
 }
 
 #[derive(Debug, Clone, Encode, Decode, TypeInfo)]
@@ -131,7 +131,7 @@ pub enum MusicNftEvent {
     },
     Minted {
         token_id: NftId,
-        nft_data: Nft,
+        links_and_data: Nft,
     },
     Approved {
         account: ActorId,
@@ -165,7 +165,7 @@ pub struct NftState {
     pub token_approvals: Vec<(NftId, ActorId)>,
     pub config: Config,
     pub nonce: NftId,
-    pub nft_data: Vec<(Links, ImageData)>,
+    pub links_and_data: Vec<(Links, ImageData)>,
     pub collection_owner: ActorId,
 }
 

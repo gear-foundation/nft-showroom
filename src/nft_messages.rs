@@ -37,7 +37,7 @@ pub async fn transfer_from_token(
         0,
         0,
     )
-    .expect("Error during Collection program initialization")
+    .expect("Error during `NftAction::TransferFrom`")
     .await
     .expect("Program was problem with transfer");
 
@@ -59,9 +59,9 @@ pub async fn check_token_info(
         0,
         0,
     )
-    .expect("Error during Collection program initialization")
+    .expect("Error during `NftAction::GetTokenInfo`")
     .await
-    .expect("Program was not initialized");
+    .expect("Problem with get token info");
 
     let reply = check_reply(reply)?;
 
@@ -102,6 +102,6 @@ pub async fn check_token_info(
 fn check_reply(reply: Result<NftEvent, NftError>) -> Result<NftEvent, NftMarketplaceError> {
     match reply {
         Ok(result) => Ok(result),
-        Err(NftError::Error(error_string)) => Err(NftMarketplaceError(error_string.clone())),
+        Err(NftError(error_string)) => Err(NftMarketplaceError(error_string.clone())),
     }
 }

@@ -12,6 +12,11 @@ impl NftMarketplace {
         min_price: u128,
         duration_ms: u32,
     ) -> Result<NftMarketplaceEvent, NftMarketplaceError> {
+        if !self.collection_to_owner.contains_key(&collection_address) {
+            return Err(NftMarketplaceError(
+                "This collection address is not in the marketplace".to_owned(),
+            ));
+        }
         if self.auctions.contains_key(&(collection_address, token_id)) {
             return Err(NftMarketplaceError(
                 "This nft is already on auction".to_owned(),

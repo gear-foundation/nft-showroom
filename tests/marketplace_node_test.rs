@@ -114,7 +114,7 @@ async fn create_test() -> Result<()> {
         limit_copies: Some(1),
         auto_changing_rules: None,
     };
-    let img_links: Vec<(String, ImageData)> = (0..10)
+    let img_links_and_data: Vec<(String, ImageData)> = (0..10)
         .map(|i| (format!("Img-{}", i), img_data.clone()))
         .collect();
 
@@ -134,7 +134,7 @@ async fn create_test() -> Result<()> {
             transferable: Some(0),
             sellable: Some(0),
         },
-        img_links,
+        img_links_and_data,
     }
     .encode();
 
@@ -197,7 +197,7 @@ async fn create_test() -> Result<()> {
         .expect("Unexpected invalid state.");
 
     assert!(!state.tokens.is_empty());
-    assert_eq!(state.img_links.len(), 9);
+    assert_eq!(state.img_links_and_data.len(), 9);
 
     Ok(())
 }
@@ -275,7 +275,7 @@ async fn sale_test() -> Result<()> {
         limit_copies: Some(1),
         auto_changing_rules: None,
     };
-    let img_links: Vec<(String, ImageData)> = (0..10)
+    let img_links_and_data: Vec<(String, ImageData)> = (0..10)
         .map(|i| (format!("Img-{}", i), img_data.clone()))
         .collect();
 
@@ -295,7 +295,7 @@ async fn sale_test() -> Result<()> {
             transferable: Some(0),
             sellable: Some(0),
         },
-        img_links,
+        img_links_and_data,
     }
     .encode();
 
@@ -358,7 +358,7 @@ async fn sale_test() -> Result<()> {
         .expect("Unexpected invalid state.");
 
     assert!(!state.tokens.is_empty());
-    assert_eq!(state.img_links.len(), 9);
+    assert_eq!(state.img_links_and_data.len(), 9);
 
     let address_marketplace: ActorId = program_id.into_bytes().into();
     let gas_info = api
@@ -533,7 +533,7 @@ async fn auction_test() -> Result<()> {
         limit_copies: Some(1),
         auto_changing_rules: None,
     };
-    let img_links: Vec<(String, ImageData)> = (0..10)
+    let img_links_and_data: Vec<(String, ImageData)> = (0..10)
         .map(|i| (format!("Img-{}", i), img_data.clone()))
         .collect();
 
@@ -553,7 +553,7 @@ async fn auction_test() -> Result<()> {
             transferable: Some(0),
             sellable: Some(0),
         },
-        img_links,
+        img_links_and_data,
     }
     .encode();
 
@@ -614,7 +614,7 @@ async fn auction_test() -> Result<()> {
         .expect("Unexpected invalid state.");
 
     assert!(!state.tokens.is_empty());
-    assert_eq!(state.img_links.len(), 9);
+    assert_eq!(state.img_links_and_data.len(), 9);
 
     let address_marketplace: ActorId = program_id.into_bytes().into();
     let gas_info = api
@@ -798,7 +798,7 @@ async fn offer_test() -> Result<()> {
         limit_copies: Some(1),
         auto_changing_rules: None,
     };
-    let img_links: Vec<(String, ImageData)> = (0..10)
+    let img_links_and_data: Vec<(String, ImageData)> = (0..10)
         .map(|i| (format!("Img-{}", i), img_data.clone()))
         .collect();
 
@@ -818,7 +818,7 @@ async fn offer_test() -> Result<()> {
             transferable: Some(0),
             sellable: Some(0),
         },
-        img_links,
+        img_links_and_data,
     }
     .encode();
 
@@ -881,7 +881,7 @@ async fn offer_test() -> Result<()> {
         .expect("Unexpected invalid state.");
 
     assert!(!state.tokens.is_empty());
-    assert_eq!(state.img_links.len(), 9);
+    assert_eq!(state.img_links_and_data.len(), 9);
 
     let alice_balance = api.total_balance(api.account_id()).await?;
     let amount = alice_balance / 10;
