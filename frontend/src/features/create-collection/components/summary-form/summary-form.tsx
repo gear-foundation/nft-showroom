@@ -6,6 +6,7 @@ import { z } from 'zod';
 import { Container } from '@/components';
 
 import CameraSVG from '../../assets/camera.svg?react';
+import PlaceholderSVG from '../../assets/placeholder.svg?react';
 import { IMAGE_TYPES } from '../../consts';
 import { SummaryValues } from '../../types';
 import { useImageInput } from '../../hooks';
@@ -46,36 +47,42 @@ function SummaryForm({ defaultValues, onSubmit, onBack }: Props) {
       onSubmit={handleSubmit((data) => onSubmit({ ...data, cover: cover.value, logo: logo.value }))}
       className={styles.form}>
       <Container>
-        <header className={styles.cover} style={coverStyle}>
-          <input type="file" className={styles.fileInput} {...cover.props} />
+        <header className={styles.header}>
+          <div className={styles.cover} style={coverStyle}>
+            <input type="file" className={styles.fileInput} {...cover.props} />
 
-          {cover.value ? (
-            <DeleteButton className={styles.deleteButton} onClick={cover.handleReset} />
-          ) : (
-            <>
-              <h4 className={styles.heading}>Collection Cover</h4>
+            {cover.value ? (
+              <DeleteButton className={styles.deleteButton} onClick={cover.handleReset} />
+            ) : (
+              <>
+                <h4 className={styles.heading}>Collection Cover</h4>
 
-              <div className={styles.text}>
-                <p>Upload a cover image with the recommended dimensions of 1200x260 pixels.</p>
-                <p>File formats: .jpg, .jpeg, .png. Max size: 5mb</p>
-              </div>
+                <div className={styles.text}>
+                  <p>Upload a cover image with the recommended dimensions of 1200x260 pixels.</p>
+                  <p>File formats: .jpg, .jpeg, .png. Max size: 5mb</p>
+                </div>
 
-              <Button text="Select File" size="small" color="dark" onClick={cover.handleClick} />
-            </>
-          )}
+                <Button text="Select File" size="small" color="dark" onClick={cover.handleClick} />
+              </>
+            )}
 
-          <div className={styles.logo}>
-            <input type="file" className={styles.fileInput} {...logo.props} />
-            <button type="button" className={styles.button} onClick={logo.handleClick} style={logoStyle}>
-              {!logo.value && <CameraSVG />}
-            </button>
+            <div className={styles.logo}>
+              <input type="file" className={styles.fileInput} {...logo.props} />
+              <button type="button" className={styles.button} onClick={logo.handleClick} style={logoStyle}>
+                {!logo.value && <CameraSVG />}
+              </button>
 
-            {logo.value && <DeleteButton className={styles.deleteButton} onClick={logo.handleReset} />}
+              {logo.value && <DeleteButton className={styles.deleteButton} onClick={logo.handleReset} />}
+            </div>
+          </div>
+
+          <div className={styles.placeholder}>
+            <PlaceholderSVG />
           </div>
         </header>
       </Container>
 
-      <Container maxWidth="sm" className={styles.inputs}>
+      <Container maxWidth="sm">
         <div className={styles.inputs}>
           <Input label="Name" className={styles.input} {...register('name')} error={errors.name?.message} />
 
@@ -90,16 +97,17 @@ function SummaryForm({ defaultValues, onSubmit, onBack }: Props) {
 
         <div className={styles.inputs}>
           <h4 className={styles.heading}>Links (optional):</h4>
+
           <Input label="URL" className={styles.input} {...register('url')} />
           <Input label="Telegram" className={styles.input} {...register('telegram')} />
           <Input label="X.com" className={styles.input} {...register('x')} />
           <Input label="Medium" className={styles.input} {...register('medium')} />
           <Input label="Discord" className={styles.input} {...register('discord')} />
-        </div>
 
-        <div className={styles.buttons}>
-          <Button text="Cancel" color="border" onClick={onBack} />
-          <Button type="submit" text="Continue" />
+          <div className={styles.buttons}>
+            <Button text="Cancel" color="border" onClick={onBack} />
+            <Button type="submit" text="Continue" />
+          </div>
         </div>
       </Container>
     </form>
