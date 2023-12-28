@@ -49,7 +49,6 @@ const DEFAULT_PARAMETERS_VALUES: ParametersValues = {
 };
 
 const DEFAULT_NFTS_VALUES: NFTsValues = {
-  image: undefined,
   nfts: [],
 };
 

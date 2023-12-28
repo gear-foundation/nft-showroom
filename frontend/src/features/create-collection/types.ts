@@ -25,7 +25,6 @@ type NFT = {
 };
 
 type NFTsValues = {
-  image: FileList | undefined;
   nfts: NFT[];
 };
 

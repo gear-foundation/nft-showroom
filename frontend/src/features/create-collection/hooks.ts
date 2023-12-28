@@ -1,32 +1,9 @@
 import { ProgramMetadata } from '@gear-js/api';
 import { useAlert } from '@gear-js/react-hooks';
-import { useRef, useImperativeHandle, useEffect, useState, ChangeEvent, DependencyList, EffectCallback } from 'react';
-import { UseFormRegisterReturn } from 'react-hook-form';
+import { useRef, useEffect, useState, ChangeEvent, DependencyList, EffectCallback } from 'react';
 
 import { MAX_IMAGE_SIZE_MB } from './consts';
 import { getBytesSize } from './utils';
-
-function useFileUrl(fileList: FileList | undefined) {
-  const [url, setUrl] = useState('');
-
-  useEffect(() => {
-    if (!fileList || !fileList.length) return setUrl('');
-
-    const [file] = fileList;
-    const result = URL.createObjectURL(file);
-
-    setUrl(result);
-  }, [fileList]);
-
-  return url;
-}
-
-function useRegisterRef<T extends string>({ ref: registerRef, ...props }: UseFormRegisterReturn<T>) {
-  const ref = useRef<HTMLInputElement>(null);
-  useImperativeHandle(registerRef, () => ref.current as HTMLInputElement);
-
-  return [ref, props] as const;
-}
 
 function useProgramMetadata(source: string) {
   const alert = useAlert();
@@ -48,6 +25,7 @@ function useProgramMetadata(source: string) {
 function useImageInput(defaultValue: File | undefined, types: string[]) {
   const alert = useAlert();
 
+  // should also set defaultValue to inputRef on mount?
   const [value, setValue] = useState(defaultValue);
   const ref = useRef<HTMLInputElement>(null);
 
@@ -110,4 +88,4 @@ function useChangeEffect(callback: EffectCallback, dependencies?: DependencyList
   }, dependencies);
 }
 
-export { useFileUrl, useRegisterRef, useProgramMetadata, useImageInput, useChangeEffect };
+export { useProgramMetadata, useImageInput, useChangeEffect };

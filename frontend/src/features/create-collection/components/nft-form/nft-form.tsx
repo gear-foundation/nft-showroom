@@ -1,11 +1,15 @@
 import { Button } from '@gear-js/vara-ui';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { useEffect } from 'react';
-import { useFieldArray, useForm, useWatch } from 'react-hook-form';
+import { useFieldArray, useForm } from 'react-hook-form';
+import { z } from 'zod';
 
 import { Container } from '@/components';
 
-import { useRegisterRef } from '../../hooks';
+import { IMAGE_TYPES } from '../../consts';
+import { useImageInput } from '../../hooks';
 import { NFTsValues } from '../../types';
+import { getFileUrl } from '../../utils';
 import { NFT } from '../nft';
 import styles from './nft-form.module.scss';
 
@@ -16,25 +20,33 @@ type Props = {
   onBack: () => void;
 };
 
+const schema = z.object({
+  nfts: z.array(
+    z.object({
+      file: z.custom<File>(),
+      limit: z.string().trim(),
+    }),
+  ),
+});
+
+const resolver = zodResolver(schema);
+
 function NFTForm({ defaultValues, isLoading, onSubmit, onBack }: Props) {
-  const { control, register, setValue, handleSubmit } = useForm({ defaultValues });
+  const { control, register, setValue, handleSubmit } = useForm({ defaultValues, resolver });
   const { fields, append, remove } = useFieldArray({ control, name: 'nfts' });
   const nftsCount = fields.length;
 
-  const [ref, inputProps] = useRegisterRef(register('image'));
-  const imageValue = useWatch({ control, name: 'image' });
+  const image = useImageInput(undefined, IMAGE_TYPES);
 
   useEffect(() => {
-    if (!imageValue || !imageValue.length) return;
+    if (!image.value) return;
 
-    const [file] = imageValue;
+    const file = image.value;
     const limit = '';
 
     append({ file, limit });
-    setValue('image', undefined);
-  }, [imageValue, append, setValue]);
-
-  const handleFileButtonClick = () => ref.current?.click();
+    image.handleReset();
+  }, [image, append, setValue]);
 
   const getNfts = () =>
     fields.map(({ id, file }, index) => {
@@ -43,7 +55,7 @@ function NFTForm({ defaultValues, isLoading, onSubmit, onBack }: Props) {
       return (
         <NFT
           key={id}
-          src={URL.createObjectURL(file)}
+          src={getFileUrl(file)}
           inputProps={register(inputName)}
           onDelete={() => remove(index)}
           onCheckboxChange={() => setValue(inputName, '')}
@@ -53,13 +65,13 @@ function NFTForm({ defaultValues, isLoading, onSubmit, onBack }: Props) {
 
   return (
     <Container>
-      <form onSubmit={handleSubmit((data) => onSubmit({ ...data, image: undefined }))}>
+      <form onSubmit={handleSubmit(onSubmit)}>
         <header className={styles.header}>
           <h4 className={styles.heading}>NFTs added: {nftsCount}</h4>
 
           <div className={styles.file}>
-            <input type="file" className={styles.fileInput} ref={ref} {...inputProps} />
-            <Button text="Select File" size="small" color="dark" onClick={handleFileButtonClick} />
+            <input type="file" className={styles.fileInput} {...image.props} />
+            <Button text="Select File" size="small" color="dark" onClick={image.handleClick} />
 
             <p>File formats: .jpg, .jpeg, .png. Max size: 5mb</p>
           </div>

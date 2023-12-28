@@ -1,5 +1,5 @@
 import { CreateType } from '@gear-js/api';
-import { useAccount } from '@gear-js/react-hooks';
+import { useAccount, useBalanceFormat } from '@gear-js/react-hooks';
 import { ModalProps } from '@gear-js/vara-ui';
 import { useState } from 'react';
 
@@ -17,11 +17,10 @@ function CreateSimpleCollectionModal({ close }: Pick<ModalProps, 'close'>) {
   const [stepIndex, setStepIndex] = useState(0);
   const [summaryValues, setSummaryValues] = useState(DEFAULT_SUMMARY_VALUES);
   const [parametersValues, setParametersValues] = useState(DEFAULT_PARAMETERS_VALUES);
-  console.log('summaryValues: ', summaryValues);
-  console.log('parametersValues: ', parametersValues);
   const [isLoading, setIsLoading] = useState(false);
 
   const { account } = useAccount();
+  const { getChainBalanceValue } = useBalanceFormat();
   const ipfs = useIPFS();
 
   const nextStep = () => setStepIndex((prevIndex) => prevIndex + 1);
@@ -56,7 +55,7 @@ function CreateSimpleCollectionModal({ close }: Pick<ModalProps, 'close'>) {
     const collectionOwner = account?.decodedAddress;
 
     const { cover, logo, name, description, telegram, medium, discord, url: externalUrl, x: xcom } = summaryValues;
-    const { isTransferable, isSellable, tags, royalty, mintLimit, mintPrice: paymentForMint } = parametersValues;
+    const { isTransferable, isSellable, tags, royalty, mintLimit, mintPrice } = parametersValues;
 
     const collectionBanner = cover ? await uploadToIpfs(cover) : null;
     const collectionLogo = logo ? await uploadToIpfs(logo) : null;
@@ -65,6 +64,7 @@ function CreateSimpleCollectionModal({ close }: Pick<ModalProps, 'close'>) {
     const userMintLimit = mintLimit || null;
     const transferable = isTransferable ? '0' : null;
     const sellable = isSellable ? '0' : null;
+    const paymentForMint = getChainBalanceValue(mintPrice).toFixed();
 
     const collectionTags = tags.map(({ value }) => value);
 
