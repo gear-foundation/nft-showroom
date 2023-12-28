@@ -1,8 +1,8 @@
 import { useBalanceFormat, useApi } from '@gear-js/react-hooks';
 
+import VaraSVG from '@/assets/vara.svg?react';
 import { useAccountDeriveBalancesAll } from '@/hooks';
 
-import VaraSVG from '../../assets/vara.svg?react';
 import styles from './balance.module.scss';
 
 function Balance() {

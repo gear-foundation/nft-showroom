@@ -12,8 +12,8 @@ dependencies:
     specifier: 0.9.5
     version: 0.9.5(@gear-js/api@0.35.2)(@polkadot/api@10.10.1)(@polkadot/extension-dapp@0.46.5)(react-dom@18.2.0)(react@18.2.0)
   '@gear-js/vara-ui':
-    specifier: 0.0.5
-    version: 0.0.5(react-dom@18.2.0)(react@18.2.0)
+    specifier: 0.0.6
+    version: 0.0.6(react-dom@18.2.0)(react@18.2.0)
   '@hookform/resolvers':
     specifier: 3.3.3
     version: 3.3.3(react-hook-form@7.49.2)
@@ -646,8 +646,8 @@ packages:
       - utf-8-validate
     dev: false
 
-  /@gear-js/vara-ui@0.0.5(react-dom@18.2.0)(react@18.2.0):
-    resolution: {integrity: sha512-Tm7ShwqPMLEdnSmyRFbRnEvqBGBa73QZm9dmULe5mOiLusb7yvsLy7gcsSIUP/SkJU8LhOOrcRsvpt13PCaR4w==}
+  /@gear-js/vara-ui@0.0.6(react-dom@18.2.0)(react@18.2.0):
+    resolution: {integrity: sha512-8g8NsUYhsZEshLf54N0/pumqs49HmjQG2PGTDrnWOdDpG11ANX/EU/L+tIg/Xj8vIolbrKi9VlS9WDX4f8b/nw==}
     peerDependencies:
       react: ^18.2.0
       react-dom: ^18.2.0

@@ -7,6 +7,11 @@ import { Container } from '@/components';
 
 import CameraSVG from '../../assets/camera.svg?react';
 import PlaceholderSVG from '../../assets/placeholder.svg?react';
+import WebSVG from '../../assets/web.svg?react';
+import TelegramSVG from '../../assets/tg.svg?react';
+import XSVG from '../../assets/x.svg?react';
+import MediumSVG from '../../assets/medium.svg?react';
+import DiscordSVG from '../../assets/discord.svg?react';
 import { IMAGE_TYPES } from '../../consts';
 import { SummaryValues } from '../../types';
 import { useImageInput } from '../../hooks';
@@ -84,25 +89,19 @@ function SummaryForm({ defaultValues, onSubmit, onBack }: Props) {
 
       <Container maxWidth="sm">
         <div className={styles.inputs}>
-          <Input label="Name" className={styles.input} {...register('name')} error={errors.name?.message} />
+          <Input label="Name" {...register('name')} error={errors.name?.message} />
 
-          <Textarea
-            label="Description"
-            rows={2}
-            className={styles.input}
-            {...register('description')}
-            error={errors.description?.message}
-          />
+          <Textarea label="Description" rows={2} {...register('description')} error={errors.description?.message} />
         </div>
 
         <div className={styles.inputs}>
           <h4 className={styles.heading}>Links (optional):</h4>
 
-          <Input label="URL" className={styles.input} {...register('url')} />
-          <Input label="Telegram" className={styles.input} {...register('telegram')} />
-          <Input label="X.com" className={styles.input} {...register('x')} />
-          <Input label="Medium" className={styles.input} {...register('medium')} />
-          <Input label="Discord" className={styles.input} {...register('discord')} />
+          <Input icon={WebSVG} label="URL" {...register('url')} />
+          <Input icon={TelegramSVG} label="Telegram" {...register('telegram')} />
+          <Input icon={XSVG} label="X.com" {...register('x')} />
+          <Input icon={MediumSVG} label="Medium" {...register('medium')} />
+          <Input icon={DiscordSVG} label="Discord" {...register('discord')} />
 
           <div className={styles.buttons}>
             <Button text="Cancel" color="border" onClick={onBack} />

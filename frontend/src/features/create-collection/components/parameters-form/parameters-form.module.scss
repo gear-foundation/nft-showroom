@@ -26,17 +26,6 @@
   gap: 24px;
 }
 
-// TODO: remove after @gear-js/vara-ui input z-index fix
-.input {
-  legend {
-    max-height: 1em;
-  }
-
-  > div:first-child {
-    z-index: 1;
-  }
-}
-
 .buttons {
   display: grid;
   grid-template-columns: 1fr 1fr;

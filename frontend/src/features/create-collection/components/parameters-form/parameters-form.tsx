@@ -1,12 +1,13 @@
 import { Button, Checkbox, Input, Select } from '@gear-js/vara-ui';
-import { useApi } from '@gear-js/react-hooks';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { ChangeEvent } from 'react';
 import { useFieldArray, useForm, useWatch } from 'react-hook-form';
 import { z } from 'zod';
 
+import VaraSVG from '@/assets/vara.svg?react';
 import { Container } from '@/components';
 
+import PercentSVG from '../../assets/percent.svg?react';
 import CrossSVG from '../../assets/cross-tag.svg?react';
 import { useChangeEffect } from '../../hooks';
 import { ParametersValues } from '../../types';
@@ -36,9 +37,6 @@ const schema = z.object({
 const resolver = zodResolver(schema);
 
 function ParametersForm({ defaultValues, onSubmit, onBack }: Props) {
-  const { api } = useApi();
-  const [unit] = api?.registry.chainTokens || ['Unit'];
-
   const { control, formState, register, handleSubmit, setValue } = useForm({ defaultValues, resolver });
   const { errors } = formState;
   const isSellable = useWatch({ control, name: 'isSellable' });
@@ -72,14 +70,13 @@ function ParametersForm({ defaultValues, onSubmit, onBack }: Props) {
       <p className={styles.text}>Once the collection is created, they cannot be modified.</p>
 
       <form onSubmit={handleSubmit(onSubmit)} className={styles.form}>
-        <Input type="number" label={`Minting limit per user`} className={styles.input} {...register('mintLimit')} />
-        <Input type="number" label={`Minting price (${unit})`} className={styles.input} {...register('mintPrice')} />
+        <Input type="number" label={`Minting limit per user`} {...register('mintLimit')} />
+        <Input type="number" icon={VaraSVG} label={'Minting price'} {...register('mintPrice')} />
 
         <div>
           <Select
             label="Tags"
             options={[PLACEHOLDER_TAG, ...options]}
-            className={styles.input}
             onChange={handleTagChange}
             disabled={!options.length}
           />
@@ -92,8 +89,8 @@ function ParametersForm({ defaultValues, onSubmit, onBack }: Props) {
 
         <Input
           type="number"
-          label="Creator royalties (%)"
-          className={styles.input}
+          icon={PercentSVG}
+          label="Creator royalties"
           disabled={!isSellable}
           {...register('royalty')}
           error={errors.royalty?.message}

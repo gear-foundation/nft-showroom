@@ -32,15 +32,8 @@
   display: grid;
   grid-template-columns: 3fr 1fr;
 
-  // TODO: remove after @gear-js/vara-ui input z-index fix
-  .input {
-    input {
-      padding: 3px 8px;
-    }
-
-    > div:first-child {
-      z-index: 1;
-    }
+  .input > div {
+    padding: 3px 8px;
   }
 }
 

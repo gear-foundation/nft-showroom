@@ -108,11 +108,4 @@
     grid-template-columns: 1fr 1fr;
     gap: 24px;
   }
-
-  // TODO: remove after @gear-js/vara-ui input z-index fix
-  .input {
-    > div:first-child {
-      z-index: 1;
-    }
-  }
 }

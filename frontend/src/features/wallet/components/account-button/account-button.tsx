@@ -14,11 +14,8 @@ type Props = {
 
 function AccountButton({ address, name, color, size, block, onClick }: Props) {
   return (
-    // TODO: remove after @gear-js/vara-ui button noText padding fix
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    <Button text={name || address} onClick={onClick} color={color} size={size} block={block} className={styles.button}>
-      <Identicon value={address} size={16} theme="polkadot" />
+    <Button onClick={onClick} color={color} size={size} block={block} className={styles.button}>
+      <Identicon value={address} size={16} theme="polkadot" /> <span>{name || address}</span>
     </Button>
   );
 }
