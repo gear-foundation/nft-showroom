@@ -1,11 +1,15 @@
 import { Button, Input, Textarea } from '@gear-js/vara-ui';
-import { useForm, useWatch } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
 
 import { Container } from '@/components';
 
 import CameraSVG from '../../assets/camera.svg?react';
+import { IMAGE_TYPES } from '../../consts';
 import { SummaryValues } from '../../types';
-import { useFileUrl, useRegisterRef } from '../../hooks';
+import { useImageInput } from '../../hooks';
+import { getFileUrl } from '../../utils';
 import { DeleteButton } from '../delete-button';
 import styles from './summary-form.module.scss';
 
@@ -15,29 +19,34 @@ type Props = {
   onBack: () => void;
 };
 
+const schema = z.object({
+  name: z.string().min(1),
+  description: z.string().min(1),
+});
+
+const resolver = zodResolver(schema);
+
 function SummaryForm({ defaultValues, onSubmit, onBack }: Props) {
-  const { register, setValue, handleSubmit, control } = useForm({ defaultValues });
+  const { register, handleSubmit, formState } = useForm({ defaultValues, resolver });
+  const { errors } = formState;
 
-  const [coverRef, coverInputProps] = useRegisterRef(register('cover'));
-  const coverFileList = useWatch({ name: 'cover', control });
-  const coverUrl = useFileUrl(coverFileList);
-  const coverStyle = { backgroundImage: `url(${coverUrl})` };
-  const handleCoverButtonClick = () => coverRef.current?.click();
-  const handleDeleteCoverButtonClick = () => setValue('cover', undefined);
+  const cover = useImageInput(IMAGE_TYPES);
 
-  const [logoRef, logoInputProps] = useRegisterRef(register('logo'));
-  const logoFileList = useWatch({ name: 'logo', control });
-  const logoUrl = useFileUrl(logoFileList);
-  const logoStyle = { backgroundImage: `url(${logoUrl})` };
-  const handleLogoButtonClick = () => logoRef.current?.click();
-  const handleDeleteLogoButtonClick = () => setValue('logo', undefined);
+  const coverStyle = cover.value ? { backgroundImage: `url(${getFileUrl(cover.value)})` } : undefined;
+
+  const logo = useImageInput(IMAGE_TYPES);
+  const logoStyle = logo.value ? { backgroundImage: `url(${getFileUrl(logo.value)})` } : undefined;
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className={styles.form}>
+    <form
+      onSubmit={handleSubmit((data) => onSubmit({ ...data, cover: cover.value, logo: logo.value }))}
+      className={styles.form}>
       <Container>
         <header className={styles.cover} style={coverStyle}>
-          {coverUrl ? (
-            <DeleteButton className={styles.deleteButton} onClick={handleDeleteCoverButtonClick} />
+          <input type="file" className={styles.fileInput} {...cover.props} />
+
+          {cover.value ? (
+            <DeleteButton className={styles.deleteButton} onClick={cover.handleReset} />
           ) : (
             <>
               <h4 className={styles.heading}>Collection Cover</h4>
@@ -47,26 +56,32 @@ function SummaryForm({ defaultValues, onSubmit, onBack }: Props) {
                 <p>File formats: .jpg, .jpeg, .png. Max size: 5mb</p>
               </div>
 
-              <input type="file" className={styles.fileInput} ref={coverRef} {...coverInputProps} />
-              <Button text="Select File" size="small" color="dark" onClick={handleCoverButtonClick} />
+              <Button text="Select File" size="small" color="dark" onClick={cover.handleClick} />
             </>
           )}
 
           <div className={styles.logo}>
-            <input type="file" className={styles.fileInput} ref={logoRef} {...logoInputProps} />
-            <button type="button" className={styles.button} onClick={handleLogoButtonClick} style={logoStyle}>
-              {!logoUrl && <CameraSVG />}
+            <input type="file" className={styles.fileInput} {...logo.props} />
+            <button type="button" className={styles.button} onClick={logo.handleClick} style={logoStyle}>
+              {!logo.value && <CameraSVG />}
             </button>
 
-            {logoUrl && <DeleteButton className={styles.deleteButton} onClick={handleDeleteLogoButtonClick} />}
+            {logo.value && <DeleteButton className={styles.deleteButton} onClick={logo.handleReset} />}
           </div>
         </header>
       </Container>
 
       <Container maxWidth="sm" className={styles.inputs}>
         <div className={styles.inputs}>
-          <Input label="Name" className={styles.input} {...register('name')} />
-          <Textarea label="Description" rows={2} className={styles.input} {...register('description')} />
+          <Input label="Name" className={styles.input} {...register('name')} error={errors.name?.message} />
+
+          <Textarea
+            label="Description"
+            rows={2}
+            className={styles.input}
+            {...register('description')}
+            error={errors.description?.message}
+          />
         </div>
 
         <div className={styles.inputs}>

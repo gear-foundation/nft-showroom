@@ -1,6 +1,6 @@
 type SummaryValues = {
-  cover: FileList | undefined;
-  logo: FileList | undefined;
+  cover: File | undefined;
+  logo: File | undefined;
   name: string;
   description: string;
   url: string;

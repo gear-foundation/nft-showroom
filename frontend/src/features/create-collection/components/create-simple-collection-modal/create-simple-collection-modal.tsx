@@ -67,8 +67,8 @@ function CreateSimpleCollectionModal({ close }: Pick<ModalProps, 'close'>) {
     const trimmedParametersValues = getTrimmedValues(parametersTextValues);
     const { royalty, mintLimit: userMintLimit, mintPrice: paymentForMint } = trimmedParametersValues;
 
-    const collectionBanner = cover?.length ? await uploadToIpfs(cover[0]) : null;
-    const collectionLogo = logo?.length ? await uploadToIpfs(logo[0]) : null;
+    const collectionBanner = cover ? await uploadToIpfs(cover) : null;
+    const collectionLogo = logo ? await uploadToIpfs(logo) : null;
     const additionalLinks = { telegram, medium, discord, externalUrl, xcom };
 
     const transferable = isTransferable ? '0' : null;

@@ -14,6 +14,9 @@ dependencies:
   '@gear-js/vara-ui':
     specifier: 0.0.5
     version: 0.0.5(react-dom@18.2.0)(react@18.2.0)
+  '@hookform/resolvers':
+    specifier: 3.3.3
+    version: 3.3.3(react-hook-form@7.49.2)
   '@polkadot/api':
     specifier: 10.10.1
     version: 10.10.1
@@ -41,6 +44,9 @@ dependencies:
   react-router-dom:
     specifier: 6.21.0
     version: 6.21.0(react-dom@18.2.0)(react@18.2.0)
+  zod:
+    specifier: 3.22.4
+    version: 3.22.4
 
 devDependencies:
   '@types/react':
@@ -648,6 +654,14 @@ packages:
     dependencies:
       react: 18.2.0
       react-dom: 18.2.0(react@18.2.0)
+    dev: false
+
+  /@hookform/resolvers@3.3.3(react-hook-form@7.49.2):
+    resolution: {integrity: sha512-bOMxKkSD3zWcS11TKoUQ8O0ZqKslFohvUsPKSrdCHiuEuMjRo/u3cq9YRJD/+xtNGYup++XD2LkjhegP5XENiw==}
+    peerDependencies:
+      react-hook-form: ^7.0.0
+    dependencies:
+      react-hook-form: 7.49.2(react@18.2.0)
     dev: false
 
   /@humanwhocodes/config-array@0.11.13:
@@ -5934,3 +5948,7 @@ packages:
     resolution: {integrity: sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q==}
     engines: {node: '>=10'}
     dev: true
+
+  /zod@3.22.4:
+    resolution: {integrity: sha512-iC+8Io04lddc+mVqQ9AZ7OQ2MrUKGN+oIQyq1vemgt46jwCwLfhq7/pwnBnNXXXZb8VTVLKwp9EDkx+ryxIWmg==}
+    dev: false

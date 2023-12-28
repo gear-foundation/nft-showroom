@@ -1,7 +1,10 @@
 import { ProgramMetadata } from '@gear-js/api';
 import { useAlert } from '@gear-js/react-hooks';
-import { useRef, useImperativeHandle, useEffect, useState } from 'react';
+import { useRef, useImperativeHandle, useEffect, useState, ChangeEvent } from 'react';
 import { UseFormRegisterReturn } from 'react-hook-form';
+
+import { MAX_IMAGE_SIZE_MB } from './consts';
+import { getBytesSize } from './utils';
 
 function useFileUrl(fileList: FileList | undefined) {
   const [url, setUrl] = useState('');
@@ -42,4 +45,51 @@ function useProgramMetadata(source: string) {
   return metadata;
 }
 
-export { useFileUrl, useRegisterRef, useProgramMetadata };
+function useImageInput(types: string[]) {
+  const alert = useAlert();
+
+  const [value, setValue] = useState<File>();
+  const ref = useRef<HTMLInputElement>(null);
+
+  const handleClick = () => ref.current?.click();
+
+  const onChange = ({ target }: ChangeEvent<HTMLInputElement>) => {
+    const { files } = target;
+
+    if (!files || !files.length) {
+      setValue(undefined);
+      return;
+    }
+
+    const [file] = files;
+    const { size, type } = file;
+
+    if (size > getBytesSize(MAX_IMAGE_SIZE_MB)) {
+      target.value = '';
+      return alert.error('Max file size is exceeded');
+    }
+
+    if (!types.includes(type)) {
+      target.value = '';
+      return alert.error('Wrong file format');
+    }
+
+    setValue(file);
+  };
+
+  const handleReset = () => {
+    if (!ref.current) return;
+
+    ref.current.value = '';
+
+    const changeEvent = new Event('change', { bubbles: true });
+    ref.current.dispatchEvent(changeEvent);
+  };
+
+  const accept = types.join(',');
+  const props = { ref, accept, onChange };
+
+  return { value, props, handleClick, handleReset };
+}
+
+export { useFileUrl, useRegisterRef, useProgramMetadata, useImageInput };
