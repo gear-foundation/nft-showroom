@@ -468,6 +468,15 @@ fn sale_failures() {
         "No approve to the marketplace".to_string()
     ));
 
+    // wrong collection address
+    let res = sale(&marketplace, USERS[1], 1.into(), 0, price);
+    assert!(!res.main_failed());
+    assert!(check_payload(
+        0,
+        &res,
+        "This collection address is not in the marketplace".to_string()
+    ));
+
     // Successful approve NFT in the collection
     let addres_marketplace: [u8; 32] = marketplace.id().into();
     let res = nft_collection.send(
@@ -513,7 +522,7 @@ fn sale_failures() {
     assert!(check_payload(
         0,
         &res,
-        "This sale does not exist. Wrong collection_address or token_id".to_string()
+        "This sale does not exist".to_string()
     ));
 
     // value is less than the price
@@ -536,14 +545,14 @@ fn sale_failures() {
     let balance = sys.balance_of(USERS[2]);
     assert_eq!(balance, price - 1, "Wrong balance");
 
-    // Wrong collection_address or token_id.
+    // sale does not exist
     let res = buy(&marketplace, USERS[2], address_nft, 1, price - 1);
     assert!(!res.main_failed());
 
     assert!(check_payload(
         0,
         &res,
-        "Wrong collection_address or token_id.".to_string()
+        "This sale does not exist".to_string()
     ));
 }
 
@@ -1245,6 +1254,28 @@ fn offer_failures() {
 
     let address_nft_2: [u8; 32] = address_nft.into();
     let nft_collection = sys.get_program(address_nft_2);
+
+    // NonFungibleToken: token does not exist
+    let offer_price = 150_000_000_000_000;
+    sys.mint_to(USERS[2], offer_price);
+    let res = create_offer(&marketplace, USERS[2], address_nft, 0, offer_price);
+    assert!(!res.main_failed());
+    assert!(check_payload(
+        0,
+        &res,
+        "NonFungibleToken: token does not exist".to_string()
+    ));
+
+    // wrong collection address
+    let offer_price = 150_000_000_000_000;
+    sys.mint_to(USERS[2], offer_price);
+    let res = create_offer(&marketplace, USERS[2], 1.into(), 0, offer_price);
+    assert!(!res.main_failed());
+    assert!(check_payload(
+        0,
+        &res,
+        "This collection address is not in the marketplace".to_string()
+    ));
 
     // Successful mint NFT in the new collection
     let res = nft_collection.send(USERS[1], nft_io::NftAction::Mint);

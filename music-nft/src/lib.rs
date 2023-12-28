@@ -15,7 +15,7 @@ struct NftContract {
     pub token_approvals: HashMap<NftId, ActorId>,
     pub config: Config,
     pub nonce: NftId,
-    pub nft_data: Vec<(Links, ImageData)>,
+    pub links_and_data: Vec<(Links, ImageData)>,
     pub collection_owner: ActorId,
 }
 static mut NFT_CONTRACT: Option<NftContract> = None;
@@ -30,13 +30,13 @@ impl NftContract {
         };
         self.payment_for_mint()?;
 
-        let rand_index = get_random_value(self.nft_data.len() as u64);
+        let rand_index = get_random_value(self.links_and_data.len() as u64);
         let music_link: String;
         let mut img_link = self.config.collection_logo.clone();
         let mut token_description = self.config.description.clone();
         let token_id = self.nonce;
 
-        if let Some((links, img_info)) = self.nft_data.get_mut(rand_index as usize) {
+        if let Some((links, img_info)) = self.links_and_data.get_mut(rand_index as usize) {
             if let Some(limit) = img_info.limit_copies.as_mut() {
                 *limit -= 1;
             }
@@ -75,7 +75,7 @@ impl NftContract {
             }
 
             if let Some(0) = img_info.limit_copies {
-                self.nft_data.remove(rand_index as usize);
+                self.links_and_data.remove(rand_index as usize);
             }
         } else {
             return Err(MusicNftError("Error with getting a random nft".to_owned()));
@@ -89,7 +89,7 @@ impl NftContract {
             .or_insert_with(|| HashSet::from([token_id]));
 
         let name = format!("{} - {}", self.config.name, token_id);
-        let nft_data = Nft {
+        let links_and_data = Nft {
             owner: msg_src,
             name,
             description: token_description,
@@ -100,7 +100,7 @@ impl NftContract {
         };
 
         self.nonce = next_nft_nonce;
-        self.tokens.insert(token_id, nft_data.clone());
+        self.tokens.insert(token_id, links_and_data.clone());
         self.restriction_mint
             .entry(msg_src)
             .and_modify(|ids| {
@@ -108,7 +108,10 @@ impl NftContract {
             })
             .or_insert(1);
 
-        Ok(MusicNftEvent::Minted { token_id, nft_data })
+        Ok(MusicNftEvent::Minted {
+            token_id,
+            links_and_data,
+        })
     }
     fn transfer_from(
         &mut self,
@@ -219,7 +222,7 @@ impl NftContract {
             ));
         }
 
-        self.nft_data.extend(additional_links.clone());
+        self.links_and_data.extend(additional_links.clone());
 
         Ok(MusicNftEvent::Expanded { additional_links })
     }
@@ -325,7 +328,7 @@ impl NftContract {
     }
 
     fn check_available_amount_of_tokens(&self) -> Result<(), MusicNftError> {
-        if self.nft_data.is_empty() {
+        if self.links_and_data.is_empty() {
             return Err(MusicNftError("All tokens are minted.".to_owned()));
         }
         Ok(())
@@ -426,7 +429,7 @@ extern "C" fn init() {
     let MusicNftInit {
         collection_owner,
         config,
-        nft_data,
+        links_and_data,
     } = msg::load().expect("Unable to decode `MusicNftInit`.");
     debug!("INIT NFT");
 
@@ -452,13 +455,13 @@ extern "C" fn init() {
         panic!("Royalty percent must be less than 100%");
     }
     assert!(
-        !nft_data.is_empty(),
+        !links_and_data.is_empty(),
         "There must be at least one link to create a collection"
     );
     if config.transferable.is_none() && config.sellable.is_some() {
         panic!("Tokens must be transferable");
     }
-    if nft_data
+    if links_and_data
         .iter()
         .any(|(_, img_data)| img_data.limit_copies.map_or(false, |limit| limit == 0))
     {
@@ -473,7 +476,7 @@ extern "C" fn init() {
             restriction_mint: HashMap::new(),
             config: config.clone(),
             nonce: 0,
-            nft_data,
+            links_and_data,
             collection_owner,
         })
     };
@@ -559,7 +562,7 @@ impl From<NftContract> for NftState {
             token_approvals,
             config,
             nonce,
-            nft_data,
+            links_and_data,
             collection_owner,
             ..
         } = value;
@@ -583,7 +586,7 @@ impl From<NftContract> for NftState {
             token_approvals,
             config,
             nonce,
-            nft_data,
+            links_and_data,
             collection_owner,
         }
     }

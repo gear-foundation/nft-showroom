@@ -11,6 +11,11 @@ impl NftMarketplace {
         token_id: u64,
         price: u128,
     ) -> Result<NftMarketplaceEvent, NftMarketplaceError> {
+        if !self.collection_to_owner.contains_key(&collection_address) {
+            return Err(NftMarketplaceError(
+                "This collection address is not in the marketplace".to_owned(),
+            ));
+        }
         // check that this nft is not sale at this moment
         if self.sales.contains_key(&(collection_address, token_id)) {
             return Err(NftMarketplaceError(
@@ -105,9 +110,7 @@ impl NftMarketplace {
                 ));
             }
         } else {
-            return Err(NftMarketplaceError(
-                "This sale does not exist. Wrong collection_address or token_id".to_owned(),
-            ));
+            return Err(NftMarketplaceError("This sale does not exist".to_owned()));
         }
 
         Ok(NftMarketplaceEvent::SaleNftCanceled {
@@ -173,9 +176,7 @@ impl NftMarketplace {
                 ));
             }
         } else {
-            return Err(NftMarketplaceError(
-                "Wrong collection_address or token_id.".to_owned(),
-            ));
+            return Err(NftMarketplaceError("This sale does not exist".to_owned()));
         }
         Ok(())
     }

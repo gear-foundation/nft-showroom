@@ -246,7 +246,7 @@ pub fn get_init_nft_payload(
         limit_copies: Some(1),
         auto_changing_rules: None,
     };
-    let img_links: Vec<(String, ImageData)> = (0..10)
+    let img_links_and_data: Vec<(String, ImageData)> = (0..10)
         .map(|i| (format!("Img-{}", i), img_data.clone()))
         .collect();
 
@@ -265,7 +265,7 @@ pub fn get_init_nft_payload(
             transferable: Some(0),
             sellable: Some(0),
         },
-        img_links,
+        img_links_and_data,
     }
 }
 // pub fn get_state(
