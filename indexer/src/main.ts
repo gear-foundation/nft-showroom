@@ -3,6 +3,7 @@ import { TypeormDatabase } from '@subsquid/typeorm-store';
 import { processor } from './processor';
 import { config } from './config';
 import { EventsProcessing } from './processing/events.processing';
+import {Collection} from "./model";
 
 processor.run(new TypeormDatabase(), async (ctx) => {
   const processing = new EventsProcessing(ctx.store);
@@ -21,7 +22,8 @@ processor.run(new TypeormDatabase(), async (ctx) => {
       if (details && details.code.__kind !== 'Success') {
         continue;
       }
-      if (config.nftProgram && config.nftProgram === source) {
+      const collection = await ctx.store.findOne(Collection, { where: { id: source } });
+      if (collection) {
         await processing.handleNftEvent(block, payload, source);
       }
       if (config.marketplaceProgram && config.marketplaceProgram === source) {
