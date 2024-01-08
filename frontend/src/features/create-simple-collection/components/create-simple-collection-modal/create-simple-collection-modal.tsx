@@ -1,12 +1,21 @@
-import { CreateType } from '@gear-js/api';
-import { useAccount, useBalanceFormat } from '@gear-js/react-hooks';
+import { useAccount, useBalanceFormat, useSendMessageHandler } from '@gear-js/react-hooks';
 import { ModalProps } from '@gear-js/vara-ui';
 import { useState } from 'react';
 
+import metaTxt from '@/assets/nft_marketplace.meta.txt';
+import nftMetaTxt from '@/assets/nft.meta.txt';
+import { ADDRESS } from '@/consts';
 import { Container } from '@/components';
 import { useIPFS } from '@/context';
 
-import { DEFAULT_NFTS_VALUES, DEFAULT_PARAMETERS_VALUES, DEFAULT_SUMMARY_VALUES, STEPS } from '../../consts';
+import {
+  COLLECTION_NAME,
+  DEFAULT_NFTS_VALUES,
+  DEFAULT_PARAMETERS_VALUES,
+  DEFAULT_SUMMARY_VALUES,
+  STEPS,
+} from '../../consts';
+import { useProgramMetadata } from '../../hooks';
 import { NFT, NFTsValues, ParametersValues, SummaryValues } from '../../types';
 import { FullScreenModal } from '../full-screen-modal';
 import { SummaryForm } from '../summary-form';
@@ -19,9 +28,14 @@ function CreateSimpleCollectionModal({ close }: Pick<ModalProps, 'close'>) {
   const [parametersValues, setParametersValues] = useState(DEFAULT_PARAMETERS_VALUES);
   const [isLoading, setIsLoading] = useState(false);
 
+  const ipfs = useIPFS();
   const { account } = useAccount();
   const { getChainBalanceValue } = useBalanceFormat();
-  const ipfs = useIPFS();
+
+  const nftMeta = useProgramMetadata(nftMetaTxt);
+
+  const metadata = useProgramMetadata(metaTxt);
+  const sendMessage = useSendMessageHandler(ADDRESS.CONTRACT, metadata);
 
   const nextStep = () => setStepIndex((prevIndex) => prevIndex + 1);
   const prevStep = () => setStepIndex((prevIndex) => prevIndex - 1);
@@ -39,7 +53,7 @@ function CreateSimpleCollectionModal({ close }: Pick<ModalProps, 'close'>) {
   const uploadToIpfs = async (file: File) => {
     const { cid } = await ipfs.add(file);
 
-    return cid.toString();
+    return `ipfs://${cid.toString()}`;
   };
 
   const getNftPayload = async ({ file, limit }: NFT) => {
@@ -51,7 +65,7 @@ function CreateSimpleCollectionModal({ close }: Pick<ModalProps, 'close'>) {
     return [cid, { limitCopies, autoChangingRules }];
   };
 
-  const getPayload = async (nfts: NFT[]) => {
+  const getFormPayload = async (nfts: NFT[]) => {
     const collectionOwner = account?.decodedAddress;
 
     const { cover, logo, name, description, telegram, medium, discord, url: externalUrl, x: xcom } = summaryValues;
@@ -64,11 +78,11 @@ function CreateSimpleCollectionModal({ close }: Pick<ModalProps, 'close'>) {
     const userMintLimit = mintLimit || null;
     const transferable = isTransferable ? '0' : null;
     const sellable = isSellable ? '0' : null;
-    const paymentForMint = getChainBalanceValue(mintPrice).toFixed();
+    const paymentForMint = getChainBalanceValue(mintPrice || '0').toFixed();
 
     const collectionTags = tags.map(({ value }) => value);
 
-    const imgLinks = await Promise.all(nfts.map((nft) => getNftPayload(nft)));
+    const imgLinksAndData = await Promise.all(nfts.map((nft) => getNftPayload(nft)));
 
     const config = {
       name,
@@ -84,18 +98,30 @@ function CreateSimpleCollectionModal({ close }: Pick<ModalProps, 'close'>) {
       collectionTags,
     };
 
-    return { collectionOwner, config, imgLinks };
+    return { collectionOwner, config, imgLinksAndData };
+  };
+
+  const getBytesPayload = (payload: Awaited<ReturnType<typeof getFormPayload>>) => {
+    if (!nftMeta) throw new Error('NFT metadata not found');
+
+    const initTypeIndex = nftMeta.types.init.input;
+
+    if (initTypeIndex == null) throw new Error('init.input type index not found in NFT metadata');
+
+    const encoded = nftMeta.createType(initTypeIndex, payload).toU8a();
+
+    return Array.from(encoded);
   };
 
   const handleNFTsSubmit = async ({ nfts }: NFTsValues) => {
-    setIsLoading(true);
+    const formPayload = await getFormPayload(nfts);
+    const bytesPayload = getBytesPayload(formPayload);
+    const payload = { CreateCollection: { typeName: COLLECTION_NAME, payload: bytesPayload } };
 
-    const payload = await getPayload(nfts);
-    const bytesPayload = CreateType.create('Bytes', payload);
+    const onSuccess = close;
+    const onError = () => setIsLoading(false);
 
-    console.log('bytesPayload: ', bytesPayload);
-
-    setIsLoading(false);
+    sendMessage({ payload, onSuccess, onError });
   };
 
   const getForm = () => {
