@@ -1,4 +1,13 @@
+import { useAccountDeriveBalancesAll } from './api';
 import { useModal } from './use-modal';
-import { useAccountDeriveBalancesAll } from './api/use-derive-balances-all';
+import { useProgramMetadata } from './use-program-metadata';
+import { useMarketplaceMetadata, useSendMarketplaceMessage, useMarketplaceState } from './marketplace';
 
-export { useModal, useAccountDeriveBalancesAll };
+export {
+  useModal,
+  useAccountDeriveBalancesAll,
+  useProgramMetadata,
+  useMarketplaceMetadata,
+  useSendMarketplaceMessage,
+  useMarketplaceState,
+};

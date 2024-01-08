@@ -1,13 +1,12 @@
-import { useAccount, useBalanceFormat, useSendMessageHandler } from '@gear-js/react-hooks';
+import { useAccount, useBalanceFormat } from '@gear-js/react-hooks';
 import { ModalProps } from '@gear-js/vara-ui';
 import { useState } from 'react';
 
-import metaTxt from '@/assets/nft_marketplace.meta.txt';
-import nftMetaTxt from '@/assets/nft.meta.txt';
-import { ADDRESS } from '@/consts';
 import { Container } from '@/components';
 import { useIPFS } from '@/context';
+import { useProgramMetadata, useSendMarketplaceMessage } from '@/hooks';
 
+import nftMetadataSource from '../../assets/nft.meta.txt';
 import {
   COLLECTION_NAME,
   DEFAULT_NFTS_VALUES,
@@ -15,7 +14,6 @@ import {
   DEFAULT_SUMMARY_VALUES,
   STEPS,
 } from '../../consts';
-import { useProgramMetadata } from '../../hooks';
 import { NFT, NFTsValues, ParametersValues, SummaryValues } from '../../types';
 import { FullScreenModal } from '../full-screen-modal';
 import { SummaryForm } from '../summary-form';
@@ -32,10 +30,8 @@ function CreateSimpleCollectionModal({ close }: Pick<ModalProps, 'close'>) {
   const { account } = useAccount();
   const { getChainBalanceValue } = useBalanceFormat();
 
-  const nftMeta = useProgramMetadata(nftMetaTxt);
-
-  const metadata = useProgramMetadata(metaTxt);
-  const sendMessage = useSendMessageHandler(ADDRESS.CONTRACT, metadata);
+  const nftMetadata = useProgramMetadata(nftMetadataSource);
+  const sendMessage = useSendMarketplaceMessage();
 
   const nextStep = () => setStepIndex((prevIndex) => prevIndex + 1);
   const prevStep = () => setStepIndex((prevIndex) => prevIndex - 1);
@@ -102,13 +98,13 @@ function CreateSimpleCollectionModal({ close }: Pick<ModalProps, 'close'>) {
   };
 
   const getBytesPayload = (payload: Awaited<ReturnType<typeof getFormPayload>>) => {
-    if (!nftMeta) throw new Error('NFT metadata not found');
+    if (!nftMetadata) throw new Error('NFT metadata not found');
 
-    const initTypeIndex = nftMeta.types.init.input;
+    const initTypeIndex = nftMetadata.types.init.input;
 
     if (initTypeIndex == null) throw new Error('init.input type index not found in NFT metadata');
 
-    const encoded = nftMeta.createType(initTypeIndex, payload).toU8a();
+    const encoded = nftMetadata.createType(initTypeIndex, payload).toU8a();
 
     return Array.from(encoded);
   };

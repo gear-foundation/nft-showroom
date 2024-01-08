@@ -1,3 +1,3 @@
-import { useDeriveBalancesAll } from './use-derive-balances-all';
+import { useDeriveBalancesAll, useAccountDeriveBalancesAll } from './use-derive-balances-all';
 
-export { useDeriveBalancesAll };
+export { useDeriveBalancesAll, useAccountDeriveBalancesAll };

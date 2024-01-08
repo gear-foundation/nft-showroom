@@ -1,26 +1,8 @@
-import { ProgramMetadata } from '@gear-js/api';
 import { useAlert } from '@gear-js/react-hooks';
 import { useRef, useEffect, useState, ChangeEvent, DependencyList, EffectCallback } from 'react';
 
 import { MAX_IMAGE_SIZE_MB } from './consts';
 import { getBytesSize } from './utils';
-
-function useProgramMetadata(source: string) {
-  const alert = useAlert();
-
-  const [metadata, setMetadata] = useState<ProgramMetadata>();
-
-  useEffect(() => {
-    fetch(source)
-      .then((response) => response.text())
-      .then((metaRaw) => setMetadata(ProgramMetadata.from(`0x${metaRaw}`)))
-      .catch(({ message }: Error) => alert.error(message));
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  return metadata;
-}
 
 function useImageInput(defaultValue: File | undefined, types: string[]) {
   const alert = useAlert();
@@ -88,4 +70,4 @@ function useChangeEffect(callback: EffectCallback, dependencies?: DependencyList
   }, dependencies);
 }
 
-export { useProgramMetadata, useImageInput, useChangeEffect };
+export { useImageInput, useChangeEffect };
