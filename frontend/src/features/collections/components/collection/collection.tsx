@@ -96,7 +96,16 @@ function Collection() {
           <Button text={`All: ${collection.tokens.length}`} color="grey" size="small" />
         </header>
 
-        {collection.tokens.length ? <ul className={styles.list}>{getNFTs()}</ul> : null}
+        {collection.tokens.length ? (
+          <ul className={styles.list}>{getNFTs()}</ul>
+        ) : (
+          <div className={styles.notFound}>
+            <p className={styles.notFoundHeading}>Oops, Nothing Found!</p>
+            <p className={styles.notFoundText}>
+              Looks like we&apos;re on a wild goose chase! Mint NFTs to have them displayed here.
+            </p>
+          </div>
+        )}
       </div>
     </Container>
   ) : null;

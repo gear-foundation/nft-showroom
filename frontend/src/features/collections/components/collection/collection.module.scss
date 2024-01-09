@@ -84,3 +84,25 @@
     gap: 32px 16px;
   }
 }
+
+.notFound {
+  margin: 0 auto;
+  padding: 100px;
+
+  text-align: center;
+
+  &Heading {
+    margin-bottom: 16px;
+
+    font-size: 32px;
+    font-weight: 600;
+    line-height: 35px;
+    letter-spacing: 0.01em;
+  }
+
+  &Text {
+    font-size: 16px;
+    font-weight: 500;
+    line-height: 24px;
+  }
+}
