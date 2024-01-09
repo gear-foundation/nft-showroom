@@ -15,8 +15,8 @@ function Collections() {
   const { api } = useApi();
   const alert = useAlert();
 
-  const collectionIdsState = useMarketplaceState<CollectionsState>('AllCollections');
-  const collectionIds = collectionIdsState.state?.AllCollections;
+  const [marketplaceState] = useMarketplaceState<CollectionsState>('AllCollections');
+  const collectionIds = marketplaceState?.AllCollections;
 
   const [collectionStates, setCollectionStates] = useState<CollectionState[]>();
 

@@ -17,8 +17,9 @@ function useSendMarketplaceMessage() {
 
 function useMarketplaceState<T>(payload: string) {
   const metadata = useMarketplaceMetadata();
+  const { state, isStateRead } = useReadFullState<T>(ADDRESS.CONTRACT, metadata, payload);
 
-  return useReadFullState<T>(ADDRESS.CONTRACT, metadata, payload);
+  return [state, isStateRead] as const;
 }
 
 export { useMarketplaceMetadata, useSendMarketplaceMessage, useMarketplaceState };

@@ -1,7 +1,22 @@
 import { HexString } from '@gear-js/api';
 
+type CollectionId = HexString;
+type OwnerId = HexString;
+type CollectionTypeName = string;
+
+type CollectionToOwner = [CollectionId, [CollectionTypeName, OwnerId]];
+
+type CollectionType = [CollectionTypeName, { codeId: HexString; metaLink: string; typeDescription: string }];
+
+type MarketplaceState = {
+  All: {
+    collectionToOwner: CollectionToOwner[];
+    typeCollections: CollectionType[];
+  };
+};
+
 type CollectionsState = {
-  AllCollections: [HexString, HexString][];
+  AllCollections: CollectionToOwner[];
 };
 
 type CollectionState = {
@@ -50,4 +65,4 @@ type CollectionState = {
   };
 };
 
-export type { CollectionsState, CollectionState };
+export type { MarketplaceState, CollectionsState, CollectionState };
