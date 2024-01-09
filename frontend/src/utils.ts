@@ -10,9 +10,9 @@ const cx = (...args: unknown[]) =>
 const getTypedEntries = <T extends object>(value: T) => Object.entries(value) as Entries<T>;
 
 const getIpfsLink = (value: string) => {
-  const [, cid] = value.split('ipfs://');
+  const [, cid = ''] = value.split('ipfs://');
 
-  if (!cid) throw new Error(`Can't find CID in a link: ${value}`);
+  // if (!cid) throw new Error(`Can't find CID in a link: ${value}`);
 
   return `${ADDRESS.IPFS_GATEWAY}/${cid}`;
 };

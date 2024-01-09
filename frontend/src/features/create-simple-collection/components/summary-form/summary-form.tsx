@@ -3,15 +3,15 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 
+import WebSVG from '@/assets/web.svg?react';
+import TelegramSVG from '@/assets/telegram.svg?react';
+import TwitterSVG from '@/assets/twitter.svg?react';
+import MediumSVG from '@/assets/medium.svg?react';
+import DiscordSVG from '@/assets/discord.svg?react';
 import { Container } from '@/components';
 
 import CameraSVG from '../../assets/camera.svg?react';
 import PlaceholderSVG from '../../assets/placeholder.svg?react';
-import WebSVG from '../../assets/web.svg?react';
-import TelegramSVG from '../../assets/tg.svg?react';
-import XSVG from '../../assets/x.svg?react';
-import MediumSVG from '../../assets/medium.svg?react';
-import DiscordSVG from '../../assets/discord.svg?react';
 import { IMAGE_TYPES } from '../../consts';
 import { SummaryValues } from '../../types';
 import { useImageInput } from '../../hooks';
@@ -99,7 +99,7 @@ function SummaryForm({ defaultValues, onSubmit, onBack }: Props) {
 
           <Input icon={WebSVG} label="URL" {...register('url')} />
           <Input icon={TelegramSVG} label="Telegram" {...register('telegram')} />
-          <Input icon={XSVG} label="X.com" {...register('x')} />
+          <Input icon={TwitterSVG} label="X.com" {...register('x')} />
           <Input icon={MediumSVG} label="Medium" {...register('medium')} />
           <Input icon={DiscordSVG} label="Discord" {...register('discord')} />
 

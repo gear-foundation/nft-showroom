@@ -1,4 +1,3 @@
-import { HexString } from '@gear-js/api';
 import { useAlert, useApi } from '@gear-js/react-hooks';
 import { Identicon } from '@polkadot/react-identicon';
 import { useEffect, useState } from 'react';
@@ -9,25 +8,8 @@ import simpleNftMetadataSource from '@/features/create-simple-collection/assets/
 import { useMarketplaceState, useProgramMetadata } from '@/hooks';
 import { getIpfsLink } from '@/utils';
 
+import { CollectionState, CollectionsState } from '../../types';
 import styles from './collections.module.scss';
-
-type CollectionsState = {
-  AllCollections: [HexString, HexString][];
-};
-
-type CollectionState = {
-  All: {
-    tokens: unknown[];
-    config: {
-      name: string;
-      description: string;
-      collectionBanner: string;
-      collectionLogo: string;
-      userMintLimit: string;
-    };
-    collectionOwner: HexString;
-  };
-};
 
 function Collections() {
   const { api } = useApi();

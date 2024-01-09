@@ -1,0 +1,32 @@
+.card {
+  max-width: 128px;
+
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  svg {
+    flex-shrink: 0;
+  }
+}
+
+.textContainer,
+.card,
+.heading,
+.text {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.heading {
+  font-size: 12px;
+  line-height: 14px;
+  color: rgba(#fff, 0.7);
+}
+
+.text {
+  font-weight: 600;
+  line-height: 17px;
+  color: #fff;
+}

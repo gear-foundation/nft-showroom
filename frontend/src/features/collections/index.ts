@@ -1,3 +1,3 @@
-import { Collections } from './components';
+import { Collections, Collection } from './components';
 
-export { Collections };
+export { Collections, Collection };
