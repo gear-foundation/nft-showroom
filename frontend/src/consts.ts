@@ -9,9 +9,9 @@ const ADDRESS = {
 
 const ROUTE = {
   HOME: '/',
-  CREATE_COLLECTION: 'create',
-  COLLECTION: 'collection/:id',
-  NFT: 'nft/:collectionId/:id',
+  CREATE_COLLECTION: '/create',
+  COLLECTION: '/collection/:id',
+  NFT: '/nft/:collectionId/:id',
 };
 
 export { ADDRESS, ROUTE };

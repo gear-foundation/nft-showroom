@@ -10,8 +10,7 @@
   }
 }
 
-.textContainer,
-.card,
+.body,
 .heading,
 .text {
   white-space: nowrap;
@@ -22,11 +21,29 @@
 .heading {
   font-size: 12px;
   line-height: 14px;
-  color: rgba(#fff, 0.7);
 }
 
 .text {
   font-weight: 600;
   line-height: 17px;
-  color: #fff;
+}
+
+.dark {
+  .heading {
+    color: rgba(#000, 0.5);
+  }
+
+  .text {
+    color: #000;
+  }
+}
+
+.light {
+  .heading {
+    color: rgba(#fff, 0.7);
+  }
+
+  .text {
+    color: #fff;
+  }
 }

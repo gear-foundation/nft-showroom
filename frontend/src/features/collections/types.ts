@@ -6,7 +6,17 @@ type CollectionsState = {
 
 type CollectionState = {
   All: {
-    tokens: unknown[];
+    tokens: [
+      string,
+      {
+        owner: HexString;
+        name: string;
+        description: string;
+        metadata: unknown[];
+        mediaUrl: string;
+        mintTime: string;
+      },
+    ][];
     owners: unknown[];
     tokenApprovals: unknown[];
     config: {

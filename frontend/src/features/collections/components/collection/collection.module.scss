@@ -63,14 +63,24 @@
     gap: 40px;
   }
 
-  .socialsContainer {
-    // margin-left: auto;
-  }
-
   .socials {
     margin-bottom: 24px;
 
     display: flex;
     gap: 12px;
+  }
+}
+
+.nfts {
+  margin-top: 32px;
+
+  &Header {
+    margin-bottom: 24px;
+  }
+
+  .list {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 32px 16px;
   }
 }
