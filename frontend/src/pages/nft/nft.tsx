@@ -1,5 +1,5 @@
 import { HexString } from '@gear-js/api';
-import { withoutCommas } from '@gear-js/react-hooks';
+import { useAccount, withoutCommas } from '@gear-js/react-hooks';
 import { Identicon } from '@polkadot/react-identicon';
 import { useState } from 'react';
 import { useParams } from 'react-router-dom';
@@ -8,6 +8,9 @@ import { Container, CopyButton } from '@/components';
 import { useCollection } from '@/hooks';
 import { cx, getIpfsLink } from '@/utils';
 
+import { StartSale } from './start-sale';
+import { StartAuction } from './start-auction';
+import { TransferNFT } from './transfer-nft';
 import InfoSVG from './info.svg?react';
 import styles from './nft.module.scss';
 
@@ -51,10 +54,16 @@ const TAB_BUTTONS = [
 
 function NFT() {
   const { collectionId, id } = useParams() as Params;
+  const { account } = useAccount();
 
   const collection = useCollection(collectionId);
   const { config } = collection || {};
+  console.log('collection: ', collection);
+
   const [, nft] = collection?.tokens.find(([_id]) => _id === id) || [];
+  console.log('nft: ', nft);
+
+  const isOwner = nft?.owner === account?.decodedAddress;
 
   const [tab] = useState('Overview');
 
@@ -80,7 +89,7 @@ function NFT() {
       );
     });
 
-  return nft ? (
+  return nft && config ? (
     <Container className={styles.container}>
       <img src={getIpfsLink(nft.mediaUrl)} alt="" className={styles.image} />
 
@@ -95,6 +104,23 @@ function NFT() {
             Owned by <span className={styles.ownerAddress}>{nft.owner}</span>
           </p>
         </div>
+
+        {isOwner && (!!config.sellable || !!config.transferable) && (
+          <div className={styles.buttons}>
+            {!!config.sellable && (
+              <StartSale
+                nftId={id}
+                nftName={nft.name}
+                nftSrc={getIpfsLink(nft.mediaUrl)}
+                collectionId={collectionId}
+                collectionName={config.name}
+              />
+            )}
+            {!!config.sellable && <StartAuction />}
+
+            <TransferNFT />
+          </div>
+        )}
 
         <div>
           <ul className={styles.tabButtons}>{getTabButtons()}</ul>

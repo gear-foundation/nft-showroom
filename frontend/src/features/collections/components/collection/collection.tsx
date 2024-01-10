@@ -1,5 +1,4 @@
 import { HexString } from '@gear-js/api';
-import { useAccount } from '@gear-js/react-hooks';
 import { Button } from '@gear-js/vara-ui';
 import { useParams } from 'react-router-dom';
 
@@ -20,12 +19,9 @@ type Params = {
 
 function Collection() {
   const { id } = useParams() as Params;
-  const { account } = useAccount();
 
   const collection = useCollection(id);
   const sendMessage = useCollectionSendMessage(id);
-
-  const isOwner = collection ? account?.decodedAddress === collection.collectionOwner : false;
 
   const socialEntries = Object.entries(collection?.config.additionalLinks || {}).filter(([, value]) => !!value) as [
     string,
@@ -81,7 +77,7 @@ function Collection() {
             <div>
               {!!socialEntries.length && <ul className={styles.socials}>{getSocials()}</ul>}
 
-              {isOwner && <Button text="Mint NFT" size="small" onClick={handleMintClick} block />}
+              <Button text="Mint NFT" size="small" onClick={handleMintClick} block />
             </div>
           </div>
         </div>

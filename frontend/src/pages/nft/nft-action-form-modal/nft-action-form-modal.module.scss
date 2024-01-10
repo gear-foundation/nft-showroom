@@ -1,0 +1,36 @@
+.nft {
+  margin-bottom: 24px;
+
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.image {
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
+
+  border-radius: 12px;
+}
+
+.name {
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 22px;
+}
+
+.collectionName {
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 13px;
+  color: #93989a;
+}
+
+.buttons {
+  margin-top: 24px;
+
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24px;
+}
