@@ -5,7 +5,7 @@ import { ROUTE } from '@/consts';
 import { getIpfsLink } from '@/utils';
 
 import { InfoCard } from '../info-card';
-import styles from './nft.module.scss';
+import styles from './nft-card.module.scss';
 
 type Props = {
   id: string;
@@ -15,7 +15,7 @@ type Props = {
   owner: HexString;
 };
 
-function NFT({ id, collectionId, mediaUrl, name, owner }: Props) {
+function NFTCard({ id, collectionId, mediaUrl, name, owner }: Props) {
   const to = generatePath(ROUTE.NFT, { collectionId, id });
   const src = getIpfsLink(mediaUrl);
 
@@ -42,4 +42,4 @@ function NFT({ id, collectionId, mediaUrl, name, owner }: Props) {
   );
 }
 
-export { NFT };
+export { NFTCard };

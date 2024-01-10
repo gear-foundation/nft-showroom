@@ -1,19 +1,17 @@
 import { HexString } from '@gear-js/api';
-import { useAccount, useReadFullState, useSendMessageHandler } from '@gear-js/react-hooks';
+import { useAccount } from '@gear-js/react-hooks';
 import { Button } from '@gear-js/vara-ui';
 import { useParams } from 'react-router-dom';
 
 import { Container } from '@/components';
-import simpleNftMetadataSource from '@/features/create-simple-collection/assets/nft.meta.txt';
-import { useProgramMetadata } from '@/hooks';
+import { useCollection, useCollectionSendMessage } from '@/hooks';
 import { getIpfsLink } from '@/utils';
 
 import UserSVG from '../../assets/user.svg?react';
 import LandscapeSVG from '../../assets/landscape.svg?react';
 import { SOCIAL_ICON } from '../../consts';
-import { CollectionState } from '../../types';
 import { InfoCard } from '../info-card';
-import { NFT } from '../nft';
+import { NFTCard } from '../nft-card';
 import styles from './collection.module.scss';
 
 type Params = {
@@ -24,12 +22,10 @@ function Collection() {
   const { id } = useParams() as Params;
   const { account } = useAccount();
 
-  const metadata = useProgramMetadata(simpleNftMetadataSource);
-  const sendMessage = useSendMessageHandler(id, metadata);
+  const collection = useCollection(id);
+  const sendMessage = useCollectionSendMessage(id);
 
-  const { state } = useReadFullState<CollectionState>(id, metadata, 'All');
-  const collection = state?.All;
-  const isOwner = state ? account?.decodedAddress === collection?.collectionOwner : false;
+  const isOwner = collection ? account?.decodedAddress === collection.collectionOwner : false;
 
   const socialEntries = Object.entries(collection?.config.additionalLinks || {}).filter(([, value]) => !!value) as [
     string,
@@ -53,7 +49,7 @@ function Collection() {
 
   const getNFTs = () =>
     collection?.tokens.map(([nftId, { name, owner, mediaUrl }]) => (
-      <NFT key={nftId} id={nftId} collectionId={id} mediaUrl={mediaUrl} name={name} owner={owner} />
+      <NFTCard key={nftId} id={nftId} collectionId={id} mediaUrl={mediaUrl} name={name} owner={owner} />
     ));
 
   return collection ? (

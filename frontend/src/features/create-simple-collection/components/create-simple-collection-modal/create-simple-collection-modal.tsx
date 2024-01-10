@@ -4,7 +4,7 @@ import { useState } from 'react';
 
 import { Container } from '@/components';
 import { useIPFS } from '@/context';
-import { useProgramMetadata, useSendMarketplaceMessage } from '@/hooks';
+import { useProgramMetadata, useMarketplaceSendMessage } from '@/hooks';
 
 import nftMetadataSource from '../../assets/nft.meta.txt';
 import {
@@ -31,7 +31,7 @@ function CreateSimpleCollectionModal({ close }: Pick<ModalProps, 'close'>) {
   const { getChainBalanceValue } = useBalanceFormat();
 
   const nftMetadata = useProgramMetadata(nftMetadataSource);
-  const sendMessage = useSendMarketplaceMessage();
+  const sendMessage = useMarketplaceSendMessage();
 
   const nextStep = () => setStepIndex((prevIndex) => prevIndex + 1);
   const prevStep = () => setStepIndex((prevIndex) => prevIndex - 1);

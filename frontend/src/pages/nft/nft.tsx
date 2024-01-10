@@ -1,12 +1,11 @@
 import { HexString } from '@gear-js/api';
-import { useReadFullState, withoutCommas } from '@gear-js/react-hooks';
+import { withoutCommas } from '@gear-js/react-hooks';
 import { Identicon } from '@polkadot/react-identicon';
 import { useState } from 'react';
 import { useParams } from 'react-router-dom';
 
 import { Container, CopyButton } from '@/components';
-import { CollectionState, MarketplaceState } from '@/features/collections/types';
-import { useMarketplaceState, useProgramMetadata } from '@/hooks';
+import { useCollection } from '@/hooks';
 import { cx, getIpfsLink } from '@/utils';
 
 import InfoSVG from './info.svg?react';
@@ -16,25 +15,6 @@ type Params = {
   collectionId: HexString;
   id: string;
 };
-
-function useNFT(collectionId: HexString, id: string) {
-  const [marketplaceState] = useMarketplaceState<MarketplaceState>('All');
-
-  const collections = marketplaceState?.All.collectionToOwner;
-  const collectionTypes = marketplaceState?.All.typeCollections;
-
-  const collection = collections?.find(([_collectionId]) => _collectionId === collectionId);
-  const collectionTypeName = collection ? collection[1][0] : '';
-
-  const collectionType = collectionTypes?.find(([typeName]) => typeName === collectionTypeName);
-  const collectionMetadataLink = collectionType ? getIpfsLink(collectionType[1].metaLink) : '';
-
-  const metadata = useProgramMetadata(collectionMetadataLink);
-  const { state: collectionState } = useReadFullState<CollectionState>(collectionId, metadata, 'All');
-  const nft = collectionState?.All.tokens.find(([_id]) => _id === id);
-
-  return [nft?.[1], collectionState?.All.config.royalty] as const;
-}
 
 const getDetailEntries = (
   collectionId: HexString,
@@ -71,11 +51,15 @@ const TAB_BUTTONS = [
 
 function NFT() {
   const { collectionId, id } = useParams() as Params;
-  const [nft, royalty] = useNFT(collectionId, id);
+
+  const collection = useCollection(collectionId);
+  const { config } = collection || {};
+  const [, nft] = collection?.tokens.find(([_id]) => _id === id) || [];
+
   const [tab] = useState('Overview');
 
   const getDetails = () =>
-    getDetailEntries(collectionId, id, 'gNFT', nft?.mintTime, royalty).map(({ key, value }) => (
+    getDetailEntries(collectionId, id, 'gNFT', nft?.mintTime, config?.royalty).map(({ key, value }) => (
       <li key={key} className={styles.row}>
         <span>{key}:</span>
         <span className={styles.value}>{value}</span>
