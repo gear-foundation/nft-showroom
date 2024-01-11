@@ -27,9 +27,13 @@
   color: #93989a;
 }
 
-.buttons {
-  margin-top: 24px;
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
 
+.buttons {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 24px;

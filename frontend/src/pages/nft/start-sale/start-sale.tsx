@@ -1,22 +1,19 @@
 import { HexString } from '@gear-js/api';
 import { useBalanceFormat } from '@gear-js/react-hooks';
-import { Button, Input, ModalProps } from '@gear-js/vara-ui';
+import { Button, ModalProps } from '@gear-js/vara-ui';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
+import { PriceInput } from '@/components';
 import { useMarketplaceSendMessage, useModal } from '@/hooks';
-import VaraSVG from '@/assets/vara.svg?react';
 
 import TagSVG from '../assets/tag.svg?react';
 import { NFTActionFormModal } from '../nft-action-form-modal';
 
 type Props = {
-  nftId: string;
-  nftName: string;
-  nftSrc: string;
-  collectionId: HexString;
-  collectionName: string;
+  nft: { id: string; name: string; mediaUrl: string };
+  collection: { id: HexString; name: string };
 };
 
 const defaultValues = {
@@ -29,14 +26,7 @@ const schema = z.object({
 
 const resolver = zodResolver(schema);
 
-function StartSaleModal({
-  nftId,
-  nftName,
-  nftSrc,
-  collectionId,
-  collectionName,
-  close,
-}: Props & Pick<ModalProps, 'close'>) {
+function StartSaleModal({ nft, collection, close }: Props & Pick<ModalProps, 'close'>) {
   const { getChainBalanceValue } = useBalanceFormat();
   const sendMessage = useMarketplaceSendMessage();
 
@@ -44,8 +34,8 @@ function StartSaleModal({
   const { errors } = formState;
 
   const onSubmit = handleSubmit((data) => {
-    const tokenId = nftId;
-    const collectionAddress = collectionId;
+    const tokenId = nft.id;
+    const collectionAddress = collection.id;
     const price = getChainBalanceValue(data.price).toFixed();
 
     const onSuccess = close;
@@ -54,36 +44,23 @@ function StartSaleModal({
     sendMessage({ payload, onSuccess });
   });
 
+  const modalProps = { heading: 'Start Sale', close, onSubmit };
+
   return (
-    <NFTActionFormModal
-      heading="Start Sale"
-      close={close}
-      onSubmit={onSubmit}
-      nftName={nftName}
-      nftSrc={nftSrc}
-      collectionName={collectionName}>
-      <Input type="number" icon={VaraSVG} label="Price" {...register('price')} error={errors.price?.message} />
+    <NFTActionFormModal modal={modalProps} nft={nft} collection={collection}>
+      <PriceInput label="Price" {...register('price')} error={errors.price?.message} />
     </NFTActionFormModal>
   );
 }
 
-function StartSale({ nftId, nftName, nftSrc, collectionId, collectionName }: Props) {
+function StartSale({ nft, collection }: Props) {
   const [isOpen, open, close] = useModal();
 
   return (
     <>
       <Button icon={TagSVG} text="Start sale" size="small" onClick={open} />
 
-      {isOpen && (
-        <StartSaleModal
-          nftId={nftId}
-          nftName={nftName}
-          nftSrc={nftSrc}
-          collectionId={collectionId}
-          collectionName={collectionName}
-          close={close}
-        />
-      )}
+      {isOpen && <StartSaleModal nft={nft} collection={collection} close={close} />}
     </>
   );
 }

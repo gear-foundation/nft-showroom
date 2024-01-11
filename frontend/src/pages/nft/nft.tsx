@@ -107,18 +107,10 @@ function NFT() {
 
         {isOwner && (!!config.sellable || !!config.transferable) && (
           <div className={styles.buttons}>
-            {!!config.sellable && (
-              <StartSale
-                nftId={id}
-                nftName={nft.name}
-                nftSrc={getIpfsLink(nft.mediaUrl)}
-                collectionId={collectionId}
-                collectionName={config.name}
-              />
-            )}
-            {!!config.sellable && <StartAuction />}
+            {!!config.sellable && <StartSale nft={{ ...nft, id }} collection={{ ...config, id: collectionId }} />}
+            {!!config.sellable && <StartAuction nft={{ ...nft, id }} collection={{ ...config, id: collectionId }} />}
 
-            <TransferNFT />
+            <TransferNFT nft={{ ...nft, id }} collection={{ ...config, id: collectionId }} />
           </div>
         )}
 

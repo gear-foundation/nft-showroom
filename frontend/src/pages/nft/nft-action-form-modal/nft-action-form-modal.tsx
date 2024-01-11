@@ -1,27 +1,32 @@
 import { Button, Modal, ModalProps } from '@gear-js/vara-ui';
+import { ReactNode } from 'react';
+
+import { getIpfsLink } from '@/utils';
 
 import styles from './nft-action-form-modal.module.scss';
 
-type Props = Pick<ModalProps, 'heading' | 'close' | 'children'> & {
-  nftName: string;
-  nftSrc: string;
-  collectionName: string;
-  onSubmit: () => void;
+type Props = {
+  modal: Pick<ModalProps, 'heading' | 'close'> & { onSubmit: () => void };
+  nft: { name: string; mediaUrl: string };
+  collection: { name: string };
+  children: ReactNode;
 };
 
-function NFTActionFormModal({ heading, close, children, nftName, nftSrc, collectionName, onSubmit }: Props) {
+function NFTActionFormModal({ modal, nft, collection, children }: Props) {
+  const { heading, close, onSubmit } = modal;
+
   return (
     <Modal heading={heading} close={close}>
       <div className={styles.nft}>
-        <img src={nftSrc} alt="" className={styles.image} />
+        <img src={getIpfsLink(nft.mediaUrl)} alt="" className={styles.image} />
 
         <div>
-          <h4 className={styles.name}>{nftName}</h4>
-          <p className={styles.collectionName}>{collectionName}</p>
+          <h4 className={styles.name}>{nft.name}</h4>
+          <p className={styles.collectionName}>{collection.name}</p>
         </div>
       </div>
 
-      <form onSubmit={onSubmit}>
+      <form onSubmit={onSubmit} className={styles.form}>
         {children}
 
         <div className={styles.buttons}>
