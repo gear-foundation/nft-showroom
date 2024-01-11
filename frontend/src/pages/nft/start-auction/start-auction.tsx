@@ -6,7 +6,7 @@ import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
 import { PriceInput } from '@/components';
-import { useMarketplaceSendMessage, useModal } from '@/hooks';
+import { useModal, useNFTSendMessage } from '@/hooks';
 
 import BidSVG from '../assets/bid.svg?react';
 import { NFTActionFormModal } from '../nft-action-form-modal';
@@ -40,7 +40,7 @@ function StartAuctionModal({ nft, collection, close }: Props & Pick<ModalProps, 
   const { errors } = formState;
 
   const { getChainBalanceValue } = useBalanceFormat();
-  const sendMessage = useMarketplaceSendMessage();
+  const sendMessage = useNFTSendMessage(collection.id);
 
   const onSubmit = handleSubmit((data) => {
     const collectionAddress = collection.id;

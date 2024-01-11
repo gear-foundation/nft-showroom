@@ -6,7 +6,7 @@ import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
 import { PriceInput } from '@/components';
-import { useMarketplaceSendMessage, useModal } from '@/hooks';
+import { useModal, useNFTSendMessage } from '@/hooks';
 
 import TagSVG from '../assets/tag.svg?react';
 import { NFTActionFormModal } from '../nft-action-form-modal';
@@ -28,7 +28,7 @@ const resolver = zodResolver(schema);
 
 function StartSaleModal({ nft, collection, close }: Props & Pick<ModalProps, 'close'>) {
   const { getChainBalanceValue } = useBalanceFormat();
-  const sendMessage = useMarketplaceSendMessage();
+  const sendMessage = useNFTSendMessage(collection.id);
 
   const { handleSubmit, register, formState } = useForm({ defaultValues, resolver });
   const { errors } = formState;

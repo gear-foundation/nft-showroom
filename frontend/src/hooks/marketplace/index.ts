@@ -7,6 +7,7 @@ import { CollectionState, CollectionsState, MarketplaceState } from '@/features/
 import { getIpfsLink } from '@/utils';
 
 import { useProgramMetadata } from '../use-program-metadata';
+import { AnyJson } from '@polkadot/types/types';
 
 function useMarketplaceMetadata() {
   return useProgramMetadata(metadataSource);
@@ -52,10 +53,35 @@ function useCollectionSendMessage(collectionId: HexString) {
   return useSendMessageHandler(collectionId, metadata);
 }
 
+function useNFTSendMessage(collectionId: HexString) {
+  const sendMarketplaceMessage = useMarketplaceSendMessage();
+  const sendCollectionMessage = useCollectionSendMessage(collectionId);
+
+  return (args: {
+    payload: Record<string, Record<'tokenId', string> | Record<string, AnyJson>>;
+    onSuccess: () => void;
+  }) => {
+    const to = ADDRESS.CONTRACT;
+    const [{ tokenId }] = Object.values(args.payload);
+
+    const payload = { Approve: { to, tokenId } };
+    const onSuccess = () => sendMarketplaceMessage(args);
+
+    sendCollectionMessage({ payload, onSuccess });
+  };
+}
+
 function useCollectionIds() {
   const { state } = useMarketplaceState<CollectionsState>('AllCollections');
 
   return state?.AllCollections;
 }
 
-export { useMarketplaceMetadata, useMarketplaceSendMessage, useCollection, useCollectionSendMessage, useCollectionIds };
+export {
+  useMarketplaceMetadata,
+  useMarketplaceSendMessage,
+  useCollection,
+  useCollectionSendMessage,
+  useNFTSendMessage,
+  useCollectionIds,
+};
