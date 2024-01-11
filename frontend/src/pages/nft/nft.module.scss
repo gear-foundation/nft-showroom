@@ -58,6 +58,37 @@
   gap: 20px;
 }
 
+.listing {
+  margin-bottom: 32px;
+  padding: 24px 16px;
+
+  border: 1px solid #00ffc4;
+  border-radius: 15px;
+
+  &Heading {
+    margin-bottom: 20px;
+
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 19px;
+    letter-spacing: 0.02em;
+
+    svg {
+      margin-right: 10px;
+    }
+  }
+
+  &Card {
+    padding: 24px 16px;
+
+    display: flex;
+    justify-content: space-between;
+
+    background-color: #959da533;
+    border-radius: 15px;
+  }
+}
+
 .tabButtons {
   margin-bottom: 24px;
 

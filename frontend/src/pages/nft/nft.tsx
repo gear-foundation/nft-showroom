@@ -1,18 +1,22 @@
 import { HexString } from '@gear-js/api';
-import { useAccount, withoutCommas } from '@gear-js/react-hooks';
+import { useAccount, useBalanceFormat, withoutCommas } from '@gear-js/react-hooks';
 import { Identicon } from '@polkadot/react-identicon';
 import { useState } from 'react';
 import { useParams } from 'react-router-dom';
 
+import VaraSVG from '@/assets/vara.svg?react';
 import { Container, CopyButton } from '@/components';
-import { useCollection } from '@/hooks';
+import { InfoCard } from '@/features/collections/components/info-card';
+import { useCollection, useListing } from '@/hooks';
 import { cx, getIpfsLink } from '@/utils';
 
+import TagSVG from './assets/tag.svg?react';
 import { StartSale } from './start-sale';
 import { StartAuction } from './start-auction';
 import { TransferNFT } from './transfer-nft';
 import InfoSVG from './info.svg?react';
 import styles from './nft.module.scss';
+import { BuyNft } from './buy-nft';
 
 type Params = {
   collectionId: HexString;
@@ -55,13 +59,17 @@ const TAB_BUTTONS = [
 function NFT() {
   const { collectionId, id } = useParams() as Params;
   const { account } = useAccount();
+  const { getFormattedBalance } = useBalanceFormat();
 
   const collection = useCollection(collectionId);
   const { config } = collection || {};
-  console.log('collection: ', collection);
+
+  const { sale } = useListing(collectionId, id);
+  const price = sale
+    ? `${getFormattedBalance(withoutCommas(sale.price)).value} ${getFormattedBalance(withoutCommas(sale.price)).unit}`
+    : '';
 
   const [, nft] = collection?.tokens.find(([_id]) => _id === id) || [];
-  console.log('nft: ', nft);
 
   const isOwner = nft?.owner === account?.decodedAddress;
 
@@ -104,6 +112,19 @@ function NFT() {
             Owned by <span className={styles.ownerAddress}>{nft.owner}</span>
           </p>
         </div>
+
+        {sale && (
+          <div className={styles.listing}>
+            <p className={styles.listingHeading}>
+              <TagSVG /> Sale is Active
+            </p>
+
+            <div className={styles.listingCard}>
+              <InfoCard SVG={VaraSVG} heading="Price" text={price} size="large" />
+              <BuyNft id={id} collectionId={collectionId} />
+            </div>
+          </div>
+        )}
 
         {isOwner && (!!config.sellable || !!config.transferable) && (
           <div className={styles.buttons}>

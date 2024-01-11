@@ -45,10 +45,10 @@ function StartAuctionModal({ nft, collection, close }: Props & Pick<ModalProps, 
   const onSubmit = handleSubmit((data) => {
     const collectionAddress = collection.id;
     const tokenId = nft.id;
-    const duration = getMilliseconds(+data.duration);
+    const durationMs = getMilliseconds(+data.duration);
     const minPrice = getChainBalanceValue(data.minPrice).toFixed();
 
-    const payload = { CreateAuction: { collectionAddress, tokenId, minPrice, duration } };
+    const payload = { CreateAuction: { collectionAddress, tokenId, minPrice, durationMs } };
     const onSuccess = close;
 
     sendMessage({ payload, onSuccess });

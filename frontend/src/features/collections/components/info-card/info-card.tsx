@@ -8,12 +8,13 @@ type Props = {
   heading: string;
   text: string;
   SVG?: FunctionComponent<SVGProps<SVGSVGElement> & { title?: string | undefined }>;
+  size?: 'large' | 'small';
   color?: 'dark' | 'light';
 };
 
-function InfoCard({ heading, text, SVG, color = 'dark' }: Props) {
+function InfoCard({ heading, text, SVG, color = 'dark', size = 'small' }: Props) {
   return (
-    <div className={cx(styles.card, styles[color])}>
+    <div className={cx(styles.card, styles[color], styles[size])}>
       {SVG && <SVG />}
 
       <div className={styles.body}>

@@ -77,6 +77,20 @@ function useCollectionIds() {
   return state?.AllCollections;
 }
 
+function useListing(collectionId: HexString, nftId: string) {
+  const { state } = useMarketplaceState<MarketplaceState>('all');
+
+  const sale = state?.All.sales.find(
+    ([[_collectionId, _nftId]]) => _collectionId === collectionId && _nftId === nftId,
+  )?.[1];
+
+  const auction = state?.All.auctions.find(
+    ([[_collectionId, _nftId]]) => _collectionId === collectionId && _nftId === nftId,
+  )?.[1];
+
+  return { sale, auction };
+}
+
 export {
   useMarketplaceMetadata,
   useMarketplaceSendMessage,
@@ -84,4 +98,5 @@ export {
   useCollectionSendMessage,
   useNFTSendMessage,
   useCollectionIds,
+  useListing,
 };

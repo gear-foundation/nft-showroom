@@ -8,6 +8,7 @@ import {
   useCollectionSendMessage,
   useNFTSendMessage,
   useCollectionIds,
+  useListing,
 } from './marketplace';
 
 export {
@@ -20,4 +21,5 @@ export {
   useCollectionSendMessage,
   useNFTSendMessage,
   useCollectionIds,
+  useListing,
 };
