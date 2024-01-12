@@ -3,13 +3,14 @@ import { Button } from '@gear-js/vara-ui';
 import { useParams } from 'react-router-dom';
 
 import { Container } from '@/components';
-import { useCollection, useCollectionSendMessage } from '@/hooks';
+import { useCollection } from '@/hooks';
 import { getIpfsLink } from '@/utils';
 
 import LandscapeSVG from '../../assets/landscape.svg?react';
 import UserSVG from '../../assets/user.svg?react';
 import { SOCIAL_ICON } from '../../consts';
 import { InfoCard } from '../info-card';
+import { MintNFT } from '../mint-nft';
 import { NFTCard } from '../nft-card';
 
 import styles from './collection.module.scss';
@@ -22,7 +23,6 @@ function Collection() {
   const { id } = useParams() as Params;
 
   const collection = useCollection(id);
-  const sendMessage = useCollectionSendMessage(id);
 
   const socialEntries = Object.entries(collection?.config.additionalLinks || {}).filter(([, value]) => !!value) as [
     string,
@@ -42,11 +42,9 @@ function Collection() {
       );
     });
 
-  const handleMintClick = () => sendMessage({ payload: { Mint: null } });
-
   const getNFTs = () =>
-    collection?.tokens.map(([nftId, { name, owner, mediaUrl }]) => (
-      <NFTCard key={nftId} id={nftId} collectionId={id} mediaUrl={mediaUrl} name={name} owner={owner} />
+    collection?.tokens.map(([nftId, nft]) => (
+      <NFTCard key={nftId} nft={{ ...nft, id: nftId }} collection={{ ...collection.config, id }} />
     ));
 
   return collection ? (
@@ -56,7 +54,7 @@ function Collection() {
           className={styles.cover}
           style={{ backgroundImage: `url(${getIpfsLink(collection.config.collectionBanner)})` }}>
           <div className={styles.infoCards}>
-            <InfoCard heading="Creator" text={collection.collectionOwner} SVG={UserSVG} color="light" />
+            <InfoCard heading="Creator" text={collection.collectionOwner} SVG={UserSVG} color="light" textOverflow />
             <InfoCard
               heading="Unlimited series"
               text={`${collection.tokens.length} NFTs`}
@@ -75,10 +73,9 @@ function Collection() {
               <p className={styles.description}>{collection.config.description}</p>
             </div>
 
-            <div>
+            <div className={styles.actions}>
               {!!socialEntries.length && <ul className={styles.socials}>{getSocials()}</ul>}
-
-              <Button text="Mint NFT" size="small" onClick={handleMintClick} block />
+              <MintNFT collectionId={id} />
             </div>
           </div>
         </div>

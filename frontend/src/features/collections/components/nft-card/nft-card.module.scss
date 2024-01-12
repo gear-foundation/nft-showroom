@@ -3,7 +3,6 @@
   overflow: hidden;
 
   box-shadow: 0px 4px 100px 0px #cacaca33;
-  transition: 0.25s opacity;
 
   img {
     width: 100%;
@@ -11,8 +10,12 @@
     object-fit: cover;
   }
 
-  &:hover {
-    opacity: 0.75;
+  a {
+    transition: 0.25s opacity;
+
+    &:hover {
+      opacity: 0.75;
+    }
   }
 }
 
@@ -44,4 +47,10 @@
   .address {
     font-weight: 600;
   }
+}
+
+.footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
