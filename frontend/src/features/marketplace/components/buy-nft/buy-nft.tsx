@@ -1,6 +1,7 @@
 import { HexString } from '@gear-js/api';
 import { Button } from '@gear-js/vara-ui';
 
+import { withAccount } from '@/components';
 import { useMarketplaceSendMessage } from '@/hooks';
 
 type Props = {
@@ -9,7 +10,7 @@ type Props = {
   price: string;
 };
 
-function BuyNFT({ id, collectionId, price }: Props) {
+function Component({ id, collectionId, price }: Props) {
   const sendMessage = useMarketplaceSendMessage();
 
   const handleClick = () => {
@@ -24,5 +25,7 @@ function BuyNFT({ id, collectionId, price }: Props) {
 
   return <Button text="Buy" size="small" onClick={handleClick} />;
 }
+
+const BuyNFT = withAccount(Component);
 
 export { BuyNFT };

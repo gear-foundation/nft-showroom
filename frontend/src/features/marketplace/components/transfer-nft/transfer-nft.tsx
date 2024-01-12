@@ -4,6 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
+import { withAccount } from '@/components';
 import { useCollectionSendMessage, useModal } from '@/hooks';
 
 import PlaneSVG from '../../assets/plane.svg?react';
@@ -55,7 +56,7 @@ function TransferNFTModal({ nft, collection, close }: Props & Pick<ModalProps, '
   );
 }
 
-function TransferNFT(props: Props) {
+function Component(props: Props) {
   const [isOpen, open, close] = useModal();
 
   return (
@@ -66,5 +67,7 @@ function TransferNFT(props: Props) {
     </>
   );
 }
+
+const TransferNFT = withAccount(Component);
 
 export { TransferNFT };

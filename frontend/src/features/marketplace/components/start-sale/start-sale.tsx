@@ -5,7 +5,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
-import { PriceInput } from '@/components';
+import { PriceInput, withAccount } from '@/components';
 import { useModal, useNFTSendMessage } from '@/hooks';
 
 import TagSVG from '../../assets/tag.svg?react';
@@ -53,7 +53,7 @@ function StartSaleModal({ nft, collection, close }: Props & Pick<ModalProps, 'cl
   );
 }
 
-function StartSale({ nft, collection }: Props) {
+function Component({ nft, collection }: Props) {
   const [isOpen, open, close] = useModal();
 
   return (
@@ -64,5 +64,7 @@ function StartSale({ nft, collection }: Props) {
     </>
   );
 }
+
+const StartSale = withAccount(Component);
 
 export { StartSale };

@@ -5,7 +5,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
-import { PriceInput } from '@/components';
+import { PriceInput, withAccount } from '@/components';
 import { useMarketplaceSendMessage, useModal } from '@/hooks';
 
 import { NFTActionFormModal } from '../nft-action-form-modal';
@@ -58,7 +58,7 @@ function MakeBidModal({ nft, collection, auction, close }: Props & Pick<ModalPro
   );
 }
 
-function MakeBid(props: Props) {
+function Component(props: Props) {
   const [isOpen, open, close] = useModal();
 
   return (
@@ -69,5 +69,7 @@ function MakeBid(props: Props) {
     </>
   );
 }
+
+const MakeBid = withAccount(Component);
 
 export { MakeBid };
