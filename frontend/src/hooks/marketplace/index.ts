@@ -1,5 +1,6 @@
 import { HexString } from '@gear-js/api';
 import { useReadFullState, useSendMessageHandler } from '@gear-js/react-hooks';
+import { AnyJson } from '@polkadot/types/types';
 
 import metadataSource from '@/assets/nft_marketplace.meta.txt';
 import { ADDRESS } from '@/consts';
@@ -7,7 +8,6 @@ import { CollectionState, CollectionsState, MarketplaceState } from '@/features/
 import { getIpfsLink } from '@/utils';
 
 import { useProgramMetadata } from '../use-program-metadata';
-import { AnyJson } from '@polkadot/types/types';
 
 function useMarketplaceMetadata() {
   return useProgramMetadata(metadataSource);

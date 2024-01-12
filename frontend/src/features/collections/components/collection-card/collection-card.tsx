@@ -1,12 +1,12 @@
+import { HexString } from '@gear-js/api';
 import { Identicon } from '@polkadot/react-identicon';
 import { Link, generatePath } from 'react-router-dom';
 
 import { ROUTE } from '@/consts';
+import { useCollection } from '@/hooks';
 import { getIpfsLink } from '@/utils';
 
 import styles from './collection-card.module.scss';
-import { HexString } from '@gear-js/api';
-import { useCollection } from '@/hooks';
 
 type Props = {
   id: HexString;

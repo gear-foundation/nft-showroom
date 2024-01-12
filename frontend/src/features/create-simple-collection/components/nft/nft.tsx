@@ -1,8 +1,9 @@
 import { Checkbox, Input } from '@gear-js/vara-ui';
-import { UseFormRegisterReturn } from 'react-hook-form';
 import { useEffect, useState } from 'react';
+import { UseFormRegisterReturn } from 'react-hook-form';
 
 import { DeleteButton } from '../delete-button';
+
 import styles from './nft.module.scss';
 
 type Props = {

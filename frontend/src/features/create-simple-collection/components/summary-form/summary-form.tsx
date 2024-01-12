@@ -1,22 +1,23 @@
 import { Button, Input, Textarea } from '@gear-js/vara-ui';
-import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
-import WebSVG from '@/assets/web.svg?react';
+import DiscordSVG from '@/assets/discord.svg?react';
+import MediumSVG from '@/assets/medium.svg?react';
 import TelegramSVG from '@/assets/telegram.svg?react';
 import TwitterSVG from '@/assets/twitter.svg?react';
-import MediumSVG from '@/assets/medium.svg?react';
-import DiscordSVG from '@/assets/discord.svg?react';
+import WebSVG from '@/assets/web.svg?react';
 import { Container } from '@/components';
 
 import CameraSVG from '../../assets/camera.svg?react';
 import PlaceholderSVG from '../../assets/placeholder.svg?react';
 import { IMAGE_TYPES } from '../../consts';
-import { SummaryValues } from '../../types';
 import { useImageInput } from '../../hooks';
+import { SummaryValues } from '../../types';
 import { getFileUrl } from '../../utils';
 import { DeleteButton } from '../delete-button';
+
 import styles from './summary-form.module.scss';
 
 type Props = {

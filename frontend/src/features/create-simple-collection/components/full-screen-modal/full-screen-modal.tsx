@@ -6,6 +6,7 @@ import { Balance } from '@/features/wallet';
 import { cx } from '@/utils';
 
 import CrossSVG from '../../assets/cross.svg?react';
+
 import styles from './full-screen-modal.module.scss';
 
 type Props = {

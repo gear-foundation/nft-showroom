@@ -1,5 +1,5 @@
-import { Button } from '@gear-js/vara-ui';
 import { useAccount } from '@gear-js/react-hooks';
+import { Button } from '@gear-js/vara-ui';
 
 import { useModal } from '@/hooks';
 

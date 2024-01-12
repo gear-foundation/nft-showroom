@@ -4,11 +4,11 @@ import { Identicon } from '@polkadot/react-identicon';
 import { useState } from 'react';
 import { useParams } from 'react-router-dom';
 
-import TagSVG from '@/features/marketplace/assets/tag.svg?react';
-import BidSVG from '@/features/marketplace/assets/bid.svg?react';
-import { BuyNFT, MakeBid, StartSale, StartAuction, TransferNFT } from '@/features/marketplace';
-import { PriceInfoCard } from '@/features/marketplace/components/price-info-card';
 import { Container, CopyButton } from '@/components';
+import { BuyNFT, MakeBid, StartSale, StartAuction, TransferNFT } from '@/features/marketplace';
+import BidSVG from '@/features/marketplace/assets/bid.svg?react';
+import TagSVG from '@/features/marketplace/assets/tag.svg?react';
+import { PriceInfoCard } from '@/features/marketplace/components/price-info-card';
 import { useCollection, useListing } from '@/hooks';
 import { cx, getIpfsLink } from '@/utils';
 

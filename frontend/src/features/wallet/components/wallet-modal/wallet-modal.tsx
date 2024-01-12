@@ -1,5 +1,6 @@
 import { decodeAddress } from '@gear-js/api';
 import { useAccount, useAlert } from '@gear-js/react-hooks';
+import { Button, Modal } from '@gear-js/vara-ui';
 
 import CopySVG from '../../assets/copy.svg?react';
 import ExitSVG from '../../assets/exit.svg?react';
@@ -7,8 +8,8 @@ import { WALLETS } from '../../consts';
 import { useWallet } from '../../hooks';
 import { AccountButton } from '../account-button';
 import { WalletItem } from '../wallet-item';
+
 import styles from './wallet-modal.module.scss';
-import { Button, Modal } from '@gear-js/vara-ui';
 
 type Props = {
   close: () => void;

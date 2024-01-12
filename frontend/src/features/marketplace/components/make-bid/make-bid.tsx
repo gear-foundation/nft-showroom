@@ -1,12 +1,14 @@
-import { useMarketplaceSendMessage, useModal } from '@/hooks';
-import { NFTActionFormModal } from '../nft-action-form-modal';
-import { Button, ModalProps } from '@gear-js/vara-ui';
 import { HexString } from '@gear-js/api';
-import { useForm } from 'react-hook-form';
-import { PriceInput } from '@/components';
-import { z } from 'zod';
-import { zodResolver } from '@hookform/resolvers/zod';
 import { useBalanceFormat } from '@gear-js/react-hooks';
+import { Button, ModalProps } from '@gear-js/vara-ui';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useForm } from 'react-hook-form';
+import { z } from 'zod';
+
+import { PriceInput } from '@/components';
+import { useMarketplaceSendMessage, useModal } from '@/hooks';
+
+import { NFTActionFormModal } from '../nft-action-form-modal';
 
 type Props = {
   nft: { id: string; name: string; mediaUrl: string };

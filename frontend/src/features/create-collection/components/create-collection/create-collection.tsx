@@ -3,6 +3,7 @@ import { useModal } from '@/hooks';
 
 import ArrowSVG from '../../assets/right-arrow.svg?react';
 import { COLLECTION_TYPES } from '../../consts';
+
 import styles from './create-collection.module.scss';
 
 function CreateCollection() {

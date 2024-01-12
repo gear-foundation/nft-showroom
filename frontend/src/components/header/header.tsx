@@ -6,6 +6,7 @@ import { Wallet, Balance } from '@/features/wallet';
 import { ButtonLink } from '../button-link';
 import { Container } from '../container';
 import { Logo } from '../logo';
+
 import styles from './header.module.scss';
 
 function Header() {

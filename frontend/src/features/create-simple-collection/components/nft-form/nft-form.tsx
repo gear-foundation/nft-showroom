@@ -11,6 +11,7 @@ import { useImageInput } from '../../hooks';
 import { NFTsValues } from '../../types';
 import { getFileUrl } from '../../utils';
 import { NFT } from '../nft';
+
 import styles from './nft-form.module.scss';
 
 type Props = {

@@ -1,8 +1,10 @@
 import { Button } from '@gear-js/vara-ui';
 
-import TrashSVG from '../../assets/trash.svg?react';
-import styles from './delete-button.module.scss';
 import { cx } from '@/utils';
+
+import TrashSVG from '../../assets/trash.svg?react';
+
+import styles from './delete-button.module.scss';
 
 type Props = {
   className?: string;

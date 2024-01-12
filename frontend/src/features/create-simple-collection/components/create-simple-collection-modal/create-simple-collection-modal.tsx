@@ -16,9 +16,9 @@ import {
 } from '../../consts';
 import { NFT, NFTsValues, ParametersValues, SummaryValues } from '../../types';
 import { FullScreenModal } from '../full-screen-modal';
-import { SummaryForm } from '../summary-form';
-import { ParametersForm } from '../parameters-form';
 import { NFTForm } from '../nft-form';
+import { ParametersForm } from '../parameters-form';
+import { SummaryForm } from '../summary-form';
 
 function CreateSimpleCollectionModal({ close }: Pick<ModalProps, 'close'>) {
   const [stepIndex, setStepIndex] = useState(0);

@@ -1,4 +1,5 @@
 import { FunctionComponent, SVGProps } from 'react';
+
 import styles from './wallet-item.module.scss';
 
 type Props = {

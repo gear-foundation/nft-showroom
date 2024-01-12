@@ -1,6 +1,7 @@
 import { useCollectionIds } from '@/hooks';
 
 import { CollectionCard } from '../collection-card';
+
 import styles from './collections.module.scss';
 
 function Collections() {

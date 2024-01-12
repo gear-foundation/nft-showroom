@@ -7,8 +7,8 @@ import {
 import { Alert, alertStyles } from '@gear-js/vara-ui';
 import { ComponentType } from 'react';
 
-import { IPFSProvider as GearIPFSProvider } from './context';
 import { ADDRESS } from './consts';
+import { IPFSProvider as GearIPFSProvider } from './context';
 
 function ApiProvider({ children }: ProviderProps) {
   return <GearApiProvider initialArgs={{ endpoint: ADDRESS.NODE }}>{children}</GearApiProvider>;

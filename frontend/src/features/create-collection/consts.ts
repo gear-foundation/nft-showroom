@@ -1,5 +1,5 @@
-import PictureSVG from './assets/picture.svg?react';
 import NoteSVG from './assets/note.svg?react';
+import PictureSVG from './assets/picture.svg?react';
 import PuzzleSVG from './assets/puzzle.svg?react';
 
 const COLLECTION_TYPES = [

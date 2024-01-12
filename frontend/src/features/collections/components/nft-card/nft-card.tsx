@@ -5,6 +5,7 @@ import { ROUTE } from '@/consts';
 import { getIpfsLink } from '@/utils';
 
 import { InfoCard } from '../info-card';
+
 import styles from './nft-card.module.scss';
 
 type Props = {

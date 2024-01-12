@@ -3,9 +3,9 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { RouterProvider, createBrowserRouter } from 'react-router-dom';
 
+import { App } from './App';
 import { ROUTE } from './consts';
 import { Collection, CreateCollection, Home, NFT } from './pages';
-import { App } from './App';
 import './index.scss';
 
 const ROUTES = [

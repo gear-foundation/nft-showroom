@@ -1,5 +1,6 @@
 import { Container } from '../container';
 import { Logo } from '../logo';
+
 import { LIST } from './consts';
 import styles from './footer.module.scss';
 

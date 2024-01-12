@@ -6,11 +6,12 @@ import { Container } from '@/components';
 import { useCollection, useCollectionSendMessage } from '@/hooks';
 import { getIpfsLink } from '@/utils';
 
-import UserSVG from '../../assets/user.svg?react';
 import LandscapeSVG from '../../assets/landscape.svg?react';
+import UserSVG from '../../assets/user.svg?react';
 import { SOCIAL_ICON } from '../../consts';
 import { InfoCard } from '../info-card';
 import { NFTCard } from '../nft-card';
+
 import styles from './collection.module.scss';
 
 type Params = {
