@@ -1,14 +1,15 @@
+import { HexString } from '@gear-js/api';
 import { Button } from '@gear-js/vara-ui';
 
 import { useMarketplaceSendMessage } from '@/hooks';
-import { HexString } from '@gear-js/api';
 
 type Props = {
   id: string;
   collectionId: HexString;
+  price: string;
 };
 
-function BuyNft({ id, collectionId }: Props) {
+function BuyNft({ id, collectionId, price }: Props) {
   const sendMessage = useMarketplaceSendMessage();
 
   const handleClick = () => {
@@ -16,8 +17,9 @@ function BuyNft({ id, collectionId }: Props) {
     const collectionAddress = collectionId;
 
     const payload = { BuyNft: { tokenId, collectionAddress } };
+    const value = price;
 
-    sendMessage({ payload });
+    sendMessage({ payload, value });
   };
 
   return <Button text="Buy" size="small" onClick={handleClick} />;

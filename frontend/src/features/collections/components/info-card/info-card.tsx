@@ -10,11 +10,12 @@ type Props = {
   SVG?: FunctionComponent<SVGProps<SVGSVGElement> & { title?: string | undefined }>;
   size?: 'large' | 'small';
   color?: 'dark' | 'light';
+  textOverflow?: boolean;
 };
 
-function InfoCard({ heading, text, SVG, color = 'dark', size = 'small' }: Props) {
+function InfoCard({ heading, text, SVG, color = 'dark', size = 'small', textOverflow }: Props) {
   return (
-    <div className={cx(styles.card, styles[color], styles[size])}>
+    <div className={cx(styles.card, styles[color], styles[size], textOverflow && styles.textOverflow)}>
       {SVG && <SVG />}
 
       <div className={styles.body}>
@@ -26,3 +27,4 @@ function InfoCard({ heading, text, SVG, color = 'dark', size = 'small' }: Props)
 }
 
 export { InfoCard };
+export type { Props };

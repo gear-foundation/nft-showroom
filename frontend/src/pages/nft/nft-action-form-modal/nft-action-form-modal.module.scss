@@ -27,6 +27,18 @@
   color: #93989a;
 }
 
+.auction {
+  margin-bottom: 24px;
+  padding: 16px;
+
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+
+  background-color: #959da533;
+  border-radius: 15px;
+}
+
 .form {
   display: flex;
   flex-direction: column;

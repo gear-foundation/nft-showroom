@@ -4,19 +4,20 @@ import { Identicon } from '@polkadot/react-identicon';
 import { useState } from 'react';
 import { useParams } from 'react-router-dom';
 
-import VaraSVG from '@/assets/vara.svg?react';
 import { Container, CopyButton } from '@/components';
-import { InfoCard } from '@/features/collections/components/info-card';
 import { useCollection, useListing } from '@/hooks';
 import { cx, getIpfsLink } from '@/utils';
 
 import TagSVG from './assets/tag.svg?react';
+import BidSVG from './assets/bid.svg?react';
 import { StartSale } from './start-sale';
 import { StartAuction } from './start-auction';
 import { TransferNFT } from './transfer-nft';
+import { BuyNft } from './buy-nft';
+import { MakeBid } from './make-bid';
+import { PriceInfoCard } from './price-info-card';
 import InfoSVG from './info.svg?react';
 import styles from './nft.module.scss';
-import { BuyNft } from './buy-nft';
 
 type Params = {
   collectionId: HexString;
@@ -59,19 +60,22 @@ const TAB_BUTTONS = [
 function NFT() {
   const { collectionId, id } = useParams() as Params;
   const { account } = useAccount();
-  const { getFormattedBalance } = useBalanceFormat();
+  const { getFormattedBalanceValue } = useBalanceFormat();
 
   const collection = useCollection(collectionId);
   const { config } = collection || {};
 
-  const { sale } = useListing(collectionId, id);
-  const price = sale
-    ? `${getFormattedBalance(withoutCommas(sale.price)).value} ${getFormattedBalance(withoutCommas(sale.price)).unit}`
-    : '';
+  const { sale, auction } = useListing(collectionId, id);
+  const price = sale ? getFormattedBalanceValue(withoutCommas(sale.price)).toFixed() : '';
+  const auctionPrice = auction ? getFormattedBalanceValue(withoutCommas(auction.currentPrice)).toFixed() : '';
+  const auctionEndDate = auction ? new Date(+withoutCommas(auction.endedAt)).toLocaleString() : '';
 
   const [, nft] = collection?.tokens.find(([_id]) => _id === id) || [];
 
-  const isOwner = nft?.owner === account?.decodedAddress;
+  // after token is listed, root owner is set to marketplace contract address
+  // account owner is saved in a listing state
+  const owner = sale?.tokenOwner || auction?.owner || nft?.owner;
+  const isOwner = owner === account?.decodedAddress;
 
   const [tab] = useState('Overview');
 
@@ -106,10 +110,10 @@ function NFT() {
         <p className={styles.description}>{nft.description}</p>
 
         <div className={styles.owner}>
-          <Identicon value={nft.owner} size={24} theme="polkadot" />
+          <Identicon value={owner} size={24} theme="polkadot" />
 
           <p className={styles.ownerText}>
-            Owned by <span className={styles.ownerAddress}>{nft.owner}</span>
+            Owned by <span className={styles.ownerAddress}>{owner}</span>
           </p>
         </div>
 
@@ -120,13 +124,34 @@ function NFT() {
             </p>
 
             <div className={styles.listingCard}>
-              <InfoCard SVG={VaraSVG} heading="Price" text={price} size="large" />
-              <BuyNft id={id} collectionId={collectionId} />
+              <PriceInfoCard heading="Price" text={price} size="large" />
+
+              {!isOwner && <BuyNft id={id} collectionId={collectionId} price={withoutCommas(sale.price)} />}
             </div>
           </div>
         )}
 
-        {isOwner && (!!config.sellable || !!config.transferable) && (
+        {auction && (
+          <div className={styles.listing}>
+            <p className={styles.listingHeading}>
+              <BidSVG /> Auction Ends: {auctionEndDate}
+            </p>
+
+            <div className={styles.listingCard}>
+              <PriceInfoCard heading="Current bid" text={auctionPrice} size="large" />
+
+              {!isOwner && (
+                <MakeBid
+                  nft={{ ...nft, id }}
+                  collection={{ ...config, id: collectionId }}
+                  auction={{ minBid: auctionPrice, endDate: auctionEndDate }}
+                />
+              )}
+            </div>
+          </div>
+        )}
+
+        {isOwner && !sale && !auction && (!!config.sellable || !!config.transferable) && (
           <div className={styles.buttons}>
             {!!config.sellable && <StartSale nft={{ ...nft, id }} collection={{ ...config, id: collectionId }} />}
             {!!config.sellable && <StartAuction nft={{ ...nft, id }} collection={{ ...config, id: collectionId }} />}

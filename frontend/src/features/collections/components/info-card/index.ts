@@ -1,3 +1,4 @@
-import { InfoCard } from './info-card';
+import { InfoCard, Props } from './info-card';
 
 export { InfoCard };
+export type { Props };

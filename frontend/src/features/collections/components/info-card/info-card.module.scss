@@ -7,9 +7,12 @@
   }
 
   &.small {
-    max-width: 128px;
-
     gap: 10px;
+
+    svg {
+      width: 24px;
+      height: 24px;
+    }
   }
 
   &.large {
@@ -22,12 +25,22 @@
   }
 }
 
-.body,
-.heading,
-.text {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+.textOverflow {
+  .body,
+  .heading,
+  .text {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  &.small {
+    max-width: 128px;
+  }
+
+  &.large {
+    max-width: 256px;
+  }
 }
 
 .heading {
