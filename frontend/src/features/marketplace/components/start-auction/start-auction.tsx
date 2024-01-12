@@ -8,7 +8,7 @@ import { z } from 'zod';
 import { PriceInput } from '@/components';
 import { useModal, useNFTSendMessage } from '@/hooks';
 
-import BidSVG from '../assets/bid.svg?react';
+import BidSVG from '../../assets/bid.svg?react';
 import { NFTActionFormModal } from '../nft-action-form-modal';
 
 type Props = {

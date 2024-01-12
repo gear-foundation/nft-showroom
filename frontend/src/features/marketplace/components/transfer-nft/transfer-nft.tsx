@@ -1,13 +1,13 @@
 import { HexString, decodeAddress } from '@gear-js/api';
 import { Button, Input, ModalProps } from '@gear-js/vara-ui';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
+import { z } from 'zod';
 
 import { useCollectionSendMessage, useModal } from '@/hooks';
 
-import PlaneSVG from '../assets/plane.svg?react';
+import PlaneSVG from '../../assets/plane.svg?react';
 import { NFTActionFormModal } from '../nft-action-form-modal';
-import { z } from 'zod';
-import { zodResolver } from '@hookform/resolvers/zod';
 
 type Props = {
   nft: { id: string; name: string; mediaUrl: string };

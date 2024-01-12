@@ -4,18 +4,14 @@ import { Identicon } from '@polkadot/react-identicon';
 import { useState } from 'react';
 import { useParams } from 'react-router-dom';
 
+import TagSVG from '@/features/marketplace/assets/tag.svg?react';
+import BidSVG from '@/features/marketplace/assets/bid.svg?react';
+import { BuyNFT, MakeBid, StartSale, StartAuction, TransferNFT } from '@/features/marketplace';
+import { PriceInfoCard } from '@/features/marketplace/components/price-info-card';
 import { Container, CopyButton } from '@/components';
 import { useCollection, useListing } from '@/hooks';
 import { cx, getIpfsLink } from '@/utils';
 
-import TagSVG from './assets/tag.svg?react';
-import BidSVG from './assets/bid.svg?react';
-import { StartSale } from './start-sale';
-import { StartAuction } from './start-auction';
-import { TransferNFT } from './transfer-nft';
-import { BuyNft } from './buy-nft';
-import { MakeBid } from './make-bid';
-import { PriceInfoCard } from './price-info-card';
 import InfoSVG from './info.svg?react';
 import styles from './nft.module.scss';
 
@@ -126,7 +122,7 @@ function NFT() {
             <div className={styles.listingCard}>
               <PriceInfoCard heading="Price" text={price} size="large" />
 
-              {!isOwner && <BuyNft id={id} collectionId={collectionId} price={withoutCommas(sale.price)} />}
+              {!isOwner && <BuyNFT id={id} collectionId={collectionId} price={withoutCommas(sale.price)} />}
             </div>
           </div>
         )}

@@ -3,7 +3,7 @@ import { ReactNode } from 'react';
 
 import { getIpfsLink } from '@/utils';
 
-import CalendarSVG from '../assets/calendar.svg?react';
+import CalendarSVG from '../../assets/calendar.svg?react';
 import { PriceInfoCard } from '../price-info-card';
 import styles from './nft-action-form-modal.module.scss';
 import { InfoCard } from '@/features/collections/components/info-card';

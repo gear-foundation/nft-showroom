@@ -9,14 +9,14 @@ type Props = {
   price: string;
 };
 
-function BuyNft({ id, collectionId, price }: Props) {
+function BuyNFT({ id, collectionId, price }: Props) {
   const sendMessage = useMarketplaceSendMessage();
 
   const handleClick = () => {
     const tokenId = id;
     const collectionAddress = collectionId;
 
-    const payload = { BuyNft: { tokenId, collectionAddress } };
+    const payload = { BuyNFT: { tokenId, collectionAddress } };
     const value = price;
 
     sendMessage({ payload, value });
@@ -25,4 +25,4 @@ function BuyNft({ id, collectionId, price }: Props) {
   return <Button text="Buy" size="small" onClick={handleClick} />;
 }
 
-export { BuyNft };
+export { BuyNFT };
