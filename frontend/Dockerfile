@@ -6,6 +6,8 @@ RUN apk update
 
 RUN apk add xsel
 
+RUN npm install -g pnpm
+
 ARG VITE_NODE_ADDRESS  \
     VITE_IPFS_ADDRESS  \
     VITE_IPFS_GATEWAY_ADDRESS  \
