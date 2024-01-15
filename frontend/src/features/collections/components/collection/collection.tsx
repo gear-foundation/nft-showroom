@@ -1,4 +1,5 @@
 import { HexString } from '@gear-js/api';
+import { withoutCommas } from '@gear-js/react-hooks';
 import { Button } from '@gear-js/vara-ui';
 import { useParams } from 'react-router-dom';
 
@@ -38,6 +39,7 @@ function Collection() {
         tokensLimit={totalNumberOfTokens}
         name={config.name}
         description={config.description}
+        mintPrice={withoutCommas(config.paymentForMint)}
         socials={config.additionalLinks || {}}
       />
 

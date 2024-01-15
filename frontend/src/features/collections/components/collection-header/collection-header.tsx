@@ -15,12 +15,24 @@ type Props = {
   owner: HexString;
   tokensCount: number;
   tokensLimit: string | null;
+  mintPrice: string;
   name: string;
   description: string;
   socials: Record<string, string | null>;
 };
 
-function CollectionHeader({ id, banner, logo, owner, tokensCount, tokensLimit, name, description, socials }: Props) {
+function CollectionHeader({
+  id,
+  banner,
+  logo,
+  owner,
+  tokensCount,
+  tokensLimit,
+  name,
+  description,
+  mintPrice,
+  socials,
+}: Props) {
   const socialEntries = Object.entries(socials).filter(([, value]) => !!value) as [string, string][];
 
   const renderSocials = () =>
@@ -57,7 +69,7 @@ function CollectionHeader({ id, banner, logo, owner, tokensCount, tokensLimit, n
         <div>
           <ul className={styles.socials}>{renderSocials()}</ul>
 
-          <MintNFT collectionId={id} />
+          <MintNFT collectionId={id} value={mintPrice} />
         </div>
       </div>
     </header>
