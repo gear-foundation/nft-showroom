@@ -2,6 +2,7 @@ import { HexString } from '@gear-js/api';
 import { Identicon } from '@polkadot/react-identicon';
 import { Link, generatePath } from 'react-router-dom';
 
+import { ResponsiveSquareImage } from '@/components';
 import { ROUTE } from '@/consts';
 import { useCollection } from '@/hooks';
 import { getIpfsLink } from '@/utils';
@@ -21,7 +22,7 @@ function CollectionCard({ id }: Props) {
   const renderNFTs = () =>
     tokens?.map(([nftId, { mediaUrl }]) => (
       <li key={nftId}>
-        <img src={getIpfsLink(mediaUrl)} alt="" />
+        <ResponsiveSquareImage src={getIpfsLink(mediaUrl)} />
       </li>
     ));
 

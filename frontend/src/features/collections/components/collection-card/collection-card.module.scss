@@ -78,11 +78,5 @@
   grid-template-columns: repeat(5, 1fr);
   gap: 1px;
 
-  // opacity: 25%;
-
-  img {
-    max-width: 100%;
-    height: auto;
-    object-fit: cover;
-  }
+  opacity: 25%;
 }
