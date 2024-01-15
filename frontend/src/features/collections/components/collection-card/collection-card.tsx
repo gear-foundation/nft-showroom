@@ -6,6 +6,8 @@ import { ROUTE } from '@/consts';
 import { useCollection } from '@/hooks';
 import { getIpfsLink } from '@/utils';
 
+import { MintLimitInfoCard } from '../mint-limit-info-card';
+
 import styles from './collection-card.module.scss';
 
 type Props = {
@@ -14,9 +16,9 @@ type Props = {
 
 function CollectionCard({ id }: Props) {
   const collection = useCollection(id);
-  const { config, collectionOwner } = collection || {};
+  const { config, collectionOwner, tokens, totalNumberOfTokens } = collection || {};
 
-  return config && collectionOwner ? (
+  return config && collectionOwner && tokens !== undefined && totalNumberOfTokens !== undefined ? (
     <li className={styles.collection}>
       <Link to={generatePath(ROUTE.COLLECTION, { id })}>
         <div className={styles.cover}>
@@ -34,6 +36,10 @@ function CollectionCard({ id }: Props) {
               <span className={styles.address}>{collectionOwner}</span>
             </div>
           </div>
+        </div>
+
+        <div className={styles.cards}>
+          <MintLimitInfoCard heading={totalNumberOfTokens} text={tokens.length} color="dark" />
         </div>
       </Link>
     </li>

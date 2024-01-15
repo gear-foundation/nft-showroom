@@ -1,9 +1,9 @@
 import { HexString } from '@gear-js/api';
 
-import LandscapeSVG from '../../assets/landscape.svg?react';
 import UserSVG from '../../assets/user.svg?react';
 import { SOCIAL_ICON } from '../../consts';
 import { InfoCard } from '../info-card';
+import { MintLimitInfoCard } from '../mint-limit-info-card';
 import { MintNFT } from '../mint-nft';
 
 import styles from './collection-header.module.scss';
@@ -14,12 +14,13 @@ type Props = {
   logo: string;
   owner: HexString;
   tokensCount: number;
+  tokensLimit: string | null;
   name: string;
   description: string;
   socials: Record<string, string | null>;
 };
 
-function CollectionHeader({ id, banner, logo, owner, tokensCount, name, description, socials }: Props) {
+function CollectionHeader({ id, banner, logo, owner, tokensCount, tokensLimit, name, description, socials }: Props) {
   const socialEntries = Object.entries(socials).filter(([, value]) => !!value) as [string, string][];
 
   const renderSocials = () =>
@@ -43,7 +44,7 @@ function CollectionHeader({ id, banner, logo, owner, tokensCount, name, descript
 
         <div className={styles.cards}>
           <InfoCard heading="Creator" text={owner} SVG={UserSVG} color="light" textOverflow />
-          <InfoCard heading="Unlimited series" text={`${tokensCount} NFTs`} SVG={LandscapeSVG} color="light" />
+          <MintLimitInfoCard heading={tokensLimit} text={tokensCount} color="light" />
         </div>
       </div>
 
