@@ -18,6 +18,13 @@ function CollectionCard({ id }: Props) {
   const collection = useCollection(id);
   const { config, collectionOwner, tokens, totalNumberOfTokens } = collection || {};
 
+  const renderNFTs = () =>
+    tokens?.map(([nftId, { mediaUrl }]) => (
+      <li key={nftId}>
+        <img src={getIpfsLink(mediaUrl)} alt="" />
+      </li>
+    ));
+
   return config && collectionOwner && tokens !== undefined && totalNumberOfTokens !== undefined ? (
     <li className={styles.collection}>
       <Link to={generatePath(ROUTE.COLLECTION, { id })}>
@@ -41,6 +48,8 @@ function CollectionCard({ id }: Props) {
         <div className={styles.cards}>
           <MintLimitInfoCard heading={totalNumberOfTokens} text={tokens.length} color="dark" />
         </div>
+
+        <ul className={styles.nfts}>{renderNFTs()}</ul>
       </Link>
     </li>
   ) : null;
