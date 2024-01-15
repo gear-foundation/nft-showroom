@@ -1,0 +1,68 @@
+.collection {
+  background-color: #fff;
+  border-radius: 15px;
+  overflow: hidden;
+
+  transition: opacity 0.25s;
+
+  &:hover {
+    opacity: 0.75;
+  }
+}
+
+.cover {
+  width: 390px;
+  height: 100px;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+}
+
+.summary {
+  margin-top: -48px;
+  padding: 0 16px 16px;
+
+  display: flex;
+  align-items: flex-end;
+  gap: 16px;
+}
+
+.logo {
+  width: 96px;
+  height: 96px;
+  object-fit: cover;
+
+  border: 1px solid #ffffff;
+  border-radius: 50%;
+}
+
+.text,
+.address,
+.name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.name {
+  display: block;
+  margin-bottom: 6px;
+
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 19px;
+}
+
+.user {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 13px;
+  color: #93989a;
+}

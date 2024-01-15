@@ -1,0 +1,116 @@
+.header {
+  border-radius: 15px;
+  overflow: hidden;
+  background-color: #fff;
+
+  .cover {
+    min-height: 260px;
+    padding: 24px;
+
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+
+    background-position: center;
+    background-size: cover;
+    background-repeat: no-repeat;
+  }
+
+  .infoCards {
+    display: flex;
+    gap: 32px;
+
+    position: relative;
+  }
+}
+
+.summary {
+  margin-top: -98px;
+  padding: 0 32px 32px 48px;
+
+  display: flex;
+  align-items: flex-end;
+  gap: 40px;
+
+  .logo {
+    width: 196px;
+    height: 196px;
+    object-fit: cover;
+
+    border: 1px solid #fff;
+    border-radius: 50%;
+  }
+
+  .name {
+    margin-bottom: 4px;
+
+    font-size: 20px;
+    font-weight: 600;
+    line-height: 26px;
+    letter-spacing: 0.01em;
+  }
+
+  .description {
+    line-height: 25px;
+    letter-spacing: 0.01em;
+    color: #93989a;
+  }
+
+  .container {
+    flex: 1;
+    display: flex;
+    justify-content: space-between;
+    gap: 40px;
+  }
+
+  .actions {
+    min-width: 200px;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .socials {
+    margin-bottom: 24px;
+
+    display: flex;
+    gap: 12px;
+  }
+}
+
+.nfts {
+  margin-top: 32px;
+
+  &Header {
+    margin-bottom: 24px;
+  }
+
+  .list {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 32px 16px;
+  }
+}
+
+.notFound {
+  margin: 0 auto;
+  padding: 100px;
+
+  text-align: center;
+
+  &Heading {
+    margin-bottom: 16px;
+
+    font-size: 32px;
+    font-weight: 600;
+    line-height: 35px;
+    letter-spacing: 0.01em;
+  }
+
+  &Text {
+    font-size: 16px;
+    font-weight: 500;
+    line-height: 24px;
+  }
+}
