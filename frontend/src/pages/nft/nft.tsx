@@ -3,7 +3,7 @@ import { useAccount, useBalanceFormat, withoutCommas } from '@gear-js/react-hook
 import { Identicon } from '@polkadot/react-identicon';
 import { useParams } from 'react-router-dom';
 
-import { Container, CopyButton, Tabs } from '@/components';
+import { Container, CopyButton, ResponsiveSquareImage, Tabs } from '@/components';
 import { BuyNFT, MakeBid, StartSale, StartAuction, TransferNFT } from '@/features/marketplace';
 import BidSVG from '@/features/marketplace/assets/bid.svg?react';
 import TagSVG from '@/features/marketplace/assets/tag.svg?react';
@@ -78,7 +78,7 @@ function NFT() {
 
   return nft && config ? (
     <Container className={styles.container}>
-      <img src={getIpfsLink(nft.mediaUrl)} alt="" className={styles.image} />
+      <ResponsiveSquareImage src={getIpfsLink(nft.mediaUrl)} rounded />
 
       <div>
         <h2 className={styles.name}>{nft.name}</h2>
