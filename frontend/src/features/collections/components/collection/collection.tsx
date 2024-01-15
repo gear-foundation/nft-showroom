@@ -19,7 +19,7 @@ function Collection() {
   const { id } = useParams() as Params;
 
   const collection = useCollection(id);
-  const { config, tokens, collectionOwner } = collection || {};
+  const { config, tokens, collectionOwner, totalNumberOfTokens } = collection || {};
   const tokensCount = tokens?.length;
 
   const getNFTs = () =>
@@ -27,7 +27,7 @@ function Collection() {
       <NFTCard key={nftId} nft={{ ...nft, id: nftId }} collection={{ ...collection.config, id }} />
     ));
 
-  return config && collectionOwner && tokensCount !== undefined ? (
+  return config && collectionOwner && tokensCount !== undefined && totalNumberOfTokens !== undefined ? (
     <Container>
       <CollectionHeader
         id={id}
@@ -35,6 +35,7 @@ function Collection() {
         logo={getIpfsLink(config.collectionLogo)}
         owner={collectionOwner}
         tokensCount={tokensCount}
+        tokensLimit={totalNumberOfTokens}
         name={config.name}
         description={config.description}
         socials={config.additionalLinks || {}}

@@ -81,6 +81,7 @@ type CollectionState = {
       },
     ][];
     collectionOwner: HexString;
+    totalNumberOfTokens: string | null;
   };
 };
 
