@@ -6,12 +6,13 @@ import { useCollectionSendMessage } from '@/hooks';
 
 type Props = {
   collectionId: HexString;
+  value: string;
 };
 
-function Component({ collectionId }: Props) {
+function Component({ collectionId, value }: Props) {
   const sendMessage = useCollectionSendMessage(collectionId);
 
-  const handleClick = () => sendMessage({ payload: { Mint: null } });
+  const handleClick = () => sendMessage({ payload: { Mint: null }, value });
 
   return <Button text="Mint NFT" size="small" onClick={handleClick} block />;
 }
