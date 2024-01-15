@@ -1,4 +1,5 @@
 FROM node:18-alpine
+MAINTAINER GEAR
 
 COPY ./frontend /opt
 
