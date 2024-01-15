@@ -1,16 +1,15 @@
 import { HexString } from '@gear-js/api';
 import { useAccount, useBalanceFormat, withoutCommas } from '@gear-js/react-hooks';
 import { Identicon } from '@polkadot/react-identicon';
-import { useState } from 'react';
 import { useParams } from 'react-router-dom';
 
-import { Container, CopyButton } from '@/components';
+import { Container, CopyButton, Tabs } from '@/components';
 import { BuyNFT, MakeBid, StartSale, StartAuction, TransferNFT } from '@/features/marketplace';
 import BidSVG from '@/features/marketplace/assets/bid.svg?react';
 import TagSVG from '@/features/marketplace/assets/tag.svg?react';
 import { PriceInfoCard } from '@/features/marketplace/components/price-info-card';
 import { useCollection, useListing } from '@/hooks';
-import { cx, getIpfsLink } from '@/utils';
+import { getIpfsLink } from '@/utils';
 
 import InfoSVG from './info.svg?react';
 import styles from './nft.module.scss';
@@ -47,11 +46,7 @@ const getDetailEntries = (
   ];
 };
 
-const TAB_BUTTONS = [
-  { text: 'Overview', isDisabled: false },
-  { text: 'Properties', isDisabled: true },
-  { text: 'Activities', isDisabled: true },
-];
+const TABS = ['Overview', 'Properties', 'Activities'];
 
 function NFT() {
   const { collectionId, id } = useParams() as Params;
@@ -73,8 +68,6 @@ function NFT() {
   const owner = sale?.tokenOwner || auction?.owner || nft?.owner;
   const isOwner = owner === account?.decodedAddress;
 
-  const [tab] = useState('Overview');
-
   const getDetails = () =>
     getDetailEntries(collectionId, id, 'gNFT', nft?.mintTime, config?.royalty).map(({ key, value }) => (
       <li key={key} className={styles.row}>
@@ -82,20 +75,6 @@ function NFT() {
         <span className={styles.value}>{value}</span>
       </li>
     ));
-
-  const getTabButtons = () =>
-    TAB_BUTTONS.map(({ text, isDisabled }) => {
-      const isActive = tab === text;
-      const disabled = isActive || isDisabled;
-
-      return (
-        <li key={text}>
-          <button type="button" disabled={disabled} className={cx(styles.tabButton, isActive && styles.active)}>
-            {text}
-          </button>
-        </li>
-      );
-    });
 
   return nft && config ? (
     <Container className={styles.container}>
@@ -157,7 +136,7 @@ function NFT() {
         )}
 
         <div>
-          <ul className={styles.tabButtons}>{getTabButtons()}</ul>
+          <Tabs list={TABS} size="small" outlined className={styles.tabs} value={0} onChange={() => {}} />
 
           <div className={styles.card}>
             <h3 className={styles.heading}>

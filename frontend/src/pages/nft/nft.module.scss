@@ -93,30 +93,8 @@
   }
 }
 
-.tabButtons {
+.tabs {
   margin-bottom: 24px;
-
-  display: flex;
-  gap: 40px;
-
-  box-shadow: inset 0px -1px 0px 0px #72707d33;
-
-  .tabButton {
-    padding-bottom: 8px;
-
-    font-size: 16px;
-    font-weight: 600;
-    line-height: 20px;
-    color: #93989a;
-
-    background-color: transparent;
-
-    &.active {
-      color: #0ed3a3;
-
-      box-shadow: inset 0px -3px 0px 0px #0ed3a3;
-    }
-  }
 }
 
 .card {

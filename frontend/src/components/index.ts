@@ -4,6 +4,7 @@ import { Footer } from './footer';
 import { Header } from './header';
 import { PriceInput } from './price-input';
 import { PrivateRoute } from './private-route';
+import { Tabs } from './tabs';
 import { withAccount } from './with-account';
 
-export { Header, Footer, Container, CopyButton, PriceInput, withAccount, PrivateRoute };
+export { Header, Footer, Container, CopyButton, PriceInput, withAccount, PrivateRoute, Tabs };
