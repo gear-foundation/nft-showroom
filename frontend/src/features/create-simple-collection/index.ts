@@ -1,3 +1,3 @@
-import { CreateSimpleCollectionModal } from './components';
+import { CreateSimpleCollection } from './components';
 
-export { CreateSimpleCollectionModal };
+export { CreateSimpleCollection };
