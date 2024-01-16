@@ -6,7 +6,7 @@ import { RouterProvider, createBrowserRouter } from 'react-router-dom';
 import { App } from './App';
 import { PrivateRoute } from './components';
 import { ROUTE } from './consts';
-import { Collection, CreateCollection, Home, NFT } from './pages';
+import { Collection, CreateCollection, Collections, NFT } from './pages';
 import './index.scss';
 
 const PRIVATE_ROUTES = [
@@ -17,7 +17,7 @@ const PRIVATE_ROUTES = [
 ];
 
 const ROUTES = [
-  { path: ROUTE.HOME, element: <Home /> },
+  { path: ROUTE.HOME, element: <Collections /> },
   { path: ROUTE.COLLECTION, element: <Collection /> },
   { path: ROUTE.NFT, element: <NFT /> },
 

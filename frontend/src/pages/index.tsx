@@ -1,6 +1,6 @@
 import { Collection } from './collection';
+import { Collections } from './collections';
 import { CreateCollection } from './create-collection';
-import { Home } from './home';
 import { NFT } from './nft';
 
-export { Home, CreateCollection, Collection, NFT };
+export { Collections, CreateCollection, Collection, NFT };

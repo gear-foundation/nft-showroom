@@ -1,23 +1,23 @@
 import { useState } from 'react';
 
 import { Container, Tabs } from '@/components';
-import { Collections } from '@/features/collections';
+import { Collections as CollectionsFeature } from '@/features/collections';
 
-import styles from './home.module.scss';
+import styles from './collections.module.scss';
 
 const TABS = ['Collections', 'NFTs'];
 
-function Home() {
+function Collections() {
   const [tabIndex, setTabIndex] = useState(0);
 
   return (
     <Container>
       <Tabs list={TABS} className={styles.tabs} value={tabIndex} onChange={setTabIndex} />
 
-      {tabIndex === 0 && <Collections />}
+      {tabIndex === 0 && <CollectionsFeature />}
       {/* {tabIndex === 1 && <NFTs} */}
     </Container>
   );
 }
 
-export { Home };
+export { Collections };
