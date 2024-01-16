@@ -1,4 +1,3 @@
-import { useAccountDeriveBalancesAll } from './api';
 import {
   useMarketplaceMetadata,
   useMarketplaceSendMessage,
@@ -13,7 +12,6 @@ import { useProgramMetadata } from './use-program-metadata';
 
 export {
   useModal,
-  useAccountDeriveBalancesAll,
   useProgramMetadata,
   useMarketplaceMetadata,
   useMarketplaceSendMessage,
