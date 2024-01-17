@@ -27,4 +27,4 @@ function InfoCard({ heading, text, SVG, color = 'dark', size = 'small', textOver
 }
 
 export { InfoCard };
-export type { Props };
+export type { Props as InfoCardProps };

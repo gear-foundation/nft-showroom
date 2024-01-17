@@ -3,12 +3,11 @@ import { useAccount, useBalanceFormat, withoutCommas } from '@gear-js/react-hook
 import { Identicon } from '@polkadot/react-identicon';
 import { useParams } from 'react-router-dom';
 
-import { Container, CopyButton, ResponsiveSquareImage, Tabs } from '@/components';
-import { BuyNFT, MakeBid, StartSale, StartAuction, TransferNFT } from '@/features/marketplace';
+import { Container, CopyButton, PriceInfoCard, ResponsiveSquareImage, Tabs } from '@/components';
+import { TransferNFT, useCollection } from '@/features/collections';
+import { BuyNFT, MakeBid, StartSale, StartAuction, useListing } from '@/features/marketplace';
 import BidSVG from '@/features/marketplace/assets/bid.svg?react';
 import TagSVG from '@/features/marketplace/assets/tag.svg?react';
-import { PriceInfoCard } from '@/features/marketplace/components/price-info-card';
-import { useCollection, useListing } from '@/hooks';
 import { getIpfsLink } from '@/utils';
 
 import InfoSVG from './info.svg?react';

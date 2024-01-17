@@ -1,12 +1,12 @@
 import { Button, Modal, ModalProps } from '@gear-js/vara-ui';
 import { ReactNode } from 'react';
 
-import { InfoCard } from '@/features/collections/components/info-card';
 import { getIpfsLink } from '@/utils';
 
-import CalendarSVG from '../../assets/calendar.svg?react';
+import { InfoCard } from '../info-card';
 import { PriceInfoCard } from '../price-info-card';
 
+import CalendarSVG from './calendar.svg?react';
 import styles from './nft-action-form-modal.module.scss';
 
 type Props = {

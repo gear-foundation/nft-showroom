@@ -5,10 +5,10 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
-import { PriceInput, withAccount } from '@/components';
-import { useMarketplaceSendMessage, useModal } from '@/hooks';
+import { NFTActionFormModal, PriceInput, withAccount } from '@/components';
+import { useModal } from '@/hooks';
 
-import { NFTActionFormModal } from '../nft-action-form-modal';
+import { useMarketplaceSendMessage } from '../../hooks';
 
 type Props = {
   nft: { id: string; name: string; mediaUrl: string };

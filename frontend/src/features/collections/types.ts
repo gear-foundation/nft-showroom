@@ -1,43 +1,5 @@
 import { HexString } from '@gear-js/api';
 
-type CollectionId = HexString;
-type OwnerId = HexString;
-type CollectionTypeName = string;
-
-type CollectionToOwner = [CollectionId, [CollectionTypeName, OwnerId]];
-
-type CollectionType = [CollectionTypeName, { codeId: HexString; metaLink: string; typeDescription: string }];
-
-type Sale = {
-  price: string;
-  tokenOwner: HexString;
-  collectionOwner: HexString;
-  royalty: string;
-};
-
-type Auction = {
-  owner: HexString;
-  startedAt: string;
-  endedAt: string;
-  currentPrice: string;
-  currentWinner: HexString;
-  collectionOwner: HexString;
-  royalty: string;
-};
-
-type MarketplaceState = {
-  All: {
-    collectionToOwner: CollectionToOwner[];
-    typeCollections: CollectionType[];
-    sales: [[HexString, string], Sale][];
-    auctions: [[HexString, string], Auction][];
-  };
-};
-
-type CollectionsState = {
-  AllCollections: CollectionToOwner[];
-};
-
 type CollectionState = {
   All: {
     tokens: [
@@ -85,4 +47,4 @@ type CollectionState = {
   };
 };
 
-export type { MarketplaceState, CollectionsState, CollectionState };
+export type { CollectionState };

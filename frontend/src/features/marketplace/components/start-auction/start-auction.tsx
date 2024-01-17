@@ -5,11 +5,11 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
-import { PriceInput, withAccount } from '@/components';
-import { useModal, useNFTSendMessage } from '@/hooks';
+import { NFTActionFormModal, PriceInput, withAccount } from '@/components';
+import { useModal } from '@/hooks';
 
 import BidSVG from '../../assets/bid.svg?react';
-import { NFTActionFormModal } from '../nft-action-form-modal';
+import { useNFTSendMessage } from '../../hooks';
 
 type Props = {
   nft: { id: string; name: string; mediaUrl: string };

@@ -1,4 +1,6 @@
-import { Collection } from './collection';
-import { Collections } from './collections';
+import { CollectionCard } from './collection-card';
+import { CollectionHeader } from './collection-header';
+import { NFTCard } from './nft-card';
+import { TransferNFT } from './transfer-nft';
 
-export { Collections, Collection };
+export { CollectionCard, NFTCard, CollectionHeader, TransferNFT };

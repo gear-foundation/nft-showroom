@@ -4,8 +4,9 @@ import { useState } from 'react';
 
 import { Container } from '@/components';
 import { useIPFS } from '@/context';
-import { useProgramMetadata, useMarketplaceSendMessage } from '@/hooks';
+import { useProgramMetadata } from '@/hooks';
 
+import { useMarketplaceSendMessage } from '../../../marketplace';
 import nftMetadataSource from '../../assets/nft.meta.txt';
 import {
   COLLECTION_NAME,

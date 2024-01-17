@@ -1,5 +1,6 @@
+import { InfoCard, InfoCardProps } from '@/components';
+
 import LandscapeSVG from '../../assets/landscape.svg?react';
-import { InfoCard, Props as InfoCardProps } from '../info-card';
 
 type Props = Omit<InfoCardProps, 'heading' | 'text' | 'SVG'> & {
   heading: string | null;

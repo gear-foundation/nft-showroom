@@ -1,8 +1,9 @@
 import { HexString } from '@gear-js/api';
 
+import { InfoCard } from '@/components';
+
 import UserSVG from '../../assets/user.svg?react';
 import { SOCIAL_ICON } from '../../consts';
-import { InfoCard } from '../info-card';
 import { MintLimitInfoCard } from '../mint-limit-info-card';
 import { MintNFT } from '../mint-nft';
 
