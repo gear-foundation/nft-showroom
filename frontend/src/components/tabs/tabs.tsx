@@ -15,7 +15,7 @@ function Tabs({ list, value, size = 'large', outlined, className, onChange }: Pr
   const renderButtons = () =>
     list.map((button, index) => {
       const isActive = index === value;
-      const isDisabled = isActive || index !== 0;
+      const isDisabled = isActive;
 
       return (
         <li key={button}>

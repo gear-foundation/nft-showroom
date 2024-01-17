@@ -1,7 +1,10 @@
 import { HexString } from '@gear-js/api';
+import { useAccount, useBalanceFormat, withoutCommas } from '@gear-js/react-hooks';
 import { Link, generatePath } from 'react-router-dom';
 
+import { PriceInfoCard, InfoCard } from '@/components';
 import { ROUTE } from '@/consts';
+import { BuyNFT, MakeBid, useListing } from '@/features/marketplace';
 import { getIpfsLink } from '@/utils';
 
 import styles from './nft-card.module.scss';
@@ -22,21 +25,19 @@ type Props = {
 };
 
 function NFTCard({ nft, collection }: Props) {
-  // const { account } = useAccount();
-  // const { getFormattedBalanceValue } = useBalanceFormat();
+  const { account } = useAccount();
+  const { getFormattedBalanceValue } = useBalanceFormat();
 
-  const owner = nft.owner;
+  const { sale, auction } = useListing(collection.id, nft.id);
 
-  // const { sale, auction } = useListing(collection.id, nft.id);
-
-  // const isTransferable = !!collection.transferable;
-  // const isListed = sale || auction;
+  const isTransferable = !!collection.transferable;
+  const isListed = sale || auction;
   // after token is listed, root owner is set to marketplace contract address
   // account owner is saved in a listing state
-  // const owner = sale?.tokenOwner || auction?.owner || nft.owner;
-  // const isOwner = owner === account?.decodedAddress;
-  // const heading = sale ? 'Price' : 'Current bid';
-  // const price = getFormattedBalanceValue(withoutCommas(sale?.price || auction?.currentPrice || '0')).toFixed();
+  const owner = sale?.tokenOwner || auction?.owner || nft.owner;
+  const isOwner = owner === account?.decodedAddress;
+  const heading = sale ? 'Price' : 'Current bid';
+  const price = getFormattedBalanceValue(withoutCommas(sale?.price || auction?.currentPrice || '0')).toFixed();
 
   const to = generatePath(ROUTE.NFT, { collectionId: collection.id, id: nft.id });
   const src = getIpfsLink(nft.mediaUrl);
@@ -57,7 +58,7 @@ function NFTCard({ nft, collection }: Props) {
         </Link>
       </header>
 
-      {/* {isTransferable && (
+      {isTransferable && (
         <footer className={styles.footer}>
           {isListed ? (
             <PriceInfoCard heading={heading} text={price} />
@@ -74,7 +75,7 @@ function NFTCard({ nft, collection }: Props) {
             />
           )}
         </footer>
-      )} */}
+      )}
     </li>
   );
 }

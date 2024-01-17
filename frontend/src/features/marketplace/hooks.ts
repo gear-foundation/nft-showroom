@@ -3,10 +3,9 @@ import { useSendMessageHandler, useReadFullState } from '@gear-js/react-hooks';
 import { AnyJson } from '@polkadot/types/types';
 
 import { ADDRESS } from '@/consts';
+import { useCollectionSendMessage } from '@/features/collections';
 import { useProgramMetadata } from '@/hooks';
 import { getIpfsLink } from '@/utils';
-
-import { useCollectionSendMessage } from '../collections';
 
 import metadataSource from './assets/nft_marketplace.meta.txt';
 import { CollectionIDsState, CollectionState, MarketplaceState } from './types';
@@ -74,4 +73,11 @@ function useListing(collectionId: HexString, nftId: string) {
   return { sale, auction };
 }
 
-export { useMarketplaceSendMessage, useNFTSendMessage, useCollectionMetadata, useCollectionIds, useListing };
+export {
+  useMarketplaceMetadata, // TODO: could be temporary export, check after migration to indexer
+  useMarketplaceSendMessage,
+  useNFTSendMessage,
+  useCollectionMetadata,
+  useCollectionIds,
+  useListing,
+};

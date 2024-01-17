@@ -1,7 +1,7 @@
 import { HexString } from '@gear-js/api';
 import { useReadFullState, useSendMessageHandler } from '@gear-js/react-hooks';
 
-import { useCollectionMetadata } from '../marketplace';
+import { useCollectionMetadata } from '@/features/marketplace';
 
 import { CollectionState } from './types';
 
