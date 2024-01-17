@@ -1,0 +1,17 @@
+.buttons {
+  display: flex;
+}
+
+.button {
+  // @gear-js/vara-ui override
+  padding: 12px !important;
+
+  svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  &.active {
+    pointer-events: none;
+  }
+}
