@@ -420,9 +420,9 @@ extern "C" fn init() {
     };
     msg::send(
         owner,
-        ComposableNftEvent::Initialized {
+        Ok::<ComposableNftEvent, ComposableNftError>(ComposableNftEvent::Initialized {
             config: config.clone(),
-        },
+        }),
         0,
     )
     .expect("Error during send to owner `ComposableNftEvent::Initialized`");

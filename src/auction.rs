@@ -115,6 +115,7 @@ impl NftMarketplace {
         Ok(NftMarketplaceEvent::BidAdded {
             collection_address,
             token_id,
+            current_price: msg_value,
         })
     }
 
