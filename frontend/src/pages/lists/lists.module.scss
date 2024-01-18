@@ -9,21 +9,21 @@
   display: grid;
   gap: 32px 16px;
 
-  &.small {
+  &.smallGrid {
     grid-template-columns: repeat(3, 1fr);
   }
 
-  &.large {
+  &.largeGrid {
     grid-template-columns: repeat(2, 1fr);
   }
 }
 
 .nfts {
-  &.small {
+  &.smallGrid {
     grid-template-columns: repeat(4, 1fr);
   }
 
-  &.large {
+  &.largeGrid {
     grid-template-columns: repeat(3, 1fr);
   }
 }

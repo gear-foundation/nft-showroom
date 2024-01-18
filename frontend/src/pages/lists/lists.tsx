@@ -1,23 +1,23 @@
-import { useState } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 
 import { Container } from '@/components';
+import { GridSize, useGridSize } from '@/features/lists';
 import { cx } from '@/utils';
 
-import { GridButtons, Tabs } from './components';
+import { Tabs } from './components';
 import styles from './lists.module.scss';
 
 function Lists() {
   const { pathname } = useLocation();
   const [, listName] = pathname.split('/');
 
-  const [gridSize, setGridSize] = useState<'large' | 'small'>('small');
+  const { gridSize, setGridSize } = useGridSize();
 
   return (
     <Container>
       <header className={styles.header}>
         <Tabs />
-        <GridButtons value={gridSize} onChange={setGridSize} />
+        <GridSize value={gridSize} onChange={setGridSize} />
       </header>
 
       <ul className={cx(styles.list, styles[gridSize], styles[listName])}>

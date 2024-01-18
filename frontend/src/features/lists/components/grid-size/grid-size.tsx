@@ -2,21 +2,24 @@ import { Button } from '@gear-js/vara-ui';
 
 import { cx } from '@/utils';
 
-import styles from './grid-buttons.module.scss';
-import LargeGridSVG from './large-grid.svg?react';
-import SmallGridSVG from './small-grid.svg?react';
+import LargeGridSVG from '../../assets/large-grid.svg?react';
+import SmallGridSVG from '../../assets/small-grid.svg?react';
+import { GRID_SIZE } from '../../consts';
+import { GridSize as GridSizeType } from '../../types';
+
+import styles from './grid-size.module.scss';
 
 const BUTTONS = [
-  { SVG: SmallGridSVG, value: 'small' },
-  { SVG: LargeGridSVG, value: 'large' },
+  { SVG: SmallGridSVG, value: GRID_SIZE.SMALL },
+  { SVG: LargeGridSVG, value: GRID_SIZE.LARGE },
 ] as const;
 
 type Props = {
-  value: 'small' | 'large';
-  onChange: (value: 'small' | 'large') => void;
+  value: GridSizeType;
+  onChange: (value: GridSizeType) => void;
 };
 
-function GridButtons({ value, onChange }: Props) {
+function GridSize({ value, onChange }: Props) {
   const renderButtons = () =>
     BUTTONS.map(({ value: _value, SVG }) => {
       const isActive = _value === value;
@@ -38,4 +41,4 @@ function GridButtons({ value, onChange }: Props) {
   return <ul className={styles.buttons}>{renderButtons()}</ul>;
 }
 
-export { GridButtons };
+export { GridSize };

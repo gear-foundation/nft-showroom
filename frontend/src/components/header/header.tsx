@@ -6,7 +6,6 @@ import { Wallet, Balance } from '@/features/wallet';
 import { ButtonLink } from '../button-link';
 import { Container } from '../container';
 import { Logo } from '../logo';
-import { SearchInput } from '../search-input/search-input';
 
 import styles from './header.module.scss';
 
@@ -17,8 +16,6 @@ function Header() {
     <header className={styles.header}>
       <Container className={styles.container}>
         <Logo />
-
-        <SearchInput />
 
         <div className={styles.wallet}>
           <Balance />
