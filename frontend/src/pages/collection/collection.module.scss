@@ -7,6 +7,12 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
+
+    .interaction {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+    }
   }
 
   .list {

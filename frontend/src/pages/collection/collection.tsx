@@ -1,9 +1,11 @@
 import { HexString } from '@gear-js/api';
 import { withoutCommas } from '@gear-js/react-hooks';
 import { Button } from '@gear-js/vara-ui';
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
 import { useParams } from 'react-router-dom';
 
-import { Container } from '@/components';
+import { Container, SearchInput } from '@/components';
 import { NFTCard, CollectionHeader, useCollection } from '@/features/collections';
 import { GridSize, useGridSize } from '@/features/lists';
 import { cx, getIpfsLink } from '@/utils';
@@ -15,17 +17,30 @@ type Params = {
   id: HexString;
 };
 
+function useSearchQuery() {
+  const { handleSubmit, register } = useForm({ defaultValues: { query: '' } });
+  const [query, setQuery] = useState('');
+
+  const onSubmit = handleSubmit((values) => setQuery(values.query.trim().toLocaleLowerCase()));
+
+  return { query, onSubmit, register };
+}
+
 function Collection() {
   const { id } = useParams() as Params;
 
   const collection = useCollection(id);
   const { gridSize, setGridSize } = useGridSize();
+  const { query, onSubmit, register } = useSearchQuery();
 
   const { config, tokens, collectionOwner, totalNumberOfTokens } = collection || {};
-  const tokensCount = tokens?.length;
+
+  const searchedTokens = tokens?.filter(([, { name }]) => name.toLocaleLowerCase().includes(query));
+  const tokensCount = searchedTokens?.length;
 
   const getNFTs = () =>
-    collection?.tokens.map(([nftId, nft]) => (
+    collection &&
+    searchedTokens?.map(([nftId, nft]) => (
       <NFTCard key={nftId} nft={{ ...nft, id: nftId }} collection={{ ...collection.config, id }} />
     ));
 
@@ -48,7 +63,13 @@ function Collection() {
         <header className={styles.nftsHeader}>
           <Button text={`All: ${tokensCount}`} color="grey" size="small" />
 
-          <GridSize value={gridSize} onChange={setGridSize} />
+          <div className={styles.interaction}>
+            <form onSubmit={onSubmit}>
+              <SearchInput label="Search by name" {...register('query')} />
+            </form>
+
+            <GridSize value={gridSize} onChange={setGridSize} />
+          </div>
         </header>
 
         {tokensCount ? (
