@@ -14,13 +14,14 @@ mod sale;
 type CollectionId = ActorId;
 type TokenId = u64;
 type Price = u128;
+type TypeName = String;
 
 #[derive(Default)]
 pub struct NftMarketplace {
     pub admins: Vec<ActorId>,
-    pub collection_to_owner: HashMap<CollectionId, ActorId>,
+    pub collection_to_owner: HashMap<CollectionId, (TypeName, ActorId)>,
     pub time_creation: HashMap<ActorId, u64>,
-    pub type_collections: HashMap<String, CollectionInfo>,
+    pub type_collections: HashMap<String, TypeCollectionInfo>,
     pub sales: HashMap<(CollectionId, TokenId), NftInfoForSale>,
     pub auctions: HashMap<(CollectionId, TokenId), Auction>,
     pub offers: HashMap<Offer, Price>,
@@ -183,7 +184,7 @@ impl NftMarketplace {
     ) -> Result<NftMarketplaceEvent, NftMarketplaceError> {
         self.check_admin()?;
 
-        let collection_info = CollectionInfo {
+        let collection_info = TypeCollectionInfo {
             code_id,
             meta_link: meta_link.clone(),
             type_description: type_description.clone(),
@@ -221,7 +222,7 @@ impl NftMarketplace {
         .await
         .expect("Program was not initialized");
 
-        self.collection_to_owner.insert(address, msg_src);
+        self.collection_to_owner.insert(address, (type_name.clone(), msg_src));
 
         self.time_creation
             .entry(msg_src)
@@ -240,7 +241,7 @@ impl NftMarketplace {
         let msg_src = msg::source();
 
         let collection_owner =
-            if let Some(owner) = self.collection_to_owner.get(&collection_address) {
+            if let Some((.., owner)) = self.collection_to_owner.get(&collection_address) {
                 *owner
             } else {
                 return Err(NftMarketplaceError(
@@ -377,7 +378,7 @@ impl NftMarketplace {
         }
     }
 
-    fn get_collection_info(&self, type_name: &str) -> Result<&CollectionInfo, NftMarketplaceError> {
+    fn get_collection_info(&self, type_name: &str) -> Result<&TypeCollectionInfo, NftMarketplaceError> {
         if let Some(collection_info) = self.type_collections.get(type_name) {
             Ok(collection_info)
         } else {
@@ -396,15 +397,12 @@ extern "C" fn state() {
             .expect("Contract state is uninitialized")
     };
     let query: StateQuery = msg::load().expect("Unable to load the state query");
-    match query {
+    let reply = match query {
         StateQuery::All => {
-            msg::reply(StateReply::All(nft_marketplace.into()), 0)
-                .expect("Unable to share the state");
+            StateReply::All(nft_marketplace.into())
         }
-
         StateQuery::Admins => {
-            msg::reply(StateReply::Admins(nft_marketplace.admins), 0)
-                .expect("Unable to share the state");
+            StateReply::Admins(nft_marketplace.admins)
         }
         StateQuery::CollectionsInfo => {
             let type_collections = nft_marketplace
@@ -412,23 +410,36 @@ extern "C" fn state() {
                 .into_iter()
                 .map(|(id, collection_info)| (id, collection_info))
                 .collect();
-            msg::reply(StateReply::CollectionsInfo(type_collections), 0)
-                .expect("Unable to share the state");
+            StateReply::CollectionsInfo(type_collections)
         }
         StateQuery::Config => {
-            msg::reply(StateReply::Config(nft_marketplace.config), 0)
-                .expect("Unable to share the state");
+            StateReply::Config(nft_marketplace.config)
         }
         StateQuery::AllCollections => {
             let collection_to_owner = nft_marketplace
                 .collection_to_owner
                 .into_iter()
-                .map(|(owner, collections)| (owner, collections))
+                .map(|(owner, collection_info)| (owner, collection_info))
                 .collect();
-            msg::reply(StateReply::AllCollections(collection_to_owner), 0)
-                .expect("Unable to share the state");
+            StateReply::AllCollections(collection_to_owner)
         }
-    }
+        StateQuery::GetCollectionInfo(collection_address) => {
+            let collection_to_owner = nft_marketplace.collection_to_owner.get(&collection_address);
+            if let Some((type_name, owner)) = collection_to_owner {
+                let meta_link = &nft_marketplace.type_collections.get(type_name).expect("This collection type name must exist").meta_link;
+                let collection_info = CollectionInfo{
+                    owner: *owner,
+                    type_name: type_name.clone(),
+                    meta_link: meta_link.clone(),
+                };
+                StateReply::CollectionInfo(Some(collection_info))
+            } else {
+                StateReply::CollectionInfo(None)
+            }
+           
+        }   
+    };
+    msg::reply(reply, 0).expect("Unable to share the state");
 }
 
 impl From<NftMarketplace> for State {
@@ -446,7 +457,7 @@ impl From<NftMarketplace> for State {
 
         let collection_to_owner = collection_to_owner
             .into_iter()
-            .map(|(owner, collections)| (owner, collections))
+            .map(|(owner, collection_info)| (owner, collection_info))
             .collect();
 
         let time_creation = time_creation

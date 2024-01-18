@@ -155,6 +155,7 @@ pub enum NftMarketplaceEvent {
     BidAdded {
         collection_address: ActorId,
         token_id: u64,
+        current_price: u128,
     },
     AuctionCanceled {
         collection_address: ActorId,
@@ -203,23 +204,25 @@ pub enum StateQuery {
     CollectionsInfo,
     Config,
     AllCollections,
+    GetCollectionInfo(ActorId),
 }
 
 #[derive(Encode, Decode, TypeInfo)]
 pub enum StateReply {
     All(State),
     Admins(Vec<ActorId>),
-    CollectionsInfo(Vec<(String, CollectionInfo)>),
+    CollectionsInfo(Vec<(String, TypeCollectionInfo)>),
     Config(Config),
-    AllCollections(Vec<(ActorId, ActorId)>),
+    AllCollections(Vec<(ActorId, (String, ActorId))>),
+    CollectionInfo(Option<CollectionInfo>),
 }
 
 #[derive(Debug, Encode, Decode, TypeInfo, Clone)]
 pub struct State {
     pub admins: Vec<ActorId>,
-    pub collection_to_owner: Vec<(ActorId, ActorId)>,
+    pub collection_to_owner: Vec<(ActorId, (String, ActorId))>,
     pub time_creation: Vec<(ActorId, u64)>,
-    pub type_collections: Vec<(String, CollectionInfo)>,
+    pub type_collections: Vec<(String, TypeCollectionInfo)>,
     pub sales: Vec<((ActorId, u64), NftInfoForSale)>,
     pub auctions: Vec<((ActorId, u64), Auction)>,
     pub offers: Vec<(Offer, u128)>,
@@ -231,11 +234,19 @@ pub struct State {
 /// * meta_link -  it is necessary to set a reference where the meta of this collection type will be stored for further interaction with the contract
 /// * type_description - description of this type of collection
 #[derive(Debug, Encode, Decode, TypeInfo, Clone)]
-pub struct CollectionInfo {
+pub struct TypeCollectionInfo {
     pub code_id: CodeId,
     pub meta_link: String,
     pub type_description: String,
 }
+
+#[derive(Debug, Encode, Decode, TypeInfo, Clone)]
+pub struct CollectionInfo {
+    pub owner: ActorId,
+    pub type_name: String,
+    pub meta_link: String,
+}
+
 
 #[derive(Default, Debug, Encode, Decode, TypeInfo, Clone)]
 pub struct Config {

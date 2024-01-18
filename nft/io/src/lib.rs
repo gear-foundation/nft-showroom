@@ -158,6 +158,7 @@ pub struct NftState {
     pub nonce: NftId,
     pub img_links_and_data: Vec<(String, ImageData)>,
     pub collection_owner: ActorId,
+    pub total_number_of_tokens: Option<u64>,
 }
 
 #[derive(Debug, Clone, Encode, Decode, TypeInfo)]

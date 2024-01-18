@@ -1,4 +1,5 @@
 use crate::utils::*;
+use gear_core::message::Payload;
 use utils::prelude::*;
 mod utils;
 use gtest::Program;
@@ -746,3 +747,14 @@ fn get_state(nft_collection: &Program) -> Option<NftState> {
 // fn admin_features() {
 
 // }
+
+
+
+#[test]
+fn check() {
+    let input = "00033c5573657220436f6c6c656374696f6e3c5573657220436f6c6c656374696f6e04107461673144436f6c6c656374696f6e2062616e6e65723c436f6c6c656374696f6e206c6f676f010300000000000000000000000000000000000000000000010000000000000000010000000000000000";
+    let decoded = hex::decode(input).expect("Decoding failed");
+    let mut res: &[u8] = &decoded;
+    let result = Result::<NftEvent, NftError>::decode(&mut res).ok();
+    println!("RES: {:?}", result);
+}

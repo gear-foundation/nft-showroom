@@ -35,6 +35,9 @@ gclient.workspace = true
 tokio.workspace = true
 gear-core.workspace = true
 primitive-types.workspace = true
+parity-scale-codec.workspace = true
+scale-info.workspace = true
+hex = "0.4.3"
 
 
 [build-dependencies]
