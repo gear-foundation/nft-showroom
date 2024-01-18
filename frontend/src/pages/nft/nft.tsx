@@ -1,9 +1,10 @@
 import { HexString } from '@gear-js/api';
 import { useAccount, useBalanceFormat, withoutCommas } from '@gear-js/react-hooks';
 import { Identicon } from '@polkadot/react-identicon';
-import { useParams } from 'react-router-dom';
+import { generatePath, useParams } from 'react-router-dom';
 
-import { Container, CopyButton, PriceInfoCard, ResponsiveSquareImage, Tabs } from '@/components';
+import { Breadcrumbs, Container, CopyButton, PriceInfoCard, ResponsiveSquareImage, Tabs } from '@/components';
+import { ROUTE } from '@/consts';
 import { TransferNFT, useCollection } from '@/features/collections';
 import { BuyNFT, MakeBid, StartSale, StartAuction, useListing } from '@/features/marketplace';
 import BidSVG from '@/features/marketplace/assets/bid.svg?react';
@@ -76,73 +77,82 @@ function NFT() {
     ));
 
   return nft && config ? (
-    <Container className={styles.container}>
-      <ResponsiveSquareImage src={getIpfsLink(nft.mediaUrl)} rounded />
+    <Container>
+      <Breadcrumbs
+        list={[
+          { to: generatePath(ROUTE.COLLECTION, { id: collectionId }), text: config.name },
+          { to: generatePath(ROUTE.NFT, { collectionId, id }), text: nft.name },
+        ]}
+      />
 
-      <div>
-        <h2 className={styles.name}>{nft.name}</h2>
-        <p className={styles.description}>{nft.description}</p>
-
-        <div className={styles.owner}>
-          <Identicon value={owner} size={24} theme="polkadot" />
-
-          <p className={styles.ownerText}>
-            Owned by <span className={styles.ownerAddress}>{owner}</span>
-          </p>
-        </div>
-
-        {sale && (
-          <div className={styles.listing}>
-            <p className={styles.listingHeading}>
-              <TagSVG /> Sale is Active
-            </p>
-
-            <div className={styles.listingCard}>
-              <PriceInfoCard heading="Price" text={price} size="large" />
-
-              {!isOwner && <BuyNFT id={id} collectionId={collectionId} price={withoutCommas(sale.price)} />}
-            </div>
-          </div>
-        )}
-
-        {auction && (
-          <div className={styles.listing}>
-            <p className={styles.listingHeading}>
-              <BidSVG /> Auction Ends: {auctionEndDate}
-            </p>
-
-            <div className={styles.listingCard}>
-              <PriceInfoCard heading="Current bid" text={auctionPrice} size="large" />
-
-              {!isOwner && (
-                <MakeBid
-                  nft={{ ...nft, id }}
-                  collection={{ ...config, id: collectionId }}
-                  auction={{ minBid: auctionPrice, endDate: auctionEndDate }}
-                />
-              )}
-            </div>
-          </div>
-        )}
-
-        {isOwner && !sale && !auction && (!!config.sellable || !!config.transferable) && (
-          <div className={styles.buttons}>
-            {!!config.sellable && <StartSale nft={{ ...nft, id }} collection={{ ...config, id: collectionId }} />}
-            {!!config.sellable && <StartAuction nft={{ ...nft, id }} collection={{ ...config, id: collectionId }} />}
-
-            <TransferNFT nft={{ ...nft, id }} collection={{ ...config, id: collectionId }} />
-          </div>
-        )}
+      <div className={styles.container}>
+        <ResponsiveSquareImage src={getIpfsLink(nft.mediaUrl)} rounded />
 
         <div>
-          <Tabs list={TABS} size="small" outlined className={styles.tabs} value={0} onChange={() => {}} />
+          <h2 className={styles.name}>{nft.name}</h2>
+          <p className={styles.description}>{nft.description}</p>
 
-          <div className={styles.card}>
-            <h3 className={styles.heading}>
-              <InfoSVG /> Details
-            </h3>
+          <div className={styles.owner}>
+            <Identicon value={owner} size={24} theme="polkadot" />
 
-            <ul className={styles.table}>{getDetails()}</ul>
+            <p className={styles.ownerText}>
+              Owned by <span className={styles.ownerAddress}>{owner}</span>
+            </p>
+          </div>
+
+          {sale && (
+            <div className={styles.listing}>
+              <p className={styles.listingHeading}>
+                <TagSVG /> Sale is Active
+              </p>
+
+              <div className={styles.listingCard}>
+                <PriceInfoCard heading="Price" text={price} size="large" />
+
+                {!isOwner && <BuyNFT id={id} collectionId={collectionId} price={withoutCommas(sale.price)} />}
+              </div>
+            </div>
+          )}
+
+          {auction && (
+            <div className={styles.listing}>
+              <p className={styles.listingHeading}>
+                <BidSVG /> Auction Ends: {auctionEndDate}
+              </p>
+
+              <div className={styles.listingCard}>
+                <PriceInfoCard heading="Current bid" text={auctionPrice} size="large" />
+
+                {!isOwner && (
+                  <MakeBid
+                    nft={{ ...nft, id }}
+                    collection={{ ...config, id: collectionId }}
+                    auction={{ minBid: auctionPrice, endDate: auctionEndDate }}
+                  />
+                )}
+              </div>
+            </div>
+          )}
+
+          {isOwner && !sale && !auction && (!!config.sellable || !!config.transferable) && (
+            <div className={styles.buttons}>
+              {!!config.sellable && <StartSale nft={{ ...nft, id }} collection={{ ...config, id: collectionId }} />}
+              {!!config.sellable && <StartAuction nft={{ ...nft, id }} collection={{ ...config, id: collectionId }} />}
+
+              <TransferNFT nft={{ ...nft, id }} collection={{ ...config, id: collectionId }} />
+            </div>
+          )}
+
+          <div>
+            <Tabs list={TABS} size="small" outlined className={styles.tabs} value={0} onChange={() => {}} />
+
+            <div className={styles.card}>
+              <h3 className={styles.heading}>
+                <InfoSVG /> Details
+              </h3>
+
+              <ul className={styles.table}>{getDetails()}</ul>
+            </div>
           </div>
         </div>
       </div>

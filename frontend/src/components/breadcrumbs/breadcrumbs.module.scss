@@ -1,0 +1,25 @@
+.breadcrumbs {
+  margin-bottom: 16px;
+
+  display: flex;
+  gap: 8px;
+
+  font-weight: 500;
+  line-height: 18px;
+  letter-spacing: 0.01em;
+  color: #93989a;
+
+  a {
+    transition: opacity 0.25s;
+
+    &:hover {
+      opacity: 0.75;
+    }
+
+    &:last-child {
+      color: #000;
+
+      pointer-events: none;
+    }
+  }
+}

@@ -1,3 +1,4 @@
+import { Breadcrumbs } from './breadcrumbs';
 import { Container } from './container';
 import { CopyButton } from './copy-button';
 import { FilterButton } from './filter-button';
@@ -28,6 +29,7 @@ export {
   PriceInfoCard,
   SearchInput,
   FilterButton,
+  Breadcrumbs,
 };
 
 export type { InfoCardProps };

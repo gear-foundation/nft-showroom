@@ -2,9 +2,10 @@ import { HexString } from '@gear-js/api';
 import { withoutCommas } from '@gear-js/react-hooks';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { useParams } from 'react-router-dom';
+import { generatePath, useParams } from 'react-router-dom';
 
-import { Container, FilterButton, SearchInput } from '@/components';
+import { Breadcrumbs, Container, FilterButton, SearchInput } from '@/components';
+import { ROUTE } from '@/consts';
 import { NFTCard, CollectionHeader, useCollection } from '@/features/collections';
 import { GridSize, useGridSize } from '@/features/lists';
 import { cx, getIpfsLink } from '@/utils';
@@ -45,6 +46,8 @@ function Collection() {
 
   return config && collectionOwner && tokensCount !== undefined && totalNumberOfTokens !== undefined ? (
     <Container>
+      <Breadcrumbs list={[{ to: generatePath(ROUTE.COLLECTION, { id }), text: config.name }]} />
+
       <CollectionHeader
         id={id}
         banner={getIpfsLink(config.collectionBanner)}
