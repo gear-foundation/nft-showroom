@@ -1,5 +1,6 @@
 import { Container } from './container';
 import { CopyButton } from './copy-button';
+import { FilterButton } from './filter-button';
 import { Footer } from './footer';
 import { Header } from './header';
 import { InfoCard, InfoCardProps } from './info-card';
@@ -26,6 +27,7 @@ export {
   NFTActionFormModal,
   PriceInfoCard,
   SearchInput,
+  FilterButton,
 };
 
 export type { InfoCardProps };

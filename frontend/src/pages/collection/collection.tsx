@@ -1,11 +1,10 @@
 import { HexString } from '@gear-js/api';
 import { withoutCommas } from '@gear-js/react-hooks';
-import { Button } from '@gear-js/vara-ui';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useParams } from 'react-router-dom';
 
-import { Container, SearchInput } from '@/components';
+import { Container, FilterButton, SearchInput } from '@/components';
 import { NFTCard, CollectionHeader, useCollection } from '@/features/collections';
 import { GridSize, useGridSize } from '@/features/lists';
 import { cx, getIpfsLink } from '@/utils';
@@ -38,7 +37,7 @@ function Collection() {
   const searchedTokens = tokens?.filter(([, { name }]) => name.toLocaleLowerCase().includes(query));
   const tokensCount = searchedTokens?.length;
 
-  const getNFTs = () =>
+  const renderNFTs = () =>
     collection &&
     searchedTokens?.map(([nftId, nft]) => (
       <NFTCard key={nftId} nft={{ ...nft, id: nftId }} collection={{ ...collection.config, id }} />
@@ -61,7 +60,7 @@ function Collection() {
 
       <div className={styles.nfts}>
         <header className={styles.nftsHeader}>
-          <Button text={`All: ${tokensCount}`} color="grey" size="small" />
+          <FilterButton text={`All: ${tokensCount}`} onClick={() => {}} isActive />
 
           <div className={styles.interaction}>
             <form onSubmit={onSubmit}>
@@ -73,7 +72,7 @@ function Collection() {
         </header>
 
         {tokensCount ? (
-          <ul className={cx(styles.list, styles[gridSize])}>{getNFTs()}</ul>
+          <ul className={cx(styles.list, styles[gridSize])}>{renderNFTs()}</ul>
         ) : (
           <div className={styles.notFound}>
             <NotFoundSVG />
