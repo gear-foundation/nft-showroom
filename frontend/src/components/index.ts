@@ -8,6 +8,7 @@ import { PriceInfoCard } from './price-info-card';
 import { PriceInput } from './price-input';
 import { PrivateRoute } from './private-route';
 import { ResponsiveSquareImage } from './responsive-square-image';
+import { SearchInput } from './search-input';
 import { Tabs } from './tabs';
 import { withAccount } from './with-account';
 
@@ -24,6 +25,7 @@ export {
   InfoCard,
   NFTActionFormModal,
   PriceInfoCard,
+  SearchInput,
 };
 
 export type { InfoCardProps };
