@@ -1,6 +1,7 @@
 import { HexString } from '@gear-js/api';
 import { useSendMessageHandler, useReadFullState } from '@gear-js/react-hooks';
 import { AnyJson } from '@polkadot/types/types';
+import { useMemo } from 'react';
 
 import { ADDRESS } from '@/consts';
 import { useCollectionSendMessage } from '@/features/collections';
@@ -45,9 +46,10 @@ function useMarketplaceState<T>(payload: AnyJson) {
 }
 
 function useCollectionMetadata(collectionId: HexString) {
-  const { state } = useMarketplaceState<CollectionState>({ GetCollectionInfo: collectionId });
-  const collection = state?.CollectionInfo;
+  const payload = useMemo(() => ({ GetCollectionInfo: collectionId }), [collectionId]);
+  const { state } = useMarketplaceState<CollectionState>(payload);
 
+  const collection = state?.CollectionInfo;
   const source = collection ? getIpfsLink(collection.metaLink) : '';
 
   return useProgramMetadata(source);
