@@ -39,7 +39,6 @@ import { ImageChangedHandler } from './nft/image-changed.handler';
 import { TransferredHandler } from './nft/transferred.handler';
 import { MetadataAddedHandler } from './nft/metadata-added.handler';
 import { EventInfo } from './event-info.type';
-import { MarketplaceEvent } from '../model';
 import { EntitiesService } from './entities.service';
 
 const marketplaceMeta = ProgramMetadata.from(
