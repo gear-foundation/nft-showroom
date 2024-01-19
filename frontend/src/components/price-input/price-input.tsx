@@ -4,7 +4,7 @@ import { ForwardedRef, forwardRef } from 'react';
 import VaraSVG from '@/assets/vara.svg?react';
 
 function Component(props: Omit<InputProps, 'type' | 'icon'>, ref: ForwardedRef<HTMLInputElement>) {
-  return <Input type="number" icon={VaraSVG} {...props} ref={ref} />;
+  return <Input type="number" step="any" icon={VaraSVG} {...props} ref={ref} />;
 }
 
 const PriceInput = forwardRef(Component);

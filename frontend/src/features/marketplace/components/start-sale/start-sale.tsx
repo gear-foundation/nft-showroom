@@ -1,5 +1,5 @@
 import { HexString } from '@gear-js/api';
-import { useBalanceFormat } from '@gear-js/react-hooks';
+import { useApi, useBalanceFormat } from '@gear-js/react-hooks';
 import { Button, ModalProps } from '@gear-js/vara-ui';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
@@ -10,6 +10,7 @@ import { useModal } from '@/hooks';
 
 import TagSVG from '../../assets/tag.svg?react';
 import { useNFTSendMessage } from '../../hooks';
+import { isDecimal } from '../../utils';
 
 type Props = {
   nft: { id: string; name: string; mediaUrl: string };
@@ -20,23 +21,34 @@ const defaultValues = {
   price: '',
 };
 
-const schema = z.object({
-  price: z.string().trim().min(1),
-});
-
-const resolver = zodResolver(schema);
-
 function StartSaleModal({ nft, collection, close }: Props & Pick<ModalProps, 'close'>) {
-  const { getChainBalanceValue } = useBalanceFormat();
-  const sendMessage = useNFTSendMessage(collection.id);
+  const { api } = useApi();
+  const { getChainBalanceValue, getFormattedBalanceValue } = useBalanceFormat();
+  const decimals = api?.registry.chainDecimals.toString() || '0';
+  const existentialDeposit = api?.existentialDeposit.toString() || '0';
+
+  const schema = z.object({
+    price: z
+      .string()
+      .transform((value) => getChainBalanceValue(value))
+      .refine(
+        (value) => value.isGreaterThanOrEqualTo(existentialDeposit),
+        `Minimum value is ${getFormattedBalanceValue(existentialDeposit).toFixed()}`,
+      )
+      .refine((value) => !isDecimal(value.toFixed()), `Maximum amount of decimal places is ${decimals}`)
+      .transform((value) => value.toFixed()),
+  });
+
+  const resolver = zodResolver(schema);
 
   const { handleSubmit, register, formState } = useForm({ defaultValues, resolver });
   const { errors } = formState;
 
-  const onSubmit = handleSubmit((data) => {
+  const sendMessage = useNFTSendMessage(collection.id);
+
+  const onSubmit = handleSubmit(({ price }) => {
     const tokenId = nft.id;
     const collectionAddress = collection.id;
-    const price = getChainBalanceValue(data.price).toFixed();
 
     const onSuccess = close;
     const payload = { SaleNft: { price, collectionAddress, tokenId } };
