@@ -4,7 +4,7 @@ const isDecimal = (value: string) => {
   return decimalRegex.test(value);
 };
 
-function getMilliseconds(value: number, unit: 'second' | 'minute' | 'hour' | 'day'): number {
+function getMilliseconds(value: number, unit: 'second' | 'minute' | 'hour' | 'day') {
   const MULTIPLIER = { MS: 1000, S: 60, M: 60, H: 24 };
 
   const UNIT_MULTIPLIER = {
@@ -22,7 +22,7 @@ const getDurationOptions = () =>
     const dayNumber = index + 1;
 
     const label = `${dayNumber} ${dayNumber === 1 ? 'day' : 'days'}`;
-    const value = getMilliseconds(dayNumber, 'day');
+    const value = getMilliseconds(dayNumber, 'day').toString();
 
     return { label, value };
   });
