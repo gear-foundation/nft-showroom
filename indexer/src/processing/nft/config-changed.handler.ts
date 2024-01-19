@@ -17,7 +17,6 @@ export class ConfigChangedHandler implements INftEventHandler {
       );
       return;
     }
-    console.log(`[ConfigChangedHandler] ${event}`);
     let {
       name,
       description,

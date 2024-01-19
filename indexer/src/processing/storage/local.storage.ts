@@ -196,7 +196,6 @@ export class LocalStorage implements IStorage {
 
   private async loadCollections() {
     const collections = await this.store.find(Collection, { where: {} });
-    console.log(collections);
     for (const entity of collections) {
       this.collections[entity.id] = entity;
     }
