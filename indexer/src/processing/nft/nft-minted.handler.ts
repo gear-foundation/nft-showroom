@@ -1,15 +1,14 @@
-import { Block } from '@subsquid/substrate-processor';
 import { MintedEvent } from '../../types/nft.events';
-import { EntitiesStorage } from '../entities.storage';
+import { EntitiesService } from '../entities.service';
 import { INftEventHandler } from './nft.handler';
 import { Nft } from '../../model';
+import { EventInfo } from '../event-info.type';
 
 export class NftMintedHandler implements INftEventHandler {
   async handle(
-    block: Block,
-    collectionAddress: string,
     event: MintedEvent,
-    storage: EntitiesStorage,
+    { source: collectionAddress, timestamp }: EventInfo,
+    storage: EntitiesService,
   ): Promise<void> {
     const collection = await storage.getCollection(collectionAddress);
     if (collection === undefined) {
@@ -20,15 +19,16 @@ export class NftMintedHandler implements INftEventHandler {
     }
     const { tokenId } = event;
     let { description, mediaUrl, metadata, name, owner } = event.nftData;
-    storage.setNft(
+    await storage.setNft(
       new Nft({
+        id: `${collection.id}-${tokenId}`,
         collection,
         description,
         idInCollection: tokenId,
         mediaUrl,
         name,
         owner,
-        mintedAt: new Date(),
+        createdAt: timestamp,
       }),
     );
   }

@@ -9,8 +9,8 @@ import * as marshal from './marshal';
 import { Nft } from './nft.model';
 
 @Entity_()
-export class Sale {
-  constructor(props?: Partial<Sale>) {
+export class Offer {
+  constructor(props?: Partial<Offer>) {
     Object.assign(this, props);
   }
 
@@ -24,14 +24,17 @@ export class Sale {
   @Column_('text', { nullable: false })
   owner!: string;
 
-  @Column_('text', { nullable: true })
-  newOwner!: string | undefined | null;
-
   @Column_('numeric', {
     transformer: marshal.bigintTransformer,
     nullable: false,
   })
   price!: bigint;
+
+  @Column_('text', { nullable: false })
+  status!: string;
+
+  @Column_('text', { nullable: false })
+  creator!: string;
 
   @Column_('timestamp with time zone', { nullable: false })
   timestamp!: Date;
@@ -41,7 +44,4 @@ export class Sale {
 
   @Column_('int4', { nullable: false })
   blockNumber!: number;
-
-  @Column_('text', { nullable: false })
-  status!: string;
 }

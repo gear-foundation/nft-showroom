@@ -28,14 +28,14 @@ export class Collection {
   @ManyToOne_(() => CollectionType, { nullable: true })
   type!: CollectionType;
 
-  @Column_('text', { nullable: false })
-  admin!: string;
+  @Column_('text', { nullable: true })
+  admin!: string | undefined | null;
 
-  @Column_('text', { nullable: false })
-  name!: string;
+  @Column_('text', { nullable: true })
+  name!: string | undefined | null;
 
-  @Column_('text', { nullable: false })
-  description!: string;
+  @Column_('text', { nullable: true })
+  description!: string | undefined | null;
 
   @Column_('numeric', {
     transformer: marshal.bigintTransformer,
@@ -49,27 +49,42 @@ export class Collection {
   })
   tokensLimit!: bigint | undefined | null;
 
-  @Column_('text', { nullable: false })
-  collectionImage!: string;
+  @Column_('numeric', {
+    transformer: marshal.bigintTransformer,
+    nullable: true,
+  })
+  paymentForMint!: bigint | undefined | null;
 
-  @Column_('bool', { nullable: false })
-  transferable!: boolean;
+  @Column_('int4', { nullable: true })
+  royalty!: number | undefined | null;
 
-  @Column_('bool', { nullable: false })
-  approvable!: boolean;
+  @Column_('text', { nullable: true })
+  collectionLogo!: string | undefined | null;
 
-  @Column_('bool', { nullable: false })
-  burnable!: boolean;
+  @Column_('text', { nullable: true })
+  collectionBanner!: string | undefined | null;
 
-  @Column_('bool', { nullable: false })
-  sellable!: boolean;
+  @Column_('bool', { nullable: true })
+  transferable!: boolean | undefined | null;
 
-  @Column_('bool', { nullable: false })
-  attandable!: boolean;
+  @Column_('bool', { nullable: true })
+  approvable!: boolean | undefined | null;
+
+  @Column_('bool', { nullable: true })
+  burnable!: boolean | undefined | null;
+
+  @Column_('bool', { nullable: true })
+  sellable!: boolean | undefined | null;
+
+  @Column_('bool', { nullable: true })
+  attendable!: boolean | undefined | null;
+
+  @Column_('timestamp with time zone', { nullable: true })
+  createdAt!: Date | undefined | null;
 
   @OneToMany_(() => Nft, (e) => e.collection)
   nfts!: Nft[];
 
-  @Column_('text', { array: true, nullable: false })
-  tags!: string[];
+  @Column_('text', { array: true, nullable: true })
+  tags!: string[] | undefined | null;
 }

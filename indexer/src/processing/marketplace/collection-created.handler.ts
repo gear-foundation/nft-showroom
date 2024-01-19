@@ -1,14 +1,14 @@
 import { CollectionCreated } from '../../types/marketplace.events';
-import { EntitiesStorage } from '../entities.storage';
+import { EntitiesService } from '../entities.service';
 import { INftMarketplaceEventHandler } from './nft-marketplace.handler';
 import { Collection } from '../../model';
-import { Block } from '@subsquid/substrate-processor';
+import { EventInfo } from '../event-info.type';
 
 export class CollectionCreatedHandler implements INftMarketplaceEventHandler {
   async handle(
-    block: Block,
     event: CollectionCreated,
-    storage: EntitiesStorage,
+    eventInfo: EventInfo,
+    storage: EntitiesService,
   ): Promise<void> {
     const { typeName, collectionAddress } = event;
     const existingCollection = await storage.getCollection(collectionAddress);
@@ -25,10 +25,11 @@ export class CollectionCreatedHandler implements INftMarketplaceEventHandler {
       );
       return;
     }
-    storage.setCollection(
+    await storage.setCollection(
       new Collection({
         id: collectionAddress,
         type: collectionType,
+        createdAt: eventInfo.timestamp,
       }),
     );
   }

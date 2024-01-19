@@ -1,5 +1,10 @@
 import { Enum, Option, Text, u128, u16, u32, u64, Vec } from '@polkadot/types';
 import { Hash } from '@polkadot/types/interfaces';
+import {
+  safeUnwrapOptional,
+  safeUnwrapToBigInt,
+  safeUnwrapToNumber,
+} from './event.utils';
 
 export enum NftEventType {
   Transferred = 'Transferred',
@@ -34,12 +39,12 @@ export type NftConfig = {
   name: string;
   description: string;
   collectionTags: string[];
-  collectionImg: string;
+  collectionBanner: string;
   collectionLogo: string;
-  userMintLimit: number | null;
-  additionalLinks: number | null;
+  userMintLimit: bigint | null;
+  additionalLinks: AdditionalLink | null;
   royalty: number;
-  paymentForMint: number;
+  paymentForMint: bigint;
   transferable: boolean;
   approvable: boolean;
   burnable: boolean;
@@ -79,7 +84,7 @@ export type ApprovalRevokedEvent = {
 
 export type ExpandedEvent = {
   type: NftEventType.Expanded;
-  additionalLinks: string[];
+  additionalLinks: AdditionalLink | null;
 };
 
 export type ConfigChangedEvent = {
@@ -99,6 +104,14 @@ export type MetadataAddedEvent = {
   metadata: string;
 };
 
+export type AdditionalLink = {
+  externalUrl: string | null;
+  telegram: string | null;
+  xcom: string | null;
+  medium: string | null;
+  discord: string | null;
+};
+
 export type NftEvent =
   | TransferEvent
   | TokenInfoReceivedEvent
@@ -111,14 +124,22 @@ export type NftEvent =
   | ImageChangedEvent
   | MetadataAddedEvent;
 
+export interface AdditionalLinkPlain {
+  externalUrl: Option<Text>;
+  telegram: Option<Text>;
+  xcom: Option<Text>;
+  medium: Option<Text>;
+  discord: Option<Text>;
+}
+
 export interface ConfigPlain {
   name: Text;
   description: Text;
   collectionTags: Vec<Text>;
-  collectionImg: Text;
+  collectionBanner: Text;
   collectionLogo: Text;
-  userMintLimit: Option<u32>;
-  additionalLinks: Option<u32>;
+  userMintLimit: Option<u32> | number;
+  additionalLinks: AdditionalLinkPlain;
   royalty: u16;
   paymentForMint: u128;
   transferable: boolean;
@@ -132,19 +153,21 @@ export interface NftEventPlain extends Enum {
   transferred: {
     owner: Hash;
     recipient: Hash;
-    token_id: u64;
+    tokenId: u64;
   };
   tokenInfoReceived: {
     token_owner: Hash;
     approval: Option<Hash>;
     sellable: boolean;
-    collection_owner: Hash;
+    collectionOwner: Hash;
     royalty: u16;
   };
-  initialized: ConfigPlain;
+  initialized: {
+    config: ConfigPlain;
+  };
   minted: {
-    token_id: u64;
-    nft_data: {
+    tokenId: u64;
+    nftData: {
       owner: Hash;
       name: Text;
       description: Text;
@@ -160,17 +183,17 @@ export interface NftEventPlain extends Enum {
     tokenId: u64;
   };
   expanded: {
-    additional_links: Vec<Text>;
+    additionalLinks: AdditionalLinkPlain;
   };
   configChanged: {
     config: ConfigPlain;
   };
   imageChanged: {
-    token_id: u64;
+    tokenId: u64;
     imgLink: Text;
   };
   metadataAdded: {
-    token_id: u64;
+    tokenId: u64;
     metadata: Text;
   };
 }
@@ -181,7 +204,7 @@ export function getNftEvent(event: NftEventPlain): NftEvent | undefined {
       type: NftEventType.Transferred,
       owner: event.transferred.owner.toString(),
       recipient: event.transferred.recipient.toString(),
-      tokenId: event.transferred.token_id.toNumber(),
+      tokenId: safeUnwrapToNumber(event.transferred.tokenId)!,
     };
   }
   if (event.tokenInfoReceived) {
@@ -190,45 +213,59 @@ export function getNftEvent(event: NftEventPlain): NftEvent | undefined {
       tokenOwner: event.tokenInfoReceived.token_owner.toString(),
       approval: event.tokenInfoReceived.approval?.toString() ?? null,
       sellable: event.tokenInfoReceived.sellable,
-      collectionOwner: event.tokenInfoReceived.collection_owner.toString(),
-      royalty: event.tokenInfoReceived.royalty.toNumber(),
+      collectionOwner: event.tokenInfoReceived.collectionOwner.toString(),
+      royalty: safeUnwrapToNumber(event.tokenInfoReceived.royalty)!,
     };
   }
   if (event.initialized) {
     return {
       type: NftEventType.Initialized,
       config: {
-        name: event.initialized.name.toString(),
-        description: event.initialized.description.toString(),
-        collectionTags: event.initialized.collectionTags.map((tag) =>
+        name: event.initialized.config.name.toString(),
+        description: event.initialized.config.description.toString(),
+        collectionTags: event.initialized.config.collectionTags.map((tag) =>
           tag.toString(),
         ),
-        collectionImg: event.initialized.collectionImg.toString(),
-        collectionLogo: event.initialized.collectionLogo.toString(),
-        userMintLimit:
-          event.initialized.userMintLimit.unwrapOr(null)?.toNumber() ?? null,
-        additionalLinks:
-          event.initialized.additionalLinks.unwrapOr(null)?.toNumber() ?? null,
-        royalty: event.initialized.royalty.toNumber(),
-        paymentForMint: event.initialized.paymentForMint.toNumber(),
-        transferable: event.initialized.transferable,
-        approvable: event.initialized.approvable,
-        burnable: event.initialized.burnable,
-        sellable: event.initialized.sellable,
-        attendable: event.initialized.attendable,
+        collectionBanner: event.initialized.config.collectionBanner.toString(),
+        collectionLogo: event.initialized.config.collectionLogo.toString(),
+        userMintLimit: safeUnwrapToBigInt(
+          safeUnwrapOptional(event.initialized.config.userMintLimit),
+        ),
+        additionalLinks: event.initialized.config.additionalLinks
+          ? {
+              externalUrl:
+                event.initialized.config.additionalLinks.externalUrl.toString(),
+              telegram:
+                event.initialized.config.additionalLinks.telegram.toString(),
+              xcom: event.initialized.config.additionalLinks.xcom.toString(),
+              medium:
+                event.initialized.config.additionalLinks.medium.toString(),
+              discord:
+                event.initialized.config.additionalLinks.discord.toString(),
+            }
+          : null,
+        royalty: safeUnwrapToNumber(event.initialized.config.royalty)!,
+        paymentForMint: safeUnwrapToBigInt(
+          event.initialized.config.paymentForMint,
+        )!,
+        transferable: event.initialized.config.transferable,
+        approvable: event.initialized.config.approvable,
+        burnable: event.initialized.config.burnable,
+        sellable: event.initialized.config.sellable,
+        attendable: event.initialized.config.attendable,
       },
     };
   }
   if (event.minted) {
     return {
       type: NftEventType.Minted,
-      tokenId: event.minted.token_id.toNumber(),
+      tokenId: safeUnwrapToNumber(event.minted.tokenId)!,
       nftData: {
-        owner: event.minted.nft_data.owner.toString(),
-        name: event.minted.nft_data.name.toString(),
-        description: event.minted.nft_data.description.toString(),
-        metadata: event.minted.nft_data.metadata.map((m) => m.toString()),
-        mediaUrl: event.minted.nft_data.mediaUrl.toString(),
+        owner: event.minted.nftData.owner.toString(),
+        name: event.minted.nftData.name.toString(),
+        description: event.minted.nftData.description.toString(),
+        metadata: event.minted.nftData.metadata.map((m) => m.toString()),
+        mediaUrl: event.minted.nftData.mediaUrl.toString(),
       },
     };
   }
@@ -236,21 +273,27 @@ export function getNftEvent(event: NftEventPlain): NftEvent | undefined {
     return {
       type: NftEventType.Approved,
       to: event.approved.to.toString(),
-      tokenId: event.approved.tokenId.toNumber(),
+      tokenId: safeUnwrapToNumber(event.approved.tokenId)!,
     };
   }
   if (event.approvalRevoked) {
     return {
       type: NftEventType.ApprovalRevoked,
-      tokenId: event.approvalRevoked.tokenId.toNumber(),
+      tokenId: safeUnwrapToNumber(event.approvalRevoked.tokenId)!,
     };
   }
   if (event.expanded) {
     return {
       type: NftEventType.Expanded,
-      additionalLinks: event.expanded.additional_links.map((link) =>
-        link.toString(),
-      ),
+      additionalLinks: event.expanded.additionalLinks
+        ? {
+            externalUrl: event.expanded.additionalLinks.externalUrl.toString(),
+            telegram: event.expanded.additionalLinks.telegram.toString(),
+            xcom: event.expanded.additionalLinks.xcom.toString(),
+            medium: event.expanded.additionalLinks.medium.toString(),
+            discord: event.expanded.additionalLinks.discord.toString(),
+          }
+        : null,
     };
   }
   if (event.configChanged) {
@@ -262,17 +305,29 @@ export function getNftEvent(event: NftEventPlain): NftEvent | undefined {
         collectionTags: event.configChanged.config.collectionTags.map((tag) =>
           tag.toString(),
         ),
-        collectionImg: event.configChanged.config.collectionImg.toString(),
+        collectionBanner:
+          event.configChanged.config.collectionBanner.toString(),
         collectionLogo: event.configChanged.config.collectionLogo.toString(),
-        userMintLimit:
-          event.configChanged.config.userMintLimit.unwrapOr(null)?.toNumber() ??
-          null,
-        additionalLinks:
-          event.configChanged.config.additionalLinks
-            .unwrapOr(null)
-            ?.toNumber() ?? null,
-        royalty: event.configChanged.config.royalty.toNumber(),
-        paymentForMint: event.configChanged.config.paymentForMint.toNumber(),
+        userMintLimit: safeUnwrapToBigInt(
+          safeUnwrapOptional(event.configChanged.config.userMintLimit),
+        ),
+        additionalLinks: event.configChanged.config.additionalLinks
+          ? {
+              externalUrl:
+                event.configChanged.config.additionalLinks.externalUrl.toString(),
+              telegram:
+                event.configChanged.config.additionalLinks.telegram.toString(),
+              xcom: event.configChanged.config.additionalLinks.xcom.toString(),
+              medium:
+                event.configChanged.config.additionalLinks.medium.toString(),
+              discord:
+                event.configChanged.config.additionalLinks.discord.toString(),
+            }
+          : null,
+        royalty: safeUnwrapToNumber(event.configChanged.config.royalty)!,
+        paymentForMint: safeUnwrapToBigInt(
+          event.configChanged.config.paymentForMint,
+        )!,
         transferable: event.configChanged.config.transferable,
         approvable: event.configChanged.config.approvable,
         burnable: event.configChanged.config.burnable,
@@ -284,14 +339,14 @@ export function getNftEvent(event: NftEventPlain): NftEvent | undefined {
   if (event.imageChanged) {
     return {
       type: NftEventType.ImageChanged,
-      tokenId: event.imageChanged.token_id.toNumber(),
+      tokenId: safeUnwrapToNumber(event.imageChanged.tokenId)!,
       imgLink: event.imageChanged.imgLink.toString(),
     };
   }
   if (event.metadataAdded) {
     return {
       type: NftEventType.MetadataAdded,
-      tokenId: event.metadataAdded.token_id.toNumber(),
+      tokenId: safeUnwrapToNumber(event.metadataAdded.tokenId)!,
       metadata: event.metadataAdded.metadata.toString(),
     };
   }

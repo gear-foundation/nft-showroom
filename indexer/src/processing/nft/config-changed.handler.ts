@@ -1,22 +1,23 @@
-import { InitializedEvent } from '../../types/nft.events';
+import { ConfigChangedEvent } from '../../types/nft.events';
 import { EntitiesService } from '../entities.service';
 import { INftEventHandler } from './nft.handler';
 import { Collection } from '../../model';
 import { EventInfo } from '../event-info.type';
 
-export class InitializedHandler implements INftEventHandler {
+export class ConfigChangedHandler implements INftEventHandler {
   async handle(
-    event: InitializedEvent,
-    { source: collectionAddress, destination, timestamp }: EventInfo,
+    event: ConfigChangedEvent,
+    { source: collectionAddress, destination }: EventInfo,
     storage: EntitiesService,
   ): Promise<void> {
     const collection = await storage.getCollection(collectionAddress);
     if (collection === undefined) {
       console.warn(
-        `[InitializedHandler] ${collectionAddress}: collection is not found`,
+        `[ConfigChangedHandler] ${collectionAddress}: collection is not found`,
       );
       return;
     }
+    console.log(`[ConfigChangedHandler] ${event}`);
     let {
       name,
       description,
@@ -50,7 +51,6 @@ export class InitializedHandler implements INftEventHandler {
         sellable,
         transferable,
         userMintLimit: userMintLimit,
-        createdAt: timestamp,
       }),
     );
   }

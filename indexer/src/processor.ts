@@ -1,5 +1,4 @@
 import { assertNotNull } from '@subsquid/util-internal';
-import { lookupArchive } from '@subsquid/archive-registry';
 import {
   BlockHeader,
   DataHandlerContext,
@@ -9,33 +8,27 @@ import {
   Call as _Call,
   Extrinsic as _Extrinsic,
 } from '@subsquid/substrate-processor';
+import { config } from './config';
 
 export const processor = new SubstrateBatchProcessor()
   .setDataSource({
-    // archive: lookupArchive('vara-testnet', { release: 'ArrowSquid' }),
-    // Chain RPC endpoint is required on Substrate for metadata and real-time updates
     chain: {
       url: assertNotNull(process.env.RPC_ENDPOINT),
-      rateLimit: 100,
+      rateLimit: config.rateLimit,
     },
   })
   .addEvent({
     name: ['Gear.UserMessageSent'],
-    extrinsic: true,
   })
   .setFields({
     event: {
       args: true,
     },
-    extrinsic: {
-      hash: true,
-      fee: true,
-    },
     block: {
       timestamp: true,
     },
   })
-  .setBlockRange({ from: 2608260 });
+  .setBlockRange({ from: config.minBlockNum });
 
 export type Fields = SubstrateBatchProcessorFields<typeof processor>;
 export type Block = BlockHeader<Fields>;

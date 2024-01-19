@@ -1,6 +1,11 @@
-import { Enum, Option, Text, Vec, u64, u128 } from '@polkadot/types';
+import { Enum, Option, Text, Vec, u64, u128, u32 } from '@polkadot/types';
 import { Hash } from '@polkadot/types/interfaces';
 import { CodeId } from '@gear-js/api';
+import {
+  safeUnwrapOptional,
+  safeUnwrapToBigInt,
+  safeUnwrapToNumber,
+} from './event.utils';
 
 export enum NftMarketplaceEventType {
   NewCollectionAdded = 'isNewCollectionAdded',
@@ -11,6 +16,7 @@ export enum NftMarketplaceEventType {
   AuctionCreated = 'isAuctionCreated',
   BidAdded = 'isBidAdded',
   AuctionCanceled = 'isAuctionCanceled',
+  AuctionClosed = 'isAuctionClosed',
   OfferCreated = 'isOfferCreated',
   OfferCanceled = 'isOfferCanceled',
   OfferAccepted = 'isOfferAccepted',
@@ -60,20 +66,29 @@ export type AuctionCreated = {
   type: NftMarketplaceEventType.AuctionCreated;
   collectionAddress: string;
   tokenId: number;
-  price: bigint;
-  currentOwner: string;
+  minPrice: bigint;
+  durationMs: number;
 };
 
 export type BidAdded = {
   type: NftMarketplaceEventType.BidAdded;
   collectionAddress: string;
   tokenId: number;
+  price: bigint;
 };
 
 export type AuctionCanceled = {
   type: NftMarketplaceEventType.AuctionCanceled;
   collectionAddress: string;
   tokenId: number;
+};
+
+export type AuctionClosed = {
+  type: NftMarketplaceEventType.AuctionClosed;
+  collectionAddress: string;
+  tokenId: number;
+  price: bigint;
+  currentOwner: string;
 };
 
 export type OfferCreated = {
@@ -91,6 +106,13 @@ export type OfferCanceled = {
 
 export type OfferAccepted = {
   type: NftMarketplaceEventType.OfferAccepted;
+  offer: Offer;
+};
+
+export type Offer = {
+  collectionAddress: string;
+  tokenId: number;
+  creator: string;
 };
 
 export type CollectionDeleted = {
@@ -111,7 +133,13 @@ export type AdminDeleted = {
 export type ConfigUpdated = {
   type: NftMarketplaceEventType.ConfigUpdated;
   gasForCreation: number | null;
+  gasForTransferToken: number | null;
+  gasForCloseAuction: number | null;
+  gasForDeleteCollection: number | null;
+  gasForGetTokenInfo: number | null;
   timeBetweenCreateCollections: number | null;
+  minimumTransferValue: bigint | null;
+  msInBlock: number | null;
 };
 
 export type NftMarketplaceEvent =
@@ -123,6 +151,7 @@ export type NftMarketplaceEvent =
   | AuctionCreated
   | BidAdded
   | AuctionCanceled
+  | AuctionClosed
   | OfferCreated
   | OfferCanceled
   | OfferAccepted
@@ -161,16 +190,23 @@ export interface NftMarketplaceEventPlain extends Enum {
   auctionCreated: {
     collectionAddress: Hash;
     tokenId: u64;
-    price: u128;
-    currentOwner: Hash;
+    minPrice: u128;
+    durationMs: u32;
   };
   bidAdded: {
     collectionAddress: Hash;
     tokenId: u64;
+    price: u128;
   };
   auctionCanceled: {
     collectionAddress: Hash;
     tokenId: u64;
+  };
+  auctionClosed: {
+    collectionAddress: Hash;
+    tokenId: u64;
+    price: u128;
+    currentOwner: Hash;
   };
   offerCreated: {
     collectionAddress: Hash;
@@ -181,19 +217,33 @@ export interface NftMarketplaceEventPlain extends Enum {
     collectionAddress: Hash;
     tokenId: u64;
   };
-  offerAccepted: {};
+  offerAccepted: {
+    offer: {
+      collectionAddress: Hash;
+      tokenId: u64;
+      creator: Hash;
+    };
+  };
   collectionDeleted: {
     collectionAddress: Hash;
   };
   adminsAdded: {
     users: Vec<Hash>;
+    collectionAddress: Hash;
   };
   adminDeleted: {
     user: Hash;
+    collectionAddress: Hash;
   };
   configUpdated: {
     gasForCreation: Option<u64>;
+    gasForTransferToken: Option<u64>;
+    gasForCloseAuction: Option<u64>;
+    gasForDeleteCollection: Option<u64>;
+    gasForGetTokenInfo: Option<u64>;
     timeBetweenCreateCollections: Option<u64>;
+    minimumTransferValue: Option<u128>;
+    msInBlock: Option<u32>;
   };
 }
 
@@ -220,8 +270,8 @@ export function getMarketplaceEvent(
     return {
       type: NftMarketplaceEventType.SaleNft,
       collectionAddress: event.saleNft.collectionAddress.toString(),
-      tokenId: event.saleNft.tokenId.toNumber(),
-      price: event.saleNft.price.toBigInt(),
+      tokenId: safeUnwrapToNumber(event.saleNft.tokenId)!,
+      price: safeUnwrapToBigInt(event.saleNft.price)!,
       owner: event.saleNft.owner.toString(),
     };
   }
@@ -229,15 +279,15 @@ export function getMarketplaceEvent(
     return {
       type: NftMarketplaceEventType.SaleNftCanceled,
       collectionAddress: event.saleNftCanceled.collectionAddress.toString(),
-      tokenId: event.saleNftCanceled.tokenId.toNumber(),
+      tokenId: safeUnwrapToNumber(event.saleNftCanceled.tokenId)!,
     };
   }
   if (event.nftSold) {
     return {
       type: NftMarketplaceEventType.NftSold,
       currentOwner: event.nftSold.currentOwner.toString(),
-      tokenId: event.nftSold.tokenId.toNumber(),
-      price: event.nftSold.price.toBigInt(),
+      tokenId: safeUnwrapToNumber(event.nftSold.tokenId)!,
+      price: safeUnwrapToBigInt(event.nftSold.price)!,
       collectionAddress: event.nftSold.collectionAddress.toString(),
     };
   }
@@ -245,43 +295,59 @@ export function getMarketplaceEvent(
     return {
       type: NftMarketplaceEventType.AuctionCreated,
       collectionAddress: event.auctionCreated.collectionAddress.toString(),
-      tokenId: event.auctionCreated.tokenId.toNumber(),
-      price: event.auctionCreated.price.toBigInt(),
-      currentOwner: event.auctionCreated.currentOwner.toString(),
+      tokenId: safeUnwrapToNumber(event.auctionCreated.tokenId)!,
+      minPrice: safeUnwrapToBigInt(event.auctionCreated.minPrice)!,
+      durationMs: safeUnwrapToNumber(event.auctionCreated.durationMs)!,
     };
   }
   if (event.bidAdded) {
     return {
       type: NftMarketplaceEventType.BidAdded,
       collectionAddress: event.bidAdded.collectionAddress.toString(),
-      tokenId: event.bidAdded.tokenId.toNumber(),
+      tokenId: safeUnwrapToNumber(event.bidAdded.tokenId)!,
+      price: safeUnwrapToBigInt(event.bidAdded.price)!,
     };
   }
   if (event.auctionCanceled) {
     return {
       type: NftMarketplaceEventType.AuctionCanceled,
       collectionAddress: event.auctionCanceled.collectionAddress.toString(),
-      tokenId: event.auctionCanceled.tokenId.toNumber(),
+      tokenId: safeUnwrapToNumber(event.auctionCanceled.tokenId)!,
+    };
+  }
+  if (event.auctionClosed) {
+    return {
+      type: NftMarketplaceEventType.AuctionClosed,
+      collectionAddress: event.auctionClosed.collectionAddress.toString(),
+      tokenId: safeUnwrapToNumber(event.auctionClosed.tokenId)!,
+      price: safeUnwrapToBigInt(event.auctionClosed.price)!,
+      currentOwner: event.auctionClosed.currentOwner.toString(),
     };
   }
   if (event.offerCreated) {
     return {
       type: NftMarketplaceEventType.OfferCreated,
       collectionAddress: event.offerCreated.collectionAddress.toString(),
-      tokenId: event.offerCreated.tokenId.toNumber(),
-      price: event.offerCreated.price.toBigInt(),
+      tokenId: safeUnwrapToNumber(event.offerCreated.tokenId)!,
+      price: safeUnwrapToBigInt(event.offerCreated.price)!,
     };
   }
   if (event.offerCanceled) {
     return {
       type: NftMarketplaceEventType.OfferCanceled,
       collectionAddress: event.offerCanceled.collectionAddress.toString(),
-      tokenId: event.offerCanceled.tokenId.toNumber(),
+      tokenId: safeUnwrapToNumber(event.offerCanceled.tokenId)!,
     };
   }
   if (event.offerAccepted) {
     return {
       type: NftMarketplaceEventType.OfferAccepted,
+      offer: {
+        collectionAddress:
+          event.offerAccepted.offer.collectionAddress.toString(),
+        tokenId: safeUnwrapToNumber(event.offerAccepted.offer.tokenId)!,
+        creator: event.offerAccepted.offer.creator.toString(),
+      },
     };
   }
   if (event.collectionDeleted) {
@@ -305,12 +371,38 @@ export function getMarketplaceEvent(
   if (event.configUpdated) {
     return {
       type: NftMarketplaceEventType.ConfigUpdated,
-      gasForCreation:
-        event.configUpdated.gasForCreation.unwrapOr(null)?.toNumber() ?? null,
-      timeBetweenCreateCollections:
-        event.configUpdated.timeBetweenCreateCollections
-          .unwrapOr(null)
-          ?.toNumber() ?? null,
+      gasForCreation: safeUnwrapToNumber(
+        safeUnwrapOptional<u64, number>(event.configUpdated.gasForCreation),
+      ),
+      gasForTransferToken: safeUnwrapToNumber(
+        safeUnwrapOptional<u64, number>(
+          event.configUpdated.gasForTransferToken,
+        ),
+      ),
+      gasForCloseAuction: safeUnwrapToNumber(
+        safeUnwrapOptional<u64, number>(event.configUpdated.gasForCloseAuction),
+      ),
+      gasForDeleteCollection: safeUnwrapToNumber(
+        safeUnwrapOptional<u64, number>(
+          event.configUpdated.gasForDeleteCollection,
+        ),
+      ),
+      gasForGetTokenInfo: safeUnwrapToNumber(
+        safeUnwrapOptional<u64, number>(event.configUpdated.gasForGetTokenInfo),
+      ),
+      timeBetweenCreateCollections: safeUnwrapToNumber(
+        safeUnwrapOptional<u64, number>(
+          event.configUpdated.timeBetweenCreateCollections,
+        ),
+      ),
+      minimumTransferValue: safeUnwrapToBigInt(
+        safeUnwrapOptional<u128, number>(
+          event.configUpdated.minimumTransferValue,
+        ),
+      ),
+      msInBlock: safeUnwrapToNumber(
+        safeUnwrapOptional<u32, number>(event.configUpdated.msInBlock),
+      ),
     };
   }
 }

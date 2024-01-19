@@ -6,11 +6,11 @@ import {
   Index as Index_,
 } from 'typeorm';
 import * as marshal from './marshal';
-import { Nft } from './nft.model';
+import { Auction } from './auction.model';
 
 @Entity_()
-export class Sale {
-  constructor(props?: Partial<Sale>) {
+export class Bid {
+  constructor(props?: Partial<Bid>) {
     Object.assign(this, props);
   }
 
@@ -18,14 +18,11 @@ export class Sale {
   id!: string;
 
   @Index_()
-  @ManyToOne_(() => Nft, { nullable: true })
-  nft!: Nft;
+  @ManyToOne_(() => Auction, { nullable: true })
+  auction!: Auction;
 
   @Column_('text', { nullable: false })
-  owner!: string;
-
-  @Column_('text', { nullable: true })
-  newOwner!: string | undefined | null;
+  bidder!: string;
 
   @Column_('numeric', {
     transformer: marshal.bigintTransformer,
@@ -36,12 +33,6 @@ export class Sale {
   @Column_('timestamp with time zone', { nullable: false })
   timestamp!: Date;
 
-  @Column_('timestamp with time zone', { nullable: false })
-  updatedAt!: Date;
-
   @Column_('int4', { nullable: false })
   blockNumber!: number;
-
-  @Column_('text', { nullable: false })
-  status!: string;
 }

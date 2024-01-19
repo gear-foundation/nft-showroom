@@ -1,12 +1,11 @@
-import { EntitiesStorage } from '../entities.storage';
-import { Block } from '@subsquid/substrate-processor';
+import { EntitiesService } from '../entities.service';
 import { NftEvent } from '../../types/nft.events';
+import { EventInfo } from '../event-info.type';
 
 export interface INftEventHandler {
   handle(
-    block: Block,
-    collectionAddress: string,
     event: NftEvent,
-    storage: EntitiesStorage,
+    eventInfo: EventInfo,
+    storage: EntitiesService,
   ): Promise<void>;
 }

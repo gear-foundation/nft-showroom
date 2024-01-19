@@ -3,18 +3,43 @@ import { TypeormDatabase } from '@subsquid/typeorm-store';
 import { processor } from './processor';
 import { config } from './config';
 import { EventsProcessing } from './processing/events.processing';
-import {Collection} from "./model";
+import { EventInfo } from './processing/event-info.type';
+import { Block } from '@subsquid/substrate-processor';
+import { NftMarketplaceEventType } from './types/marketplace.events';
+import { EntitiesService } from './processing/entities.service';
+import { getLocalStorage } from './processing/storage/local.storage';
+import { BatchService } from './processing/batch.service';
+
+const NFT_INITIALIZED_CLEAR_TIME = 5 * 60 * 1000; // 5 minutes
+
+function getBlockDate(
+  block: Block<{ block: { timestamp: boolean }; event: { args: boolean } }>,
+) {
+  return new Date(block.header.timestamp ?? new Date().getTime());
+}
+
+let possibleNftInitializedEvents: {
+  payload: string;
+  eventInfo: EventInfo;
+}[] = [];
 
 processor.run(new TypeormDatabase(), async (ctx) => {
-  const processing = new EventsProcessing(ctx.store);
+  const localStorage = await getLocalStorage(ctx.store);
+  const entitiesService = new EntitiesService(
+    localStorage,
+    new BatchService(ctx.store),
+    ctx.store,
+  );
+  const processing = new EventsProcessing(entitiesService);
+  const firstBlockDate = getBlockDate(ctx.blocks[0]);
+  console.log(
+    `[main] start processing ${ctx.blocks.length} blocks at ${firstBlockDate}.`,
+  );
   for (const block of ctx.blocks) {
-    const events = [
-      ...block.events,
-      ...block.extrinsics.flatMap((e) => e.events),
-    ].filter((e) => e.args && e.args.message);
+    const events = block.events.filter((e) => e.args && e.args.message);
     for (const item of events) {
       const {
-        message: { source, payload, details },
+        message: { source, payload, details, destination, id },
       } = item.args;
       if (payload === '0x') {
         continue;
@@ -22,14 +47,45 @@ processor.run(new TypeormDatabase(), async (ctx) => {
       if (details && details.code.__kind !== 'Success') {
         continue;
       }
-      const collection = await ctx.store.findOne(Collection, { where: { id: source } });
-      if (collection) {
-        await processing.handleNftEvent(block, payload, source);
-      }
-      if (config.marketplaceProgram && config.marketplaceProgram === source) {
-        await processing.handleMarketplaceEvent(block, payload, source);
+      const eventInfo: EventInfo = {
+        blockNumber: block.header.height,
+        destination,
+        source,
+        timestamp: getBlockDate(block),
+        txHash: id,
+      };
+      if (config.marketplaceProgram === source) {
+        const marketplaceEvent = await processing.handleMarketplaceEvent(
+          payload,
+          eventInfo,
+        );
+        if (
+          marketplaceEvent &&
+          marketplaceEvent.type === NftMarketplaceEventType.CollectionCreated
+        ) {
+          const nftInitialize = possibleNftInitializedEvents.find(
+            (e) => e.eventInfo.source === marketplaceEvent.collectionAddress,
+          );
+          if (nftInitialize) {
+            await processing.handleNftEvent(
+              nftInitialize.payload,
+              nftInitialize.eventInfo,
+            );
+          }
+        }
+      } else {
+        let collection = await localStorage.getCollection(source);
+        if (collection) {
+          await processing.handleNftEvent(payload, eventInfo);
+        }
+        possibleNftInitializedEvents.push({ payload, eventInfo });
       }
     }
   }
+  possibleNftInitializedEvents = possibleNftInitializedEvents.filter(
+    (s) =>
+      s.eventInfo.timestamp >
+      new Date(firstBlockDate.getTime() - NFT_INITIALIZED_CLEAR_TIME),
+  );
   await processing.saveAll();
 });

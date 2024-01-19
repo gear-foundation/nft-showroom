@@ -1,14 +1,15 @@
 import { NftSold } from '../../types/marketplace.events';
-import { EntitiesStorage } from '../entities.storage';
+import { EntitiesService } from '../entities.service';
 import { INftMarketplaceEventHandler } from './nft-marketplace.handler';
-import { Sale, Transfer } from '../../model';
-import { Block } from '@subsquid/substrate-processor';
+import { Sale } from '../../model';
+import { SaleStatus } from '../../model/types';
+import { EventInfo } from '../event-info.type';
 
 export class NftSoldHandler implements INftMarketplaceEventHandler {
   async handle(
-    block: Block,
     event: NftSold,
-    storage: EntitiesStorage,
+    eventInfo: EventInfo,
+    storage: EntitiesService,
   ): Promise<void> {
     const { collectionAddress, tokenId, price, currentOwner } = event;
     const collection = await storage.getCollection(collectionAddress);
@@ -21,37 +22,27 @@ export class NftSoldHandler implements INftMarketplaceEventHandler {
     const nft = await storage.getNft(collectionAddress, tokenId);
     if (nft === undefined) {
       console.warn(
-        `[AuctionCreatedHandler] ${collectionAddress}-${tokenId}: nft is not found`,
+        `[NftSoldHandler] ${collectionAddress}-${tokenId}: nft is not found`,
       );
       return;
     }
     const sale = await storage.getSale(nft);
-    if (sale !== undefined) {
+    if (sale === undefined) {
       console.warn(
-        `[AuctionCreatedHandler] ${collectionAddress}-${tokenId}: sale is already exists`,
+        `[NftSoldHandler] ${collectionAddress}-${tokenId}: sale not found`,
       );
       return;
     }
-    storage.setSale(
+    await storage.setSale(
       new Sale({
+        ...sale,
         nft,
         price,
-        owner: currentOwner,
-        isSold: true,
-        blockNumber: block.header.hash,
+        newOwner: currentOwner,
+        status: SaleStatus.Sold,
+        blockNumber: eventInfo.blockNumber,
+        updatedAt: eventInfo.timestamp,
       }),
     );
-    storage.setTransfer(
-      new Transfer({
-        nft,
-        from: nft.owner,
-        to: currentOwner,
-        blockNumber: block.header.hash,
-      }),
-    );
-    storage.setNft({
-      ...nft,
-      owner: currentOwner,
-    });
   }
 }
