@@ -4,4 +4,27 @@ const isDecimal = (value: string) => {
   return decimalRegex.test(value);
 };
 
-export { isDecimal };
+function getMilliseconds(value: number, unit: 'second' | 'minute' | 'hour' | 'day'): number {
+  const MULTIPLIER = { MS: 1000, S: 60, M: 60, H: 24 };
+
+  const UNIT_MULTIPLIER = {
+    second: MULTIPLIER.MS,
+    minute: MULTIPLIER.MS * MULTIPLIER.S,
+    hour: MULTIPLIER.MS * MULTIPLIER.S * MULTIPLIER.M,
+    day: MULTIPLIER.MS * MULTIPLIER.S * MULTIPLIER.M * MULTIPLIER.H,
+  };
+
+  return value * UNIT_MULTIPLIER[unit];
+}
+
+const getDurationOptions = () =>
+  new Array(30).fill(undefined).map((_, index) => {
+    const dayNumber = index + 1;
+
+    const label = `${dayNumber} ${dayNumber === 1 ? 'day' : 'days'}`;
+    const value = getMilliseconds(dayNumber, 'day');
+
+    return { label, value };
+  });
+
+export { isDecimal, getMilliseconds, getDurationOptions };
