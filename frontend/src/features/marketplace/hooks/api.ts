@@ -8,8 +8,8 @@ import { useCollectionSendMessage } from '@/features/collections';
 import { useProgramMetadata } from '@/hooks';
 import { getIpfsLink } from '@/utils';
 
-import metadataSource from './assets/nft_marketplace.meta.txt';
-import { CollectionIDsState, CollectionState, MarketplaceState } from './types';
+import metadataSource from '../assets/nft_marketplace.meta.txt';
+import { CollectionIDsState, CollectionState, MarketplaceState } from '../types';
 
 function useMarketplaceMetadata() {
   return useProgramMetadata(metadataSource);

@@ -6,8 +6,7 @@ import { NFTActionFormModal, PriceInput, withAccount } from '@/components';
 import { useModal } from '@/hooks';
 
 import BidSVG from '../../assets/bid.svg?react';
-import { useNFTSendMessage } from '../../hooks';
-import { useGetPriceSchema } from '../../use-get-price-schema';
+import { useNFTSendMessage, usePriceSchema } from '../../hooks';
 import { getDurationOptions } from '../../utils';
 
 type Props = {
@@ -25,8 +24,8 @@ const defaultValues = {
 function Component({ nft, collection }: Props) {
   const [isOpen, open, close] = useModal();
 
-  const { getPriceSchema } = useGetPriceSchema();
-  const schema = z.object({ duration: z.string(), minPrice: getPriceSchema() });
+  const { getPriceSchema } = usePriceSchema();
+  const schema = z.object({ minBid: getPriceSchema() });
 
   const sendMessage = useNFTSendMessage(collection.id);
 

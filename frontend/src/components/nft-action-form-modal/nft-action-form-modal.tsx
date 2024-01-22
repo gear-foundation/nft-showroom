@@ -1,3 +1,4 @@
+import { useBalanceFormat } from '@gear-js/react-hooks';
 import { Button, Modal, ModalProps } from '@gear-js/vara-ui';
 import { ReactNode } from 'react';
 import { DefaultValues, FieldValues } from 'react-hook-form';
@@ -25,6 +26,8 @@ function NFTActionFormModal<T extends FieldValues>({ modal, form, nft, collectio
   const { heading, close } = modal;
   const { defaultValues, schema, onSubmit } = form;
 
+  const { getFormattedBalanceValue } = useBalanceFormat();
+
   return (
     <Modal heading={heading} close={close}>
       <div className={styles.nft}>
@@ -38,7 +41,7 @@ function NFTActionFormModal<T extends FieldValues>({ modal, form, nft, collectio
 
       {auction && (
         <div className={styles.auction}>
-          <PriceInfoCard heading="Minimal bid" text={auction.minBid} />
+          <PriceInfoCard heading="Minimal bid" text={getFormattedBalanceValue(auction.minBid).toFixed()} />
           <InfoCard SVG={CalendarSVG} heading="End date" text={auction.endDate} />
         </div>
       )}

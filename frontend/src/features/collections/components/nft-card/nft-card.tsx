@@ -71,7 +71,10 @@ function NFTCard({ nft, collection }: Props) {
             <MakeBid
               nft={nft}
               collection={collection}
-              auction={{ minBid: price, endDate: new Date(+withoutCommas(auction.endedAt)).toLocaleString() }}
+              auction={{
+                minBid: withoutCommas(auction.currentPrice),
+                endDate: new Date(+withoutCommas(auction.endedAt)).toLocaleString(),
+              }}
             />
           )}
         </footer>

@@ -127,7 +127,7 @@ function NFT() {
                   <MakeBid
                     nft={{ ...nft, id }}
                     collection={{ ...config, id: collectionId }}
-                    auction={{ minBid: auctionPrice, endDate: auctionEndDate }}
+                    auction={{ minBid: withoutCommas(auction.currentPrice), endDate: auctionEndDate }}
                   />
                 )}
               </div>
