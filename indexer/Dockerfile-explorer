@@ -15,6 +15,7 @@ RUN npm ci
 ADD tsconfig.json .
 ADD src src
 RUN npm run build
+
 FROM node-with-gyp AS deps
 WORKDIR /squid
 ADD package.json .
