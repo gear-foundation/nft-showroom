@@ -20,7 +20,10 @@ WORKDIR /squid
 ADD package.json .
 ADD package-lock.json .
 RUN npm ci --production
+
 FROM node AS squid
+RUN npm i -g @subsquid/cli@latest
+RUN echo -e "loglevel=silent\\nupdate-notifier=false" > /squid/.npmrc
 WORKDIR /squid
 COPY --from=deps /squid/package.json .
 COPY --from=deps /squid/package-lock.json .
@@ -34,7 +37,5 @@ COPY --from=builder /squid/db db
 COPY --from=builder /squid/schema.graphql schema.graphql
 # remove if no commands.json is in the root
 ADD commands.json .
-RUN echo -e "loglevel=silent\\nupdate-notifier=false" > /squid/.npmrc
-RUN npm i -g @subsquid/commands && mv $(which squid-commands) /usr/local/bin/sqd
 ENV PROCESSOR_PROMETHEUS_PORT 3000
 CMD ["npm", "run", "serve"]
