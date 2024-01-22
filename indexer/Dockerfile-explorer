@@ -6,7 +6,7 @@ WORKDIR /squid
 ADD package.json .
 ADD package-lock.json .
 # remove if needed
-ADD assets assets 
+ADD assets assets
 # remove if needed
 ADD db db
 # remove if needed
@@ -37,3 +37,4 @@ ADD commands.json .
 RUN echo -e "loglevel=silent\\nupdate-notifier=false" > /squid/.npmrc
 RUN npm i -g @subsquid/commands && mv $(which squid-commands) /usr/local/bin/sqd
 ENV PROCESSOR_PROMETHEUS_PORT 3000
+CMD ["npm", "run", "serve"]

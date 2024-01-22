@@ -9,13 +9,15 @@
     "run": "sqd process",
     "migrations:generate": "sqd migration:generate",
     "migrations:apply": "sqd migration:apply",
-    "format": "prettier --write \"src/**/*.ts\""
+    "serve": "squid-graphql-server serve",
+    "format": "prettier --write \"src/**/*.ts\"",
+    "start": "npm run migration:apply && node lib/main.js"
   },
   "dependencies": {
     "@gear-js/api": "^0.35.2",
     "@polkadot/types": "10.10.1",
     "@subsquid/archive-registry": "^3.3.0",
-    "@subsquid/graphql-server": "^4.3.1",
+    "@subsquid/graphql-server": "^4.5.0",
     "@subsquid/ss58": "^2.0.1",
     "@subsquid/substrate-processor": "^7.2.1",
     "@subsquid/typeorm-migration": "^1.2.2",
