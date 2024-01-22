@@ -1,9 +1,9 @@
 import { HexString } from '@gear-js/api';
-import { Button, ModalProps, Select } from '@gear-js/vara-ui';
+import { Button, Select } from '@gear-js/vara-ui';
 import { z } from 'zod';
 
 import { NFTActionFormModal, PriceInput, withAccount } from '@/components';
-import { useForm, useModal } from '@/hooks';
+import { useModal } from '@/hooks';
 
 import BidSVG from '../../assets/bid.svg?react';
 import { useNFTSendMessage } from '../../hooks';
@@ -22,47 +22,38 @@ const defaultValues = {
   minPrice: '',
 };
 
-function StartAuctionModal({ nft, collection, close }: Props & Pick<ModalProps, 'close'>) {
+function Component({ nft, collection }: Props) {
+  const [isOpen, open, close] = useModal();
+
   const { getPriceSchema } = useGetPriceSchema();
   const schema = z.object({ duration: z.string(), minPrice: getPriceSchema() });
-  const { handleSubmit, register } = useForm({ defaultValues, schema });
 
   const sendMessage = useNFTSendMessage(collection.id);
 
-  const onSubmit = handleSubmit((data) => {
+  const onSubmit = ({ minPrice, duration }: typeof defaultValues) => {
     const collectionAddress = collection.id;
     const tokenId = nft.id;
-    const durationMs = data.duration;
-    const { minPrice } = data;
+    const durationMs = duration;
 
     const payload = { CreateAuction: { collectionAddress, tokenId, minPrice, durationMs } };
     const onSuccess = close;
 
     sendMessage({ payload, onSuccess });
-  });
-
-  const modalProps = {
-    heading: 'Start Auction',
-    close,
-    onSubmit,
   };
 
-  return (
-    <NFTActionFormModal modal={modalProps} nft={nft} collection={collection}>
-      <Select label="Duration" options={defaultOptions} {...register('duration')} />
-      <PriceInput label="Minimal bid" {...register('minPrice')} />
-    </NFTActionFormModal>
-  );
-}
-
-function Component({ nft, collection }: Props) {
-  const [isOpen, open, close] = useModal();
+  const modalProps = { heading: 'Start Auction', close };
+  const formProps = { defaultValues, schema, onSubmit };
 
   return (
     <>
       <Button icon={BidSVG} text="Start auction" size="small" color="dark" onClick={open} />
 
-      {isOpen && <StartAuctionModal nft={nft} collection={collection} close={close} />}
+      {isOpen && (
+        <NFTActionFormModal modal={modalProps} form={formProps} nft={nft} collection={collection}>
+          <Select label="Duration" options={defaultOptions} name="duration" />
+          <PriceInput label="Minimal bid" name="minPrice" />
+        </NFTActionFormModal>
+      )}
     </>
   );
 }

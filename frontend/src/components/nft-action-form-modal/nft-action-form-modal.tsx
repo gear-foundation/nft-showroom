@@ -1,24 +1,29 @@
 import { Button, Modal, ModalProps } from '@gear-js/vara-ui';
 import { ReactNode } from 'react';
+import { DefaultValues, FieldValues } from 'react-hook-form';
+import { ZodType } from 'zod';
 
 import { getIpfsLink } from '@/utils';
 
+import { Form } from '../form';
 import { InfoCard } from '../info-card';
 import { PriceInfoCard } from '../price-info-card';
 
 import CalendarSVG from './calendar.svg?react';
 import styles from './nft-action-form-modal.module.scss';
 
-type Props = {
-  modal: Pick<ModalProps, 'heading' | 'close'> & { onSubmit: () => void };
+type Props<T> = {
+  modal: Pick<ModalProps, 'heading' | 'close'>;
+  form: { defaultValues: DefaultValues<T>; onSubmit: (data: T) => void; schema?: ZodType };
   nft: { name: string; mediaUrl: string };
   collection: { name: string };
-  auction?: { minBid: string; endDate: string };
   children: ReactNode;
+  auction?: { minBid: string; endDate: string };
 };
 
-function NFTActionFormModal({ modal, nft, collection, auction, children }: Props) {
-  const { heading, close, onSubmit } = modal;
+function NFTActionFormModal<T extends FieldValues>({ modal, form, nft, collection, auction, children }: Props<T>) {
+  const { heading, close } = modal;
+  const { defaultValues, schema, onSubmit } = form;
 
   return (
     <Modal heading={heading} close={close}>
@@ -38,14 +43,14 @@ function NFTActionFormModal({ modal, nft, collection, auction, children }: Props
         </div>
       )}
 
-      <form onSubmit={onSubmit} className={styles.form}>
+      <Form defaultValues={defaultValues} onSubmit={onSubmit} className={styles.form} schema={schema}>
         {children}
 
         <div className={styles.buttons}>
           <Button text="Cancel" color="grey" onClick={close} />
           <Button type="submit" text="Submit" />
         </div>
-      </form>
+      </Form>
     </Modal>
   );
 }

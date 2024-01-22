@@ -1,7 +1,5 @@
 import { HexString, decodeAddress } from '@gear-js/api';
-import { Button, Input, ModalProps } from '@gear-js/vara-ui';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm } from 'react-hook-form';
+import { Button, Input } from '@gear-js/vara-ui';
 import { z } from 'zod';
 
 import { NFTActionFormModal, withAccount } from '@/components';
@@ -19,51 +17,51 @@ const defaultValues = {
   address: '',
 };
 
+const isValidAddress = (address: string) => {
+  try {
+    decodeAddress(address);
+    return true;
+  } catch {
+    return false;
+  }
+};
+
 const schema = z.object({
-  address: z.string().trim().min(0),
+  address: z
+    .string()
+    .trim()
+    .min(0)
+    .refine((value) => isValidAddress(value), 'Invalid address')
+    .transform((value) => decodeAddress(value)),
 });
 
-const resolver = zodResolver(schema);
-
-function TransferNFTModal({ nft, collection, close }: Props & Pick<ModalProps, 'close'>) {
-  const { formState, handleSubmit, register, setError } = useForm({ defaultValues, resolver });
-  const { errors } = formState;
+function Component({ nft, collection }: Props) {
+  const [isOpen, open, close] = useModal();
 
   const sendMessage = useCollectionSendMessage(collection.id);
 
-  const onSubmit = handleSubmit((data) => {
-    try {
-      const tokenId = nft.id;
-      const to = decodeAddress(data.address);
+  const onSubmit = ({ address }: typeof defaultValues) => {
+    const tokenId = nft.id;
+    const to = address;
 
-      const payload = { Transfer: { tokenId, to } };
-      const onSuccess = close;
+    const payload = { Transfer: { tokenId, to } };
+    const onSuccess = close;
 
-      sendMessage({ payload, onSuccess });
-    } catch {
-      const message = 'Invalid address';
+    sendMessage({ payload, onSuccess });
+  };
 
-      setError('address', { message });
-    }
-  });
-
-  const modalProps = { heading: 'Transfer NFT', close, onSubmit };
-
-  return (
-    <NFTActionFormModal modal={modalProps} nft={nft} collection={collection}>
-      <Input label="Account address" {...register('address')} error={errors?.address?.message} />
-    </NFTActionFormModal>
-  );
-}
-
-function Component(props: Props) {
-  const [isOpen, open, close] = useModal();
+  const modalProps = { heading: 'Transfer NFT', close };
+  const formProps = { defaultValues, schema, onSubmit };
 
   return (
     <>
       <Button icon={PlaneSVG} text="Transfer" size="small" color="dark" onClick={open} />
 
-      {isOpen && <TransferNFTModal close={close} {...props} />}
+      {isOpen && (
+        <NFTActionFormModal modal={modalProps} form={formProps} nft={nft} collection={collection}>
+          <Input label="Account address" name="address" />
+        </NFTActionFormModal>
+      )}
     </>
   );
 }
