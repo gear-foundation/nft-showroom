@@ -1,0 +1,22 @@
+.button {
+  &:not(.active) {
+    background-color: transparent;
+
+    &:hover {
+      opacity: 0.75;
+    }
+  }
+
+  &.active {
+    pointer-events: none;
+  }
+
+  svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  &.square {
+    padding: 12px;
+  }
+}

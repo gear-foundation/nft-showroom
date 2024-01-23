@@ -11,11 +11,10 @@
   },
   "dependencies": {
     "@gear-js/api": "0.35.2",
-    "@gear-js/react-hooks": "0.9.5",
+    "@gear-js/react-hooks": "0.9.7",
     "@gear-js/vara-ui": "0.0.6",
     "@hookform/resolvers": "3.3.3",
     "@polkadot/api": "10.10.1",
-    "@polkadot/api-derive": "10.10.1",
     "@polkadot/react-identicon": "3.6.4",
     "@polkadot/types": "10.10.1",
     "kubo-rpc-client": "3.0.2",

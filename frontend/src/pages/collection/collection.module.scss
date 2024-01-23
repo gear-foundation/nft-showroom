@@ -1,0 +1,54 @@
+.nfts {
+  margin-top: 32px;
+
+  &Header {
+    margin-bottom: 24px;
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    .interaction {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+    }
+  }
+
+  .list {
+    display: grid;
+    gap: 32px 16px;
+
+    &.smallGrid {
+      grid-template-columns: repeat(4, 1fr);
+    }
+
+    &.largeGrid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+}
+
+.notFound {
+  margin: 0 auto;
+  padding: 100px;
+
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  gap: 16px;
+
+  &Heading {
+    font-size: 32px;
+    font-weight: 600;
+    line-height: 35px;
+    letter-spacing: 0.01em;
+  }
+
+  &Text {
+    font-size: 16px;
+    font-weight: 500;
+    line-height: 24px;
+    color: rgba(#000, 0.7);
+  }
+}

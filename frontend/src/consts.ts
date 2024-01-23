@@ -12,6 +12,7 @@ const ROUTE = {
   CREATE_COLLECTION: '/create',
   COLLECTION: '/collection/:id',
   NFT: '/nft/:collectionId/:id',
+  NFTS: '/nfts',
 };
 
 export { ADDRESS, ROUTE };

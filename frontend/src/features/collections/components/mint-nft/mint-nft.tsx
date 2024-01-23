@@ -2,7 +2,8 @@ import { HexString } from '@gear-js/api';
 import { Button } from '@gear-js/vara-ui';
 
 import { withAccount } from '@/components';
-import { useCollectionSendMessage } from '@/hooks';
+
+import { useCollectionSendMessage } from '../../hooks';
 
 type Props = {
   collectionId: HexString;

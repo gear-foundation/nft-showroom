@@ -1,14 +1,11 @@
 import { HexString } from '@gear-js/api';
-import { useBalanceFormat } from '@gear-js/react-hooks';
-import { Button, ModalProps } from '@gear-js/vara-ui';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm } from 'react-hook-form';
+import { Button } from '@gear-js/vara-ui';
 import { z } from 'zod';
 
-import { PriceInput, withAccount } from '@/components';
-import { useMarketplaceSendMessage, useModal } from '@/hooks';
+import { NFTActionFormModal, PriceInput, withAccount } from '@/components';
+import { useModal } from '@/hooks';
 
-import { NFTActionFormModal } from '../nft-action-form-modal';
+import { useMarketplaceSendMessage, usePriceSchema } from '../../hooks';
 
 type Props = {
   nft: { id: string; name: string; mediaUrl: string };
@@ -20,52 +17,36 @@ const defaultValues = {
   value: '',
 };
 
-const getSchema = (minBid: number) =>
-  z.object({
-    value: z.coerce.number().min(minBid),
-  });
+function Component({ nft, collection, auction }: Props) {
+  const [isOpen, open, close] = useModal();
 
-const getResolver = (minBid: number) => zodResolver(getSchema(minBid));
+  const { getPriceSchema } = usePriceSchema();
+  const schema = z.object({ value: getPriceSchema(auction.minBid, true) });
 
-function MakeBidModal({ nft, collection, auction, close }: Props & Pick<ModalProps, 'close'>) {
-  const { handleSubmit, register, formState } = useForm({ defaultValues, resolver: getResolver(+auction.minBid) });
-  const { errors } = formState;
-
-  const { getChainBalanceValue } = useBalanceFormat();
   const sendMessage = useMarketplaceSendMessage();
 
-  const onSubmit = handleSubmit((data) => {
+  const onSubmit = ({ value }: typeof defaultValues) => {
     const tokenId = nft.id;
     const collectionAddress = collection.id;
 
     const payload = { AddBid: { tokenId, collectionAddress } };
-    const value = getChainBalanceValue(data.value).toFixed();
     const onSuccess = close;
 
     sendMessage({ payload, value, onSuccess });
-  });
-
-  const modalProps = {
-    heading: 'Make bid',
-    close,
-    onSubmit,
   };
 
-  return (
-    <NFTActionFormModal modal={modalProps} nft={nft} collection={collection} auction={auction}>
-      <PriceInput label="Value" {...register('value')} error={errors.value?.message} />
-    </NFTActionFormModal>
-  );
-}
-
-function Component(props: Props) {
-  const [isOpen, open, close] = useModal();
+  const modalProps = { heading: 'Make bid', close };
+  const formProps = { defaultValues, schema, onSubmit };
 
   return (
     <>
       <Button text="Make bid" size="small" onClick={open} />
 
-      {isOpen && <MakeBidModal close={close} {...props} />}
+      {isOpen && (
+        <NFTActionFormModal modal={modalProps} form={formProps} nft={nft} collection={collection} auction={auction}>
+          <PriceInput label="Value" name="value" />
+        </NFTActionFormModal>
+      )}
     </>
   );
 }

@@ -4,9 +4,9 @@ import { Link, generatePath } from 'react-router-dom';
 
 import { ResponsiveSquareImage } from '@/components';
 import { ROUTE } from '@/consts';
-import { useCollection } from '@/hooks';
 import { getIpfsLink } from '@/utils';
 
+import { useCollection } from '../../hooks';
 import { MintLimitInfoCard } from '../mint-limit-info-card';
 
 import styles from './collection-card.module.scss';

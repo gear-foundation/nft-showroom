@@ -1,0 +1,29 @@
+.header {
+  margin-bottom: 32px;
+
+  display: flex;
+  justify-content: space-between;
+}
+
+.list {
+  display: grid;
+  gap: 32px 16px;
+
+  &.smallGrid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  &.largeGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.nfts {
+  &.smallGrid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  &.largeGrid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
