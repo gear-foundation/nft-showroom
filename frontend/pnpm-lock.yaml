@@ -9,8 +9,8 @@ dependencies:
     specifier: 0.35.2
     version: 0.35.2(@polkadot/api@10.10.1)(@polkadot/wasm-crypto@7.2.2)(rxjs@7.8.1)
   '@gear-js/react-hooks':
-    specifier: 0.9.5
-    version: 0.9.5(@gear-js/api@0.35.2)(@polkadot/api@10.10.1)(@polkadot/extension-dapp@0.46.5)(react-dom@18.2.0)(react@18.2.0)
+    specifier: 0.9.7
+    version: 0.9.7(@gear-js/api@0.35.2)(@polkadot/api@10.10.1)(@polkadot/extension-dapp@0.46.5)(react-dom@18.2.0)(react@18.2.0)
   '@gear-js/vara-ui':
     specifier: 0.0.6
     version: 0.0.6(react-dom@18.2.0)(react@18.2.0)
@@ -18,9 +18,6 @@ dependencies:
     specifier: 3.3.3
     version: 3.3.3(react-hook-form@7.49.2)
   '@polkadot/api':
-    specifier: 10.10.1
-    version: 10.10.1
-  '@polkadot/api-derive':
     specifier: 10.10.1
     version: 10.10.1
   '@polkadot/react-identicon':
@@ -620,8 +617,8 @@ packages:
       rxjs: 7.8.1
     dev: false
 
-  /@gear-js/react-hooks@0.9.5(@gear-js/api@0.35.2)(@polkadot/api@10.10.1)(@polkadot/extension-dapp@0.46.5)(react-dom@18.2.0)(react@18.2.0):
-    resolution: {integrity: sha512-MRf0HkPDJfA4qfe4FVwn/7TuJTPwgjjCFSzldJhTf6Gknsp+Ome7bDl/Nsnl+eI1/A+cZ+nTErw395HeOBVIkw==}
+  /@gear-js/react-hooks@0.9.7(@gear-js/api@0.35.2)(@polkadot/api@10.10.1)(@polkadot/extension-dapp@0.46.5)(react-dom@18.2.0)(react@18.2.0):
+    resolution: {integrity: sha512-hquAS78HgE7/Pcdt8LGanW31Fvr4BeNlDRGEn3RYWhbLZhtICEXk2M6ihLkA2dtIWuZDycXqox1pUa2COEwaIA==}
     peerDependencies:
       '@gear-js/api': 0.35.2
       '@polkadot/api': 10.10.1
@@ -631,6 +628,7 @@ packages:
     dependencies:
       '@gear-js/api': 0.35.2(@polkadot/api@10.10.1)(@polkadot/wasm-crypto@7.2.2)(rxjs@7.8.1)
       '@polkadot/api': 10.10.1
+      '@polkadot/api-derive': 10.10.1
       '@polkadot/extension-dapp': 0.46.5(@polkadot/api@10.10.1)(@polkadot/util-crypto@12.6.1)(@polkadot/util@12.6.1)
       '@polkadot/extension-inject': 0.46.5(@polkadot/api@10.10.1)(@polkadot/util@12.5.1)
       '@polkadot/util': 12.5.1
@@ -1032,7 +1030,7 @@ packages:
     dependencies:
       '@polkadot/api': 10.10.1
       '@polkadot/rpc-provider': 10.11.1
-      '@polkadot/types': 10.11.1
+      '@polkadot/types': 10.10.1
       '@polkadot/util': 12.5.1
       '@polkadot/util-crypto': 12.6.1(@polkadot/util@12.5.1)
       '@polkadot/x-global': 12.6.1
@@ -1052,7 +1050,7 @@ packages:
     dependencies:
       '@polkadot/api': 10.10.1
       '@polkadot/rpc-provider': 10.11.1
-      '@polkadot/types': 10.11.1
+      '@polkadot/types': 10.10.1
       '@polkadot/util': 12.6.1
       '@polkadot/util-crypto': 12.6.1(@polkadot/util@12.6.1)
       '@polkadot/x-global': 12.6.1

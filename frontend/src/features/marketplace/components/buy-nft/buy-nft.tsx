@@ -2,7 +2,8 @@ import { HexString } from '@gear-js/api';
 import { Button } from '@gear-js/vara-ui';
 
 import { withAccount } from '@/components';
-import { useMarketplaceSendMessage } from '@/hooks';
+
+import { useMarketplaceSendMessage } from '../../hooks';
 
 type Props = {
   id: string;

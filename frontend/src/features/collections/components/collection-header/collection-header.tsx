@@ -1,8 +1,10 @@
 import { HexString } from '@gear-js/api';
+import { withoutCommas } from '@gear-js/react-hooks';
+
+import { InfoCard } from '@/components';
 
 import UserSVG from '../../assets/user.svg?react';
 import { SOCIAL_ICON } from '../../consts';
-import { InfoCard } from '../info-card';
 import { MintLimitInfoCard } from '../mint-limit-info-card';
 import { MintNFT } from '../mint-nft';
 
@@ -48,6 +50,8 @@ function CollectionHeader({
       );
     });
 
+  const tokensToMint = tokensLimit ? +withoutCommas(tokensLimit) - tokensCount : 1;
+
   return (
     <header className={styles.container}>
       <div className={styles.header}>
@@ -69,7 +73,7 @@ function CollectionHeader({
         <div>
           <ul className={styles.socials}>{renderSocials()}</ul>
 
-          <MintNFT collectionId={id} value={mintPrice} />
+          {tokensToMint > 0 && <MintNFT collectionId={id} value={mintPrice} />}
         </div>
       </div>
     </header>

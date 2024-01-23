@@ -2,13 +2,10 @@ import { HexString } from '@gear-js/api';
 import { useAccount, useBalanceFormat, withoutCommas } from '@gear-js/react-hooks';
 import { Link, generatePath } from 'react-router-dom';
 
+import { PriceInfoCard, InfoCard } from '@/components';
 import { ROUTE } from '@/consts';
-import { BuyNFT, MakeBid } from '@/features/marketplace';
-import { PriceInfoCard } from '@/features/marketplace/components/price-info-card';
-import { useListing } from '@/hooks';
+import { BuyNFT, MakeBid, useListing } from '@/features/marketplace';
 import { getIpfsLink } from '@/utils';
-
-import { InfoCard } from '../info-card';
 
 import styles from './nft-card.module.scss';
 
@@ -74,7 +71,10 @@ function NFTCard({ nft, collection }: Props) {
             <MakeBid
               nft={nft}
               collection={collection}
-              auction={{ minBid: price, endDate: new Date(+withoutCommas(auction.endedAt)).toLocaleString() }}
+              auction={{
+                minBid: withoutCommas(auction.currentPrice),
+                endDate: new Date(+withoutCommas(auction.endedAt)).toLocaleString(),
+              }}
             />
           )}
         </footer>
