@@ -36,7 +36,8 @@ processor.run(new TypeormDatabase(), async (ctx) => {
     `[main] start processing ${ctx.blocks.length} blocks at ${firstBlockDate}.`,
   );
   for (const block of ctx.blocks) {
-    const events = block.events.filter((e) => e.args && e.args.message);
+    const { events } = block;
+    const timestamp = getBlockDate(block);
     for (const item of events) {
       const {
         message: { source, payload, details, destination, id },
@@ -51,7 +52,8 @@ processor.run(new TypeormDatabase(), async (ctx) => {
         blockNumber: block.header.height,
         destination,
         source,
-        timestamp: getBlockDate(block),
+        timestamp,
+        messageId: id,
         txHash: id,
       };
       if (config.marketplaceProgram === source) {

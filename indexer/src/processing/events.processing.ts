@@ -99,9 +99,9 @@ export class EventsProcessing {
     payload: string,
     eventInfo: EventInfo,
   ): Promise<NftMarketplaceEvent | null> {
-    const { blockNumber, txHash } = eventInfo;
+    const { blockNumber, messageId } = eventInfo;
     try {
-      console.log(`${blockNumber}-${txHash}: handling marketplace event`);
+      console.log(`${blockNumber}-${messageId}: handling marketplace event`);
       const data = marketplaceMeta.createType<NftMarketplaceEventPlain>(
         marketplaceMeta.types.handle.output!,
         payload,
@@ -112,10 +112,10 @@ export class EventsProcessing {
       }
       const event = getMarketplaceEvent(parsed.ok);
       if (!event) {
-        console.warn(`${blockNumber}-${txHash}: unknown event type`, parsed);
+        console.warn(`${blockNumber}-${messageId}: unknown event type`, parsed);
         return null;
       }
-      console.log(`${blockNumber}-${txHash}: detected event: ${event.type}`);
+      console.log(`${blockNumber}-${messageId}: detected event: ${event.type}`);
       this.entitiesService
         .addEvent({
           blockNumber: eventInfo.blockNumber,
@@ -125,12 +125,12 @@ export class EventsProcessing {
           txHash: eventInfo.txHash,
         })
         .catch((err) =>
-          console.error(`${blockNumber}-${txHash}: error adding event`, err),
+          console.error(`${blockNumber}-${messageId}: error adding event`, err),
         );
       const eventHandler = marketplaceEventsToHandler[event.type];
       if (!eventHandler) {
         console.warn(
-          `${blockNumber}-${txHash}: no event handlers found for ${event.type}`,
+          `${blockNumber}-${messageId}: no event handlers found for ${event.type}`,
         );
         return null;
       }
@@ -138,7 +138,7 @@ export class EventsProcessing {
       return event;
     } catch (e) {
       console.error(
-        `${blockNumber}-${txHash}: error handling marketplace event`,
+        `${blockNumber}-${messageId}: error handling marketplace event`,
         e,
       );
       return null;
@@ -149,9 +149,9 @@ export class EventsProcessing {
     payload: string,
     eventInfo: EventInfo,
   ): Promise<NftEvent | null> {
-    const { blockNumber, txHash } = eventInfo;
+    const { blockNumber, messageId } = eventInfo;
     try {
-      console.log(`${blockNumber}-${txHash}: handling nft event`);
+      console.log(`${blockNumber}-${messageId}: handling nft event`);
       const data = nftMeta.createType<NftEventPlain>(
         // @ts-ignore
         nftMeta.types.handle.output!,
@@ -160,7 +160,7 @@ export class EventsProcessing {
       const parsed = data.toJSON() as { ok: NftEventPlain } | null;
       if (!parsed || !parsed.ok) {
         console.warn(
-          `${blockNumber}-${txHash}: failed to parse event`,
+          `${blockNumber}-${messageId}: failed to parse event`,
           parsed,
           payload,
         );
@@ -169,16 +169,16 @@ export class EventsProcessing {
       const event = getNftEvent(parsed.ok);
       if (!event) {
         console.warn(
-          `${blockNumber}-${txHash}: unknown nft event type`,
+          `${blockNumber}-${messageId}: unknown nft event type`,
           parsed,
         );
         return null;
       }
-      console.log(`${blockNumber}-${txHash}: detected event: ${event.type}`);
+      console.log(`${blockNumber}-${messageId}: detected event: ${event.type}`);
       const eventHandler = nftEventsToHandler[event.type];
       if (!eventHandler) {
         console.warn(
-          `${blockNumber}-${txHash}: no nft event handlers found for ${event.type}`,
+          `${blockNumber}-${messageId}: no nft event handlers found for ${event.type}`,
         );
         return null;
       }
@@ -186,7 +186,7 @@ export class EventsProcessing {
       return event;
     } catch (e) {
       console.error(
-        `${blockNumber}-${txHash}: error handling nft event`,
+        `${blockNumber}-${messageId}: error handling nft event`,
         e,
         payload,
       );
