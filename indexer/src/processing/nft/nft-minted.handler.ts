@@ -1,7 +1,7 @@
 import { MintedEvent } from '../../types/nft.events';
 import { EntitiesService } from '../entities.service';
 import { INftEventHandler } from './nft.handler';
-import { Nft } from '../../model';
+import { Nft, Offer } from '../../model';
 import { EventInfo } from '../event-info.type';
 
 export class NftMintedHandler implements INftEventHandler {
@@ -28,7 +28,13 @@ export class NftMintedHandler implements INftEventHandler {
         mediaUrl,
         name,
         owner,
+        metadata: JSON.stringify(metadata),
+        onSale: false,
         createdAt: timestamp,
+        sales: [],
+        offers: [],
+        transfers: [],
+        auctions: [],
       }),
     );
   }
