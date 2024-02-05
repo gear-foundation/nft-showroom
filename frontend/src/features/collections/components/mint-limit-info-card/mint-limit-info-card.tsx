@@ -3,7 +3,8 @@ import { InfoCard, InfoCardProps } from '@/components';
 import LandscapeSVG from '../../assets/landscape.svg?react';
 
 type Props = Omit<InfoCardProps, 'heading' | 'text' | 'SVG'> & {
-  heading: string | null;
+  // TODO: drop string
+  heading: string | number | null;
   text: number;
 };
 

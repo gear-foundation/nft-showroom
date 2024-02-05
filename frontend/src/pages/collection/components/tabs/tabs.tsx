@@ -1,5 +1,4 @@
 import { ROUTE } from '@/consts';
-import { useCollectionIds } from '@/features/marketplace';
 import { cx } from '@/utils';
 
 const TABS = [

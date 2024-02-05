@@ -1,4 +1,4 @@
 import { CollectionCard, NFTCard, CollectionHeader, TransferNFT } from './components';
-import { useCollection, useCollectionSendMessage } from './hooks';
+import { useCollectionSendMessage } from './hooks';
 
-export { CollectionCard, NFTCard, CollectionHeader, TransferNFT, useCollection, useCollectionSendMessage };
+export { CollectionCard, NFTCard, CollectionHeader, TransferNFT, useCollectionSendMessage };

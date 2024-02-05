@@ -5,7 +5,8 @@ import {
   ProviderProps,
 } from '@gear-js/react-hooks';
 import { Alert, alertStyles } from '@gear-js/vara-ui';
-import { ComponentType } from 'react';
+import { ComponentType, useRef } from 'react';
+import { Client, Provider as UrqlProvider, cacheExchange, fetchExchange } from 'urql';
 
 import { ADDRESS } from './consts';
 import { IPFSProvider as GearIPFSProvider } from './context';
@@ -18,6 +19,12 @@ function IPFSProvider({ children }: ProviderProps) {
   return <GearIPFSProvider url={ADDRESS.IPFS}>{children}</GearIPFSProvider>;
 }
 
+function IndexerProvider({ children }: ProviderProps) {
+  const ref = useRef(new Client({ url: ADDRESS.INDEXER, exchanges: [cacheExchange, fetchExchange] }));
+
+  return <UrqlProvider value={ref.current}>{children}</UrqlProvider>;
+}
+
 function AlertProvider({ children }: ProviderProps) {
   return (
     <GearAlertProvider template={Alert} containerClassName={alertStyles.root}>
@@ -26,7 +33,7 @@ function AlertProvider({ children }: ProviderProps) {
   );
 }
 
-const providers = [ApiProvider, IPFSProvider, AccountProvider, AlertProvider];
+const providers = [ApiProvider, IPFSProvider, AccountProvider, AlertProvider, IndexerProvider];
 
 const withProviders = (Component: ComponentType) => () =>
   providers.reduceRight((children, Provider) => <Provider>{children}</Provider>, <Component />);

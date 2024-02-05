@@ -2,6 +2,7 @@ import { HexString } from '@gear-js/api';
 import { withoutCommas } from '@gear-js/react-hooks';
 
 import { InfoCard } from '@/components';
+import { getIpfsLink } from '@/utils';
 
 import UserSVG from '../../assets/user.svg?react';
 import { SOCIAL_ICON } from '../../consts';
@@ -14,7 +15,7 @@ type Props = {
   id: HexString;
   banner: string;
   logo: string;
-  owner: HexString;
+  owner: string;
   tokensCount: number;
   tokensLimit: string | null;
   mintPrice: string;
@@ -55,8 +56,8 @@ function CollectionHeader({
   return (
     <header className={styles.container}>
       <div className={styles.header}>
-        <img src={banner} alt="" className={styles.banner} />
-        <img src={logo} alt="" className={styles.logo} />
+        <img src={getIpfsLink(banner)} alt="" className={styles.banner} />
+        <img src={getIpfsLink(logo)} alt="" className={styles.logo} />
 
         <div className={styles.cards}>
           <InfoCard heading="Creator" text={owner} SVG={UserSVG} color="light" textOverflow />

@@ -3,7 +3,6 @@ import {
   useMarketplaceSendMessage,
   useNFTSendMessage,
   useCollectionMetadata,
-  useCollectionIds,
   useListing,
 } from './api';
 import { usePriceSchema } from './use-price-schema';
@@ -13,7 +12,6 @@ export {
   useMarketplaceSendMessage,
   useNFTSendMessage,
   useCollectionMetadata,
-  useCollectionIds,
   useListing,
   usePriceSchema,
 };

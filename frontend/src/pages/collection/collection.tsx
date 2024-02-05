@@ -1,17 +1,17 @@
 import { HexString } from '@gear-js/api';
-import { withoutCommas } from '@gear-js/react-hooks';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { generatePath, useParams } from 'react-router-dom';
 
 import { Breadcrumbs, Container, FilterButton, SearchInput } from '@/components';
 import { ROUTE } from '@/consts';
-import { NFTCard, CollectionHeader, useCollection } from '@/features/collections';
+import { NFTCard, CollectionHeader } from '@/features/collections';
 import { GridSize, useGridSize } from '@/features/lists';
-import { cx, getIpfsLink } from '@/utils';
+import { cx } from '@/utils';
 
 import NotFoundSVG from './assets/not-found.svg?react';
 import styles from './collection.module.scss';
+import { useCollection } from './hooks';
 
 type Params = {
   id: HexString;
@@ -28,37 +28,46 @@ function useSearchQuery() {
 
 function Collection() {
   const { id } = useParams() as Params;
-
   const collection = useCollection(id);
+
   const { gridSize, setGridSize } = useGridSize();
   const { query, onSubmit, register } = useSearchQuery();
 
-  const { config, tokens, collectionOwner, totalNumberOfTokens } = collection || {};
+  // TODOINDEXER:
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+  const { collectionBanner, collectionLogo, admin, tokensLimit, name, description, paymentForMint, nfts } =
+    collection || {};
 
-  const searchedTokens = tokens?.filter(([, { name }]) => name.toLocaleLowerCase().includes(query));
-  const tokensCount = searchedTokens?.length;
+  if (!collectionBanner || !collectionLogo || !admin || !name || !description) return null;
+
+  // TODOINDEXER:
+  const additionalLinks = {};
+
+  const searchedTokens = nfts?.filter((nft) => nft.name.toLocaleLowerCase().includes(query));
+  const tokensCount = searchedTokens?.length || 0;
 
   const renderNFTs = () =>
-    collection &&
-    searchedTokens?.map(([nftId, nft]) => (
-      <NFTCard key={nftId} nft={{ ...nft, id: nftId }} collection={{ ...collection.config, id }} />
-    ));
+    collection && searchedTokens?.map(({ id: nftId, ...nft }) => <NFTCard key={nftId} {...nft} />);
 
-  return config && collectionOwner && tokensCount !== undefined && totalNumberOfTokens !== undefined ? (
+  return (
     <Container>
-      <Breadcrumbs list={[{ to: generatePath(ROUTE.COLLECTION, { id }), text: config.name }]} />
+      <Breadcrumbs list={[{ to: generatePath(ROUTE.COLLECTION, { id }), text: name }]} />
 
       <CollectionHeader
         id={id}
-        banner={getIpfsLink(config.collectionBanner)}
-        logo={getIpfsLink(config.collectionLogo)}
-        owner={collectionOwner}
+        banner={collectionBanner}
+        logo={collectionLogo}
+        owner={admin}
         tokensCount={tokensCount}
-        tokensLimit={totalNumberOfTokens}
-        name={config.name}
-        description={config.description}
-        mintPrice={withoutCommas(config.paymentForMint)}
-        socials={config.additionalLinks || {}}
+        // TODOINDEXER:
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+        tokensLimit={tokensLimit}
+        name={name}
+        description={description}
+        // TODOINDEXER:
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+        mintPrice={paymentForMint}
+        socials={additionalLinks}
       />
 
       <div className={styles.nfts}>
@@ -88,7 +97,7 @@ function Collection() {
         )}
       </div>
     </Container>
-  ) : null;
+  );
 }
 
 export { Collection };

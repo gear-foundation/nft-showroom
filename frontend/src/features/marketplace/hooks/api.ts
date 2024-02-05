@@ -9,7 +9,7 @@ import { useProgramMetadata } from '@/hooks';
 import { getIpfsLink } from '@/utils';
 
 import metadataSource from '../assets/nft_marketplace.meta.txt';
-import { CollectionIDsState, CollectionState, MarketplaceState } from '../types';
+import { CollectionState, MarketplaceState } from '../types';
 
 function useMarketplaceMetadata() {
   return useProgramMetadata(metadataSource);
@@ -55,12 +55,6 @@ function useCollectionMetadata(collectionId: HexString) {
   return useProgramMetadata(source);
 }
 
-function useCollectionIds() {
-  const { state } = useMarketplaceState<CollectionIDsState>('AllCollections');
-
-  return state?.AllCollections;
-}
-
 function useListing(collectionId: HexString, nftId: string) {
   const { state } = useMarketplaceState<MarketplaceState>('all');
 
@@ -80,6 +74,5 @@ export {
   useMarketplaceSendMessage,
   useNFTSendMessage,
   useCollectionMetadata,
-  useCollectionIds,
   useListing,
 };

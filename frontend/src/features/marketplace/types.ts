@@ -34,10 +34,6 @@ type MarketplaceState = {
   };
 };
 
-type CollectionIDsState = {
-  AllCollections: CollectionToOwner[];
-};
-
 type CollectionState = {
   CollectionInfo: {
     owner: HexString;
@@ -46,4 +42,4 @@ type CollectionState = {
   };
 };
 
-export type { MarketplaceState, CollectionIDsState, CollectionState };
+export type { MarketplaceState, CollectionState };
