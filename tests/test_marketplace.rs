@@ -105,7 +105,7 @@ fn create_success() {
         .expect("Unexpected invalid state.");
     if let StateReply::AllCollections(state) = state_reply {
         assert!(!state.is_empty(), "Collections shouldn't be empty");
-        assert_eq!(state[0].1.1, USERS[0].into(), "Wrong owner of collection");
+        assert_eq!(state[0].1 .1, USERS[0].into(), "Wrong owner of collection");
     }
     sys.spend_blocks(7200);
     let res = create_collection(
@@ -317,7 +317,7 @@ fn sale_success() {
         .expect("Unexpected invalid state.");
     let address_nft = if let StateReply::AllCollections(state) = state_reply {
         assert!(!state.is_empty(), "Collections shouldn't be empty");
-        assert_eq!(state[0].1.1, USERS[0].into(), "Wrong owner of collection");
+        assert_eq!(state[0].1 .1, USERS[0].into(), "Wrong owner of collection");
         state[0].0
     } else {
         assert!(false, "Unexpected StateReply variant");
@@ -426,7 +426,7 @@ fn sale_failures() {
         .expect("Unexpected invalid state.");
     let address_nft = if let StateReply::AllCollections(state) = state_reply {
         assert!(!state.is_empty(), "Collections shouldn't be empty");
-        assert_eq!(state[0].1.1, USERS[0].into(), "Wrong owner of collection");
+        assert_eq!(state[0].1 .1, USERS[0].into(), "Wrong owner of collection");
         state[0].0
     } else {
         assert!(false, "Unexpected StateReply variant");
@@ -606,7 +606,7 @@ fn auction_success() {
         .expect("Unexpected invalid state.");
     let address_nft = if let StateReply::AllCollections(state) = state_reply {
         assert!(!state.is_empty(), "Collections shouldn't be empty");
-        assert_eq!(state[0].1.1, USERS[0].into(), "Wrong owner of collection");
+        assert_eq!(state[0].1 .1, USERS[0].into(), "Wrong owner of collection");
         state[0].0
     } else {
         assert!(false, "Unexpected StateReply variant");
@@ -762,7 +762,7 @@ fn auction_cancel() {
         .expect("Unexpected invalid state.");
     let address_nft = if let StateReply::AllCollections(state) = state_reply {
         assert!(!state.is_empty(), "Collections shouldn't be empty");
-        assert_eq!(state[0].1.1, USERS[0].into(), "Wrong owner of collection");
+        assert_eq!(state[0].1 .1, USERS[0].into(), "Wrong owner of collection");
         state[0].0
     } else {
         assert!(false, "Unexpected StateReply variant");
@@ -944,7 +944,7 @@ fn auction_failures() {
         .expect("Unexpected invalid state.");
     let address_nft = if let StateReply::AllCollections(state) = state_reply {
         assert!(!state.is_empty(), "Collections shouldn't be empty");
-        assert_eq!(state[0].1.1, USERS[0].into(), "Wrong owner of collection");
+        assert_eq!(state[0].1 .1, USERS[0].into(), "Wrong owner of collection");
         state[0].0
     } else {
         assert!(false, "Unexpected StateReply variant");
@@ -1121,7 +1121,7 @@ fn offer_success() {
         .expect("Unexpected invalid state.");
     let address_nft = if let StateReply::AllCollections(state) = state_reply {
         assert!(!state.is_empty(), "Collections shouldn't be empty");
-        assert_eq!(state[0].1.1, USERS[0].into(), "Wrong owner of collection");
+        assert_eq!(state[0].1 .1, USERS[0].into(), "Wrong owner of collection");
         state[0].0
     } else {
         assert!(false, "Unexpected StateReply variant");
@@ -1245,7 +1245,7 @@ fn offer_failures() {
         .expect("Unexpected invalid state.");
     let address_nft = if let StateReply::AllCollections(state) = state_reply {
         assert!(!state.is_empty(), "Collections shouldn't be empty");
-        assert_eq!(state[0].1.1, USERS[0].into(), "Wrong owner of collection");
+        assert_eq!(state[0].1 .1, USERS[0].into(), "Wrong owner of collection");
         state[0].0
     } else {
         assert!(false, "Unexpected StateReply variant");

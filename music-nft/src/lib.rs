@@ -231,7 +231,10 @@ impl NftContract {
         }
         self.total_number_of_tokens = number_tokens;
 
-        Ok(MusicNftEvent::Expanded { additional_links })
+        Ok(MusicNftEvent::Expanded {
+            additional_links,
+            total_number_of_tokens: number_tokens,
+        })
     }
 
     fn change_config(&mut self, config: Config) -> Result<MusicNftEvent, MusicNftError> {
@@ -492,8 +495,9 @@ extern "C" fn init() {
 
     msg::send(
         collection_owner,
-    Ok::<MusicNftEvent, MusicNftError>(MusicNftEvent::Initialized {
+        Ok::<MusicNftEvent, MusicNftError>(MusicNftEvent::Initialized {
             config: config.clone(),
+            total_number_of_tokens,
         }),
         0,
     )
@@ -502,6 +506,7 @@ extern "C" fn init() {
     msg::reply(
         MusicNftEvent::Initialized {
             config: config.clone(),
+            total_number_of_tokens,
         },
         0,
     )
@@ -604,9 +609,9 @@ impl From<NftContract> for NftState {
 }
 
 fn sum_limit_copies(links_and_data: &[(Links, ImageData)]) -> Option<u64> {
-    let sum = links_and_data
-        .iter()
-        .try_fold(0, |acc, (_, img_data)| img_data.limit_copies.map(|y| acc + y as u64));
+    let sum = links_and_data.iter().try_fold(0, |acc, (_, img_data)| {
+        img_data.limit_copies.map(|y| acc + y as u64)
+    });
     sum
 }
 

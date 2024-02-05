@@ -222,7 +222,8 @@ impl NftMarketplace {
         .await
         .expect("Program was not initialized");
 
-        self.collection_to_owner.insert(address, (type_name.clone(), msg_src));
+        self.collection_to_owner
+            .insert(address, (type_name.clone(), msg_src));
 
         self.time_creation
             .entry(msg_src)
@@ -378,7 +379,10 @@ impl NftMarketplace {
         }
     }
 
-    fn get_collection_info(&self, type_name: &str) -> Result<&TypeCollectionInfo, NftMarketplaceError> {
+    fn get_collection_info(
+        &self,
+        type_name: &str,
+    ) -> Result<&TypeCollectionInfo, NftMarketplaceError> {
         if let Some(collection_info) = self.type_collections.get(type_name) {
             Ok(collection_info)
         } else {
@@ -398,12 +402,8 @@ extern "C" fn state() {
     };
     let query: StateQuery = msg::load().expect("Unable to load the state query");
     let reply = match query {
-        StateQuery::All => {
-            StateReply::All(nft_marketplace.into())
-        }
-        StateQuery::Admins => {
-            StateReply::Admins(nft_marketplace.admins)
-        }
+        StateQuery::All => StateReply::All(nft_marketplace.into()),
+        StateQuery::Admins => StateReply::Admins(nft_marketplace.admins),
         StateQuery::CollectionsInfo => {
             let type_collections = nft_marketplace
                 .type_collections
@@ -412,9 +412,7 @@ extern "C" fn state() {
                 .collect();
             StateReply::CollectionsInfo(type_collections)
         }
-        StateQuery::Config => {
-            StateReply::Config(nft_marketplace.config)
-        }
+        StateQuery::Config => StateReply::Config(nft_marketplace.config),
         StateQuery::AllCollections => {
             let collection_to_owner = nft_marketplace
                 .collection_to_owner
@@ -426,8 +424,12 @@ extern "C" fn state() {
         StateQuery::GetCollectionInfo(collection_address) => {
             let collection_to_owner = nft_marketplace.collection_to_owner.get(&collection_address);
             if let Some((type_name, owner)) = collection_to_owner {
-                let meta_link = &nft_marketplace.type_collections.get(type_name).expect("This collection type name must exist").meta_link;
-                let collection_info = CollectionInfo{
+                let meta_link = &nft_marketplace
+                    .type_collections
+                    .get(type_name)
+                    .expect("This collection type name must exist")
+                    .meta_link;
+                let collection_info = CollectionInfo {
                     owner: *owner,
                     type_name: type_name.clone(),
                     meta_link: meta_link.clone(),
@@ -436,8 +438,7 @@ extern "C" fn state() {
             } else {
                 StateReply::CollectionInfo(None)
             }
-           
-        }   
+        }
     };
     msg::reply(reply, 0).expect("Unable to share the state");
 }

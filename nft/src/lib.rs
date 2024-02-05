@@ -208,7 +208,10 @@ impl NftContract {
         }
         self.total_number_of_tokens = number_tokens;
 
-        Ok(NftEvent::Expanded { additional_links })
+        Ok(NftEvent::Expanded {
+            additional_links,
+            total_number_of_tokens: number_tokens,
+        })
     }
 
     fn change_config(&mut self, config: Config) -> Result<NftEvent, NftError> {
@@ -354,7 +357,9 @@ impl NftContract {
                 ));
             }
         } else {
-            return Err(NftError("Caller is not approved to perform transfer.".to_owned()));
+            return Err(NftError(
+                "Caller is not approved to perform transfer.".to_owned(),
+            ));
         }
         Ok(())
     }
@@ -456,19 +461,26 @@ extern "C" fn init() {
             nonce: 0,
             img_links_and_data,
             collection_owner,
-            total_number_of_tokens
+            total_number_of_tokens,
         })
     };
     msg::send(
         collection_owner,
         Ok::<NftEvent, NftError>(NftEvent::Initialized {
             config: config.clone(),
+            total_number_of_tokens,
         }),
         0,
     )
     .expect("Error during send to owner `NftEvent::Initialized`");
-    msg::reply(NftEvent::Initialized { config }, 0)
-        .expect("Error during send reply `NftEvent::Initialized`");
+    msg::reply(
+        NftEvent::Initialized {
+            config,
+            total_number_of_tokens,
+        },
+        0,
+    )
+    .expect("Error during send reply `NftEvent::Initialized`");
 }
 
 #[no_mangle]
@@ -563,13 +575,12 @@ impl From<NftContract> for NftState {
             total_number_of_tokens,
         }
     }
-    
 }
 
 fn sum_limit_copies(img_links_and_data: &[(String, ImageData)]) -> Option<u64> {
-    let sum = img_links_and_data
-        .iter()
-        .try_fold(0, |acc, (_, img_data)| img_data.limit_copies.map(|y| acc + y as u64));
+    let sum = img_links_and_data.iter().try_fold(0, |acc, (_, img_data)| {
+        img_data.limit_copies.map(|y| acc + y as u64)
+    });
     sum
 }
 

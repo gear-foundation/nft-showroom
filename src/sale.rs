@@ -50,7 +50,7 @@ impl NftMarketplace {
         )
         .await?;
 
-        // send a message to the nft contract to transfer the token to the marketplace address 
+        // send a message to the nft contract to transfer the token to the marketplace address
         // so that the token can be immediately transferred to the buyer upon purchase.
         if let NftEvent::Transferred {
             owner,

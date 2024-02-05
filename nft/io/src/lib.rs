@@ -119,6 +119,7 @@ pub enum NftEvent {
     CanDelete(bool),
     Initialized {
         config: Config,
+        total_number_of_tokens: Option<u64>,
     },
     Minted {
         token_id: NftId,
@@ -133,6 +134,7 @@ pub enum NftEvent {
     },
     Expanded {
         additional_links: Vec<(String, ImageData)>,
+        total_number_of_tokens: Option<u64>,
     },
     ConfigChanged {
         config: Config,

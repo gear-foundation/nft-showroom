@@ -128,6 +128,7 @@ pub enum MusicNftEvent {
     CanDelete(bool),
     Initialized {
         config: Config,
+        total_number_of_tokens: Option<u64>,
     },
     Minted {
         token_id: NftId,
@@ -142,6 +143,7 @@ pub enum MusicNftEvent {
     },
     Expanded {
         additional_links: Vec<(Links, ImageData)>,
+        total_number_of_tokens: Option<u64>,
     },
     ConfigChanged {
         config: Config,
