@@ -31,6 +31,7 @@ export class NftMintedHandler implements INftEventHandler {
         metadata: JSON.stringify(metadata),
         onSale: false,
         createdAt: timestamp,
+        updatedAt: timestamp,
         sales: [],
         offers: [],
         transfers: [],
