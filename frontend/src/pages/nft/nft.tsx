@@ -1,7 +1,6 @@
-import { HexString } from '@gear-js/api';
 import { useAccount, useBalanceFormat } from '@gear-js/react-hooks';
 import { Identicon } from '@polkadot/react-identicon';
-import { generatePath, useParams } from 'react-router-dom';
+import { generatePath } from 'react-router-dom';
 
 import { Breadcrumbs, Container, CopyButton, PriceInfoCard, ResponsiveSquareImage, Tabs } from '@/components';
 import { ROUTE } from '@/consts';
@@ -11,30 +10,24 @@ import BidSVG from '@/features/marketplace/assets/bid.svg?react';
 import TagSVG from '@/features/marketplace/assets/tag.svg?react';
 import { getIpfsLink } from '@/utils';
 
-import { useNFT } from './hooks';
+import { useNFTContext, withNFTProvider } from './context';
 import InfoSVG from './info.svg?react';
 import styles from './nft.module.scss';
 import { getDetailEntries } from './utils';
 
-type Params = {
-  collectionId: HexString;
-  id: string;
-};
-
 const TABS = ['Overview', 'Properties', 'Activities'];
 
-function NFT() {
-  const { collectionId, id } = useParams() as Params;
+function Component() {
   const { account } = useAccount();
   const { getFormattedBalanceValue } = useBalanceFormat();
 
-  const nft = useNFT(collectionId, id);
+  const nft = useNFTContext();
   if (!nft) return null;
 
   // TODOINDEXER:
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-  const { owner, name, collection, mediaUrl, description, createdAt } = nft || {};
-  const { name: collectionName, royalty } = collection;
+  const { id, owner, name, collection, mediaUrl, description, createdAt } = nft || {};
+  const { name: collectionName, id: collectionId, royalty } = collection;
 
   if (!collectionName || royalty == null) return null;
 
@@ -116,16 +109,20 @@ function NFT() {
                 )}
               </div>
             </div>
-          )}
-
-          {isOwner && !sale && !auction && (!!config.sellable || !!config.transferable) && (
-            <div className={styles.buttons}>
-              {!!config.sellable && <StartSale nft={{ ...nft, id }} collection={{ ...config, id: collectionId }} />}
-              {!!config.sellable && <StartAuction nft={{ ...nft, id }} collection={{ ...config, id: collectionId }} />}
-
-              <TransferNFT nft={{ ...nft, id }} collection={{ ...config, id: collectionId }} />
-            </div>
           )} */}
+
+          {/* {isOwner && !sale && !auction && (!!config.sellable || !!config.transferable) && ( */}
+          <div className={styles.buttons}>
+            {/* {!!config.sellable && <StartSale nft={{ ...nft, id }} collection={{ ...config, id: collectionId }} />} */}
+            <StartSale />
+            <StartAuction />
+            <TransferNFT />
+            <MakeBid />
+            {/* {!!config.sellable && <StartAuction nft={{ ...nft, id }} collection={{ ...config, id: collectionId }} />} */}
+
+            {/* <TransferNFT nft={{ ...nft, id }} collection={{ ...config, id: collectionId }} /> */}
+          </div>
+          {/* )} */}
 
           <div>
             <Tabs list={TABS} size="small" outlined className={styles.tabs} value={0} onChange={() => {}} />
@@ -143,5 +140,7 @@ function NFT() {
     </Container>
   );
 }
+
+const NFT = withNFTProvider(Component);
 
 export { NFT };

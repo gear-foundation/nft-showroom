@@ -19,6 +19,7 @@ type Props<T extends FieldValues> = FormProps<T> & UseFormProps<T>;
 function Form<T extends FieldValues>({ children, onSubmit, schema, defaultValues, ...props }: Props<T>) {
   const resolver = schema ? zodResolver(schema) : undefined;
   const { register, handleSubmit, formState } = useForm<T>({ defaultValues, resolver });
+  console.log('formState: ', formState.errors);
 
   const renderChildren = () =>
     Children.map(children, (child) => {

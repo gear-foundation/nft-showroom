@@ -1,23 +1,19 @@
-import { HexString } from '@gear-js/api';
 import { Button } from '@gear-js/vara-ui';
 import { z } from 'zod';
 
-import { NFTActionFormModal, PriceInput, withAccount } from '@/components';
+import { NFTActionFormModal, PriceInput, withAccount, withApi } from '@/components';
 import { useModal } from '@/hooks';
+import { useNFTContext } from '@/pages/nft/context';
 
 import { useMarketplaceSendMessage, usePriceSchema } from '../../hooks';
-
-type Props = {
-  nft: { id: string; name: string; mediaUrl: string };
-  collection: { id: HexString; name: string };
-  auction: { minBid: string; endDate: string };
-};
 
 const defaultValues = {
   value: '',
 };
 
-function Component({ nft, collection, auction }: Props) {
+function Component() {
+  const auction = { minBid: '10', endDate: '' };
+
   const [isOpen, open, close] = useModal();
 
   const { getPriceSchema } = usePriceSchema();
@@ -25,8 +21,13 @@ function Component({ nft, collection, auction }: Props) {
 
   const sendMessage = useMarketplaceSendMessage();
 
+  const nft = useNFTContext();
+  if (!nft) return null;
+
+  const { collection } = nft;
+
   const onSubmit = ({ value }: typeof defaultValues) => {
-    const tokenId = nft.id;
+    const tokenId = nft.idInCollection;
     const collectionAddress = collection.id;
 
     const payload = { AddBid: { tokenId, collectionAddress } };
@@ -35,6 +36,7 @@ function Component({ nft, collection, auction }: Props) {
     sendMessage({ payload, value, onSuccess });
   };
 
+  const collectionProps = { name: collection.name || '' };
   const modalProps = { heading: 'Make bid', close };
   const formProps = { defaultValues, schema, onSubmit };
 
@@ -43,7 +45,12 @@ function Component({ nft, collection, auction }: Props) {
       <Button text="Make bid" size="small" onClick={open} />
 
       {isOpen && (
-        <NFTActionFormModal modal={modalProps} form={formProps} nft={nft} collection={collection} auction={auction}>
+        <NFTActionFormModal
+          modal={modalProps}
+          form={formProps}
+          nft={nft}
+          collection={collectionProps}
+          auction={auction}>
           <PriceInput label="Value" name="value" />
         </NFTActionFormModal>
       )}
@@ -51,6 +58,6 @@ function Component({ nft, collection, auction }: Props) {
   );
 }
 
-const MakeBid = withAccount(Component);
+const MakeBid = withAccount(withApi(Component));
 
 export { MakeBid };

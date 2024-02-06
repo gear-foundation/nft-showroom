@@ -1,22 +1,23 @@
-import { HexString } from '@gear-js/api';
 import { Button } from '@gear-js/vara-ui';
 
 import { withAccount } from '@/components';
+import { useNFTContext } from '@/pages/nft/context';
 
 import { useMarketplaceSendMessage } from '../../hooks';
 
-type Props = {
-  id: string;
-  collectionId: HexString;
-  price: string;
-};
+function Component() {
+  const price = '10';
 
-function Component({ id, collectionId, price }: Props) {
   const sendMessage = useMarketplaceSendMessage();
 
+  const nft = useNFTContext();
+
+  if (!nft) return null;
+  const { collection } = nft;
+
   const handleClick = () => {
-    const tokenId = id;
-    const collectionAddress = collectionId;
+    const tokenId = nft.idInCollection;
+    const collectionAddress = collection.id;
 
     const payload = { BuyNFT: { tokenId, collectionAddress } };
     const value = price;

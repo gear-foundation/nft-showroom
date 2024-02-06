@@ -14,6 +14,9 @@ const NFT_QUERY = graphql(`
         name
         sellable
         transferable
+        type {
+          metaUrl
+        }
       }
       name
       description

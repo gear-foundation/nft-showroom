@@ -1,17 +1,13 @@
-import { HexString, decodeAddress } from '@gear-js/api';
+import { decodeAddress } from '@gear-js/api';
 import { Button, Input } from '@gear-js/vara-ui';
 import { z } from 'zod';
 
 import { NFTActionFormModal, withAccount } from '@/components';
 import { useModal } from '@/hooks';
+import { useNFTContext } from '@/pages/nft/context';
 
 import PlaneSVG from '../../assets/plane.svg?react';
 import { useCollectionSendMessage } from '../../hooks';
-
-type Props = {
-  nft: { id: string; name: string; mediaUrl: string };
-  collection: { id: HexString; name: string };
-};
 
 const defaultValues = {
   address: '',
@@ -35,21 +31,27 @@ const schema = z.object({
     .transform((value) => decodeAddress(value)),
 });
 
-function Component({ nft, collection }: Props) {
+function Component() {
   const [isOpen, open, close] = useModal();
 
-  const sendMessage = useCollectionSendMessage(collection.id);
+  const nft = useNFTContext();
+  if (!nft) return null;
+
+  const { collection } = nft;
+
+  // const sendMessage = useCollectionSendMessage(collection.id);
 
   const onSubmit = ({ address }: typeof defaultValues) => {
-    const tokenId = nft.id;
+    const tokenId = nft.idInCollection;
     const to = address;
 
     const payload = { Transfer: { tokenId, to } };
     const onSuccess = close;
 
-    sendMessage({ payload, onSuccess });
+    // sendMessage({ payload, onSuccess });
   };
 
+  const collectionProps = { name: collection.name || '' };
   const modalProps = { heading: 'Transfer NFT', close };
   const formProps = { defaultValues, schema, onSubmit };
 
@@ -58,7 +60,7 @@ function Component({ nft, collection }: Props) {
       <Button icon={PlaneSVG} text="Transfer" size="small" color="dark" onClick={open} />
 
       {isOpen && (
-        <NFTActionFormModal modal={modalProps} form={formProps} nft={nft} collection={collection}>
+        <NFTActionFormModal modal={modalProps} form={formProps} nft={nft} collection={collectionProps}>
           <Input label="Account address" name="address" />
         </NFTActionFormModal>
       )}

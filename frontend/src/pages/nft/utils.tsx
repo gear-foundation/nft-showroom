@@ -1,11 +1,9 @@
-import { HexString } from '@gear-js/api';
-
 import { CopyButton } from '@/components';
 
 import styles from './nft.module.scss';
 
 const getDetailEntries = (
-  collectionId: HexString,
+  collectionId: string,
   nftId: string,
   nftStandart: string,
   mintTimestamp: string,
