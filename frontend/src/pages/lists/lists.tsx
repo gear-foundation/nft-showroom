@@ -22,7 +22,6 @@ function Lists() {
 
   const collections = useCollections();
   const nfts = useNFTs();
-  console.log('nfts: ', nfts);
 
   const counters = [collections?.length || 0, nfts?.length || 0];
 

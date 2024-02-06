@@ -1,19 +1,25 @@
-import { HexString } from '@gear-js/api';
 import { Button } from '@gear-js/vara-ui';
 
 import { withAccount } from '@/components';
 
-import { useCollectionSendMessage } from '../../hooks';
+import { useCollectionContext } from '../../context';
 
-type Props = {
-  collectionId: HexString;
-  value: string;
-};
+function Component() {
+  const collection = useCollectionContext();
 
-function Component({ collectionId, value }: Props) {
-  const sendMessage = useCollectionSendMessage(collectionId);
+  if (!collection) return null;
 
-  const handleClick = () => sendMessage({ payload: { Mint: null }, value });
+  // TODOINDEXER:
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+  const { tokensLimit, paymentForMint, nfts, sendMessage } = collection || {};
+
+  const tokensToMint = tokensLimit ? tokensLimit - nfts.length : 1;
+
+  if (tokensToMint <= 0) return null;
+
+  // TODOINDEXER:
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+  const handleClick = () => sendMessage({ payload: { Mint: null }, value: paymentForMint });
 
   return <Button text="Mint NFT" size="small" onClick={handleClick} block />;
 }

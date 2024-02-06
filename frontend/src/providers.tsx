@@ -35,7 +35,10 @@ function AlertProvider({ children }: ProviderProps) {
 
 const providers = [ApiProvider, IPFSProvider, AccountProvider, AlertProvider, IndexerProvider];
 
-const withProviders = (Component: ComponentType) => () =>
+const withProviders = (Component: ComponentType, hocs: (({ children }: ProviderProps) => JSX.Element)[]) => () =>
+  hocs.reduceRight((children, Provider) => <Provider>{children}</Provider>, <Component />);
+
+const withAppProviders = (Component: ComponentType) => () =>
   providers.reduceRight((children, Provider) => <Provider>{children}</Provider>, <Component />);
 
-export { withProviders };
+export { withProviders, withAppProviders };

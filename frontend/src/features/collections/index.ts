@@ -1,4 +1,14 @@
-import { CollectionCard, NFTCard, CollectionHeader, TransferNFT } from './components';
+import { CollectionCard, MintLimitInfoCard, NFTCard, TransferNFT, MintNFT } from './components';
+import { withCollectionProvider, useCollectionContext } from './context';
 import { useCollectionSendMessage } from './hooks';
 
-export { CollectionCard, NFTCard, CollectionHeader, TransferNFT, useCollectionSendMessage };
+export {
+  CollectionCard,
+  MintLimitInfoCard,
+  NFTCard,
+  TransferNFT,
+  useCollectionSendMessage,
+  withCollectionProvider,
+  useCollectionContext,
+  MintNFT,
+};

@@ -9,6 +9,7 @@ const NFT_QUERY = graphql(`
       owner
       createdAt
       collection {
+        id
         royalty
         name
         sellable

@@ -13,10 +13,10 @@ import { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/
  * Therefore it is highly recommended to use the babel or swc plugin for production.
  */
 const documents = {
-    "\n  query CollectionQuery($id: String!) {\n    collectionById(id: $id) {\n      admin\n      collectionBanner\n      collectionLogo\n      description\n      id\n      name\n      tokensLimit\n      paymentForMint\n      nfts {\n        id\n        name\n        collection {\n          name\n          id\n        }\n        mediaUrl\n        idInCollection\n        owner\n      }\n    }\n  }\n": types.CollectionQueryDocument,
+    "\n  query CollectionQuery($id: String!) {\n    collectionById(id: $id) {\n      admin\n      collectionBanner\n      collectionLogo\n      description\n      id\n      name\n      tokensLimit\n      paymentForMint\n      nfts {\n        id\n        name\n        collection {\n          name\n          id\n        }\n        mediaUrl\n        idInCollection\n        owner\n      }\n      type {\n        metaUrl\n      }\n    }\n  }\n": types.CollectionQueryDocument,
     "\n  query CollectionsQuery {\n    collections {\n      collectionBanner\n      collectionLogo\n      id\n      name\n      nfts {\n        id\n        mediaUrl\n      }\n      description\n      admin\n      tokensLimit\n    }\n  }\n": types.CollectionsQueryDocument,
     "\n  query NFTsQuery {\n    nfts {\n      id\n      name\n      collection {\n        name\n        id\n      }\n      mediaUrl\n      idInCollection\n      owner\n    }\n  }\n": types.NfTsQueryDocument,
-    "\n  query NFTQuery($id: String!) {\n    nftById(id: $id) {\n      idInCollection\n      mediaUrl\n      id\n      owner\n      createdAt\n      collection {\n        royalty\n        name\n        sellable\n        transferable\n      }\n      name\n      description\n    }\n  }\n": types.NftQueryDocument,
+    "\n  query NFTQuery($id: String!) {\n    nftById(id: $id) {\n      idInCollection\n      mediaUrl\n      id\n      owner\n      createdAt\n      collection {\n        id\n        royalty\n        name\n        sellable\n        transferable\n      }\n      name\n      description\n    }\n  }\n": types.NftQueryDocument,
 };
 
 /**
@@ -36,7 +36,7 @@ export function graphql(source: string): unknown;
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "\n  query CollectionQuery($id: String!) {\n    collectionById(id: $id) {\n      admin\n      collectionBanner\n      collectionLogo\n      description\n      id\n      name\n      tokensLimit\n      paymentForMint\n      nfts {\n        id\n        name\n        collection {\n          name\n          id\n        }\n        mediaUrl\n        idInCollection\n        owner\n      }\n    }\n  }\n"): (typeof documents)["\n  query CollectionQuery($id: String!) {\n    collectionById(id: $id) {\n      admin\n      collectionBanner\n      collectionLogo\n      description\n      id\n      name\n      tokensLimit\n      paymentForMint\n      nfts {\n        id\n        name\n        collection {\n          name\n          id\n        }\n        mediaUrl\n        idInCollection\n        owner\n      }\n    }\n  }\n"];
+export function graphql(source: "\n  query CollectionQuery($id: String!) {\n    collectionById(id: $id) {\n      admin\n      collectionBanner\n      collectionLogo\n      description\n      id\n      name\n      tokensLimit\n      paymentForMint\n      nfts {\n        id\n        name\n        collection {\n          name\n          id\n        }\n        mediaUrl\n        idInCollection\n        owner\n      }\n      type {\n        metaUrl\n      }\n    }\n  }\n"): (typeof documents)["\n  query CollectionQuery($id: String!) {\n    collectionById(id: $id) {\n      admin\n      collectionBanner\n      collectionLogo\n      description\n      id\n      name\n      tokensLimit\n      paymentForMint\n      nfts {\n        id\n        name\n        collection {\n          name\n          id\n        }\n        mediaUrl\n        idInCollection\n        owner\n      }\n      type {\n        metaUrl\n      }\n    }\n  }\n"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -48,7 +48,7 @@ export function graphql(source: "\n  query NFTsQuery {\n    nfts {\n      id\n  
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "\n  query NFTQuery($id: String!) {\n    nftById(id: $id) {\n      idInCollection\n      mediaUrl\n      id\n      owner\n      createdAt\n      collection {\n        royalty\n        name\n        sellable\n        transferable\n      }\n      name\n      description\n    }\n  }\n"): (typeof documents)["\n  query NFTQuery($id: String!) {\n    nftById(id: $id) {\n      idInCollection\n      mediaUrl\n      id\n      owner\n      createdAt\n      collection {\n        royalty\n        name\n        sellable\n        transferable\n      }\n      name\n      description\n    }\n  }\n"];
+export function graphql(source: "\n  query NFTQuery($id: String!) {\n    nftById(id: $id) {\n      idInCollection\n      mediaUrl\n      id\n      owner\n      createdAt\n      collection {\n        id\n        royalty\n        name\n        sellable\n        transferable\n      }\n      name\n      description\n    }\n  }\n"): (typeof documents)["\n  query NFTQuery($id: String!) {\n    nftById(id: $id) {\n      idInCollection\n      mediaUrl\n      id\n      owner\n      createdAt\n      collection {\n        id\n        royalty\n        name\n        sellable\n        transferable\n      }\n      name\n      description\n    }\n  }\n"];
 
 export function graphql(source: string) {
   return (documents as any)[source] ?? {};

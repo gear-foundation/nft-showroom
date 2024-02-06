@@ -1,21 +1,23 @@
-import { HexString } from '@gear-js/api';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { generatePath, useParams } from 'react-router-dom';
+import { generatePath } from 'react-router-dom';
 
-import { Breadcrumbs, Container, FilterButton, SearchInput } from '@/components';
+import { Breadcrumbs, Container, FilterButton, InfoCard, SearchInput } from '@/components';
 import { ROUTE } from '@/consts';
-import { NFTCard, CollectionHeader } from '@/features/collections';
+import {
+  MintLimitInfoCard,
+  MintNFT,
+  NFTCard,
+  useCollectionContext,
+  withCollectionProvider,
+} from '@/features/collections';
 import { GridSize, useGridSize } from '@/features/lists';
-import { cx } from '@/utils';
+import { cx, getIpfsLink } from '@/utils';
 
 import NotFoundSVG from './assets/not-found.svg?react';
+import UserSVG from './assets/user.svg?react';
 import styles from './collection.module.scss';
-import { useCollection } from './hooks';
-
-type Params = {
-  id: HexString;
-};
+import { SOCIAL_ICON } from './consts';
 
 function useSearchQuery() {
   const { handleSubmit, register } = useForm({ defaultValues: { query: '' } });
@@ -26,22 +28,17 @@ function useSearchQuery() {
   return { query, onSubmit, register };
 }
 
-function Collection() {
-  const { id } = useParams() as Params;
-  const collection = useCollection(id);
+function Component() {
+  const collection = useCollectionContext();
 
   const { gridSize, setGridSize } = useGridSize();
   const { query, onSubmit, register } = useSearchQuery();
 
   // TODOINDEXER:
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-  const { collectionBanner, collectionLogo, admin, tokensLimit, name, description, paymentForMint, nfts } =
-    collection || {};
+  const { id, collectionBanner, collectionLogo, admin, tokensLimit, name, description, nfts } = collection || {};
 
-  if (!collectionBanner || !collectionLogo || !admin || !name || !description) return null;
-
-  // TODOINDEXER:
-  const additionalLinks = {};
+  if (!id || !collectionBanner || !collectionLogo || !admin || !name || !description) return null;
 
   const searchedTokens = nfts?.filter((nft) => nft.name.toLocaleLowerCase().includes(query));
   const tokensCount = searchedTokens?.length || 0;
@@ -49,26 +46,53 @@ function Collection() {
   const renderNFTs = () =>
     collection && searchedTokens?.map(({ id: nftId, ...nft }) => <NFTCard key={nftId} {...nft} />);
 
+  // TODOINDEXER:
+  const additionalLinks = {};
+  const socialEntries = Object.entries(additionalLinks).filter(([, value]) => !!value) as [string, string][];
+
+  const renderSocials = () =>
+    socialEntries.map(([key, value]) => {
+      const SVG = SOCIAL_ICON[key as keyof typeof SOCIAL_ICON];
+
+      return (
+        <li key={key}>
+          <a href={value} target="_blank" rel="noreferrer">
+            <SVG />
+          </a>
+        </li>
+      );
+    });
+
   return (
     <Container>
       <Breadcrumbs list={[{ to: generatePath(ROUTE.COLLECTION, { id }), text: name }]} />
 
-      <CollectionHeader
-        id={id}
-        banner={collectionBanner}
-        logo={collectionLogo}
-        owner={admin}
-        tokensCount={tokensCount}
-        // TODOINDEXER:
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-        tokensLimit={tokensLimit}
-        name={name}
-        description={description}
-        // TODOINDEXER:
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-        mintPrice={paymentForMint}
-        socials={additionalLinks}
-      />
+      <header className={styles.headerContainer}>
+        <div className={styles.header}>
+          <img src={getIpfsLink(collectionBanner)} alt="" className={styles.banner} />
+          <img src={getIpfsLink(collectionLogo)} alt="" className={styles.logo} />
+
+          <div className={styles.cards}>
+            <InfoCard heading="Creator" text={admin} SVG={UserSVG} color="light" textOverflow />
+            {/* TODOINDEXER: */}
+            {/* eslint-disable-next-line @typescript-eslint/no-unsafe-assignment */}
+            <MintLimitInfoCard heading={tokensLimit} text={tokensCount} color="light" />
+          </div>
+        </div>
+
+        <div className={styles.footer}>
+          <div>
+            <h2 className={styles.name}>{name}</h2>
+            <p className={styles.description}>{description}</p>
+          </div>
+
+          <div>
+            <ul className={styles.socials}>{renderSocials()}</ul>
+
+            <MintNFT />
+          </div>
+        </div>
+      </header>
 
       <div className={styles.nfts}>
         <header className={styles.nftsHeader}>
@@ -99,5 +123,7 @@ function Collection() {
     </Container>
   );
 }
+
+const Collection = withCollectionProvider(Component);
 
 export { Collection };
