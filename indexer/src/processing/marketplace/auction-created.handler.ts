@@ -44,6 +44,7 @@ export class AuctionCreatedHandler implements INftMarketplaceEventHandler {
         status: SaleStatus.Open,
         blockNumber: eventInfo.blockNumber,
         timestamp: eventInfo.timestamp,
+        updatedAt: eventInfo.timestamp,
       }),
     );
   }

@@ -96,6 +96,7 @@ export class LocalStorage implements IStorage {
         },
         idInCollection: tokenId,
       },
+      relations: { collection: true },
     });
   }
 

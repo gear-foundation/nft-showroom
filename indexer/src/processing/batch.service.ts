@@ -41,6 +41,7 @@ export class BatchService {
     ]).catch((err) => {
       console.error('Error saving batch', err);
     });
+    this.clearAll();
   }
 
   clearAll() {

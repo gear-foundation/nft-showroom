@@ -2,7 +2,7 @@ import { AuctionCanceled } from '../../types/marketplace.events';
 import { EntitiesService } from '../entities.service';
 import { INftMarketplaceEventHandler } from './nft-marketplace.handler';
 import { AuctionStatus, SaleStatus } from '../../model/types';
-import { Sale } from '../../model';
+import { Nft, Sale } from '../../model';
 import { EventInfo } from '../event-info.type';
 
 export class SaleNftCanceledHandler implements INftMarketplaceEventHandler {
@@ -33,5 +33,9 @@ export class SaleNftCanceledHandler implements INftMarketplaceEventHandler {
         updatedAt: eventInfo.timestamp,
       }),
     );
+    await storage.setNft(new Nft({
+      ...nft,
+      onSale: false,
+    }));
   }
 }

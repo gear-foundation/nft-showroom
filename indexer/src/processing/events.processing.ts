@@ -121,7 +121,11 @@ export class EventsProcessing {
           blockNumber: eventInfo.blockNumber,
           timestamp: eventInfo.timestamp,
           type: event.type,
-          raw: JSON.stringify(event),
+          raw: JSON.stringify(event, (key, value) =>
+            typeof value === 'bigint'
+              ? value.toString()
+              : value // return everything else unchanged
+          ),
           txHash: eventInfo.txHash,
         })
         .catch((err) =>

@@ -1,7 +1,7 @@
 import { SaleNft } from '../../types/marketplace.events';
 import { EntitiesService } from '../entities.service';
 import { INftMarketplaceEventHandler } from './nft-marketplace.handler';
-import { Sale } from '../../model';
+import { Nft, Sale } from '../../model';
 import { SaleStatus } from '../../model/types';
 import { EventInfo } from '../event-info.type';
 import { v4 as uuidv4 } from 'uuid';
@@ -46,5 +46,9 @@ export class SaleNftHandler implements INftMarketplaceEventHandler {
         updatedAt: eventInfo.timestamp,
       }),
     );
+    await storage.setNft(new Nft({
+      ...nft,
+      onSale: true,
+    }));
   }
 }
