@@ -3,7 +3,6 @@ import { ProviderProps, useAlert } from '@gear-js/react-hooks';
 import { createContext, useContext, useEffect, useState } from 'react';
 import { useQuery } from 'urql';
 
-import marketplaceMetadataSource from '@/assets/nft_marketplace.meta.txt';
 import { graphql } from '@/graphql';
 import { getIpfsLink } from '@/utils';
 
@@ -23,6 +22,15 @@ const MetadataContext = createContext<Value>(DEFAULT_VALUE);
 const { Provider } = MetadataContext;
 const useMetadata = () => useContext(MetadataContext);
 
+const MARKETPLACE_QUERY = graphql(`
+  query MarketplaceQuery {
+    marketplaceById(id: "1") {
+      id
+      metadata
+    }
+  }
+`);
+
 const COLLECTION_TYPES_QUERY = graphql(`
   query CollectionTypesQuery {
     collectionTypes {
@@ -40,22 +48,32 @@ function useCollectionTypes() {
   return result.data?.collectionTypes;
 }
 
+function useMarketplace() {
+  const [result] = useQuery({ query: MARKETPLACE_QUERY });
+
+  return result.data?.marketplaceById;
+}
+
 function MetadataProvider({ children }: ProviderProps) {
   const alert = useAlert();
 
-  const [metadata, setMetadata] = useState<MetadataRecord>();
-  const { marketplaceMetadata, ...collectionsMetadata } = metadata || {};
-
+  // TODOINDEXER: combine into one query after fix
+  const marketplace = useMarketplace();
   const collectionTypes = useCollectionTypes();
 
+  const [marketplaceMetadata, setMarketplaceMetadata] = useState<ProgramMetadata>();
+  console.log('marketplaceMetadata: ', marketplaceMetadata);
+  const [collectionsMetadata, setCollectionsMetadata] = useState<MetadataRecord>();
+  console.log('collectionsMetadata: ', collectionsMetadata);
+
+  const getMetadata = (value: string) => ProgramMetadata.from(`0x${value}`);
+
   useEffect(() => {
-    if (!collectionTypes) return;
+    if (!marketplace || !collectionTypes) return;
 
-    const collectionURLs = collectionTypes
-      .filter(({ type }) => type !== 'nft') // TODOINDEXER: remove after db cleanup
-      .map(({ metaUrl }) => fetch(getIpfsLink(metaUrl)));
-
-    const requests = [fetch(marketplaceMetadataSource), ...collectionURLs];
+    const { metadata } = marketplace;
+    const collectionURLs = collectionTypes.map(({ metaUrl }) => fetch(getIpfsLink(metaUrl)));
+    const requests = [...collectionURLs];
 
     // TODO: performance
     // upload each .txt in a one folder to retrive them in a single request
@@ -63,20 +81,15 @@ function MetadataProvider({ children }: ProviderProps) {
       .then((responses) => responses.map((response) => response.text()))
       .then((textPromises) => Promise.all(textPromises))
       .then((texts) => {
-        const entries = texts.map(
-          (text, index) =>
-            [
-              index === 0 ? 'marketplaceMetadata' : collectionTypes[index].id,
-              ProgramMetadata.from(`0x${text}`),
-            ] as const,
-        );
+        const entries = texts.map((text, index) => [collectionTypes[index].id, getMetadata(text)] as const);
 
-        setMetadata(Object.fromEntries(entries));
+        setMarketplaceMetadata(getMetadata(metadata));
+        setCollectionsMetadata(Object.fromEntries(entries));
       })
       .catch(({ message }: Error) => alert.error(message));
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [collectionTypes]);
+  }, [marketplace, collectionTypes]);
 
   return <Provider value={{ marketplaceMetadata, collectionsMetadata }}>{children}</Provider>;
 }

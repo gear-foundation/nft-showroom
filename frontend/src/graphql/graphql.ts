@@ -505,10 +505,22 @@ export enum CollectionOrderByInput {
   IdAscNullsFirst = 'id_ASC_NULLS_FIRST',
   IdDesc = 'id_DESC',
   IdDescNullsLast = 'id_DESC_NULLS_LAST',
+  MarketplaceAddressAsc = 'marketplace_address_ASC',
+  MarketplaceAddressAscNullsFirst = 'marketplace_address_ASC_NULLS_FIRST',
+  MarketplaceAddressDesc = 'marketplace_address_DESC',
+  MarketplaceAddressDescNullsLast = 'marketplace_address_DESC_NULLS_LAST',
   MarketplaceIdAsc = 'marketplace_id_ASC',
   MarketplaceIdAscNullsFirst = 'marketplace_id_ASC_NULLS_FIRST',
   MarketplaceIdDesc = 'marketplace_id_DESC',
   MarketplaceIdDescNullsLast = 'marketplace_id_DESC_NULLS_LAST',
+  MarketplaceMetadataAsc = 'marketplace_metadata_ASC',
+  MarketplaceMetadataAscNullsFirst = 'marketplace_metadata_ASC_NULLS_FIRST',
+  MarketplaceMetadataDesc = 'marketplace_metadata_DESC',
+  MarketplaceMetadataDescNullsLast = 'marketplace_metadata_DESC_NULLS_LAST',
+  MarketplaceNftMetadataAsc = 'marketplace_nftMetadata_ASC',
+  MarketplaceNftMetadataAscNullsFirst = 'marketplace_nftMetadata_ASC_NULLS_FIRST',
+  MarketplaceNftMetadataDesc = 'marketplace_nftMetadata_DESC',
+  MarketplaceNftMetadataDescNullsLast = 'marketplace_nftMetadata_DESC_NULLS_LAST',
   NameAsc = 'name_ASC',
   NameAscNullsFirst = 'name_ASC_NULLS_FIRST',
   NameDesc = 'name_DESC',
@@ -584,10 +596,22 @@ export enum CollectionTypeOrderByInput {
   IdAscNullsFirst = 'id_ASC_NULLS_FIRST',
   IdDesc = 'id_DESC',
   IdDescNullsLast = 'id_DESC_NULLS_LAST',
+  MarketplaceAddressAsc = 'marketplace_address_ASC',
+  MarketplaceAddressAscNullsFirst = 'marketplace_address_ASC_NULLS_FIRST',
+  MarketplaceAddressDesc = 'marketplace_address_DESC',
+  MarketplaceAddressDescNullsLast = 'marketplace_address_DESC_NULLS_LAST',
   MarketplaceIdAsc = 'marketplace_id_ASC',
   MarketplaceIdAscNullsFirst = 'marketplace_id_ASC_NULLS_FIRST',
   MarketplaceIdDesc = 'marketplace_id_DESC',
   MarketplaceIdDescNullsLast = 'marketplace_id_DESC_NULLS_LAST',
+  MarketplaceMetadataAsc = 'marketplace_metadata_ASC',
+  MarketplaceMetadataAscNullsFirst = 'marketplace_metadata_ASC_NULLS_FIRST',
+  MarketplaceMetadataDesc = 'marketplace_metadata_DESC',
+  MarketplaceMetadataDescNullsLast = 'marketplace_metadata_DESC_NULLS_LAST',
+  MarketplaceNftMetadataAsc = 'marketplace_nftMetadata_ASC',
+  MarketplaceNftMetadataAscNullsFirst = 'marketplace_nftMetadata_ASC_NULLS_FIRST',
+  MarketplaceNftMetadataDesc = 'marketplace_nftMetadata_DESC',
+  MarketplaceNftMetadataDescNullsLast = 'marketplace_nftMetadata_DESC_NULLS_LAST',
   MetaStrAsc = 'metaStr_ASC',
   MetaStrAscNullsFirst = 'metaStr_ASC_NULLS_FIRST',
   MetaStrDesc = 'metaStr_DESC',
@@ -888,12 +912,15 @@ export type CollectionsConnection = {
 
 export type Marketplace = {
   __typename?: 'Marketplace';
+  address: Scalars['String']['output'];
   admins: Array<Scalars['String']['output']>;
   collectionTypes: Array<CollectionType>;
   collections: Array<Collection>;
   config: MarketplaceConfig;
   events: Array<MarketplaceEvent>;
   id: Scalars['String']['output'];
+  metadata: Scalars['String']['output'];
+  nftMetadata: Scalars['String']['output'];
 };
 
 
@@ -965,10 +992,22 @@ export enum MarketplaceConfigOrderByInput {
   IdAscNullsFirst = 'id_ASC_NULLS_FIRST',
   IdDesc = 'id_DESC',
   IdDescNullsLast = 'id_DESC_NULLS_LAST',
+  MarketplaceAddressAsc = 'marketplace_address_ASC',
+  MarketplaceAddressAscNullsFirst = 'marketplace_address_ASC_NULLS_FIRST',
+  MarketplaceAddressDesc = 'marketplace_address_DESC',
+  MarketplaceAddressDescNullsLast = 'marketplace_address_DESC_NULLS_LAST',
   MarketplaceIdAsc = 'marketplace_id_ASC',
   MarketplaceIdAscNullsFirst = 'marketplace_id_ASC_NULLS_FIRST',
   MarketplaceIdDesc = 'marketplace_id_DESC',
   MarketplaceIdDescNullsLast = 'marketplace_id_DESC_NULLS_LAST',
+  MarketplaceMetadataAsc = 'marketplace_metadata_ASC',
+  MarketplaceMetadataAscNullsFirst = 'marketplace_metadata_ASC_NULLS_FIRST',
+  MarketplaceMetadataDesc = 'marketplace_metadata_DESC',
+  MarketplaceMetadataDescNullsLast = 'marketplace_metadata_DESC_NULLS_LAST',
+  MarketplaceNftMetadataAsc = 'marketplace_nftMetadata_ASC',
+  MarketplaceNftMetadataAscNullsFirst = 'marketplace_nftMetadata_ASC_NULLS_FIRST',
+  MarketplaceNftMetadataDesc = 'marketplace_nftMetadata_DESC',
+  MarketplaceNftMetadataDescNullsLast = 'marketplace_nftMetadata_DESC_NULLS_LAST',
   MinimumTransferValueAsc = 'minimumTransferValue_ASC',
   MinimumTransferValueAscNullsFirst = 'minimumTransferValue_ASC_NULLS_FIRST',
   MinimumTransferValueDesc = 'minimumTransferValue_DESC',
@@ -1118,10 +1157,22 @@ export enum MarketplaceEventOrderByInput {
   IdAscNullsFirst = 'id_ASC_NULLS_FIRST',
   IdDesc = 'id_DESC',
   IdDescNullsLast = 'id_DESC_NULLS_LAST',
+  MarketplaceAddressAsc = 'marketplace_address_ASC',
+  MarketplaceAddressAscNullsFirst = 'marketplace_address_ASC_NULLS_FIRST',
+  MarketplaceAddressDesc = 'marketplace_address_DESC',
+  MarketplaceAddressDescNullsLast = 'marketplace_address_DESC_NULLS_LAST',
   MarketplaceIdAsc = 'marketplace_id_ASC',
   MarketplaceIdAscNullsFirst = 'marketplace_id_ASC_NULLS_FIRST',
   MarketplaceIdDesc = 'marketplace_id_DESC',
   MarketplaceIdDescNullsLast = 'marketplace_id_DESC_NULLS_LAST',
+  MarketplaceMetadataAsc = 'marketplace_metadata_ASC',
+  MarketplaceMetadataAscNullsFirst = 'marketplace_metadata_ASC_NULLS_FIRST',
+  MarketplaceMetadataDesc = 'marketplace_metadata_DESC',
+  MarketplaceMetadataDescNullsLast = 'marketplace_metadata_DESC_NULLS_LAST',
+  MarketplaceNftMetadataAsc = 'marketplace_nftMetadata_ASC',
+  MarketplaceNftMetadataAscNullsFirst = 'marketplace_nftMetadata_ASC_NULLS_FIRST',
+  MarketplaceNftMetadataDesc = 'marketplace_nftMetadata_DESC',
+  MarketplaceNftMetadataDescNullsLast = 'marketplace_nftMetadata_DESC_NULLS_LAST',
   RawAsc = 'raw_ASC',
   RawAscNullsFirst = 'raw_ASC_NULLS_FIRST',
   RawDesc = 'raw_DESC',
@@ -1241,6 +1292,10 @@ export type MarketplaceEventsConnection = {
 };
 
 export enum MarketplaceOrderByInput {
+  AddressAsc = 'address_ASC',
+  AddressAscNullsFirst = 'address_ASC_NULLS_FIRST',
+  AddressDesc = 'address_DESC',
+  AddressDescNullsLast = 'address_DESC_NULLS_LAST',
   ConfigGasForCloseAuctionAsc = 'config_gasForCloseAuction_ASC',
   ConfigGasForCloseAuctionAscNullsFirst = 'config_gasForCloseAuction_ASC_NULLS_FIRST',
   ConfigGasForCloseAuctionDesc = 'config_gasForCloseAuction_DESC',
@@ -1280,12 +1335,37 @@ export enum MarketplaceOrderByInput {
   IdAsc = 'id_ASC',
   IdAscNullsFirst = 'id_ASC_NULLS_FIRST',
   IdDesc = 'id_DESC',
-  IdDescNullsLast = 'id_DESC_NULLS_LAST'
+  IdDescNullsLast = 'id_DESC_NULLS_LAST',
+  MetadataAsc = 'metadata_ASC',
+  MetadataAscNullsFirst = 'metadata_ASC_NULLS_FIRST',
+  MetadataDesc = 'metadata_DESC',
+  MetadataDescNullsLast = 'metadata_DESC_NULLS_LAST',
+  NftMetadataAsc = 'nftMetadata_ASC',
+  NftMetadataAscNullsFirst = 'nftMetadata_ASC_NULLS_FIRST',
+  NftMetadataDesc = 'nftMetadata_DESC',
+  NftMetadataDescNullsLast = 'nftMetadata_DESC_NULLS_LAST'
 }
 
 export type MarketplaceWhereInput = {
   AND?: InputMaybe<Array<MarketplaceWhereInput>>;
   OR?: InputMaybe<Array<MarketplaceWhereInput>>;
+  address_contains?: InputMaybe<Scalars['String']['input']>;
+  address_containsInsensitive?: InputMaybe<Scalars['String']['input']>;
+  address_endsWith?: InputMaybe<Scalars['String']['input']>;
+  address_eq?: InputMaybe<Scalars['String']['input']>;
+  address_gt?: InputMaybe<Scalars['String']['input']>;
+  address_gte?: InputMaybe<Scalars['String']['input']>;
+  address_in?: InputMaybe<Array<Scalars['String']['input']>>;
+  address_isNull?: InputMaybe<Scalars['Boolean']['input']>;
+  address_lt?: InputMaybe<Scalars['String']['input']>;
+  address_lte?: InputMaybe<Scalars['String']['input']>;
+  address_not_contains?: InputMaybe<Scalars['String']['input']>;
+  address_not_containsInsensitive?: InputMaybe<Scalars['String']['input']>;
+  address_not_endsWith?: InputMaybe<Scalars['String']['input']>;
+  address_not_eq?: InputMaybe<Scalars['String']['input']>;
+  address_not_in?: InputMaybe<Array<Scalars['String']['input']>>;
+  address_not_startsWith?: InputMaybe<Scalars['String']['input']>;
+  address_startsWith?: InputMaybe<Scalars['String']['input']>;
   admins_containsAll?: InputMaybe<Array<Scalars['String']['input']>>;
   admins_containsAny?: InputMaybe<Array<Scalars['String']['input']>>;
   admins_containsNone?: InputMaybe<Array<Scalars['String']['input']>>;
@@ -1318,6 +1398,40 @@ export type MarketplaceWhereInput = {
   id_not_in?: InputMaybe<Array<Scalars['String']['input']>>;
   id_not_startsWith?: InputMaybe<Scalars['String']['input']>;
   id_startsWith?: InputMaybe<Scalars['String']['input']>;
+  metadata_contains?: InputMaybe<Scalars['String']['input']>;
+  metadata_containsInsensitive?: InputMaybe<Scalars['String']['input']>;
+  metadata_endsWith?: InputMaybe<Scalars['String']['input']>;
+  metadata_eq?: InputMaybe<Scalars['String']['input']>;
+  metadata_gt?: InputMaybe<Scalars['String']['input']>;
+  metadata_gte?: InputMaybe<Scalars['String']['input']>;
+  metadata_in?: InputMaybe<Array<Scalars['String']['input']>>;
+  metadata_isNull?: InputMaybe<Scalars['Boolean']['input']>;
+  metadata_lt?: InputMaybe<Scalars['String']['input']>;
+  metadata_lte?: InputMaybe<Scalars['String']['input']>;
+  metadata_not_contains?: InputMaybe<Scalars['String']['input']>;
+  metadata_not_containsInsensitive?: InputMaybe<Scalars['String']['input']>;
+  metadata_not_endsWith?: InputMaybe<Scalars['String']['input']>;
+  metadata_not_eq?: InputMaybe<Scalars['String']['input']>;
+  metadata_not_in?: InputMaybe<Array<Scalars['String']['input']>>;
+  metadata_not_startsWith?: InputMaybe<Scalars['String']['input']>;
+  metadata_startsWith?: InputMaybe<Scalars['String']['input']>;
+  nftMetadata_contains?: InputMaybe<Scalars['String']['input']>;
+  nftMetadata_containsInsensitive?: InputMaybe<Scalars['String']['input']>;
+  nftMetadata_endsWith?: InputMaybe<Scalars['String']['input']>;
+  nftMetadata_eq?: InputMaybe<Scalars['String']['input']>;
+  nftMetadata_gt?: InputMaybe<Scalars['String']['input']>;
+  nftMetadata_gte?: InputMaybe<Scalars['String']['input']>;
+  nftMetadata_in?: InputMaybe<Array<Scalars['String']['input']>>;
+  nftMetadata_isNull?: InputMaybe<Scalars['Boolean']['input']>;
+  nftMetadata_lt?: InputMaybe<Scalars['String']['input']>;
+  nftMetadata_lte?: InputMaybe<Scalars['String']['input']>;
+  nftMetadata_not_contains?: InputMaybe<Scalars['String']['input']>;
+  nftMetadata_not_containsInsensitive?: InputMaybe<Scalars['String']['input']>;
+  nftMetadata_not_endsWith?: InputMaybe<Scalars['String']['input']>;
+  nftMetadata_not_eq?: InputMaybe<Scalars['String']['input']>;
+  nftMetadata_not_in?: InputMaybe<Array<Scalars['String']['input']>>;
+  nftMetadata_not_startsWith?: InputMaybe<Scalars['String']['input']>;
+  nftMetadata_startsWith?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type MarketplacesConnection = {
@@ -2655,6 +2769,11 @@ export type WhereIdInput = {
   id: Scalars['String']['input'];
 };
 
+export type MarketplaceQueryQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type MarketplaceQueryQuery = { __typename?: 'Query', marketplaceById?: { __typename?: 'Marketplace', id: string, metadata: string } | null };
+
 export type CollectionTypesQueryQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -2685,6 +2804,7 @@ export type NftQueryQueryVariables = Exact<{
 export type NftQueryQuery = { __typename?: 'Query', nftById?: { __typename?: 'Nft', idInCollection: number, mediaUrl: string, id: string, owner: string, createdAt: any, name: string, description: string, collection: { __typename?: 'Collection', id: string, royalty?: number | null, name?: string | null, sellable?: boolean | null, transferable?: boolean | null, type: { __typename?: 'CollectionType', id: string } } } | null };
 
 
+export const MarketplaceQueryDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"MarketplaceQuery"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"marketplaceById"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"StringValue","value":"1","block":false}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"metadata"}}]}}]}}]} as unknown as DocumentNode<MarketplaceQueryQuery, MarketplaceQueryQueryVariables>;
 export const CollectionTypesQueryDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"CollectionTypesQuery"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"collectionTypes"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"description"}},{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"metaUrl"}},{"kind":"Field","name":{"kind":"Name","value":"type"}}]}}]}}]} as unknown as DocumentNode<CollectionTypesQueryQuery, CollectionTypesQueryQueryVariables>;
 export const CollectionQueryDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"CollectionQuery"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"collectionById"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"admin"}},{"kind":"Field","name":{"kind":"Name","value":"collectionBanner"}},{"kind":"Field","name":{"kind":"Name","value":"collectionLogo"}},{"kind":"Field","name":{"kind":"Name","value":"description"}},{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"tokensLimit"}},{"kind":"Field","name":{"kind":"Name","value":"paymentForMint"}},{"kind":"Field","name":{"kind":"Name","value":"nfts"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"collection"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"id"}}]}},{"kind":"Field","name":{"kind":"Name","value":"mediaUrl"}},{"kind":"Field","name":{"kind":"Name","value":"idInCollection"}},{"kind":"Field","name":{"kind":"Name","value":"owner"}}]}},{"kind":"Field","name":{"kind":"Name","value":"type"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]}}]} as unknown as DocumentNode<CollectionQueryQuery, CollectionQueryQueryVariables>;
 export const CollectionsQueryDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"CollectionsQuery"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"collections"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"collectionBanner"}},{"kind":"Field","name":{"kind":"Name","value":"collectionLogo"}},{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"nfts"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"mediaUrl"}}]}},{"kind":"Field","name":{"kind":"Name","value":"description"}},{"kind":"Field","name":{"kind":"Name","value":"admin"}},{"kind":"Field","name":{"kind":"Name","value":"tokensLimit"}}]}}]}}]} as unknown as DocumentNode<CollectionsQueryQuery, CollectionsQueryQueryVariables>;
