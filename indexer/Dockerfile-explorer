@@ -24,7 +24,6 @@ RUN npm ci --production
 
 FROM node AS squid
 RUN npm i -g @subsquid/cli@latest
-RUN echo -e "loglevel=silent\\nupdate-notifier=false" > /squid/.npmrc
 WORKDIR /squid
 COPY --from=deps /squid/package.json .
 COPY --from=deps /squid/package-lock.json .
