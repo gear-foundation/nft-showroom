@@ -1,7 +1,7 @@
 import { Outlet } from 'react-router-dom';
 
 import { Footer, Header } from './components';
-import { withAppProviders } from './providers';
+import { withProviders } from './providers';
 
 function Component() {
   return (
@@ -17,6 +17,6 @@ function Component() {
   );
 }
 
-const App = withAppProviders(Component);
+const App = withProviders(Component);
 
 export { App };

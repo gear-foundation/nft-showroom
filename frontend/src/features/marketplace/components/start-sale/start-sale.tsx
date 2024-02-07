@@ -2,26 +2,29 @@ import { Button } from '@gear-js/vara-ui';
 import { z } from 'zod';
 
 import { NFTActionFormModal, PriceInput, withAccount, withApi } from '@/components';
-import { useModal } from '@/hooks';
-import { useNFTContext } from '@/pages/nft/context';
+import { Nft, Collection, CollectionType } from '@/graphql/graphql';
+import { useApprovedMessage, useModal } from '@/hooks';
 
 import TagSVG from '../../assets/tag.svg?react';
 import { usePriceSchema } from '../../hooks';
+
+type Props = Pick<Nft, 'idInCollection' | 'name' | 'mediaUrl'> & {
+  collection: Pick<Collection, 'id' | 'name'> & {
+    type: Pick<CollectionType, 'id'>;
+  };
+};
 
 const defaultValues = {
   price: '',
 };
 
-function Component() {
+function Component({ collection, ...nft }: Props) {
   const [isOpen, open, close] = useModal();
 
   const { getPriceSchema } = usePriceSchema();
   const schema = z.object({ price: getPriceSchema() });
 
-  const nft = useNFTContext();
-
-  if (!nft) return null;
-  const { collection, sendMessage } = nft;
+  const sendMessage = useApprovedMessage(collection.id, collection.type.id);
 
   const onSubmit = ({ price }: typeof defaultValues) => {
     const tokenId = nft.idInCollection;
@@ -33,7 +36,6 @@ function Component() {
     sendMessage({ payload, onSuccess });
   };
 
-  const collectionProps = { name: collection.name || '' };
   const modalProps = { heading: 'Start Sale', close };
   const formProps = { defaultValues, schema, onSubmit };
 
@@ -42,7 +44,7 @@ function Component() {
       <Button icon={TagSVG} text="Start sale" size="small" onClick={open} />
 
       {isOpen && (
-        <NFTActionFormModal modal={modalProps} form={formProps} nft={nft} collection={collectionProps}>
+        <NFTActionFormModal modal={modalProps} form={formProps} nft={nft} collection={collection}>
           <PriceInput label="Price" name="price" />
         </NFTActionFormModal>
       )}

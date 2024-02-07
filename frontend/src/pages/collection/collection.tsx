@@ -1,16 +1,10 @@
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { generatePath } from 'react-router-dom';
+import { generatePath, useParams } from 'react-router-dom';
 
 import { Breadcrumbs, Container, FilterButton, InfoCard, SearchInput } from '@/components';
 import { ROUTE } from '@/consts';
-import {
-  MintLimitInfoCard,
-  MintNFT,
-  NFTCard,
-  useCollectionContext,
-  withCollectionProvider,
-} from '@/features/collections';
+import { MintLimitInfoCard, MintNFT, NFTCard } from '@/features/collections';
 import { GridSize, useGridSize } from '@/features/lists';
 import { cx, getIpfsLink } from '@/utils';
 
@@ -18,6 +12,7 @@ import NotFoundSVG from './assets/not-found.svg?react';
 import UserSVG from './assets/user.svg?react';
 import styles from './collection.module.scss';
 import { SOCIAL_ICON } from './consts';
+import { useCollection } from './hooks';
 
 function useSearchQuery() {
   const { handleSubmit, register } = useForm({ defaultValues: { query: '' } });
@@ -28,17 +23,23 @@ function useSearchQuery() {
   return { query, onSubmit, register };
 }
 
-function Component() {
-  const collection = useCollectionContext();
+type Params = {
+  id: string;
+};
+
+function Collection() {
+  const { id } = useParams() as Params;
+  const collection = useCollection(id);
 
   const { gridSize, setGridSize } = useGridSize();
   const { query, onSubmit, register } = useSearchQuery();
 
+  if (!collection) return null;
   // TODOINDEXER:
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-  const { id, collectionBanner, collectionLogo, admin, tokensLimit, name, description, nfts } = collection || {};
+  const { collectionBanner, collectionLogo, admin, tokensLimit, name, description, nfts } = collection;
 
-  if (!id || !collectionBanner || !collectionLogo || !admin || !name || !description) return null;
+  if (!collectionBanner || !collectionLogo || !admin || !name || !description) return null;
 
   const searchedTokens = nfts?.filter((nft) => nft.name.toLocaleLowerCase().includes(query));
   const tokensCount = searchedTokens?.length || 0;
@@ -89,7 +90,7 @@ function Component() {
           <div>
             <ul className={styles.socials}>{renderSocials()}</ul>
 
-            <MintNFT />
+            <MintNFT {...collection} />
           </div>
         </div>
       </header>
@@ -123,7 +124,5 @@ function Component() {
     </Container>
   );
 }
-
-const Collection = withCollectionProvider(Component);
 
 export { Collection };

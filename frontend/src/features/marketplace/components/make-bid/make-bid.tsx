@@ -2,16 +2,21 @@ import { Button } from '@gear-js/vara-ui';
 import { z } from 'zod';
 
 import { NFTActionFormModal, PriceInput, withAccount, withApi } from '@/components';
-import { useModal } from '@/hooks';
-import { useNFTContext } from '@/pages/nft/context';
+import { Collection, Nft } from '@/graphql/graphql';
+import { useMarketplaceMessage, useModal } from '@/hooks';
 
-import { useMarketplaceSendMessage, usePriceSchema } from '../../hooks';
+import { usePriceSchema } from '../../hooks';
+
+type Props = Pick<Nft, 'idInCollection' | 'name' | 'mediaUrl'> & {
+  collection: Pick<Collection, 'id' | 'name'>;
+};
 
 const defaultValues = {
   value: '',
 };
 
-function Component() {
+function Component({ collection, ...nft }: Props) {
+  // TODOINDEXER:
   const auction = { minBid: '10', endDate: '' };
 
   const [isOpen, open, close] = useModal();
@@ -19,12 +24,7 @@ function Component() {
   const { getPriceSchema } = usePriceSchema();
   const schema = z.object({ value: getPriceSchema(auction.minBid, true) });
 
-  const sendMessage = useMarketplaceSendMessage();
-
-  const nft = useNFTContext();
-  if (!nft) return null;
-
-  const { collection } = nft;
+  const sendMessage = useMarketplaceMessage();
 
   const onSubmit = ({ value }: typeof defaultValues) => {
     const tokenId = nft.idInCollection;
@@ -36,7 +36,6 @@ function Component() {
     sendMessage({ payload, value, onSuccess });
   };
 
-  const collectionProps = { name: collection.name || '' };
   const modalProps = { heading: 'Make bid', close };
   const formProps = { defaultValues, schema, onSubmit };
 
@@ -45,12 +44,7 @@ function Component() {
       <Button text="Make bid" size="small" onClick={open} />
 
       {isOpen && (
-        <NFTActionFormModal
-          modal={modalProps}
-          form={formProps}
-          nft={nft}
-          collection={collectionProps}
-          auction={auction}>
+        <NFTActionFormModal modal={modalProps} form={formProps} nft={nft} collection={collection} auction={auction}>
           <PriceInput label="Value" name="value" />
         </NFTActionFormModal>
       )}

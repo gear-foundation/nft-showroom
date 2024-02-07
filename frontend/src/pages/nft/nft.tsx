@@ -1,33 +1,40 @@
 import { useAccount, useBalanceFormat } from '@gear-js/react-hooks';
 import { Identicon } from '@polkadot/react-identicon';
-import { generatePath } from 'react-router-dom';
+import { generatePath, useParams } from 'react-router-dom';
 
 import { Breadcrumbs, Container, CopyButton, PriceInfoCard, ResponsiveSquareImage, Tabs } from '@/components';
 import { ROUTE } from '@/consts';
 import { TransferNFT } from '@/features/collections';
-import { BuyNFT, MakeBid, StartSale, StartAuction, useListing } from '@/features/marketplace';
+import { BuyNFT, MakeBid, StartSale, StartAuction } from '@/features/marketplace';
 import BidSVG from '@/features/marketplace/assets/bid.svg?react';
 import TagSVG from '@/features/marketplace/assets/tag.svg?react';
 import { getIpfsLink } from '@/utils';
 
-import { useNFTContext, withNFTProvider } from './context';
+import { useNFT } from './hooks';
 import InfoSVG from './info.svg?react';
 import styles from './nft.module.scss';
 import { getDetailEntries } from './utils';
 
 const TABS = ['Overview', 'Properties', 'Activities'];
 
-function Component() {
+type Params = {
+  collectionId: string;
+  id: string;
+};
+
+function NFT() {
+  const { collectionId, id } = useParams() as Params;
+
   const { account } = useAccount();
   const { getFormattedBalanceValue } = useBalanceFormat();
 
-  const nft = useNFTContext();
+  const nft = useNFT(collectionId, id);
   if (!nft) return null;
 
   // TODOINDEXER:
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-  const { id, owner, name, collection, mediaUrl, description, createdAt } = nft || {};
-  const { name: collectionName, id: collectionId, royalty } = collection;
+  const { owner, name, collection, mediaUrl, description, createdAt } = nft || {};
+  const { name: collectionName, royalty } = collection;
 
   if (!collectionName || royalty == null) return null;
 
@@ -114,10 +121,11 @@ function Component() {
           {/* {isOwner && !sale && !auction && (!!config.sellable || !!config.transferable) && ( */}
           <div className={styles.buttons}>
             {/* {!!config.sellable && <StartSale nft={{ ...nft, id }} collection={{ ...config, id: collectionId }} />} */}
-            <StartSale />
-            <StartAuction />
-            <TransferNFT />
-            <MakeBid />
+            <StartSale {...nft} />
+            <StartAuction {...nft} />
+            <TransferNFT {...nft} />
+            <MakeBid {...nft} />
+            <BuyNFT {...nft} />
             {/* {!!config.sellable && <StartAuction nft={{ ...nft, id }} collection={{ ...config, id: collectionId }} />} */}
 
             {/* <TransferNFT nft={{ ...nft, id }} collection={{ ...config, id: collectionId }} /> */}
@@ -140,7 +148,5 @@ function Component() {
     </Container>
   );
 }
-
-const NFT = withNFTProvider(Component);
 
 export { NFT };

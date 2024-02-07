@@ -3,7 +3,7 @@ import { Link, generatePath } from 'react-router-dom';
 
 import { PriceInfoCard, InfoCard } from '@/components';
 import { ROUTE } from '@/consts';
-import { BuyNFT, MakeBid, useListing } from '@/features/marketplace';
+import { BuyNFT, MakeBid } from '@/features/marketplace';
 import { Collection, Nft } from '@/graphql/graphql';
 import { getIpfsLink } from '@/utils';
 

@@ -3,11 +3,10 @@ import { Button, Input } from '@gear-js/vara-ui';
 import { z } from 'zod';
 
 import { NFTActionFormModal, withAccount } from '@/components';
-import { useModal } from '@/hooks';
-import { useNFTContext } from '@/pages/nft/context';
+import { Collection, CollectionType, Nft } from '@/graphql/graphql';
+import { useCollectionMessage, useModal } from '@/hooks';
 
 import PlaneSVG from '../../assets/plane.svg?react';
-import { useCollectionSendMessage } from '../../hooks';
 
 const defaultValues = {
   address: '',
@@ -31,15 +30,14 @@ const schema = z.object({
     .transform((value) => decodeAddress(value)),
 });
 
-function Component() {
+type Props = Pick<Nft, 'idInCollection' | 'name' | 'mediaUrl'> & {
+  collection: Pick<Collection, 'id' | 'name'> & { type: Pick<CollectionType, 'id'> };
+};
+
+function Component({ collection, ...nft }: Props) {
   const [isOpen, open, close] = useModal();
 
-  const nft = useNFTContext();
-  if (!nft) return null;
-
-  const { collection } = nft;
-
-  // const sendMessage = useCollectionSendMessage(collection.id);
+  const sendMessage = useCollectionMessage(collection.id, collection.type.id);
 
   const onSubmit = ({ address }: typeof defaultValues) => {
     const tokenId = nft.idInCollection;
@@ -48,10 +46,9 @@ function Component() {
     const payload = { Transfer: { tokenId, to } };
     const onSuccess = close;
 
-    // sendMessage({ payload, onSuccess });
+    sendMessage({ payload, onSuccess });
   };
 
-  const collectionProps = { name: collection.name || '' };
   const modalProps = { heading: 'Transfer NFT', close };
   const formProps = { defaultValues, schema, onSubmit };
 
@@ -60,7 +57,7 @@ function Component() {
       <Button icon={PlaneSVG} text="Transfer" size="small" color="dark" onClick={open} />
 
       {isOpen && (
-        <NFTActionFormModal modal={modalProps} form={formProps} nft={nft} collection={collectionProps}>
+        <NFTActionFormModal modal={modalProps} form={formProps} nft={nft} collection={collection}>
           <Input label="Account address" name="address" />
         </NFTActionFormModal>
       )}

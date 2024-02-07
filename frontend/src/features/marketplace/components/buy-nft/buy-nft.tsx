@@ -1,22 +1,21 @@
 import { Button } from '@gear-js/vara-ui';
 
 import { withAccount } from '@/components';
-import { useNFTContext } from '@/pages/nft/context';
+import { Collection, Nft } from '@/graphql/graphql';
+import { useMarketplaceMessage } from '@/hooks';
 
-import { useMarketplaceSendMessage } from '../../hooks';
+type Props = Pick<Nft, 'idInCollection'> & {
+  collection: Pick<Collection, 'id'>;
+};
 
-function Component() {
+function Component({ idInCollection, collection }: Props) {
+  // TODOINDEXER:
   const price = '10';
 
-  const sendMessage = useMarketplaceSendMessage();
-
-  const nft = useNFTContext();
-
-  if (!nft) return null;
-  const { collection } = nft;
+  const sendMessage = useMarketplaceMessage();
 
   const handleClick = () => {
-    const tokenId = nft.idInCollection;
+    const tokenId = idInCollection;
     const collectionAddress = collection.id;
 
     const payload = { BuyNFT: { tokenId, collectionAddress } };

@@ -1,27 +1,27 @@
 import { Button } from '@gear-js/vara-ui';
 
 import { withAccount } from '@/components';
+import { Collection, CollectionType, Nft } from '@/graphql/graphql';
+import { useCollectionMessage } from '@/hooks';
 
-import { useCollectionContext } from '../../context';
+type Props = Pick<Collection, 'id' | 'name' | 'tokensLimit' | 'paymentForMint'> & {
+  nfts: Pick<Nft, 'id'>[];
+} & {
+  type: Pick<CollectionType, 'id'>;
+};
 
-function Component() {
-  const collection = useCollectionContext();
-
-  if (!collection) return null;
-
-  // TODOINDEXER:
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-  const { tokensLimit, paymentForMint, nfts, sendMessage } = collection || {};
+// TODOINDEXER:
+// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+function Component({ id, type, tokensLimit, paymentForMint, nfts }: Props) {
+  const sendMessage = useCollectionMessage(id, type.id);
 
   const tokensToMint = tokensLimit ? tokensLimit - nfts.length : 1;
-
-  if (tokensToMint <= 0) return null;
 
   // TODOINDEXER:
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   const handleClick = () => sendMessage({ payload: { Mint: null }, value: paymentForMint });
 
-  return <Button text="Mint NFT" size="small" onClick={handleClick} block />;
+  return tokensToMint > 0 ? <Button text="Mint NFT" size="small" onClick={handleClick} block /> : null;
 }
 
 const MintNFT = withAccount(Component);

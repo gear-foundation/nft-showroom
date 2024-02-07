@@ -2,12 +2,18 @@ import { Button, Select } from '@gear-js/vara-ui';
 import { z } from 'zod';
 
 import { NFTActionFormModal, PriceInput, withAccount, withApi } from '@/components';
-import { useModal } from '@/hooks';
-import { useNFTContext } from '@/pages/nft/context';
+import { Collection, CollectionType, Nft } from '@/graphql/graphql';
+import { useApprovedMessage, useModal } from '@/hooks';
 
 import BidSVG from '../../assets/bid.svg?react';
 import { usePriceSchema } from '../../hooks';
 import { getDurationOptions } from '../../utils';
+
+type Props = Pick<Nft, 'idInCollection' | 'name' | 'mediaUrl'> & {
+  collection: Pick<Collection, 'id' | 'name'> & {
+    type: Pick<CollectionType, 'id'>;
+  };
+};
 
 const defaultOptions = getDurationOptions();
 
@@ -16,16 +22,13 @@ const defaultValues = {
   minPrice: '',
 };
 
-function Component() {
+function Component({ collection, ...nft }: Props) {
   const [isOpen, open, close] = useModal();
 
   const { getPriceSchema } = usePriceSchema();
   const schema = z.object({ minPrice: getPriceSchema(), duration: z.string() });
 
-  const nft = useNFTContext();
-
-  if (!nft) return null;
-  const { collection, sendMessage } = nft || {};
+  const sendMessage = useApprovedMessage(collection.id, collection.type.id);
 
   const onSubmit = ({ minPrice, duration }: typeof defaultValues) => {
     const collectionAddress = collection.id;
@@ -38,7 +41,6 @@ function Component() {
     sendMessage({ payload, onSuccess });
   };
 
-  const collectionProps = { name: collection.name || '' };
   const modalProps = { heading: 'Start Auction', close };
   const formProps = { defaultValues, schema, onSubmit };
 
@@ -47,7 +49,7 @@ function Component() {
       <Button icon={BidSVG} text="Start auction" size="small" color="dark" onClick={open} />
 
       {isOpen && (
-        <NFTActionFormModal modal={modalProps} form={formProps} nft={nft} collection={collectionProps}>
+        <NFTActionFormModal modal={modalProps} form={formProps} nft={nft} collection={collection}>
           <Select label="Duration" options={defaultOptions} name="duration" />
           <PriceInput label="Minimal bid" name="minPrice" />
         </NFTActionFormModal>

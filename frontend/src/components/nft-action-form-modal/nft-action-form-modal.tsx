@@ -4,6 +4,7 @@ import { ReactNode } from 'react';
 import { DefaultValues, FieldValues } from 'react-hook-form';
 import { ZodType } from 'zod';
 
+import { Nft, Collection } from '@/graphql/graphql';
 import { getIpfsLink } from '@/utils';
 
 import { Form } from '../form';
@@ -16,8 +17,8 @@ import styles from './nft-action-form-modal.module.scss';
 type Props<T> = {
   modal: Pick<ModalProps, 'heading' | 'close'>;
   form: { defaultValues: DefaultValues<T>; onSubmit: (data: T) => void; schema?: ZodType };
-  nft: { name: string; mediaUrl: string };
-  collection: { name: string };
+  nft: Pick<Nft, 'name' | 'mediaUrl'>;
+  collection: Pick<Collection, 'name'>;
   children: ReactNode;
   auction?: { minBid: string; endDate: string };
 };

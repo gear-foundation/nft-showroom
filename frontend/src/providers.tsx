@@ -9,7 +9,7 @@ import { ComponentType, useRef } from 'react';
 import { Client, Provider as UrqlProvider, cacheExchange, fetchExchange } from 'urql';
 
 import { ADDRESS } from './consts';
-import { IPFSProvider as GearIPFSProvider } from './context';
+import { IPFSProvider as GearIPFSProvider, MetadataProvider } from './context';
 
 function ApiProvider({ children }: ProviderProps) {
   return <GearApiProvider initialArgs={{ endpoint: ADDRESS.NODE }}>{children}</GearApiProvider>;
@@ -33,12 +33,9 @@ function AlertProvider({ children }: ProviderProps) {
   );
 }
 
-const providers = [ApiProvider, IPFSProvider, AccountProvider, AlertProvider, IndexerProvider];
+const providers = [ApiProvider, IPFSProvider, AccountProvider, AlertProvider, IndexerProvider, MetadataProvider];
 
-const withProviders = (Component: ComponentType, hocs: (({ children }: ProviderProps) => JSX.Element)[]) => () =>
-  hocs.reduceRight((children, Provider) => <Provider>{children}</Provider>, <Component />);
-
-const withAppProviders = (Component: ComponentType) => () =>
+const withProviders = (Component: ComponentType) => () =>
   providers.reduceRight((children, Provider) => <Provider>{children}</Provider>, <Component />);
 
-export { withProviders, withAppProviders };
+export { withProviders };
