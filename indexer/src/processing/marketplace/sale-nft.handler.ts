@@ -46,9 +46,11 @@ export class SaleNftHandler implements INftMarketplaceEventHandler {
         updatedAt: eventInfo.timestamp,
       }),
     );
-    await storage.setNft(new Nft({
-      ...nft,
-      onSale: true,
-    }));
+    await storage.setNft(
+      new Nft({
+        ...nft,
+        onSale: true,
+      }),
+    );
   }
 }

@@ -35,4 +35,13 @@ export class Marketplace {
 
   @OneToMany_(() => MarketplaceEvent, (e) => e.marketplace)
   events!: MarketplaceEvent[];
+
+  @Column_('text', { nullable: false })
+  address!: string;
+
+  @Column_('text', { nullable: false })
+  metadata!: string;
+
+  @Column_('text', { nullable: false })
+  nftMetadata!: string;
 }

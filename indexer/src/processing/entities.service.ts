@@ -36,7 +36,7 @@ export class EntitiesService {
     const entity = new MarketplaceEvent({
       ...event,
       id: uuidv4(),
-      marketplace: await this.storage.getMarketplace(),
+      marketplace: this.storage.getMarketplace(),
     } as MarketplaceEvent);
     this.batchService.addEvent(entity);
   }
@@ -115,7 +115,7 @@ export class EntitiesService {
   }
 
   async setMarketplaceConfig(marketplaceConfig: MarketplaceConfig) {
-    const marketplace = await this.storage.getMarketplace();
+    const marketplace = this.storage.getMarketplace();
     marketplace.config = marketplaceConfig;
     await this.storage.updateMarketplace(marketplace);
     this.batchService.setMarketplace(marketplace);

@@ -9,8 +9,16 @@ import {
 } from '../../model';
 import { Store } from '@subsquid/typeorm-store';
 import { IStorage } from './storage.inteface';
+import { config } from '../../config';
+import { readFileSync } from 'fs';
 
 let storage: LocalStorage | undefined;
+
+const marketplaceMeta = readFileSync(
+  './assets/nft_marketplace.meta.txt',
+  'utf8',
+);
+const nftMeta = readFileSync('./assets/nft.meta.txt', 'utf8');
 
 export async function getLocalStorage(store: Store): Promise<LocalStorage> {
   if (storage === undefined) {
@@ -22,12 +30,6 @@ export async function getLocalStorage(store: Store): Promise<LocalStorage> {
 }
 
 export class LocalStorage implements IStorage {
-  async updateNft(nft: Nft): Promise<void> {
-    this.nfts[this.getNftKey(nft.collection.id, nft.idInCollection)] = nft;
-  }
-  async updateCollectionType(collectionType: CollectionType): Promise<void> {
-    this.collectionTypes[collectionType.type] = collectionType;
-  }
   private initialized = false;
   // typeName -> CollectionType
   private collectionTypes: Record<string, CollectionType> = {};
@@ -48,13 +50,22 @@ export class LocalStorage implements IStorage {
     }
     await this.loadEntities();
     this.initialized = true;
+    setInterval(() => this.loadMarketplace(), 10 * 1000); // 10 seconds
   }
 
   setStore(store: Store) {
     this.store = store;
   }
 
-  async getMarketplace(): Promise<Marketplace> {
+  async updateNft(nft: Nft): Promise<void> {
+    this.nfts[this.getNftKey(nft.collection.id, nft.idInCollection)] = nft;
+  }
+
+  async updateCollectionType(collectionType: CollectionType): Promise<void> {
+    this.collectionTypes[collectionType.type] = collectionType;
+  }
+
+  getMarketplace(): Marketplace {
     return this.marketplace!;
   }
 
@@ -193,6 +204,15 @@ export class LocalStorage implements IStorage {
 
   private async loadMarketplace() {
     this.marketplace = await this.store.findOne(Marketplace, { where: {} });
+    if (!this.marketplace!.address) {
+      this.marketplace!.address = config.marketplaceProgram;
+    }
+    if (!this.marketplace!.metadata) {
+      this.marketplace!.metadata = marketplaceMeta;
+    }
+    if (!this.marketplace!.nftMetadata) {
+      this.marketplace!.nftMetadata = nftMeta;
+    }
   }
 
   private async loadCollections() {

@@ -1,7 +1,6 @@
 import { TypeormDatabase } from '@subsquid/typeorm-store';
 
 import { processor } from './processor';
-import { config } from './config';
 import { EventsProcessing } from './processing/events.processing';
 import { EventInfo } from './processing/event-info.type';
 import { Block } from '@subsquid/substrate-processor';
@@ -30,7 +29,7 @@ processor.run(new TypeormDatabase(), async (ctx) => {
     new BatchService(ctx.store),
     ctx.store,
   );
-  const processing = new EventsProcessing(entitiesService);
+  const processing = new EventsProcessing(entitiesService, localStorage);
   const firstBlockDate = getBlockDate(ctx.blocks[0]);
   console.log(
     `[main] start processing ${ctx.blocks.length} blocks at ${firstBlockDate}.`,
@@ -56,7 +55,7 @@ processor.run(new TypeormDatabase(), async (ctx) => {
         messageId: id,
         txHash: id,
       };
-      if (config.marketplaceProgram === source) {
+      if (localStorage.getMarketplace().address === source) {
         const marketplaceEvent = await processing.handleMarketplaceEvent(
           payload,
           eventInfo,

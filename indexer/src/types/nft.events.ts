@@ -50,6 +50,7 @@ export type NftConfig = {
   burnable: boolean;
   sellable: boolean;
   attendable: boolean;
+  totalNumberOfTokens: bigint | null;
 };
 
 export type InitializedEvent = {
@@ -164,6 +165,7 @@ export interface NftEventPlain extends Enum {
   };
   initialized: {
     config: ConfigPlain;
+    totalNumberOfTokens: u64;
   };
   minted: {
     tokenId: u64;
@@ -187,6 +189,7 @@ export interface NftEventPlain extends Enum {
   };
   configChanged: {
     config: ConfigPlain;
+    totalNumberOfTokens: u64;
   };
   imageChanged: {
     tokenId: u64;
@@ -253,6 +256,9 @@ export function getNftEvent(event: NftEventPlain): NftEvent | undefined {
         burnable: event.initialized.config.burnable,
         sellable: event.initialized.config.sellable,
         attendable: event.initialized.config.attendable,
+        totalNumberOfTokens: safeUnwrapToBigInt(
+          event.initialized.totalNumberOfTokens,
+        ),
       },
     };
   }
@@ -333,6 +339,9 @@ export function getNftEvent(event: NftEventPlain): NftEvent | undefined {
         burnable: event.configChanged.config.burnable,
         sellable: event.configChanged.config.sellable,
         attendable: event.configChanged.config.attendable,
+        totalNumberOfTokens: safeUnwrapToBigInt(
+          event.configChanged.totalNumberOfTokens,
+        ),
       },
     };
   }

@@ -9,7 +9,7 @@ import {
 } from '../../model';
 
 export interface IStorage {
-  getMarketplace(): Promise<Marketplace>;
+  getMarketplace(): Marketplace;
   updateMarketplace(marketplace: Marketplace): Promise<void>;
 
   getCollection(collectionAddress: string): Promise<Collection | undefined>;

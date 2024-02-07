@@ -1,5 +1,3 @@
-import { readFileSync } from 'fs';
-import { ProgramMetadata } from '@gear-js/api';
 import {
   getMarketplaceEvent,
   NftMarketplaceEvent,
@@ -40,13 +38,8 @@ import { TransferredHandler } from './nft/transferred.handler';
 import { MetadataAddedHandler } from './nft/metadata-added.handler';
 import { EventInfo } from './event-info.type';
 import { EntitiesService } from './entities.service';
-
-const marketplaceMeta = ProgramMetadata.from(
-  readFileSync('./assets/nft_marketplace.meta.txt', 'utf8'),
-);
-const nftMeta = ProgramMetadata.from(
-  readFileSync('./assets/nft.meta.txt', 'utf8'),
-);
+import { IStorage } from './storage/storage.inteface';
+import { ProgramMetadata } from '@gear-js/api';
 
 const marketplaceEventsToHandler: Record<
   NftMarketplaceEventType,
@@ -89,7 +82,17 @@ const nftEventsToHandler: Record<NftEventType, INftEventHandler | undefined> = {
 };
 
 export class EventsProcessing {
-  constructor(private readonly entitiesService: EntitiesService) {}
+  private readonly marketplaceMeta: ProgramMetadata;
+  private readonly nftMeta: ProgramMetadata;
+
+  constructor(
+    private readonly entitiesService: EntitiesService,
+    private readonly storage: IStorage,
+  ) {
+    const marketplace = this.storage.getMarketplace();
+    this.marketplaceMeta = ProgramMetadata.from(marketplace.metadata);
+    this.nftMeta = ProgramMetadata.from(marketplace.nftMetadata);
+  }
 
   saveAll() {
     return this.entitiesService.saveAll();
@@ -102,8 +105,8 @@ export class EventsProcessing {
     const { blockNumber, messageId } = eventInfo;
     try {
       console.log(`${blockNumber}-${messageId}: handling marketplace event`);
-      const data = marketplaceMeta.createType<NftMarketplaceEventPlain>(
-        marketplaceMeta.types.handle.output!,
+      const data = this.marketplaceMeta.createType<NftMarketplaceEventPlain>(
+        this.marketplaceMeta.types.handle.output!,
         payload,
       );
       const parsed = data.toJSON() as { ok: NftMarketplaceEventPlain } | null;
@@ -121,10 +124,10 @@ export class EventsProcessing {
           blockNumber: eventInfo.blockNumber,
           timestamp: eventInfo.timestamp,
           type: event.type,
-          raw: JSON.stringify(event, (key, value) =>
-            typeof value === 'bigint'
-              ? value.toString()
-              : value // return everything else unchanged
+          raw: JSON.stringify(
+            event,
+            (key, value) =>
+              typeof value === 'bigint' ? value.toString() : value, // return everything else unchanged
           ),
           txHash: eventInfo.txHash,
         })
@@ -156,9 +159,8 @@ export class EventsProcessing {
     const { blockNumber, messageId } = eventInfo;
     try {
       console.log(`${blockNumber}-${messageId}: handling nft event`);
-      const data = nftMeta.createType<NftEventPlain>(
-        // @ts-ignore
-        nftMeta.types.handle.output!,
+      const data = this.nftMeta.createType<NftEventPlain>(
+        this.nftMeta.types.handle.output!,
         payload,
       );
       const parsed = data.toJSON() as { ok: NftEventPlain } | null;

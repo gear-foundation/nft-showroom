@@ -5,6 +5,9 @@ type Marketplace @entity {
   collections: [Collection!]! @derivedFrom(field: "marketplace")
   collectionTypes: [CollectionType!]! @derivedFrom(field: "marketplace")
   events: [MarketplaceEvent!]! @derivedFrom(field: "marketplace")
+  address: String!
+  metadata: String!
+  nftMetadata: String!
 }
 
 type MarketplaceConfig @entity {
