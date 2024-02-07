@@ -23,7 +23,7 @@ export class EntitiesService {
     private readonly store: Store,
   ) {}
 
-  async getMarketplace(): Promise<Marketplace> {
+  getMarketplace(): Marketplace {
     return this.storage.getMarketplace();
   }
 

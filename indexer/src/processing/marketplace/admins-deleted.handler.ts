@@ -11,7 +11,7 @@ export class AdminDeletedHandler implements INftMarketplaceEventHandler {
     storage: EntitiesService,
   ): Promise<void> {
     const { user } = event;
-    const marketplace = await storage.getMarketplace();
+    const marketplace = storage.getMarketplace();
     await storage.setMarketplace(
       new Marketplace({
         ...marketplace,

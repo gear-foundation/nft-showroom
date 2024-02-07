@@ -25,6 +25,7 @@ export class NewCollectionAddedHandler implements INftMarketplaceEventHandler {
         type: typeName,
         metaUrl: metaLink,
         metaStr: '',
+        marketplace: storage.getMarketplace()
       }),
     );
   }

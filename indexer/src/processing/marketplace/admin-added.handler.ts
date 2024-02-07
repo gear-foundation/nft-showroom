@@ -11,7 +11,7 @@ export class AdminAddedHandler implements INftMarketplaceEventHandler {
     storage: EntitiesService,
   ): Promise<void> {
     const { users } = event;
-    const marketplace = await storage.getMarketplace();
+    const marketplace = storage.getMarketplace();
     await storage.setMarketplace(
       new Marketplace({
         ...marketplace,
