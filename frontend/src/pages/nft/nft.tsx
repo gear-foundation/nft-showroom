@@ -31,8 +31,6 @@ function NFT() {
   const nft = useNFT(collectionId, id);
   if (!nft) return null;
 
-  // TODOINDEXER:
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   const { owner, name, collection, mediaUrl, description, createdAt } = nft || {};
   const { name: collectionName, royalty } = collection;
 
@@ -51,8 +49,6 @@ function NFT() {
   const isOwner = owner === account?.decodedAddress;
 
   const getDetails = () =>
-    // TODOINDEXER:
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
     getDetailEntries(collectionId, id, 'gNFT', createdAt, royalty).map(({ key, value }) => (
       <li key={key} className={styles.row}>
         <span>{key}:</span>

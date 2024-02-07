@@ -27,26 +27,15 @@ const MARKETPLACE_QUERY = graphql(`
     marketplaceById(id: "1") {
       id
       metadata
+      collectionTypes {
+        description
+        id
+        metaUrl
+        type
+      }
     }
   }
 `);
-
-const COLLECTION_TYPES_QUERY = graphql(`
-  query CollectionTypesQuery {
-    collectionTypes {
-      description
-      id
-      metaUrl
-      type
-    }
-  }
-`);
-
-function useCollectionTypes() {
-  const [result] = useQuery({ query: COLLECTION_TYPES_QUERY });
-
-  return result.data?.collectionTypes;
-}
 
 function useMarketplace() {
   const [result] = useQuery({ query: MARKETPLACE_QUERY });
@@ -57,23 +46,19 @@ function useMarketplace() {
 function MetadataProvider({ children }: ProviderProps) {
   const alert = useAlert();
 
-  // TODOINDEXER: combine into one query after fix
   const marketplace = useMarketplace();
-  const collectionTypes = useCollectionTypes();
 
   const [marketplaceMetadata, setMarketplaceMetadata] = useState<ProgramMetadata>();
-  console.log('marketplaceMetadata: ', marketplaceMetadata);
   const [collectionsMetadata, setCollectionsMetadata] = useState<MetadataRecord>();
-  console.log('collectionsMetadata: ', collectionsMetadata);
-
-  const getMetadata = (value: string) => ProgramMetadata.from(`0x${value}`);
 
   useEffect(() => {
-    if (!marketplace || !collectionTypes) return;
+    if (!marketplace) return;
 
-    const { metadata } = marketplace;
+    const { metadata, collectionTypes } = marketplace;
     const collectionURLs = collectionTypes.map(({ metaUrl }) => fetch(getIpfsLink(metaUrl)));
     const requests = [...collectionURLs];
+
+    const getMetadata = (value: string) => ProgramMetadata.from(`0x${value}`);
 
     // TODO: performance
     // upload each .txt in a one folder to retrive them in a single request
@@ -89,7 +74,7 @@ function MetadataProvider({ children }: ProviderProps) {
       .catch(({ message }: Error) => alert.error(message));
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [marketplace, collectionTypes]);
+  }, [marketplace]);
 
   return <Provider value={{ marketplaceMetadata, collectionsMetadata }}>{children}</Provider>;
 }

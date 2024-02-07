@@ -19,7 +19,7 @@ import { NFTForm } from '../nft-form';
 import { ParametersForm } from '../parameters-form';
 import { SummaryForm } from '../summary-form';
 
-// TODOINDEXER: get collection type metadata
+// TODO: get collection type metadata
 const SIMPLE_COLLECTION_ID = '0x605b40eca154cc101178294a214ca8742dd1012f91111d5aecbfa9efe0aa9dfc';
 
 function CreateSimpleCollectionModal({ close }: Pick<ModalProps, 'close'>) {

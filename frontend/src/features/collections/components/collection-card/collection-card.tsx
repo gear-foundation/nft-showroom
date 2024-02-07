@@ -45,8 +45,6 @@ function CollectionCard({ id, name, collectionBanner, collectionLogo, admin, tok
         </div>
 
         <div className={styles.cards}>
-          {/* TODOINDEXER: */}
-          {/* eslint-disable-next-line @typescript-eslint/no-unsafe-assignment */}
           <MintLimitInfoCard heading={tokensLimit} text={nfts.length} color="dark" />
         </div>
 

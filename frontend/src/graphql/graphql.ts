@@ -15,9 +15,9 @@ export type Scalars = {
   Int: { input: number; output: number; }
   Float: { input: number; output: number; }
   /** Big number integer */
-  BigInt: { input: any; output: any; }
+  BigInt: { input: string; output: string; }
   /** A date-time string in simplified extended ISO 8601 format (YYYY-MM-DDTHH:mm:ss.sssZ) */
-  DateTime: { input: any; output: any; }
+  DateTime: { input: string; output: string; }
 };
 
 export type Auction = {
@@ -2772,24 +2772,19 @@ export type WhereIdInput = {
 export type MarketplaceQueryQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type MarketplaceQueryQuery = { __typename?: 'Query', marketplaceById?: { __typename?: 'Marketplace', id: string, metadata: string } | null };
-
-export type CollectionTypesQueryQueryVariables = Exact<{ [key: string]: never; }>;
-
-
-export type CollectionTypesQueryQuery = { __typename?: 'Query', collectionTypes: Array<{ __typename?: 'CollectionType', description: string, id: string, metaUrl: string, type: string }> };
+export type MarketplaceQueryQuery = { __typename?: 'Query', marketplaceById?: { __typename?: 'Marketplace', id: string, metadata: string, collectionTypes: Array<{ __typename?: 'CollectionType', description: string, id: string, metaUrl: string, type: string }> } | null };
 
 export type CollectionQueryQueryVariables = Exact<{
   id: Scalars['String']['input'];
 }>;
 
 
-export type CollectionQueryQuery = { __typename?: 'Query', collectionById?: { __typename?: 'Collection', admin?: string | null, collectionBanner?: string | null, collectionLogo?: string | null, description?: string | null, id: string, name?: string | null, tokensLimit?: any | null, paymentForMint?: any | null, nfts: Array<{ __typename?: 'Nft', id: string, name: string, mediaUrl: string, idInCollection: number, owner: string, collection: { __typename?: 'Collection', name?: string | null, id: string } }>, type: { __typename?: 'CollectionType', id: string } } | null };
+export type CollectionQueryQuery = { __typename?: 'Query', collectionById?: { __typename?: 'Collection', admin?: string | null, collectionBanner?: string | null, collectionLogo?: string | null, description?: string | null, id: string, name?: string | null, tokensLimit?: string | null, paymentForMint?: string | null, nfts: Array<{ __typename?: 'Nft', id: string, name: string, mediaUrl: string, idInCollection: number, owner: string, collection: { __typename?: 'Collection', name?: string | null, id: string } }>, type: { __typename?: 'CollectionType', id: string } } | null };
 
 export type CollectionsQueryQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type CollectionsQueryQuery = { __typename?: 'Query', collections: Array<{ __typename?: 'Collection', collectionBanner?: string | null, collectionLogo?: string | null, id: string, name?: string | null, description?: string | null, admin?: string | null, tokensLimit?: any | null, nfts: Array<{ __typename?: 'Nft', id: string, mediaUrl: string }> }> };
+export type CollectionsQueryQuery = { __typename?: 'Query', collections: Array<{ __typename?: 'Collection', collectionBanner?: string | null, collectionLogo?: string | null, id: string, name?: string | null, description?: string | null, admin?: string | null, tokensLimit?: string | null, nfts: Array<{ __typename?: 'Nft', id: string, mediaUrl: string }> }> };
 
 export type NfTsQueryQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -2801,11 +2796,10 @@ export type NftQueryQueryVariables = Exact<{
 }>;
 
 
-export type NftQueryQuery = { __typename?: 'Query', nftById?: { __typename?: 'Nft', idInCollection: number, mediaUrl: string, id: string, owner: string, createdAt: any, name: string, description: string, collection: { __typename?: 'Collection', id: string, royalty?: number | null, name?: string | null, sellable?: boolean | null, transferable?: boolean | null, type: { __typename?: 'CollectionType', id: string } } } | null };
+export type NftQueryQuery = { __typename?: 'Query', nftById?: { __typename?: 'Nft', idInCollection: number, mediaUrl: string, id: string, owner: string, createdAt: string, name: string, description: string, collection: { __typename?: 'Collection', id: string, royalty?: number | null, name?: string | null, sellable?: boolean | null, transferable?: boolean | null, type: { __typename?: 'CollectionType', id: string } } } | null };
 
 
-export const MarketplaceQueryDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"MarketplaceQuery"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"marketplaceById"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"StringValue","value":"1","block":false}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"metadata"}}]}}]}}]} as unknown as DocumentNode<MarketplaceQueryQuery, MarketplaceQueryQueryVariables>;
-export const CollectionTypesQueryDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"CollectionTypesQuery"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"collectionTypes"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"description"}},{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"metaUrl"}},{"kind":"Field","name":{"kind":"Name","value":"type"}}]}}]}}]} as unknown as DocumentNode<CollectionTypesQueryQuery, CollectionTypesQueryQueryVariables>;
+export const MarketplaceQueryDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"MarketplaceQuery"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"marketplaceById"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"StringValue","value":"1","block":false}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"metadata"}},{"kind":"Field","name":{"kind":"Name","value":"collectionTypes"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"description"}},{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"metaUrl"}},{"kind":"Field","name":{"kind":"Name","value":"type"}}]}}]}}]}}]} as unknown as DocumentNode<MarketplaceQueryQuery, MarketplaceQueryQueryVariables>;
 export const CollectionQueryDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"CollectionQuery"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"collectionById"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"admin"}},{"kind":"Field","name":{"kind":"Name","value":"collectionBanner"}},{"kind":"Field","name":{"kind":"Name","value":"collectionLogo"}},{"kind":"Field","name":{"kind":"Name","value":"description"}},{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"tokensLimit"}},{"kind":"Field","name":{"kind":"Name","value":"paymentForMint"}},{"kind":"Field","name":{"kind":"Name","value":"nfts"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"collection"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"id"}}]}},{"kind":"Field","name":{"kind":"Name","value":"mediaUrl"}},{"kind":"Field","name":{"kind":"Name","value":"idInCollection"}},{"kind":"Field","name":{"kind":"Name","value":"owner"}}]}},{"kind":"Field","name":{"kind":"Name","value":"type"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]}}]} as unknown as DocumentNode<CollectionQueryQuery, CollectionQueryQueryVariables>;
 export const CollectionsQueryDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"CollectionsQuery"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"collections"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"collectionBanner"}},{"kind":"Field","name":{"kind":"Name","value":"collectionLogo"}},{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"nfts"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"mediaUrl"}}]}},{"kind":"Field","name":{"kind":"Name","value":"description"}},{"kind":"Field","name":{"kind":"Name","value":"admin"}},{"kind":"Field","name":{"kind":"Name","value":"tokensLimit"}}]}}]}}]} as unknown as DocumentNode<CollectionsQueryQuery, CollectionsQueryQueryVariables>;
 export const NfTsQueryDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"NFTsQuery"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"nfts"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"collection"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"id"}}]}},{"kind":"Field","name":{"kind":"Name","value":"mediaUrl"}},{"kind":"Field","name":{"kind":"Name","value":"idInCollection"}},{"kind":"Field","name":{"kind":"Name","value":"owner"}}]}}]}}]} as unknown as DocumentNode<NfTsQueryQuery, NfTsQueryQueryVariables>;

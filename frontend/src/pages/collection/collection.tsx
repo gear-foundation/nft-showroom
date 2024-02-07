@@ -35,8 +35,6 @@ function Collection() {
   const { query, onSubmit, register } = useSearchQuery();
 
   if (!collection) return null;
-  // TODOINDEXER:
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   const { collectionBanner, collectionLogo, admin, tokensLimit, name, description, nfts } = collection;
 
   if (!collectionBanner || !collectionLogo || !admin || !name || !description) return null;
@@ -75,8 +73,6 @@ function Collection() {
 
           <div className={styles.cards}>
             <InfoCard heading="Creator" text={admin} SVG={UserSVG} color="light" textOverflow />
-            {/* TODOINDEXER: */}
-            {/* eslint-disable-next-line @typescript-eslint/no-unsafe-assignment */}
             <MintLimitInfoCard heading={tokensLimit} text={tokensCount} color="light" />
           </div>
         </div>

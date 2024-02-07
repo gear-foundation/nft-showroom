@@ -1,6 +1,6 @@
 import { NFTsValues, ParametersValues, SummaryValues } from './types';
 
-const COLLECTION_NAME = 'simple';
+const COLLECTION_NAME = 'Simple NFT Collection';
 
 const STEPS = ['Fill info', 'Set parameters', 'Add NFTs'];
 
