@@ -14,6 +14,7 @@ const config: CodegenConfig = {
           DateTime: 'string',
           BigInt: 'string',
         },
+        avoidOptionals: true,
       },
     },
   },
