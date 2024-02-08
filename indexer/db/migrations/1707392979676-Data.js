@@ -2,7 +2,6 @@ module.exports = class Data1707392979676 {
     name = 'Data1707392979676'
 
     async up(db) {
-        await db.query(`ALTER TABLE "collection" ADD "additional_links" text`)
         await db.query(`ALTER TABLE "collection" ALTER COLUMN "admin" SET NOT NULL`)
         await db.query(`ALTER TABLE "collection" ALTER COLUMN "name" SET NOT NULL`)
         await db.query(`ALTER TABLE "collection" ALTER COLUMN "description" SET NOT NULL`)
@@ -15,7 +14,6 @@ module.exports = class Data1707392979676 {
     }
 
     async down(db) {
-        await db.query(`ALTER TABLE "collection" DROP COLUMN "additional_links"`)
         await db.query(`ALTER TABLE "collection" ALTER COLUMN "admin" DROP NOT NULL`)
         await db.query(`ALTER TABLE "collection" ALTER COLUMN "name" DROP NOT NULL`)
         await db.query(`ALTER TABLE "collection" ALTER COLUMN "description" DROP NOT NULL`)
