@@ -119,7 +119,7 @@ export class EventsProcessing {
         return null;
       }
       console.log(`${blockNumber}-${messageId}: detected event: ${event.type}`);
-      this.entitiesService
+      await this.entitiesService
         .addEvent({
           blockNumber: eventInfo.blockNumber,
           timestamp: eventInfo.timestamp,
