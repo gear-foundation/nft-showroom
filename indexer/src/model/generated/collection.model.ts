@@ -9,6 +9,7 @@ import {
 import * as marshal from './marshal';
 import { Marketplace } from './marketplace.model';
 import { CollectionType } from './collectionType.model';
+import { AdditionalLinks } from './_additionalLinks';
 import { Nft } from './nft.model';
 
 @Entity_()
@@ -37,8 +38,15 @@ export class Collection {
   @Column_('text', { nullable: false })
   description!: string;
 
-  @Column_('text', { nullable: true })
-  additionalLinks!: string | undefined | null;
+  @Column_('jsonb', {
+    transformer: {
+      to: (obj) => (obj == null ? undefined : obj.toJSON()),
+      from: (obj) =>
+        obj == null ? undefined : new AdditionalLinks(undefined, obj),
+    },
+    nullable: true,
+  })
+  additionalLinks!: AdditionalLinks | undefined | null;
 
   @Column_('numeric', {
     transformer: marshal.bigintTransformer,

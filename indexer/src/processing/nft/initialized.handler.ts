@@ -1,7 +1,7 @@
 import { InitializedEvent } from '../../types/nft.events';
 import { EntitiesService } from '../entities.service';
 import { INftEventHandler } from './nft.handler';
-import { Collection } from '../../model';
+import { AdditionalLinks, Collection } from '../../model';
 import { EventInfo } from '../event-info.type';
 
 export class InitializedHandler implements INftEventHandler {
@@ -43,7 +43,9 @@ export class InitializedHandler implements INftEventHandler {
         approvable,
         attendable,
         burnable,
-        additionalLinks: JSON.stringify(additionalLinks),
+        additionalLinks: new AdditionalLinks({
+          ...additionalLinks,
+        }),
         collectionBanner: collectionBanner,
         collectionLogo,
         tags: collectionTags,

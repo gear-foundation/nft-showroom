@@ -3,6 +3,7 @@ export * from './marketplaceConfig.model';
 export * from './marketplaceEvent.model';
 export * from './collectionType.model';
 export * from './collection.model';
+export * from './_additionalLinks';
 export * from './nft.model';
 export * from './transfer.model';
 export * from './sale.model';

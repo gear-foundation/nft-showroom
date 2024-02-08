@@ -40,6 +40,13 @@ type CollectionType @entity {
   metaStr: String!
   marketplace: Marketplace!
 }
+type AdditionalLinks {
+  externalUrl: String
+  telegram: String
+  xcom: String
+  medium: String
+  discord: String
+}
 
 type Collection @entity {
   id: ID!
@@ -48,7 +55,7 @@ type Collection @entity {
   admin: String!
   name: String!
   description: String!
-  additionalLinks: String
+  additionalLinks: AdditionalLinks
   userMintLimit: BigInt
   tokensLimit: BigInt
   paymentForMint: BigInt!
