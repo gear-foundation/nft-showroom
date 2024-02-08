@@ -37,6 +37,9 @@ export class Collection {
   @Column_('text', { nullable: true })
   description!: string | undefined | null;
 
+  @Column_('text', { nullable: true })
+  additionalLinks!: string | undefined | null;
+
   @Column_('numeric', {
     transformer: marshal.bigintTransformer,
     nullable: true,

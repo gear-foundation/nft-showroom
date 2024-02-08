@@ -43,6 +43,7 @@ export class InitializedHandler implements INftEventHandler {
         approvable,
         attendable,
         burnable,
+        additionalLinks: JSON.stringify(additionalLinks),
         collectionBanner: collectionBanner,
         collectionLogo,
         tags: collectionTags,

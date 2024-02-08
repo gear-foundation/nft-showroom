@@ -28,5 +28,9 @@ export class TransferredHandler implements INftEventHandler {
         txHash,
       }),
     );
+    await storage.setNft({
+      ...nft,
+      owner: recipient,
+    })
   }
 }

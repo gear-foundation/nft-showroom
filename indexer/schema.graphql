@@ -48,6 +48,7 @@ type Collection @entity {
   admin: String
   name: String
   description: String
+  additionalLinks: String
   userMintLimit: BigInt
   tokensLimit: BigInt
   paymentForMint: BigInt

@@ -1,7 +1,7 @@
 import { NftSold } from '../../types/marketplace.events';
 import { EntitiesService } from '../entities.service';
 import { INftMarketplaceEventHandler } from './nft-marketplace.handler';
-import { Nft, Sale } from '../../model';
+import { Nft, Sale, Transfer } from '../../model';
 import { SaleStatus } from '../../model/types';
 import { EventInfo } from '../event-info.type';
 
@@ -44,9 +44,19 @@ export class NftSoldHandler implements INftMarketplaceEventHandler {
         updatedAt: eventInfo.timestamp,
       }),
     );
+    storage.addTransfer(
+      new Transfer({
+        nft,
+        from: sale.owner,
+        to: currentOwner,
+        timestamp: eventInfo.timestamp,
+        txHash: eventInfo.txHash,
+      }),
+    );
     await storage.setNft(
       new Nft({
         ...nft,
+        owner: currentOwner,
         onSale: false,
       }),
     );

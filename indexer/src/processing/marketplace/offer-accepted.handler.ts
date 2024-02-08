@@ -2,7 +2,7 @@ import { OfferAccepted } from '../../types/marketplace.events';
 import { EntitiesService } from '../entities.service';
 import { INftMarketplaceEventHandler } from './nft-marketplace.handler';
 import { OfferStatus } from '../../model/types';
-import { Offer } from '../../model';
+import { Offer, Transfer } from '../../model';
 import { EventInfo } from '../event-info.type';
 
 export class OfferAcceptedHandler implements INftMarketplaceEventHandler {
@@ -36,5 +36,18 @@ export class OfferAcceptedHandler implements INftMarketplaceEventHandler {
         blockNumber: eventInfo.blockNumber,
       }),
     );
+    storage.addTransfer(
+      new Transfer({
+        nft,
+        from: nft.owner,
+        to: offer.creator,
+        timestamp: eventInfo.timestamp,
+        txHash: eventInfo.txHash,
+      }),
+    );
+    await storage.setNft({
+      ...nft,
+      owner: offer.creator,
+    })
   }
 }

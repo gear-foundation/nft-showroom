@@ -18,6 +18,12 @@ export class NewCollectionAddedHandler implements INftMarketplaceEventHandler {
       );
       return;
     }
+    if (!typeName) {
+      console.warn(
+        `[NewCollectionAddedHandler]: Collection type ${typeName} is not valid`,
+      );
+      return;
+    }
     await storage.setCollectionType(
       new CollectionType({
         id: codeId,
@@ -25,7 +31,7 @@ export class NewCollectionAddedHandler implements INftMarketplaceEventHandler {
         type: typeName,
         metaUrl: metaLink,
         metaStr: '',
-        marketplace: storage.getMarketplace()
+        marketplace: storage.getMarketplace(),
       }),
     );
   }
