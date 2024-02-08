@@ -28,14 +28,14 @@ export class Collection {
   @ManyToOne_(() => CollectionType, { nullable: true })
   type!: CollectionType;
 
-  @Column_('text', { nullable: true })
-  admin!: string | undefined | null;
+  @Column_('text', { nullable: false })
+  admin!: string;
 
-  @Column_('text', { nullable: true })
-  name!: string | undefined | null;
+  @Column_('text', { nullable: false })
+  name!: string;
 
-  @Column_('text', { nullable: true })
-  description!: string | undefined | null;
+  @Column_('text', { nullable: false })
+  description!: string;
 
   @Column_('text', { nullable: true })
   additionalLinks!: string | undefined | null;
@@ -54,18 +54,18 @@ export class Collection {
 
   @Column_('numeric', {
     transformer: marshal.bigintTransformer,
-    nullable: true,
+    nullable: false,
   })
-  paymentForMint!: bigint | undefined | null;
+  paymentForMint!: bigint;
 
-  @Column_('int4', { nullable: true })
-  royalty!: number | undefined | null;
+  @Column_('int4', { nullable: false })
+  royalty!: number;
 
-  @Column_('text', { nullable: true })
-  collectionLogo!: string | undefined | null;
+  @Column_('text', { nullable: false })
+  collectionLogo!: string;
 
-  @Column_('text', { nullable: true })
-  collectionBanner!: string | undefined | null;
+  @Column_('text', { nullable: false })
+  collectionBanner!: string;
 
   @Column_('bool', { nullable: true })
   transferable!: boolean | undefined | null;
@@ -82,12 +82,12 @@ export class Collection {
   @Column_('bool', { nullable: true })
   attendable!: boolean | undefined | null;
 
-  @Column_('timestamp with time zone', { nullable: true })
-  createdAt!: Date | undefined | null;
+  @Column_('timestamp with time zone', { nullable: false })
+  createdAt!: Date;
 
   @OneToMany_(() => Nft, (e) => e.collection)
   nfts!: Nft[];
 
-  @Column_('text', { array: true, nullable: true })
-  tags!: string[] | undefined | null;
+  @Column_('text', { array: true, nullable: false })
+  tags!: string[];
 }

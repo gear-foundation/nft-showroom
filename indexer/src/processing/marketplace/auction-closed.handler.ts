@@ -45,6 +45,6 @@ export class AuctionClosedHandler implements INftMarketplaceEventHandler {
     await storage.setNft({
       ...nft,
       owner: currentOwner,
-    })
+    });
   }
 }

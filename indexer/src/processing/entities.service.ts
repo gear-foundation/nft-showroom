@@ -55,7 +55,9 @@ export class EntitiesService {
 
   async setCollection(collection: Collection) {
     await this.storage.updateCollection(collection);
-    this.batchService.addCollectionUpdate(collection);
+    if (collection.admin) {
+      this.batchService.addCollectionUpdate(collection);
+    }
   }
 
   getSale(nft: Nft) {

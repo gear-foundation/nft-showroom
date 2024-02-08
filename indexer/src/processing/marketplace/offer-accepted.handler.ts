@@ -48,6 +48,6 @@ export class OfferAcceptedHandler implements INftMarketplaceEventHandler {
     await storage.setNft({
       ...nft,
       owner: offer.creator,
-    })
+    });
   }
 }

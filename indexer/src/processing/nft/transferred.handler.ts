@@ -31,6 +31,6 @@ export class TransferredHandler implements INftEventHandler {
     await storage.setNft({
       ...nft,
       owner: recipient,
-    })
+    });
   }
 }

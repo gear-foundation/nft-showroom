@@ -45,24 +45,24 @@ type Collection @entity {
   id: ID!
   marketplace: Marketplace!
   type: CollectionType!
-  admin: String
-  name: String
-  description: String
+  admin: String!
+  name: String!
+  description: String!
   additionalLinks: String
   userMintLimit: BigInt
   tokensLimit: BigInt
-  paymentForMint: BigInt
-  royalty: Int
-  collectionLogo: String
-  collectionBanner: String
+  paymentForMint: BigInt!
+  royalty: Int!
+  collectionLogo: String!
+  collectionBanner: String!
   transferable: Boolean
   approvable: Boolean
   burnable: Boolean
   sellable: Boolean
   attendable: Boolean
-  createdAt: DateTime
-  nfts: [Nft!] @derivedFrom(field: "collection")
-  tags: [String!]
+  createdAt: DateTime!
+  nfts: [Nft!]! @derivedFrom(field: "collection")
+  tags: [String!]!
 }
 
 type Nft @entity {
