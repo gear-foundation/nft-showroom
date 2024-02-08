@@ -203,15 +203,19 @@ export class LocalStorage implements IStorage {
   }
 
   private async loadMarketplace() {
-    this.marketplace = await this.store.findOne(Marketplace, { where: {} });
-    if (!this.marketplace!.address) {
-      this.marketplace!.address = config.marketplaceProgram;
-    }
-    if (!this.marketplace!.metadata) {
-      this.marketplace!.metadata = marketplaceMeta;
-    }
-    if (!this.marketplace!.nftMetadata) {
-      this.marketplace!.nftMetadata = nftMeta;
+    try {
+      this.marketplace = await this.store.findOne(Marketplace, { where: {} });
+      if (!this.marketplace!.address) {
+        this.marketplace!.address = config.marketplaceProgram;
+      }
+      if (!this.marketplace!.metadata) {
+        this.marketplace!.metadata = marketplaceMeta;
+      }
+      if (!this.marketplace!.nftMetadata) {
+        this.marketplace!.nftMetadata = nftMeta;
+      }
+    } catch (e) {
+      console.error(e);
     }
   }
 
