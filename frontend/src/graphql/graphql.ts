@@ -20,6 +20,103 @@ export type Scalars = {
   DateTime: { input: string; output: string; }
 };
 
+export type AdditionalLinks = {
+  __typename?: 'AdditionalLinks';
+  discord?: Maybe<Scalars['String']['output']>;
+  externalUrl?: Maybe<Scalars['String']['output']>;
+  medium?: Maybe<Scalars['String']['output']>;
+  telegram?: Maybe<Scalars['String']['output']>;
+  xcom?: Maybe<Scalars['String']['output']>;
+};
+
+export type AdditionalLinksWhereInput = {
+  discord_contains?: InputMaybe<Scalars['String']['input']>;
+  discord_containsInsensitive?: InputMaybe<Scalars['String']['input']>;
+  discord_endsWith?: InputMaybe<Scalars['String']['input']>;
+  discord_eq?: InputMaybe<Scalars['String']['input']>;
+  discord_gt?: InputMaybe<Scalars['String']['input']>;
+  discord_gte?: InputMaybe<Scalars['String']['input']>;
+  discord_in?: InputMaybe<Array<Scalars['String']['input']>>;
+  discord_isNull?: InputMaybe<Scalars['Boolean']['input']>;
+  discord_lt?: InputMaybe<Scalars['String']['input']>;
+  discord_lte?: InputMaybe<Scalars['String']['input']>;
+  discord_not_contains?: InputMaybe<Scalars['String']['input']>;
+  discord_not_containsInsensitive?: InputMaybe<Scalars['String']['input']>;
+  discord_not_endsWith?: InputMaybe<Scalars['String']['input']>;
+  discord_not_eq?: InputMaybe<Scalars['String']['input']>;
+  discord_not_in?: InputMaybe<Array<Scalars['String']['input']>>;
+  discord_not_startsWith?: InputMaybe<Scalars['String']['input']>;
+  discord_startsWith?: InputMaybe<Scalars['String']['input']>;
+  externalUrl_contains?: InputMaybe<Scalars['String']['input']>;
+  externalUrl_containsInsensitive?: InputMaybe<Scalars['String']['input']>;
+  externalUrl_endsWith?: InputMaybe<Scalars['String']['input']>;
+  externalUrl_eq?: InputMaybe<Scalars['String']['input']>;
+  externalUrl_gt?: InputMaybe<Scalars['String']['input']>;
+  externalUrl_gte?: InputMaybe<Scalars['String']['input']>;
+  externalUrl_in?: InputMaybe<Array<Scalars['String']['input']>>;
+  externalUrl_isNull?: InputMaybe<Scalars['Boolean']['input']>;
+  externalUrl_lt?: InputMaybe<Scalars['String']['input']>;
+  externalUrl_lte?: InputMaybe<Scalars['String']['input']>;
+  externalUrl_not_contains?: InputMaybe<Scalars['String']['input']>;
+  externalUrl_not_containsInsensitive?: InputMaybe<Scalars['String']['input']>;
+  externalUrl_not_endsWith?: InputMaybe<Scalars['String']['input']>;
+  externalUrl_not_eq?: InputMaybe<Scalars['String']['input']>;
+  externalUrl_not_in?: InputMaybe<Array<Scalars['String']['input']>>;
+  externalUrl_not_startsWith?: InputMaybe<Scalars['String']['input']>;
+  externalUrl_startsWith?: InputMaybe<Scalars['String']['input']>;
+  medium_contains?: InputMaybe<Scalars['String']['input']>;
+  medium_containsInsensitive?: InputMaybe<Scalars['String']['input']>;
+  medium_endsWith?: InputMaybe<Scalars['String']['input']>;
+  medium_eq?: InputMaybe<Scalars['String']['input']>;
+  medium_gt?: InputMaybe<Scalars['String']['input']>;
+  medium_gte?: InputMaybe<Scalars['String']['input']>;
+  medium_in?: InputMaybe<Array<Scalars['String']['input']>>;
+  medium_isNull?: InputMaybe<Scalars['Boolean']['input']>;
+  medium_lt?: InputMaybe<Scalars['String']['input']>;
+  medium_lte?: InputMaybe<Scalars['String']['input']>;
+  medium_not_contains?: InputMaybe<Scalars['String']['input']>;
+  medium_not_containsInsensitive?: InputMaybe<Scalars['String']['input']>;
+  medium_not_endsWith?: InputMaybe<Scalars['String']['input']>;
+  medium_not_eq?: InputMaybe<Scalars['String']['input']>;
+  medium_not_in?: InputMaybe<Array<Scalars['String']['input']>>;
+  medium_not_startsWith?: InputMaybe<Scalars['String']['input']>;
+  medium_startsWith?: InputMaybe<Scalars['String']['input']>;
+  telegram_contains?: InputMaybe<Scalars['String']['input']>;
+  telegram_containsInsensitive?: InputMaybe<Scalars['String']['input']>;
+  telegram_endsWith?: InputMaybe<Scalars['String']['input']>;
+  telegram_eq?: InputMaybe<Scalars['String']['input']>;
+  telegram_gt?: InputMaybe<Scalars['String']['input']>;
+  telegram_gte?: InputMaybe<Scalars['String']['input']>;
+  telegram_in?: InputMaybe<Array<Scalars['String']['input']>>;
+  telegram_isNull?: InputMaybe<Scalars['Boolean']['input']>;
+  telegram_lt?: InputMaybe<Scalars['String']['input']>;
+  telegram_lte?: InputMaybe<Scalars['String']['input']>;
+  telegram_not_contains?: InputMaybe<Scalars['String']['input']>;
+  telegram_not_containsInsensitive?: InputMaybe<Scalars['String']['input']>;
+  telegram_not_endsWith?: InputMaybe<Scalars['String']['input']>;
+  telegram_not_eq?: InputMaybe<Scalars['String']['input']>;
+  telegram_not_in?: InputMaybe<Array<Scalars['String']['input']>>;
+  telegram_not_startsWith?: InputMaybe<Scalars['String']['input']>;
+  telegram_startsWith?: InputMaybe<Scalars['String']['input']>;
+  xcom_contains?: InputMaybe<Scalars['String']['input']>;
+  xcom_containsInsensitive?: InputMaybe<Scalars['String']['input']>;
+  xcom_endsWith?: InputMaybe<Scalars['String']['input']>;
+  xcom_eq?: InputMaybe<Scalars['String']['input']>;
+  xcom_gt?: InputMaybe<Scalars['String']['input']>;
+  xcom_gte?: InputMaybe<Scalars['String']['input']>;
+  xcom_in?: InputMaybe<Array<Scalars['String']['input']>>;
+  xcom_isNull?: InputMaybe<Scalars['Boolean']['input']>;
+  xcom_lt?: InputMaybe<Scalars['String']['input']>;
+  xcom_lte?: InputMaybe<Scalars['String']['input']>;
+  xcom_not_contains?: InputMaybe<Scalars['String']['input']>;
+  xcom_not_containsInsensitive?: InputMaybe<Scalars['String']['input']>;
+  xcom_not_endsWith?: InputMaybe<Scalars['String']['input']>;
+  xcom_not_eq?: InputMaybe<Scalars['String']['input']>;
+  xcom_not_in?: InputMaybe<Array<Scalars['String']['input']>>;
+  xcom_not_startsWith?: InputMaybe<Scalars['String']['input']>;
+  xcom_startsWith?: InputMaybe<Scalars['String']['input']>;
+};
+
 export type Auction = {
   __typename?: 'Auction';
   bids: Array<Bid>;
@@ -432,22 +529,23 @@ export type BidsConnection = {
 
 export type Collection = {
   __typename?: 'Collection';
-  admin?: Maybe<Scalars['String']['output']>;
+  additionalLinks?: Maybe<AdditionalLinks>;
+  admin: Scalars['String']['output'];
   approvable?: Maybe<Scalars['Boolean']['output']>;
   attendable?: Maybe<Scalars['Boolean']['output']>;
   burnable?: Maybe<Scalars['Boolean']['output']>;
-  collectionBanner?: Maybe<Scalars['String']['output']>;
-  collectionLogo?: Maybe<Scalars['String']['output']>;
-  createdAt?: Maybe<Scalars['DateTime']['output']>;
-  description?: Maybe<Scalars['String']['output']>;
+  collectionBanner: Scalars['String']['output'];
+  collectionLogo: Scalars['String']['output'];
+  createdAt: Scalars['DateTime']['output'];
+  description: Scalars['String']['output'];
   id: Scalars['String']['output'];
   marketplace: Marketplace;
-  name?: Maybe<Scalars['String']['output']>;
+  name: Scalars['String']['output'];
   nfts: Array<Nft>;
-  paymentForMint?: Maybe<Scalars['BigInt']['output']>;
-  royalty?: Maybe<Scalars['Int']['output']>;
+  paymentForMint: Scalars['BigInt']['output'];
+  royalty: Scalars['Int']['output'];
   sellable?: Maybe<Scalars['Boolean']['output']>;
-  tags?: Maybe<Array<Scalars['String']['output']>>;
+  tags: Array<Scalars['String']['output']>;
   tokensLimit?: Maybe<Scalars['BigInt']['output']>;
   transferable?: Maybe<Scalars['Boolean']['output']>;
   type: CollectionType;
@@ -469,6 +567,26 @@ export type CollectionEdge = {
 };
 
 export enum CollectionOrderByInput {
+  AdditionalLinksDiscordAsc = 'additionalLinks_discord_ASC',
+  AdditionalLinksDiscordAscNullsFirst = 'additionalLinks_discord_ASC_NULLS_FIRST',
+  AdditionalLinksDiscordDesc = 'additionalLinks_discord_DESC',
+  AdditionalLinksDiscordDescNullsLast = 'additionalLinks_discord_DESC_NULLS_LAST',
+  AdditionalLinksExternalUrlAsc = 'additionalLinks_externalUrl_ASC',
+  AdditionalLinksExternalUrlAscNullsFirst = 'additionalLinks_externalUrl_ASC_NULLS_FIRST',
+  AdditionalLinksExternalUrlDesc = 'additionalLinks_externalUrl_DESC',
+  AdditionalLinksExternalUrlDescNullsLast = 'additionalLinks_externalUrl_DESC_NULLS_LAST',
+  AdditionalLinksMediumAsc = 'additionalLinks_medium_ASC',
+  AdditionalLinksMediumAscNullsFirst = 'additionalLinks_medium_ASC_NULLS_FIRST',
+  AdditionalLinksMediumDesc = 'additionalLinks_medium_DESC',
+  AdditionalLinksMediumDescNullsLast = 'additionalLinks_medium_DESC_NULLS_LAST',
+  AdditionalLinksTelegramAsc = 'additionalLinks_telegram_ASC',
+  AdditionalLinksTelegramAscNullsFirst = 'additionalLinks_telegram_ASC_NULLS_FIRST',
+  AdditionalLinksTelegramDesc = 'additionalLinks_telegram_DESC',
+  AdditionalLinksTelegramDescNullsLast = 'additionalLinks_telegram_DESC_NULLS_LAST',
+  AdditionalLinksXcomAsc = 'additionalLinks_xcom_ASC',
+  AdditionalLinksXcomAscNullsFirst = 'additionalLinks_xcom_ASC_NULLS_FIRST',
+  AdditionalLinksXcomDesc = 'additionalLinks_xcom_DESC',
+  AdditionalLinksXcomDescNullsLast = 'additionalLinks_xcom_DESC_NULLS_LAST',
   AdminAsc = 'admin_ASC',
   AdminAscNullsFirst = 'admin_ASC_NULLS_FIRST',
   AdminDesc = 'admin_DESC',
@@ -728,6 +846,8 @@ export type CollectionTypesConnection = {
 export type CollectionWhereInput = {
   AND?: InputMaybe<Array<CollectionWhereInput>>;
   OR?: InputMaybe<Array<CollectionWhereInput>>;
+  additionalLinks?: InputMaybe<AdditionalLinksWhereInput>;
+  additionalLinks_isNull?: InputMaybe<Scalars['Boolean']['input']>;
   admin_contains?: InputMaybe<Scalars['String']['input']>;
   admin_containsInsensitive?: InputMaybe<Scalars['String']['input']>;
   admin_endsWith?: InputMaybe<Scalars['String']['input']>;
@@ -2779,28 +2899,28 @@ export type CollectionQueryQueryVariables = Exact<{
 }>;
 
 
-export type CollectionQueryQuery = { __typename?: 'Query', collectionById?: { __typename?: 'Collection', admin?: string | null, collectionBanner?: string | null, collectionLogo?: string | null, description?: string | null, id: string, name?: string | null, tokensLimit?: string | null, paymentForMint?: string | null, nfts: Array<{ __typename?: 'Nft', id: string, name: string, mediaUrl: string, idInCollection: number, owner: string, collection: { __typename?: 'Collection', name?: string | null, id: string } }>, type: { __typename?: 'CollectionType', id: string } } | null };
+export type CollectionQueryQuery = { __typename?: 'Query', collectionById?: { __typename?: 'Collection', admin: string, collectionBanner: string, collectionLogo: string, description: string, id: string, name: string, tokensLimit?: string | null, paymentForMint: string, nfts: Array<{ __typename?: 'Nft', id: string, name: string, mediaUrl: string, idInCollection: number, owner: string, collection: { __typename?: 'Collection', name: string, id: string, transferable?: boolean | null, sellable?: boolean | null }, sales: Array<{ __typename?: 'Sale', price: string }>, auctions: Array<{ __typename?: 'Auction', minPrice: string, timestamp: string }> }>, type: { __typename?: 'CollectionType', id: string } } | null };
 
 export type CollectionsQueryQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type CollectionsQueryQuery = { __typename?: 'Query', collections: Array<{ __typename?: 'Collection', collectionBanner?: string | null, collectionLogo?: string | null, id: string, name?: string | null, description?: string | null, admin?: string | null, tokensLimit?: string | null, nfts: Array<{ __typename?: 'Nft', id: string, mediaUrl: string }> }> };
+export type CollectionsQueryQuery = { __typename?: 'Query', collections: Array<{ __typename?: 'Collection', collectionBanner: string, collectionLogo: string, id: string, name: string, description: string, admin: string, tokensLimit?: string | null, nfts: Array<{ __typename?: 'Nft', id: string, mediaUrl: string }> }> };
 
 export type NfTsQueryQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type NfTsQueryQuery = { __typename?: 'Query', nfts: Array<{ __typename?: 'Nft', id: string, name: string, mediaUrl: string, idInCollection: number, owner: string, collection: { __typename?: 'Collection', name?: string | null, id: string } }> };
+export type NfTsQueryQuery = { __typename?: 'Query', nfts: Array<{ __typename?: 'Nft', id: string, name: string, mediaUrl: string, idInCollection: number, owner: string, collection: { __typename?: 'Collection', name: string, id: string, transferable?: boolean | null, sellable?: boolean | null }, sales: Array<{ __typename?: 'Sale', price: string }>, auctions: Array<{ __typename?: 'Auction', minPrice: string, timestamp: string }> }> };
 
 export type NftQueryQueryVariables = Exact<{
   id: Scalars['String']['input'];
 }>;
 
 
-export type NftQueryQuery = { __typename?: 'Query', nftById?: { __typename?: 'Nft', idInCollection: number, mediaUrl: string, id: string, owner: string, createdAt: string, name: string, description: string, collection: { __typename?: 'Collection', id: string, royalty?: number | null, name?: string | null, sellable?: boolean | null, transferable?: boolean | null, type: { __typename?: 'CollectionType', id: string } } } | null };
+export type NftQueryQuery = { __typename?: 'Query', nftById?: { __typename?: 'Nft', idInCollection: number, mediaUrl: string, id: string, owner: string, createdAt: string, name: string, description: string, collection: { __typename?: 'Collection', id: string, royalty: number, name: string, sellable?: boolean | null, transferable?: boolean | null, type: { __typename?: 'CollectionType', id: string } }, sales: Array<{ __typename?: 'Sale', price: string }>, auctions: Array<{ __typename?: 'Auction', minPrice: string, timestamp: string }> } | null };
 
 
 export const MarketplaceQueryDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"MarketplaceQuery"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"marketplaceById"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"StringValue","value":"1","block":false}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"metadata"}},{"kind":"Field","name":{"kind":"Name","value":"collectionTypes"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"description"}},{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"metaUrl"}},{"kind":"Field","name":{"kind":"Name","value":"type"}}]}}]}}]}}]} as unknown as DocumentNode<MarketplaceQueryQuery, MarketplaceQueryQueryVariables>;
-export const CollectionQueryDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"CollectionQuery"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"collectionById"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"admin"}},{"kind":"Field","name":{"kind":"Name","value":"collectionBanner"}},{"kind":"Field","name":{"kind":"Name","value":"collectionLogo"}},{"kind":"Field","name":{"kind":"Name","value":"description"}},{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"tokensLimit"}},{"kind":"Field","name":{"kind":"Name","value":"paymentForMint"}},{"kind":"Field","name":{"kind":"Name","value":"nfts"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"collection"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"id"}}]}},{"kind":"Field","name":{"kind":"Name","value":"mediaUrl"}},{"kind":"Field","name":{"kind":"Name","value":"idInCollection"}},{"kind":"Field","name":{"kind":"Name","value":"owner"}}]}},{"kind":"Field","name":{"kind":"Name","value":"type"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]}}]} as unknown as DocumentNode<CollectionQueryQuery, CollectionQueryQueryVariables>;
+export const CollectionQueryDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"CollectionQuery"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"collectionById"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"admin"}},{"kind":"Field","name":{"kind":"Name","value":"collectionBanner"}},{"kind":"Field","name":{"kind":"Name","value":"collectionLogo"}},{"kind":"Field","name":{"kind":"Name","value":"description"}},{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"tokensLimit"}},{"kind":"Field","name":{"kind":"Name","value":"paymentForMint"}},{"kind":"Field","name":{"kind":"Name","value":"nfts"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"collection"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"transferable"}},{"kind":"Field","name":{"kind":"Name","value":"sellable"}}]}},{"kind":"Field","name":{"kind":"Name","value":"mediaUrl"}},{"kind":"Field","name":{"kind":"Name","value":"idInCollection"}},{"kind":"Field","name":{"kind":"Name","value":"owner"}},{"kind":"Field","name":{"kind":"Name","value":"sales"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"status_eq"},"value":{"kind":"StringValue","value":"open","block":false}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"price"}}]}},{"kind":"Field","name":{"kind":"Name","value":"auctions"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"status_eq"},"value":{"kind":"StringValue","value":"open","block":false}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"minPrice"}},{"kind":"Field","name":{"kind":"Name","value":"timestamp"}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"type"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]}}]} as unknown as DocumentNode<CollectionQueryQuery, CollectionQueryQueryVariables>;
 export const CollectionsQueryDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"CollectionsQuery"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"collections"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"collectionBanner"}},{"kind":"Field","name":{"kind":"Name","value":"collectionLogo"}},{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"nfts"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"mediaUrl"}}]}},{"kind":"Field","name":{"kind":"Name","value":"description"}},{"kind":"Field","name":{"kind":"Name","value":"admin"}},{"kind":"Field","name":{"kind":"Name","value":"tokensLimit"}}]}}]}}]} as unknown as DocumentNode<CollectionsQueryQuery, CollectionsQueryQueryVariables>;
-export const NfTsQueryDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"NFTsQuery"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"nfts"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"collection"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"id"}}]}},{"kind":"Field","name":{"kind":"Name","value":"mediaUrl"}},{"kind":"Field","name":{"kind":"Name","value":"idInCollection"}},{"kind":"Field","name":{"kind":"Name","value":"owner"}}]}}]}}]} as unknown as DocumentNode<NfTsQueryQuery, NfTsQueryQueryVariables>;
-export const NftQueryDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"NFTQuery"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"nftById"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"idInCollection"}},{"kind":"Field","name":{"kind":"Name","value":"mediaUrl"}},{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"owner"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"collection"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"royalty"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"sellable"}},{"kind":"Field","name":{"kind":"Name","value":"transferable"}},{"kind":"Field","name":{"kind":"Name","value":"type"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"description"}}]}}]}}]} as unknown as DocumentNode<NftQueryQuery, NftQueryQueryVariables>;
+export const NfTsQueryDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"NFTsQuery"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"nfts"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"collection"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"transferable"}},{"kind":"Field","name":{"kind":"Name","value":"sellable"}}]}},{"kind":"Field","name":{"kind":"Name","value":"mediaUrl"}},{"kind":"Field","name":{"kind":"Name","value":"idInCollection"}},{"kind":"Field","name":{"kind":"Name","value":"owner"}},{"kind":"Field","name":{"kind":"Name","value":"sales"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"status_eq"},"value":{"kind":"StringValue","value":"open","block":false}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"price"}}]}},{"kind":"Field","name":{"kind":"Name","value":"auctions"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"status_eq"},"value":{"kind":"StringValue","value":"open","block":false}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"minPrice"}},{"kind":"Field","name":{"kind":"Name","value":"timestamp"}}]}}]}}]}}]} as unknown as DocumentNode<NfTsQueryQuery, NfTsQueryQueryVariables>;
+export const NftQueryDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"NFTQuery"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"nftById"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"idInCollection"}},{"kind":"Field","name":{"kind":"Name","value":"mediaUrl"}},{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"owner"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"collection"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"royalty"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"sellable"}},{"kind":"Field","name":{"kind":"Name","value":"transferable"}},{"kind":"Field","name":{"kind":"Name","value":"type"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"description"}},{"kind":"Field","name":{"kind":"Name","value":"sales"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"status_eq"},"value":{"kind":"StringValue","value":"open","block":false}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"price"}}]}},{"kind":"Field","name":{"kind":"Name","value":"auctions"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"status_eq"},"value":{"kind":"StringValue","value":"open","block":false}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"minPrice"}},{"kind":"Field","name":{"kind":"Name","value":"timestamp"}}]}}]}}]}}]} as unknown as DocumentNode<NftQueryQuery, NftQueryQueryVariables>;

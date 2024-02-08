@@ -20,7 +20,7 @@ type Props<T> = {
   nft: Pick<Nft, 'name' | 'mediaUrl'>;
   collection: Pick<Collection, 'name'>;
   children: ReactNode;
-  auction?: { minBid: string; endDate: string };
+  auction?: { minPrice: string; timestamp: string };
 };
 
 function NFTActionFormModal<T extends FieldValues>({ modal, form, nft, collection, auction, children }: Props<T>) {
@@ -42,8 +42,8 @@ function NFTActionFormModal<T extends FieldValues>({ modal, form, nft, collectio
 
       {auction && (
         <div className={styles.auction}>
-          <PriceInfoCard heading="Minimal bid" text={getFormattedBalanceValue(auction.minBid).toFixed()} />
-          <InfoCard SVG={CalendarSVG} heading="End date" text={auction.endDate} />
+          <PriceInfoCard heading="Minimal bid" text={getFormattedBalanceValue(auction.minPrice).toFixed()} />
+          <InfoCard SVG={CalendarSVG} heading="End date" text={new Date(auction.timestamp).toLocaleString()} />
         </div>
       )}
 

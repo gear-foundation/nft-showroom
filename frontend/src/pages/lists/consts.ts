@@ -26,10 +26,19 @@ const NFTS_QUERY = graphql(`
       collection {
         name
         id
+        transferable
+        sellable
       }
       mediaUrl
       idInCollection
       owner
+      sales(where: { status_eq: "open" }) {
+        price
+      }
+      auctions(where: { status_eq: "open" }) {
+        minPrice
+        timestamp
+      }
     }
   }
 `);

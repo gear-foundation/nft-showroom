@@ -4,7 +4,7 @@ import { z } from 'zod';
 
 import { NFTActionFormModal, withAccount } from '@/components';
 import { Collection, CollectionType, Nft } from '@/graphql/graphql';
-import { useCollectionMessage, useModal } from '@/hooks';
+import { useCollectionMessage, useIsOwner, useModal } from '@/hooks';
 
 import PlaneSVG from '../../assets/plane.svg?react';
 
@@ -30,12 +30,15 @@ const schema = z.object({
     .transform((value) => decodeAddress(value)),
 });
 
-type Props = Pick<Nft, 'idInCollection' | 'name' | 'mediaUrl'> & {
-  collection: Pick<Collection, 'id' | 'name'> & { type: Pick<CollectionType, 'id'> };
+type Props = Pick<Nft, 'idInCollection' | 'name' | 'mediaUrl' | 'owner'> & {
+  collection: Pick<Collection, 'id' | 'name' | 'transferable'> & {
+    type: Pick<CollectionType, 'id'>;
+  };
 };
 
-function Component({ collection, ...nft }: Props) {
+function Component({ collection, owner, ...nft }: Props) {
   const [isOpen, open, close] = useModal();
+  const isOwner = useIsOwner(owner);
 
   const sendMessage = useCollectionMessage(collection.id, collection.type.id);
 
@@ -52,7 +55,7 @@ function Component({ collection, ...nft }: Props) {
   const modalProps = { heading: 'Transfer NFT', close };
   const formProps = { defaultValues, schema, onSubmit };
 
-  return (
+  return isOwner && collection.transferable ? (
     <>
       <Button icon={PlaneSVG} text="Transfer" size="small" color="dark" onClick={open} />
 
@@ -62,7 +65,7 @@ function Component({ collection, ...nft }: Props) {
         </NFTActionFormModal>
       )}
     </>
-  );
+  ) : null;
 }
 
 const TransferNFT = withAccount(Component);

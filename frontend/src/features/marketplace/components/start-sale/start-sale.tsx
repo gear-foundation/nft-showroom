@@ -3,13 +3,13 @@ import { z } from 'zod';
 
 import { NFTActionFormModal, PriceInput, withAccount, withApi } from '@/components';
 import { Nft, Collection, CollectionType } from '@/graphql/graphql';
-import { useApprovedMessage, useModal } from '@/hooks';
+import { useApprovedMessage, useIsOwner, useModal } from '@/hooks';
 
 import TagSVG from '../../assets/tag.svg?react';
 import { usePriceSchema } from '../../hooks';
 
-type Props = Pick<Nft, 'idInCollection' | 'name' | 'mediaUrl'> & {
-  collection: Pick<Collection, 'id' | 'name'> & {
+type Props = Pick<Nft, 'idInCollection' | 'name' | 'mediaUrl' | 'owner'> & {
+  collection: Pick<Collection, 'id' | 'name' | 'sellable'> & {
     type: Pick<CollectionType, 'id'>;
   };
 };
@@ -18,8 +18,9 @@ const defaultValues = {
   price: '',
 };
 
-function Component({ collection, ...nft }: Props) {
+function Component({ collection, owner, ...nft }: Props) {
   const [isOpen, open, close] = useModal();
+  const isOwner = useIsOwner(owner);
 
   const { getPriceSchema } = usePriceSchema();
   const schema = z.object({ price: getPriceSchema() });
@@ -39,7 +40,7 @@ function Component({ collection, ...nft }: Props) {
   const modalProps = { heading: 'Start Sale', close };
   const formProps = { defaultValues, schema, onSubmit };
 
-  return (
+  return isOwner && collection.sellable ? (
     <>
       <Button icon={TagSVG} text="Start sale" size="small" onClick={open} />
 
@@ -49,7 +50,7 @@ function Component({ collection, ...nft }: Props) {
         </NFTActionFormModal>
       )}
     </>
-  );
+  ) : null;
 }
 
 const StartSale = withAccount(withApi(Component));

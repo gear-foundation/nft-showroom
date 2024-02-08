@@ -61,10 +61,6 @@
   .text {
     color: #000;
   }
-
-  svg path {
-    fill: #000;
-  }
 }
 
 .light {
@@ -74,6 +70,10 @@
 
   .text {
     color: #fff;
+  }
+
+  svg path {
+    fill: #fff;
   }
 }
 

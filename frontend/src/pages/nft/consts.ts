@@ -20,6 +20,13 @@ const NFT_QUERY = graphql(`
       }
       name
       description
+      sales(where: { status_eq: "open" }) {
+        price
+      }
+      auctions(where: { status_eq: "open" }) {
+        minPrice
+        timestamp
+      }
     }
   }
 `);

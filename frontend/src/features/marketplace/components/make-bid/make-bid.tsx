@@ -2,29 +2,28 @@ import { Button } from '@gear-js/vara-ui';
 import { z } from 'zod';
 
 import { NFTActionFormModal, PriceInput, withAccount, withApi } from '@/components';
-import { Collection, Nft } from '@/graphql/graphql';
-import { useMarketplaceMessage, useModal } from '@/hooks';
+import { Auction, Collection, Nft } from '@/graphql/graphql';
+import { useIsOwner, useMarketplaceMessage, useModal } from '@/hooks';
 
 import { usePriceSchema } from '../../hooks';
 
-type Props = Pick<Nft, 'idInCollection' | 'name' | 'mediaUrl'> & {
+type Props = Pick<Nft, 'idInCollection' | 'name' | 'mediaUrl' | 'owner'> & {
   collection: Pick<Collection, 'id' | 'name'>;
+} & {
+  auction: Pick<Auction, 'minPrice' | 'timestamp'>;
 };
 
 const defaultValues = {
   value: '',
 };
 
-function Component({ collection, ...nft }: Props) {
-  // TODOINDEXER:
-  const auction = { minBid: '10', endDate: '' };
-
+function Component({ collection, auction, ...nft }: Props) {
   const [isOpen, open, close] = useModal();
+  const sendMessage = useMarketplaceMessage();
+  const isOwner = useIsOwner(nft.owner);
 
   const { getPriceSchema } = usePriceSchema();
-  const schema = z.object({ value: getPriceSchema(auction.minBid, true) });
-
-  const sendMessage = useMarketplaceMessage();
+  const schema = z.object({ value: getPriceSchema(auction.minPrice, true) });
 
   const onSubmit = ({ value }: typeof defaultValues) => {
     const tokenId = nft.idInCollection;
@@ -39,7 +38,7 @@ function Component({ collection, ...nft }: Props) {
   const modalProps = { heading: 'Make bid', close };
   const formProps = { defaultValues, schema, onSubmit };
 
-  return (
+  return !isOwner ? (
     <>
       <Button text="Make bid" size="small" onClick={open} />
 
@@ -49,7 +48,7 @@ function Component({ collection, ...nft }: Props) {
         </NFTActionFormModal>
       )}
     </>
-  );
+  ) : null;
 }
 
 const MakeBid = withAccount(withApi(Component));

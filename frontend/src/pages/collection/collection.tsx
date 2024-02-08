@@ -42,8 +42,7 @@ function Collection() {
   const searchedTokens = nfts?.filter((nft) => nft.name.toLocaleLowerCase().includes(query));
   const tokensCount = searchedTokens?.length || 0;
 
-  const renderNFTs = () =>
-    collection && searchedTokens?.map(({ id: nftId, ...nft }) => <NFTCard key={nftId} {...nft} />);
+  const renderNFTs = () => collection && searchedTokens?.map((nft) => <NFTCard key={nft.id} {...nft} />);
 
   // TODOINDEXER:
   const additionalLinks = {};

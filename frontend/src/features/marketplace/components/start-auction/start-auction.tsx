@@ -3,14 +3,14 @@ import { z } from 'zod';
 
 import { NFTActionFormModal, PriceInput, withAccount, withApi } from '@/components';
 import { Collection, CollectionType, Nft } from '@/graphql/graphql';
-import { useApprovedMessage, useModal } from '@/hooks';
+import { useApprovedMessage, useIsOwner, useModal } from '@/hooks';
 
 import BidSVG from '../../assets/bid.svg?react';
 import { usePriceSchema } from '../../hooks';
 import { getDurationOptions } from '../../utils';
 
-type Props = Pick<Nft, 'idInCollection' | 'name' | 'mediaUrl'> & {
-  collection: Pick<Collection, 'id' | 'name'> & {
+type Props = Pick<Nft, 'idInCollection' | 'name' | 'mediaUrl' | 'owner'> & {
+  collection: Pick<Collection, 'id' | 'name' | 'sellable'> & {
     type: Pick<CollectionType, 'id'>;
   };
 };
@@ -22,8 +22,9 @@ const defaultValues = {
   minPrice: '',
 };
 
-function Component({ collection, ...nft }: Props) {
+function Component({ collection, owner, ...nft }: Props) {
   const [isOpen, open, close] = useModal();
+  const isOwner = useIsOwner(owner);
 
   const { getPriceSchema } = usePriceSchema();
   const schema = z.object({ minPrice: getPriceSchema(), duration: z.string() });
@@ -44,7 +45,7 @@ function Component({ collection, ...nft }: Props) {
   const modalProps = { heading: 'Start Auction', close };
   const formProps = { defaultValues, schema, onSubmit };
 
-  return (
+  return isOwner && collection.sellable ? (
     <>
       <Button icon={BidSVG} text="Start auction" size="small" color="dark" onClick={open} />
 
@@ -55,7 +56,7 @@ function Component({ collection, ...nft }: Props) {
         </NFTActionFormModal>
       )}
     </>
-  );
+  ) : null;
 }
 
 const StartAuction = withAccount(withApi(Component));
