@@ -62,10 +62,10 @@ type Collection @entity {
   royalty: Int!
   collectionLogo: String!
   collectionBanner: String!
-  transferable: Boolean
+  transferable: BigInt
   approvable: Boolean
   burnable: Boolean
-  sellable: Boolean
+  sellable: BigInt
   attendable: Boolean
   createdAt: DateTime!
   nfts: [Nft!]! @derivedFrom(field: "collection")

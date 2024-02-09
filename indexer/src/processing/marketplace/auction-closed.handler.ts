@@ -4,6 +4,7 @@ import { INftMarketplaceEventHandler } from './nft-marketplace.handler';
 import { AuctionStatus } from '../../model/types';
 import { EventInfo } from '../event-info.type';
 import { Transfer } from '../../model';
+import { v4 as uuidv4 } from 'uuid';
 
 export class AuctionClosedHandler implements INftMarketplaceEventHandler {
   async handle(
@@ -35,6 +36,7 @@ export class AuctionClosedHandler implements INftMarketplaceEventHandler {
     });
     storage.addTransfer(
       new Transfer({
+        id: uuidv4(),
         nft,
         from: auction.owner,
         to: currentOwner,

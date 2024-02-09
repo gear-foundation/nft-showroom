@@ -75,8 +75,11 @@ export class Collection {
   @Column_('text', { nullable: false })
   collectionBanner!: string;
 
-  @Column_('bool', { nullable: true })
-  transferable!: boolean | undefined | null;
+  @Column_('numeric', {
+    transformer: marshal.bigintTransformer,
+    nullable: true,
+  })
+  transferable!: bigint | undefined | null;
 
   @Column_('bool', { nullable: true })
   approvable!: boolean | undefined | null;
@@ -84,8 +87,11 @@ export class Collection {
   @Column_('bool', { nullable: true })
   burnable!: boolean | undefined | null;
 
-  @Column_('bool', { nullable: true })
-  sellable!: boolean | undefined | null;
+  @Column_('numeric', {
+    transformer: marshal.bigintTransformer,
+    nullable: true,
+  })
+  sellable!: bigint | undefined | null;
 
   @Column_('bool', { nullable: true })
   attendable!: boolean | undefined | null;

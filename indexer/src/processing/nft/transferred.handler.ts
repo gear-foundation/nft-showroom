@@ -3,6 +3,7 @@ import { EntitiesService } from '../entities.service';
 import { INftEventHandler } from './nft.handler';
 import { Transfer } from '../../model';
 import { EventInfo } from '../event-info.type';
+import { v4 as uuidv4 } from 'uuid';
 
 export class TransferredHandler implements INftEventHandler {
   async handle(
@@ -20,6 +21,7 @@ export class TransferredHandler implements INftEventHandler {
     }
     storage.addTransfer(
       new Transfer({
+        id: uuidv4(),
         nft,
         from: owner,
         to: recipient,

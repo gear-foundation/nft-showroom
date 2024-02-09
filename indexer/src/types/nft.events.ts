@@ -45,10 +45,10 @@ export type NftConfig = {
   additionalLinks: AdditionalLink | null;
   royalty: number;
   paymentForMint: bigint;
-  transferable: boolean;
+  transferable: bigint | null;
   approvable: boolean;
   burnable: boolean;
-  sellable: boolean;
+  sellable: bigint | null;
   attendable: boolean;
   totalNumberOfTokens: bigint | null;
 };
@@ -143,10 +143,10 @@ export interface ConfigPlain {
   additionalLinks: AdditionalLinkPlain;
   royalty: u16;
   paymentForMint: u128;
-  transferable: boolean;
+  transferable: Option<u64> | number;
   approvable: boolean;
   burnable: boolean;
-  sellable: boolean;
+  sellable: Option<u64> | number;
   attendable: boolean;
 }
 
@@ -251,10 +251,14 @@ export function getNftEvent(event: NftEventPlain): NftEvent | undefined {
         paymentForMint: safeUnwrapToBigInt(
           event.initialized.config.paymentForMint,
         )!,
-        transferable: event.initialized.config.transferable,
+        transferable: safeUnwrapToBigInt(
+          safeUnwrapOptional(event.initialized.config.transferable),
+        ),
         approvable: event.initialized.config.approvable,
         burnable: event.initialized.config.burnable,
-        sellable: event.initialized.config.sellable,
+        sellable: safeUnwrapToBigInt(
+          safeUnwrapOptional(event.initialized.config.sellable),
+        ),
         attendable: event.initialized.config.attendable,
         totalNumberOfTokens: safeUnwrapToBigInt(
           event.initialized.totalNumberOfTokens,
@@ -334,10 +338,14 @@ export function getNftEvent(event: NftEventPlain): NftEvent | undefined {
         paymentForMint: safeUnwrapToBigInt(
           event.configChanged.config.paymentForMint,
         )!,
-        transferable: event.configChanged.config.transferable,
+        transferable: safeUnwrapToBigInt(
+          safeUnwrapOptional(event.configChanged.config.transferable),
+        ),
         approvable: event.configChanged.config.approvable,
         burnable: event.configChanged.config.burnable,
-        sellable: event.configChanged.config.sellable,
+        sellable: safeUnwrapToBigInt(
+          safeUnwrapOptional(event.configChanged.config.sellable),
+        ),
         attendable: event.configChanged.config.attendable,
         totalNumberOfTokens: safeUnwrapToBigInt(
           event.configChanged.totalNumberOfTokens,
