@@ -53,6 +53,9 @@ export class Auction {
   @Column_('timestamp with time zone', { nullable: false })
   updatedAt!: Date;
 
+  @Column_('timestamp with time zone', { nullable: true })
+  endTimestamp!: Date | undefined | null;
+
   @Column_('int4', { nullable: false })
   blockNumber!: number;
 

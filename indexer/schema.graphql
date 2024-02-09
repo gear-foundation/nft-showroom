@@ -124,6 +124,7 @@ type Auction @entity {
   durationMs: Int!
   timestamp: DateTime!
   updatedAt: DateTime!
+  endTimestamp: DateTime
   blockNumber: Int!
   bids: [Bid!]! @derivedFrom(field: "auction")
 }

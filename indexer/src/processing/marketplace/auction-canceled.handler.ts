@@ -29,6 +29,7 @@ export class AuctionCanceledHandler implements INftMarketplaceEventHandler {
       ...auction,
       status: AuctionStatus.Canceled,
       updatedAt: eventInfo.timestamp,
+      endTimestamp: eventInfo.timestamp,
     });
   }
 }

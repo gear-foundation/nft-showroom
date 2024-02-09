@@ -33,6 +33,7 @@ export class AuctionClosedHandler implements INftMarketplaceEventHandler {
       newOwner: currentOwner,
       lastPrice: price,
       updatedAt: eventInfo.timestamp,
+      endTimestamp: eventInfo.timestamp,
     });
     storage.addTransfer(
       new Transfer({
