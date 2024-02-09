@@ -16,34 +16,34 @@ const SOCIAL_ICON = {
 const COLLECTION_QUERY = graphql(`
   query CollectionQuery($id: String!) {
     collectionById(id: $id) {
-      admin
-      collectionBanner
-      collectionLogo
-      description
       id
       name
+      description
+      collectionBanner
+      collectionLogo
+      admin
       tokensLimit
       paymentForMint
+      transferable
+      sellable
+
       nfts {
         id
-        name
-        collection {
-          name
-          id
-          transferable
-          sellable
-        }
-        mediaUrl
         idInCollection
+        name
+        mediaUrl
         owner
+
         sales(where: { status_eq: "open" }) {
           price
         }
+
         auctions(where: { status_eq: "open" }) {
           minPrice
           timestamp
         }
       }
+
       type {
         id
       }

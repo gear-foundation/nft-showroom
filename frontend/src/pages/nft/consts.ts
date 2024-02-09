@@ -3,26 +3,30 @@ import { graphql } from '@/graphql';
 const NFT_QUERY = graphql(`
   query NFTQuery($id: String!) {
     nftById(id: $id) {
-      idInCollection
-      mediaUrl
       id
+      idInCollection
+      name
+      description
+      mediaUrl
       owner
       createdAt
+
       collection {
         id
-        royalty
         name
+        royalty
         sellable
         transferable
+
         type {
           id
         }
       }
-      name
-      description
+
       sales(where: { status_eq: "open" }) {
         price
       }
+
       auctions(where: { status_eq: "open" }) {
         minPrice
         timestamp

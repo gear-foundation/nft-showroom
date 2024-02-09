@@ -3,17 +3,18 @@ import { graphql } from '@/graphql';
 const COLLECTIONS_QUERY = graphql(`
   query CollectionsQuery {
     collections {
-      collectionBanner
-      collectionLogo
       id
       name
+      description
+      collectionBanner
+      collectionLogo
+      admin
+      tokensLimit
+
       nfts {
         id
         mediaUrl
       }
-      description
-      admin
-      tokensLimit
     }
   }
 `);
@@ -22,19 +23,22 @@ const NFTS_QUERY = graphql(`
   query NFTsQuery {
     nfts {
       id
+      idInCollection
       name
+      mediaUrl
+      owner
+
       collection {
-        name
         id
+        name
         transferable
         sellable
       }
-      mediaUrl
-      idInCollection
-      owner
+
       sales(where: { status_eq: "open" }) {
         price
       }
+
       auctions(where: { status_eq: "open" }) {
         minPrice
         timestamp
