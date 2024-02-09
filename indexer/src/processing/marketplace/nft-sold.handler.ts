@@ -52,6 +52,7 @@ export class NftSoldHandler implements INftMarketplaceEventHandler {
         from: sale.owner,
         to: currentOwner,
         timestamp: eventInfo.timestamp,
+        blockNumber: eventInfo.blockNumber,
         txHash: eventInfo.txHash,
       }),
     );

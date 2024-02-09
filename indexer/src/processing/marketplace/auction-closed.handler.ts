@@ -41,6 +41,7 @@ export class AuctionClosedHandler implements INftMarketplaceEventHandler {
         from: auction.owner,
         to: currentOwner,
         timestamp: eventInfo.timestamp,
+        blockNumber: eventInfo.blockNumber,
         txHash: eventInfo.txHash,
       }),
     );

@@ -44,6 +44,7 @@ export class OfferAcceptedHandler implements INftMarketplaceEventHandler {
         from: nft.owner,
         to: offer.creator,
         timestamp: eventInfo.timestamp,
+        blockNumber: eventInfo.blockNumber,
         txHash: eventInfo.txHash,
       }),
     );
