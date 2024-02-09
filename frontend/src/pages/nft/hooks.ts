@@ -1,10 +1,10 @@
-import { useQuery } from 'urql';
+import { useSubscription } from 'urql';
 
 import { NFT_QUERY } from './consts';
 
 function useNFT(collectionId: string, idInCollection: string) {
   const id = `${collectionId}-${idInCollection}`;
-  const [result] = useQuery({ query: NFT_QUERY, variables: { id } });
+  const [result] = useSubscription({ query: NFT_QUERY, variables: { id } });
 
   return result.data?.nftById;
 }

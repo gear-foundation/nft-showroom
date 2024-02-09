@@ -5,8 +5,9 @@ import {
   ProviderProps,
 } from '@gear-js/react-hooks';
 import { Alert, alertStyles } from '@gear-js/vara-ui';
-import { ComponentType, useRef } from 'react';
-import { Client, Provider as UrqlProvider, cacheExchange, fetchExchange } from 'urql';
+import { createClient } from 'graphql-ws';
+import { ComponentType } from 'react';
+import { Client, Provider as UrqlProvider, cacheExchange, fetchExchange, subscriptionExchange } from 'urql';
 
 import { ADDRESS } from './consts';
 import { IPFSProvider as GearIPFSProvider, MetadataProvider } from './context';
@@ -19,10 +20,31 @@ function IPFSProvider({ children }: ProviderProps) {
   return <GearIPFSProvider url={ADDRESS.IPFS}>{children}</GearIPFSProvider>;
 }
 
-function IndexerProvider({ children }: ProviderProps) {
-  const ref = useRef(new Client({ url: ADDRESS.INDEXER, exchanges: [cacheExchange, fetchExchange] }));
+const wsClient = createClient({ url: ADDRESS.WS_INDEXER });
 
-  return <UrqlProvider value={ref.current}>{children}</UrqlProvider>;
+const client = new Client({
+  url: ADDRESS.INDEXER,
+  exchanges: [
+    cacheExchange,
+    fetchExchange,
+
+    subscriptionExchange({
+      forwardSubscription(request) {
+        const input = { ...request, query: request.query || '' };
+
+        return {
+          subscribe(sink) {
+            const unsubscribe = wsClient.subscribe(input, sink);
+            return { unsubscribe };
+          },
+        };
+      },
+    }),
+  ],
+});
+
+function IndexerProvider({ children }: ProviderProps) {
+  return <UrqlProvider value={client}>{children}</UrqlProvider>;
 }
 
 function AlertProvider({ children }: ProviderProps) {

@@ -1,7 +1,7 @@
 import { graphql } from '@/graphql';
 
 const NFT_QUERY = graphql(`
-  query NFTQuery($id: String!) {
+  subscription NFTQuery($id: String!) {
     nftById(id: $id) {
       id
       idInCollection

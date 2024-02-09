@@ -6,6 +6,7 @@ const ADDRESS = {
   IPFS_GATEWAY: import.meta.env.VITE_IPFS_GATEWAY_ADDRESS as string,
   CONTRACT: import.meta.env.VITE_CONTRACT_ADDRESS as HexString,
   INDEXER: import.meta.env.VITE_INDEXER_ADDRESS as string,
+  WS_INDEXER: import.meta.env.VITE_WS_INDEXER_ADDRESS as string,
 };
 
 const ROUTE = {

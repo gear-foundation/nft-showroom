@@ -1,7 +1,7 @@
 import { graphql } from '@/graphql';
 
 const COLLECTIONS_QUERY = graphql(`
-  query CollectionsQuery {
+  subscription CollectionsQuery {
     collections {
       id
       name
@@ -20,7 +20,7 @@ const COLLECTIONS_QUERY = graphql(`
 `);
 
 const NFTS_QUERY = graphql(`
-  query NFTsQuery {
+  subscription NFTsQuery {
     nfts {
       id
       idInCollection
