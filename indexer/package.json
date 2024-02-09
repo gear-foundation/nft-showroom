@@ -9,7 +9,7 @@
     "run": "sqd process",
     "migrations:generate": "sqd migration:generate",
     "migrations:apply": "sqd migration:apply",
-    "serve": "squid-graphql-server serve",
+    "serve": "squid-graphql-server --subscriptions serve",
     "format": "prettier --write \"src/**/*.ts\"",
     "start": "npm run migration:apply && node lib/main.js"
   },
