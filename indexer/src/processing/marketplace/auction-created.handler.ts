@@ -41,6 +41,7 @@ export class AuctionCreatedHandler implements INftMarketplaceEventHandler {
         owner: nft.owner,
         minPrice,
         durationMs,
+        endTimestamp: new Date(eventInfo.timestamp.getTime() + durationMs),
         status: SaleStatus.Open,
         blockNumber: eventInfo.blockNumber,
         timestamp: eventInfo.timestamp,
