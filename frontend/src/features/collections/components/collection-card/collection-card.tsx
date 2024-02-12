@@ -6,6 +6,7 @@ import { ROUTE } from '@/consts';
 import { Collection, Nft } from '@/graphql/graphql';
 import { getIpfsLink } from '@/utils';
 
+import PlaceholderSrc from '../../assets/placeholder.svg';
 import { MintLimitInfoCard } from '../mint-limit-info-card';
 
 import styles from './collection-card.module.scss';
@@ -14,13 +15,18 @@ type Props = Pick<Collection, 'id' | 'name' | 'collectionBanner' | 'collectionLo
   nfts: Pick<Nft, 'id' | 'mediaUrl'>[];
 };
 
+const PREVIEW_NFTS_COUNT = 5;
+const DEFAULT_NFTS = new Array<null>(PREVIEW_NFTS_COUNT).fill(null);
+
 function CollectionCard({ id, name, collectionBanner, collectionLogo, admin, tokensLimit, nfts }: Props) {
   const renderNFTs = () =>
-    nfts.slice(0, 5).map((nft) => (
-      <li key={nft.id}>
-        <ResponsiveSquareImage src={getIpfsLink(nft.mediaUrl)} />
-      </li>
-    ));
+    (nfts.length < PREVIEW_NFTS_COUNT ? [...nfts, ...DEFAULT_NFTS] : nfts)
+      .slice(0, PREVIEW_NFTS_COUNT)
+      .map((nft, index) => (
+        <li key={nft ? nft.id : `${id}-${index}`}>
+          <ResponsiveSquareImage src={nft ? getIpfsLink(nft.mediaUrl) : PlaceholderSrc} />
+        </li>
+      ));
 
   return (
     <li className={styles.collection}>
