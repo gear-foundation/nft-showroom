@@ -196,7 +196,7 @@ export interface NftMarketplaceEventPlain extends Enum {
   bidAdded: {
     collectionAddress: Hash;
     tokenId: u64;
-    price: u128;
+    currentPrice: u128;
   };
   auctionCanceled: {
     collectionAddress: Hash;
@@ -305,7 +305,7 @@ export function getMarketplaceEvent(
       type: NftMarketplaceEventType.BidAdded,
       collectionAddress: event.bidAdded.collectionAddress.toString(),
       tokenId: safeUnwrapToNumber(event.bidAdded.tokenId)!,
-      price: safeUnwrapToBigInt(event.bidAdded.price)!,
+      price: safeUnwrapToBigInt(event.bidAdded.currentPrice)!,
     };
   }
   if (event.auctionCanceled) {

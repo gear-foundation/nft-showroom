@@ -1,7 +1,7 @@
 import { BidAdded } from '../../types/marketplace.events';
 import { EntitiesService } from '../entities.service';
 import { INftMarketplaceEventHandler } from './nft-marketplace.handler';
-import { Bid } from '../../model';
+import { Auction, Bid } from '../../model';
 import { EventInfo } from '../event-info.type';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -33,6 +33,10 @@ export class BidAddedHandler implements INftMarketplaceEventHandler {
       );
       return;
     }
+    await storage.setAuction(new Auction({
+      ...auction,
+      lastPrice: price,
+    }))
     storage.addBid(
       new Bid({
         id: uuidv4(),

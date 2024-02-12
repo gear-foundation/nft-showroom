@@ -213,9 +213,7 @@ export class LocalStorage implements IStorage {
       }
       if (!this.marketplace!.nftMetadata) {
         this.marketplace!.nftMetadata = nftMeta;
-      }
-    } catch (e) {
-      console.error(e);
+      }} catch (e) {
     }
   }
 
