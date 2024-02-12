@@ -15,10 +15,8 @@ type Props = Pick<Collection, 'id' | 'name' | 'collectionBanner' | 'collectionLo
 };
 
 function CollectionCard({ id, name, collectionBanner, collectionLogo, admin, tokensLimit, nfts }: Props) {
-  if (!name || !collectionBanner || !collectionLogo) return null;
-
   const renderNFTs = () =>
-    nfts.map((nft) => (
+    nfts.slice(0, 5).map((nft) => (
       <li key={nft.id}>
         <ResponsiveSquareImage src={getIpfsLink(nft.mediaUrl)} />
       </li>
