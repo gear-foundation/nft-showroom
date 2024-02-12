@@ -14,6 +14,7 @@ import { ResponsiveSquareImage } from './responsive-square-image';
 import { SearchInput } from './search-input';
 import { Tabs } from './tabs';
 import { withAccount } from './with-account';
+import { withApi } from './with-api';
 
 export {
   Header,
@@ -32,6 +33,7 @@ export {
   FilterButton,
   Breadcrumbs,
   Form,
+  withApi,
 };
 
 export type { InfoCardProps };

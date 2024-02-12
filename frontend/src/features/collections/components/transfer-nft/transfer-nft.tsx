@@ -1,17 +1,12 @@
-import { HexString, decodeAddress } from '@gear-js/api';
+import { decodeAddress } from '@gear-js/api';
 import { Button, Input } from '@gear-js/vara-ui';
 import { z } from 'zod';
 
 import { NFTActionFormModal, withAccount } from '@/components';
-import { useModal } from '@/hooks';
+import { Collection, CollectionType, Nft } from '@/graphql/graphql';
+import { useCollectionMessage, useIsOwner, useModal } from '@/hooks';
 
 import PlaneSVG from '../../assets/plane.svg?react';
-import { useCollectionSendMessage } from '../../hooks';
-
-type Props = {
-  nft: { id: string; name: string; mediaUrl: string };
-  collection: { id: HexString; name: string };
-};
 
 const defaultValues = {
   address: '',
@@ -35,13 +30,20 @@ const schema = z.object({
     .transform((value) => decodeAddress(value)),
 });
 
-function Component({ nft, collection }: Props) {
-  const [isOpen, open, close] = useModal();
+type Props = Pick<Nft, 'idInCollection' | 'name' | 'mediaUrl' | 'owner'> & {
+  collection: Pick<Collection, 'id' | 'name' | 'transferable'> & {
+    type: Pick<CollectionType, 'id'>;
+  };
+};
 
-  const sendMessage = useCollectionSendMessage(collection.id);
+function Component({ collection, owner, ...nft }: Props) {
+  const [isOpen, open, close] = useModal();
+  const isOwner = useIsOwner(owner);
+
+  const sendMessage = useCollectionMessage(collection.id, collection.type.id);
 
   const onSubmit = ({ address }: typeof defaultValues) => {
-    const tokenId = nft.id;
+    const tokenId = nft.idInCollection;
     const to = address;
 
     const payload = { Transfer: { tokenId, to } };
@@ -53,7 +55,7 @@ function Component({ nft, collection }: Props) {
   const modalProps = { heading: 'Transfer NFT', close };
   const formProps = { defaultValues, schema, onSubmit };
 
-  return (
+  return isOwner && collection.transferable ? (
     <>
       <Button icon={PlaneSVG} text="Transfer" size="small" color="dark" onClick={open} />
 
@@ -63,7 +65,7 @@ function Component({ nft, collection }: Props) {
         </NFTActionFormModal>
       )}
     </>
-  );
+  ) : null;
 }
 
 const TransferNFT = withAccount(Component);

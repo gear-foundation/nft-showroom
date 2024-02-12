@@ -1,32 +1,34 @@
-import { HexString } from '@gear-js/api';
 import { Button } from '@gear-js/vara-ui';
 import { z } from 'zod';
 
-import { NFTActionFormModal, PriceInput, withAccount } from '@/components';
-import { useModal } from '@/hooks';
+import { NFTActionFormModal, PriceInput, withAccount, withApi } from '@/components';
+import { Nft, Collection, CollectionType } from '@/graphql/graphql';
+import { useApprovedMessage, useIsOwner, useModal } from '@/hooks';
 
 import TagSVG from '../../assets/tag.svg?react';
-import { useNFTSendMessage, usePriceSchema } from '../../hooks';
+import { usePriceSchema } from '../../hooks';
 
-type Props = {
-  nft: { id: string; name: string; mediaUrl: string };
-  collection: { id: HexString; name: string };
+type Props = Pick<Nft, 'idInCollection' | 'name' | 'mediaUrl' | 'owner'> & {
+  collection: Pick<Collection, 'id' | 'name' | 'sellable'> & {
+    type: Pick<CollectionType, 'id'>;
+  };
 };
 
 const defaultValues = {
   price: '',
 };
 
-function Component({ nft, collection }: Props) {
+function Component({ collection, owner, ...nft }: Props) {
   const [isOpen, open, close] = useModal();
+  const isOwner = useIsOwner(owner);
 
   const { getPriceSchema } = usePriceSchema();
   const schema = z.object({ price: getPriceSchema() });
 
-  const sendMessage = useNFTSendMessage(collection.id);
+  const sendMessage = useApprovedMessage(collection.id, collection.type.id);
 
   const onSubmit = ({ price }: typeof defaultValues) => {
-    const tokenId = nft.id;
+    const tokenId = nft.idInCollection;
     const collectionAddress = collection.id;
 
     const onSuccess = close;
@@ -38,7 +40,7 @@ function Component({ nft, collection }: Props) {
   const modalProps = { heading: 'Start Sale', close };
   const formProps = { defaultValues, schema, onSubmit };
 
-  return (
+  return isOwner && collection.sellable ? (
     <>
       <Button icon={TagSVG} text="Start sale" size="small" onClick={open} />
 
@@ -48,9 +50,9 @@ function Component({ nft, collection }: Props) {
         </NFTActionFormModal>
       )}
     </>
-  );
+  ) : null;
 }
 
-const StartSale = withAccount(Component);
+const StartSale = withAccount(withApi(Component));
 
 export { StartSale };

@@ -5,6 +5,35 @@
   justify-content: space-between;
 }
 
+.tabs {
+  display: flex;
+  gap: 32px;
+
+  .tab {
+    padding-bottom: 8px;
+
+    font-size: 24px;
+    font-weight: 600;
+    line-height: 26px;
+    letter-spacing: 0.01em;
+    color: #93989a;
+
+    background-color: transparent;
+
+    &:hover {
+      opacity: 0.75;
+    }
+
+    &.active {
+      color: #0ed3a3;
+
+      box-shadow: inset 0px -3px 0px 0px #0ed3a3;
+
+      pointer-events: none;
+    }
+  }
+}
+
 .list {
   display: grid;
   gap: 32px 16px;

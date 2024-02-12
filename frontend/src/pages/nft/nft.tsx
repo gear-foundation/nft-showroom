@@ -1,96 +1,66 @@
-import { HexString } from '@gear-js/api';
-import { useAccount, useBalanceFormat, withoutCommas } from '@gear-js/react-hooks';
+import { useAccount } from '@gear-js/react-hooks';
 import { Identicon } from '@polkadot/react-identicon';
 import { generatePath, useParams } from 'react-router-dom';
 
-import { Breadcrumbs, Container, CopyButton, PriceInfoCard, ResponsiveSquareImage, Tabs } from '@/components';
+import { Breadcrumbs, Container, ResponsiveSquareImage, Tabs } from '@/components';
 import { ROUTE } from '@/consts';
-import { TransferNFT, useCollection } from '@/features/collections';
-import { BuyNFT, MakeBid, StartSale, StartAuction, useListing } from '@/features/marketplace';
+import { TransferNFT } from '@/features/collections';
+import { BuyNFT, MakeBid, StartSale, StartAuction } from '@/features/marketplace';
 import BidSVG from '@/features/marketplace/assets/bid.svg?react';
 import TagSVG from '@/features/marketplace/assets/tag.svg?react';
 import { getIpfsLink } from '@/utils';
 
+import { ListingCard } from './components';
+import { useNFT } from './hooks';
 import InfoSVG from './info.svg?react';
 import styles from './nft.module.scss';
-
-type Params = {
-  collectionId: HexString;
-  id: string;
-};
-
-const getDetailEntries = (
-  collectionId: HexString,
-  nftId: string,
-  nftStandart: string,
-  commasMintTimestamp = '0',
-  royalty = '0',
-) => {
-  const mintTimestamp = +withoutCommas(commasMintTimestamp);
-  const mintDate = new Date(mintTimestamp).toLocaleString();
-
-  return [
-    {
-      key: 'Contract Address',
-      value: (
-        <>
-          <span className={styles.address}>{collectionId}</span>
-          <CopyButton value={collectionId} />
-        </>
-      ),
-    },
-    { key: 'Token ID', value: nftId },
-    { key: 'Token Standart', value: nftStandart },
-    { key: 'Mint Date', value: mintDate },
-    { key: 'Creator Earnings', value: `${royalty}%` },
-  ];
-};
+import { getDetailEntries } from './utils';
 
 const TABS = ['Overview', 'Properties', 'Activities'];
 
+type Params = {
+  collectionId: string;
+  id: string;
+};
+
 function NFT() {
-  const { collectionId, id } = useParams() as Params;
   const { account } = useAccount();
-  const { getFormattedBalanceValue } = useBalanceFormat();
 
-  const collection = useCollection(collectionId);
-  const { config } = collection || {};
+  const { collectionId, id } = useParams() as Params;
+  const nft = useNFT(collectionId, id);
 
-  const { sale, auction } = useListing(collectionId, id);
-  const price = sale ? getFormattedBalanceValue(withoutCommas(sale.price)).toFixed() : '';
-  const auctionPrice = auction ? getFormattedBalanceValue(withoutCommas(auction.currentPrice)).toFixed() : '';
-  const auctionEndDate = auction ? new Date(+withoutCommas(auction.endedAt)).toLocaleString() : '';
+  if (!nft) return null;
+  const { owner, name, collection, mediaUrl, description, createdAt, sales, auctions } = nft;
+  const { name: collectionName, royalty } = collection;
 
-  const [, nft] = collection?.tokens.find(([_id]) => _id === id) || [];
+  const [sale] = sales;
+  const [auction] = auctions;
 
-  // after token is listed, root owner is set to marketplace contract address
-  // account owner is saved in a listing state
-  const owner = sale?.tokenOwner || auction?.owner || nft?.owner;
-  const isOwner = owner === account?.decodedAddress;
+  const isOwner = account?.decodedAddress === owner;
 
   const getDetails = () =>
-    getDetailEntries(collectionId, id, 'gNFT', nft?.mintTime, config?.royalty).map(({ key, value }) => (
+    getDetailEntries(collectionId, id, 'gNFT', createdAt, royalty).map(({ key, value }) => (
       <li key={key} className={styles.row}>
         <span>{key}:</span>
         <span className={styles.value}>{value}</span>
       </li>
     ));
 
-  return nft && config ? (
+  return (
     <Container>
       <Breadcrumbs
         list={[
-          { to: generatePath(ROUTE.COLLECTION, { id: collectionId }), text: config.name },
-          { to: generatePath(ROUTE.NFT, { collectionId, id }), text: nft.name },
+          { to: generatePath(ROUTE.COLLECTION, { id: collectionId }), text: collectionName },
+          { to: generatePath(ROUTE.NFT, { collectionId, id }), text: name },
         ]}
       />
 
       <div className={styles.container}>
-        <ResponsiveSquareImage src={getIpfsLink(nft.mediaUrl)} rounded />
+        <ResponsiveSquareImage src={getIpfsLink(mediaUrl)} rounded />
 
         <div>
-          <h2 className={styles.name}>{nft.name}</h2>
-          <p className={styles.description}>{nft.description}</p>
+          <h2 className={styles.name}>{name}</h2>
+          <p className={styles.description}>{description}</p>
 
           <div className={styles.owner}>
             <Identicon value={owner} size={24} theme="polkadot" />
@@ -101,45 +71,27 @@ function NFT() {
           </div>
 
           {sale && (
-            <div className={styles.listing}>
-              <p className={styles.listingHeading}>
-                <TagSVG /> Sale is Active
-              </p>
-
-              <div className={styles.listingCard}>
-                <PriceInfoCard heading="Price" text={price} size="large" />
-
-                {!isOwner && <BuyNFT id={id} collectionId={collectionId} price={withoutCommas(sale.price)} />}
-              </div>
-            </div>
+            <ListingCard SVG={TagSVG} heading="Sale is Active" price={sale.price} priceHeading="Price">
+              <BuyNFT {...{ ...nft, sale }} />
+            </ListingCard>
           )}
 
           {auction && (
-            <div className={styles.listing}>
-              <p className={styles.listingHeading}>
-                <BidSVG /> Auction Ends: {auctionEndDate}
-              </p>
-
-              <div className={styles.listingCard}>
-                <PriceInfoCard heading="Current bid" text={auctionPrice} size="large" />
-
-                {!isOwner && (
-                  <MakeBid
-                    nft={{ ...nft, id }}
-                    collection={{ ...config, id: collectionId }}
-                    auction={{ minBid: withoutCommas(auction.currentPrice), endDate: auctionEndDate }}
-                  />
-                )}
-              </div>
-            </div>
+            <ListingCard
+              SVG={BidSVG}
+              // TODOINDEXER:
+              heading={`Auction Ends: ${new Date(auction.endTimestamp!).toLocaleString()}`}
+              price={auction.lastPrice || auction.minPrice}
+              priceHeading={auction.lastPrice ? 'Current bid' : 'Minimum bid'}>
+              <MakeBid {...{ ...nft, auction }} />
+            </ListingCard>
           )}
 
-          {isOwner && !sale && !auction && (!!config.sellable || !!config.transferable) && (
+          {isOwner && collection.transferable && !sale && !auction && (
             <div className={styles.buttons}>
-              {!!config.sellable && <StartSale nft={{ ...nft, id }} collection={{ ...config, id: collectionId }} />}
-              {!!config.sellable && <StartAuction nft={{ ...nft, id }} collection={{ ...config, id: collectionId }} />}
-
-              <TransferNFT nft={{ ...nft, id }} collection={{ ...config, id: collectionId }} />
+              <StartSale {...nft} />
+              <StartAuction {...nft} />
+              <TransferNFT {...nft} />
             </div>
           )}
 
@@ -157,7 +109,7 @@ function NFT() {
         </div>
       </div>
     </Container>
-  ) : null;
+  );
 }
 
 export { NFT };

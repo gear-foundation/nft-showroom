@@ -1,6 +1,7 @@
 import { CollectionCard } from './collection-card';
-import { CollectionHeader } from './collection-header';
+import { MintLimitInfoCard } from './mint-limit-info-card';
+import { MintNFT } from './mint-nft';
 import { NFTCard } from './nft-card';
 import { TransferNFT } from './transfer-nft';
 
-export { CollectionCard, NFTCard, CollectionHeader, TransferNFT };
+export { CollectionCard, MintLimitInfoCard, NFTCard, TransferNFT, MintNFT };
