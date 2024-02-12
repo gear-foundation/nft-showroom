@@ -10,7 +10,7 @@ import { usePriceSchema } from '../../hooks';
 type Props = Pick<Nft, 'idInCollection' | 'name' | 'mediaUrl' | 'owner'> & {
   collection: Pick<Collection, 'id' | 'name'>;
 } & {
-  auction: Pick<Auction, 'minPrice' | 'timestamp'>;
+  auction: Pick<Auction, 'minPrice' | 'lastPrice' | 'endTimestamp'>;
 };
 
 const defaultValues = {
@@ -23,7 +23,7 @@ function Component({ collection, auction, ...nft }: Props) {
   const isOwner = useIsOwner(nft.owner);
 
   const { getPriceSchema } = usePriceSchema();
-  const schema = z.object({ value: getPriceSchema(auction.minPrice, true) });
+  const schema = z.object({ value: getPriceSchema(auction.lastPrice || auction.minPrice, Boolean(auction.lastPrice)) });
 
   const onSubmit = ({ value }: typeof defaultValues) => {
     const tokenId = nft.idInCollection;

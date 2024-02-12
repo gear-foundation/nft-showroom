@@ -4,7 +4,7 @@ import { ReactNode } from 'react';
 import { DefaultValues, FieldValues } from 'react-hook-form';
 import { ZodType } from 'zod';
 
-import { Nft, Collection } from '@/graphql/graphql';
+import { Nft, Collection, Auction } from '@/graphql/graphql';
 import { getIpfsLink } from '@/utils';
 
 import { Form } from '../form';
@@ -20,7 +20,7 @@ type Props<T> = {
   nft: Pick<Nft, 'name' | 'mediaUrl'>;
   collection: Pick<Collection, 'name'>;
   children: ReactNode;
-  auction?: { minPrice: string; timestamp: string };
+  auction?: Pick<Auction, 'minPrice' | 'lastPrice' | 'endTimestamp'>;
 };
 
 function NFTActionFormModal<T extends FieldValues>({ modal, form, nft, collection, auction, children }: Props<T>) {
@@ -42,8 +42,17 @@ function NFTActionFormModal<T extends FieldValues>({ modal, form, nft, collectio
 
       {auction && (
         <div className={styles.auction}>
-          <PriceInfoCard heading="Minimal bid" text={getFormattedBalanceValue(auction.minPrice).toFixed()} />
-          <InfoCard SVG={CalendarSVG} heading="End date" text={new Date(auction.timestamp).toLocaleString()} />
+          <PriceInfoCard
+            heading={auction.lastPrice ? 'Current bid' : 'Minimum bid'}
+            text={getFormattedBalanceValue(auction.lastPrice || auction.minPrice).toFixed()}
+          />
+
+          <InfoCard
+            SVG={CalendarSVG}
+            heading="End date"
+            // TODOINDEXER:
+            text={new Date(auction.endTimestamp!).toLocaleString()}
+          />
         </div>
       )}
 

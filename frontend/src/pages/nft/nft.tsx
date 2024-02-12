@@ -79,9 +79,10 @@ function NFT() {
           {auction && (
             <ListingCard
               SVG={BidSVG}
-              heading={`Auction Ends: ${new Date(auction.timestamp).toLocaleString()}`}
-              price={auction.minPrice}
-              priceHeading="Current bid">
+              // TODOINDEXER:
+              heading={`Auction Ends: ${new Date(auction.endTimestamp!).toLocaleString()}`}
+              price={auction.lastPrice || auction.minPrice}
+              priceHeading={auction.lastPrice ? 'Current bid' : 'Minimum bid'}>
               <MakeBid {...{ ...nft, auction }} />
             </ListingCard>
           )}

@@ -14,7 +14,7 @@ type Props = Pick<Nft, 'mediaUrl' | 'name' | 'idInCollection' | 'owner'> & {
 } & {
   sales: Pick<Sale, 'price'>[];
 } & {
-  auctions: Pick<Auction, 'minPrice' | 'timestamp'>[];
+  auctions: Pick<Auction, 'minPrice' | 'lastPrice' | 'endTimestamp'>[];
 };
 
 function NFTCard({ sales, auctions, ...nft }: Props) {
@@ -51,7 +51,12 @@ function NFTCard({ sales, auctions, ...nft }: Props) {
 
           {auction && (
             <>
-              <PriceInfoCard heading="Current bid" text={getFormattedBalanceValue(auction.minPrice).toFixed()} />
+              {/* TODO: BidInfoCard */}
+              <PriceInfoCard
+                heading={auction.lastPrice ? 'Current bid' : 'Minimum bid'}
+                text={getFormattedBalanceValue(auction.lastPrice || auction.minPrice).toFixed()}
+              />
+
               <MakeBid {...{ ...nft, auction }} />
             </>
           )}

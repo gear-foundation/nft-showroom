@@ -41,7 +41,8 @@ const NFTS_QUERY = graphql(`
 
       auctions(where: { status_eq: "open" }) {
         minPrice
-        timestamp
+        lastPrice
+        endTimestamp
       }
     }
   }
