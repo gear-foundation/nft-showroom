@@ -35,21 +35,19 @@ function Collection() {
   const { query, onSubmit, register } = useSearchQuery();
 
   if (!collection) return null;
-  const { collectionBanner, collectionLogo, admin, tokensLimit, name, description, nfts } = collection;
-
-  if (!collectionBanner || !collectionLogo || !admin || !name || !description) return null;
+  const { collectionBanner, collectionLogo, admin, tokensLimit, name, description, nfts, additionalLinks } = collection;
 
   const searchedTokens = nfts?.filter((nft) => nft.name.toLocaleLowerCase().includes(query));
   const tokensCount = searchedTokens?.length || 0;
 
   const renderNFTs = () => searchedTokens?.map((nft) => <NFTCard key={nft.id} {...{ ...nft, collection }} />);
 
-  // TODOINDEXER:
-  const additionalLinks = {};
-  const socialEntries = Object.entries(additionalLinks).filter(([, value]) => !!value) as [string, string][];
+  const socialEntries = Object.entries(additionalLinks || {});
 
   const renderSocials = () =>
     socialEntries.map(([key, value]) => {
+      if (!value) return null;
+
       const SVG = SOCIAL_ICON[key as keyof typeof SOCIAL_ICON];
 
       return (

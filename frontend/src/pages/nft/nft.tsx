@@ -86,7 +86,7 @@ function NFT() {
             </ListingCard>
           )}
 
-          {isOwner && collection.transferable && (
+          {isOwner && collection.transferable && !sale && !auction && (
             <div className={styles.buttons}>
               <StartSale {...nft} />
               <StartAuction {...nft} />
