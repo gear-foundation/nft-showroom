@@ -1,21 +1,18 @@
-import { HexString } from '@gear-js/api';
-import { withoutCommas } from '@gear-js/react-hooks';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { generatePath, useParams } from 'react-router-dom';
 
-import { Breadcrumbs, Container, FilterButton, SearchInput } from '@/components';
+import { Breadcrumbs, Container, FilterButton, InfoCard, SearchInput } from '@/components';
 import { ROUTE } from '@/consts';
-import { NFTCard, CollectionHeader, useCollection } from '@/features/collections';
+import { MintLimitInfoCard, MintNFT, NFTCard } from '@/features/collections';
 import { GridSize, useGridSize } from '@/features/lists';
 import { cx, getIpfsLink } from '@/utils';
 
 import NotFoundSVG from './assets/not-found.svg?react';
+import UserSVG from './assets/user.svg?react';
 import styles from './collection.module.scss';
-
-type Params = {
-  id: HexString;
-};
+import { SOCIAL_ICON } from './consts';
+import { useCollection } from './hooks';
 
 function useSearchQuery() {
   const { handleSubmit, register } = useForm({ defaultValues: { query: '' } });
@@ -26,40 +23,70 @@ function useSearchQuery() {
   return { query, onSubmit, register };
 }
 
+type Params = {
+  id: string;
+};
+
 function Collection() {
   const { id } = useParams() as Params;
-
   const collection = useCollection(id);
+
   const { gridSize, setGridSize } = useGridSize();
   const { query, onSubmit, register } = useSearchQuery();
 
-  const { config, tokens, collectionOwner, totalNumberOfTokens } = collection || {};
+  if (!collection) return null;
+  const { collectionBanner, collectionLogo, admin, tokensLimit, name, description, nfts, additionalLinks } = collection;
 
-  const searchedTokens = tokens?.filter(([, { name }]) => name.toLocaleLowerCase().includes(query));
-  const tokensCount = searchedTokens?.length;
+  const searchedTokens = nfts?.filter((nft) => nft.name.toLocaleLowerCase().includes(query));
+  const tokensCount = searchedTokens?.length || 0;
 
-  const renderNFTs = () =>
-    collection &&
-    searchedTokens?.map(([nftId, nft]) => (
-      <NFTCard key={nftId} nft={{ ...nft, id: nftId }} collection={{ ...collection.config, id }} />
-    ));
+  const renderNFTs = () => searchedTokens?.map((nft) => <NFTCard key={nft.id} {...{ ...nft, collection }} />);
 
-  return config && collectionOwner && tokensCount !== undefined && totalNumberOfTokens !== undefined ? (
+  const socialEntries = Object.entries(additionalLinks || {});
+
+  const renderSocials = () =>
+    socialEntries.map(([key, value]) => {
+      if (!value) return null;
+
+      const SVG = SOCIAL_ICON[key as keyof typeof SOCIAL_ICON];
+
+      return (
+        <li key={key}>
+          <a href={value} target="_blank" rel="noreferrer">
+            <SVG />
+          </a>
+        </li>
+      );
+    });
+
+  return (
     <Container>
-      <Breadcrumbs list={[{ to: generatePath(ROUTE.COLLECTION, { id }), text: config.name }]} />
+      <Breadcrumbs list={[{ to: generatePath(ROUTE.COLLECTION, { id }), text: name }]} />
 
-      <CollectionHeader
-        id={id}
-        banner={getIpfsLink(config.collectionBanner)}
-        logo={getIpfsLink(config.collectionLogo)}
-        owner={collectionOwner}
-        tokensCount={tokensCount}
-        tokensLimit={totalNumberOfTokens}
-        name={config.name}
-        description={config.description}
-        mintPrice={withoutCommas(config.paymentForMint)}
-        socials={config.additionalLinks || {}}
-      />
+      <header className={styles.headerContainer}>
+        <div className={styles.header}>
+          <img src={getIpfsLink(collectionBanner)} alt="" className={styles.banner} />
+          <img src={getIpfsLink(collectionLogo)} alt="" className={styles.logo} />
+
+          <div className={styles.cards}>
+            <InfoCard heading="Creator" text={admin} SVG={UserSVG} color="light" textOverflow />
+            <MintLimitInfoCard heading={tokensLimit} text={tokensCount} color="light" />
+          </div>
+        </div>
+
+        <div className={styles.footer}>
+          <div>
+            <h2 className={styles.name}>{name}</h2>
+            <p className={styles.description}>{description}</p>
+          </div>
+
+          <div>
+            <ul className={styles.socials}>{renderSocials()}</ul>
+
+            <MintNFT {...collection} />
+          </div>
+        </div>
+      </header>
 
       <div className={styles.nfts}>
         <header className={styles.nftsHeader}>
@@ -88,7 +115,7 @@ function Collection() {
         )}
       </div>
     </Container>
-  ) : null;
+  );
 }
 
 export { Collection };

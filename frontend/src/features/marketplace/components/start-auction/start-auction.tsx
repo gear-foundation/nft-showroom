@@ -1,17 +1,18 @@
-import { HexString } from '@gear-js/api';
 import { Button, Select } from '@gear-js/vara-ui';
 import { z } from 'zod';
 
-import { NFTActionFormModal, PriceInput, withAccount } from '@/components';
-import { useModal } from '@/hooks';
+import { NFTActionFormModal, PriceInput, withAccount, withApi } from '@/components';
+import { Collection, CollectionType, Nft } from '@/graphql/graphql';
+import { useApprovedMessage, useIsOwner, useModal } from '@/hooks';
 
 import BidSVG from '../../assets/bid.svg?react';
-import { useNFTSendMessage, usePriceSchema } from '../../hooks';
+import { usePriceSchema } from '../../hooks';
 import { getDurationOptions } from '../../utils';
 
-type Props = {
-  nft: { id: string; name: string; mediaUrl: string };
-  collection: { id: HexString; name: string };
+type Props = Pick<Nft, 'idInCollection' | 'name' | 'mediaUrl' | 'owner'> & {
+  collection: Pick<Collection, 'id' | 'name' | 'sellable'> & {
+    type: Pick<CollectionType, 'id'>;
+  };
 };
 
 const defaultOptions = getDurationOptions();
@@ -21,17 +22,18 @@ const defaultValues = {
   minPrice: '',
 };
 
-function Component({ nft, collection }: Props) {
+function Component({ collection, owner, ...nft }: Props) {
   const [isOpen, open, close] = useModal();
+  const isOwner = useIsOwner(owner);
 
   const { getPriceSchema } = usePriceSchema();
-  const schema = z.object({ minBid: getPriceSchema() });
+  const schema = z.object({ minPrice: getPriceSchema(), duration: z.string() });
 
-  const sendMessage = useNFTSendMessage(collection.id);
+  const sendMessage = useApprovedMessage(collection.id, collection.type.id);
 
   const onSubmit = ({ minPrice, duration }: typeof defaultValues) => {
     const collectionAddress = collection.id;
-    const tokenId = nft.id;
+    const tokenId = nft.idInCollection;
     const durationMs = duration;
 
     const payload = { CreateAuction: { collectionAddress, tokenId, minPrice, durationMs } };
@@ -43,7 +45,7 @@ function Component({ nft, collection }: Props) {
   const modalProps = { heading: 'Start Auction', close };
   const formProps = { defaultValues, schema, onSubmit };
 
-  return (
+  return isOwner && collection.sellable ? (
     <>
       <Button icon={BidSVG} text="Start auction" size="small" color="dark" onClick={open} />
 
@@ -54,9 +56,9 @@ function Component({ nft, collection }: Props) {
         </NFTActionFormModal>
       )}
     </>
-  );
+  ) : null;
 }
 
-const StartAuction = withAccount(Component);
+const StartAuction = withAccount(withApi(Component));
 
 export { StartAuction };

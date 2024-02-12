@@ -1,21 +1,27 @@
-import { HexString } from '@gear-js/api';
 import { Button } from '@gear-js/vara-ui';
 
 import { withAccount } from '@/components';
+import { Collection, CollectionType, Nft } from '@/graphql/graphql';
+import { useCollectionMessage } from '@/hooks';
 
-import { useCollectionSendMessage } from '../../hooks';
-
-type Props = {
-  collectionId: HexString;
-  value: string;
+type Props = Pick<Collection, 'id' | 'tokensLimit' | 'paymentForMint'> & {
+  nfts: Pick<Nft, 'id'>[];
+} & {
+  type: Pick<CollectionType, 'id'>;
 };
 
-function Component({ collectionId, value }: Props) {
-  const sendMessage = useCollectionSendMessage(collectionId);
+function Component({ id, type, tokensLimit, paymentForMint, nfts }: Props) {
+  const sendMessage = useCollectionMessage(id, type.id);
 
-  const handleClick = () => sendMessage({ payload: { Mint: null }, value });
+  const tokensToMint = tokensLimit ? Number(tokensLimit) - nfts.length : 1;
 
-  return <Button text="Mint NFT" size="small" onClick={handleClick} block />;
+  const handleClick = () => {
+    if (!paymentForMint) throw new Error('paymentForMint is not exists');
+
+    sendMessage({ payload: { Mint: null }, value: paymentForMint });
+  };
+
+  return tokensToMint > 0 ? <Button text="Mint NFT" size="small" onClick={handleClick} block /> : null;
 }
 
 const MintNFT = withAccount(Component);

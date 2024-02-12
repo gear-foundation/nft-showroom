@@ -1,4 +1,3 @@
-import { CollectionCard, NFTCard, CollectionHeader, TransferNFT } from './components';
-import { useCollection, useCollectionSendMessage } from './hooks';
+import { CollectionCard, MintLimitInfoCard, NFTCard, TransferNFT, MintNFT } from './components';
 
-export { CollectionCard, NFTCard, CollectionHeader, TransferNFT, useCollection, useCollectionSendMessage };
+export { CollectionCard, MintLimitInfoCard, NFTCard, TransferNFT, MintNFT };

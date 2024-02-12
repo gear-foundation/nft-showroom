@@ -1,30 +1,30 @@
-import { HexString } from '@gear-js/api';
 import { Button } from '@gear-js/vara-ui';
 
 import { withAccount } from '@/components';
+import { Collection, Nft, Sale } from '@/graphql/graphql';
+import { useIsOwner, useMarketplaceMessage } from '@/hooks';
 
-import { useMarketplaceSendMessage } from '../../hooks';
-
-type Props = {
-  id: string;
-  collectionId: HexString;
-  price: string;
+type Props = Pick<Nft, 'idInCollection' | 'owner'> & {
+  collection: Pick<Collection, 'id'>;
+} & {
+  sale: Pick<Sale, 'price'>;
 };
 
-function Component({ id, collectionId, price }: Props) {
-  const sendMessage = useMarketplaceSendMessage();
+function Component({ idInCollection, owner, collection, sale }: Props) {
+  const sendMessage = useMarketplaceMessage();
+  const isOwner = useIsOwner(owner);
 
   const handleClick = () => {
-    const tokenId = id;
-    const collectionAddress = collectionId;
+    const tokenId = idInCollection;
+    const collectionAddress = collection.id;
 
     const payload = { BuyNFT: { tokenId, collectionAddress } };
-    const value = price;
+    const value = sale.price;
 
     sendMessage({ payload, value });
   };
 
-  return <Button text="Buy" size="small" onClick={handleClick} />;
+  return !isOwner ? <Button text="Buy" size="small" onClick={handleClick} /> : null;
 }
 
 const BuyNFT = withAccount(Component);
