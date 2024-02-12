@@ -20,7 +20,7 @@ function IPFSProvider({ children }: ProviderProps) {
   return <GearIPFSProvider url={ADDRESS.IPFS}>{children}</GearIPFSProvider>;
 }
 
-const wsClient = createClient({ url: ADDRESS.WS_INDEXER });
+const wsClient = createClient({ url: ADDRESS.INDEXER_WS });
 
 const client = new Client({
   url: ADDRESS.INDEXER,
