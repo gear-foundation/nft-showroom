@@ -35,20 +35,22 @@ export class AuctionClosedHandler implements INftMarketplaceEventHandler {
       updatedAt: eventInfo.timestamp,
       endTimestamp: eventInfo.timestamp,
     });
-    storage.addTransfer(
-      new Transfer({
-        id: uuidv4(),
-        nft,
-        from: auction.owner,
-        to: currentOwner,
-        timestamp: eventInfo.timestamp,
-        blockNumber: eventInfo.blockNumber,
-        txHash: eventInfo.txHash,
-      }),
-    );
-    await storage.setNft({
-      ...nft,
-      owner: currentOwner,
-    });
+    if (currentOwner !== null && currentOwner !== auction.owner) {
+      storage.addTransfer(
+        new Transfer({
+          id: uuidv4(),
+          nft,
+          from: auction.owner,
+          to: currentOwner,
+          timestamp: eventInfo.timestamp,
+          blockNumber: eventInfo.blockNumber,
+          txHash: eventInfo.txHash,
+        }),
+      );
+      await storage.setNft({
+        ...nft,
+        owner: currentOwner,
+      });
+    }
   }
 }
