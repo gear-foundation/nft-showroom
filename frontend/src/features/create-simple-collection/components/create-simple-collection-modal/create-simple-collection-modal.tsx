@@ -117,10 +117,7 @@ function CreateSimpleCollectionModal({ close }: Pick<ModalProps, 'close'>) {
     const bytesPayload = getBytesPayload(formPayload);
     const payload = { CreateCollection: { typeName: COLLECTION_NAME, payload: bytesPayload } };
 
-    const onSuccess = close;
-    const onError = () => setIsLoading(false);
-
-    sendMessage({ payload, onSuccess, onError });
+    sendMessage({ payload });
   };
 
   const getForm = () => {
