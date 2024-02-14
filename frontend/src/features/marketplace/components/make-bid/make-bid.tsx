@@ -1,3 +1,4 @@
+import { useAlert } from '@gear-js/react-hooks';
 import { Button } from '@gear-js/vara-ui';
 import { z } from 'zod';
 
@@ -21,6 +22,7 @@ function Component({ collection, auction, ...nft }: Props) {
   const [isOpen, open, close] = useModal();
   const sendMessage = useMarketplaceMessage();
   const isOwner = useIsOwner(nft.owner);
+  const alert = useAlert();
 
   const { getPriceSchema } = usePriceSchema();
   const schema = z.object({ value: getPriceSchema(auction.lastPrice || auction.minPrice, Boolean(auction.lastPrice)) });
@@ -30,7 +32,11 @@ function Component({ collection, auction, ...nft }: Props) {
     const collectionAddress = collection.id;
 
     const payload = { AddBid: { tokenId, collectionAddress } };
-    const onSuccess = close;
+
+    const onSuccess = () => {
+      alert.success('Bid made');
+      close();
+    };
 
     sendMessage({ payload, value, onSuccess });
   };

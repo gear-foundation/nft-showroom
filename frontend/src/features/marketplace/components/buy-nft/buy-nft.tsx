@@ -1,3 +1,4 @@
+import { useAlert } from '@gear-js/react-hooks';
 import { Button } from '@gear-js/vara-ui';
 
 import { withAccount } from '@/components';
@@ -13,6 +14,7 @@ type Props = Pick<Nft, 'idInCollection' | 'owner'> & {
 function Component({ idInCollection, owner, collection, sale }: Props) {
   const sendMessage = useMarketplaceMessage();
   const isOwner = useIsOwner(owner);
+  const alert = useAlert();
 
   const handleClick = () => {
     const tokenId = idInCollection;
@@ -21,7 +23,9 @@ function Component({ idInCollection, owner, collection, sale }: Props) {
     const payload = { BuyNFT: { tokenId, collectionAddress } };
     const value = sale.price;
 
-    sendMessage({ payload, value });
+    const onSuccess = () => alert.success('NFT bought');
+
+    sendMessage({ payload, value, onSuccess });
   };
 
   return !isOwner ? <Button text="Buy" size="small" onClick={handleClick} /> : null;

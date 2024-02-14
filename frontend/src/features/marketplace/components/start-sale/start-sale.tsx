@@ -1,3 +1,4 @@
+import { useAlert } from '@gear-js/react-hooks';
 import { Button } from '@gear-js/vara-ui';
 import { z } from 'zod';
 
@@ -21,6 +22,7 @@ const defaultValues = {
 function Component({ collection, owner, ...nft }: Props) {
   const [isOpen, open, close] = useModal();
   const isOwner = useIsOwner(owner);
+  const alert = useAlert();
 
   const { getPriceSchema } = usePriceSchema();
   const schema = z.object({ price: getPriceSchema() });
@@ -31,8 +33,12 @@ function Component({ collection, owner, ...nft }: Props) {
     const tokenId = nft.idInCollection;
     const collectionAddress = collection.id;
 
-    const onSuccess = close;
     const payload = { SaleNft: { price, collectionAddress, tokenId } };
+
+    const onSuccess = () => {
+      alert.success('Sale started');
+      close();
+    };
 
     sendMessage({ payload, onSuccess });
   };

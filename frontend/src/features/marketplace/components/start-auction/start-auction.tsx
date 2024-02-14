@@ -1,3 +1,4 @@
+import { useAlert } from '@gear-js/react-hooks';
 import { Button, Select } from '@gear-js/vara-ui';
 import { z } from 'zod';
 
@@ -25,6 +26,7 @@ const defaultValues = {
 function Component({ collection, owner, ...nft }: Props) {
   const [isOpen, open, close] = useModal();
   const isOwner = useIsOwner(owner);
+  const alert = useAlert();
 
   const { getPriceSchema } = usePriceSchema();
   const schema = z.object({ minPrice: getPriceSchema(), duration: z.string() });
@@ -37,7 +39,11 @@ function Component({ collection, owner, ...nft }: Props) {
     const durationMs = duration;
 
     const payload = { CreateAuction: { collectionAddress, tokenId, minPrice, durationMs } };
-    const onSuccess = close;
+
+    const onSuccess = () => {
+      alert.success('Auction started');
+      close();
+    };
 
     sendMessage({ payload, onSuccess });
   };
