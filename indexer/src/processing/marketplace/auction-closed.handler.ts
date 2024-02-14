@@ -3,7 +3,7 @@ import { EntitiesService } from '../entities.service';
 import { INftMarketplaceEventHandler } from './nft-marketplace.handler';
 import { AuctionStatus } from '../../model/types';
 import { EventInfo } from '../event-info.type';
-import { Transfer } from '../../model';
+import { Nft, Transfer } from '../../model';
 import { v4 as uuidv4 } from 'uuid';
 
 export class AuctionClosedHandler implements INftMarketplaceEventHandler {
@@ -47,10 +47,10 @@ export class AuctionClosedHandler implements INftMarketplaceEventHandler {
           txHash: eventInfo.txHash,
         }),
       );
-      await storage.setNft({
+      await storage.setNft(new Nft({
         ...nft,
         owner: currentOwner,
-      });
+      }));
     }
   }
 }

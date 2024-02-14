@@ -261,7 +261,7 @@ export function getNftEvent(event: NftEventPlain): NftEvent | undefined {
         ),
         attendable: event.initialized.config.attendable,
         totalNumberOfTokens: safeUnwrapToBigInt(
-          event.initialized.totalNumberOfTokens,
+          safeUnwrapOptional(event.initialized.totalNumberOfTokens),
         ),
       },
     };
