@@ -2,40 +2,40 @@ import { HexString, UserMessageSent } from '@gear-js/api';
 import { useAccount, useAlert, useApi, useSendMessageHandler } from '@gear-js/react-hooks';
 import { UnsubscribePromise } from '@polkadot/api/types';
 import { AnyJson } from '@polkadot/types/types';
-import { generatePath, useNavigate } from 'react-router-dom';
 
-import { ADDRESS, ROUTE } from '@/consts';
+import { ADDRESS } from '@/consts';
 import { useMetadata } from '@/context';
+import { ApproveNFTPayload, MintNFTPayload, TransferNFTPayload } from '@/features/collections';
+import { CreateCollectionPayload, CreateCollectionReply } from '@/features/create-simple-collection';
+import { BuyNFTPayload, MakeBidPayload, StartAuctionPayload, StartSalePayload } from '@/features/marketplace';
 
-interface MarketplacePayload {
-  collectionCreated: {
-    collectionAddress: HexString;
-  };
+type Payload =
+  | CreateCollectionPayload
+  | BuyNFTPayload
+  | MakeBidPayload
+  | StartAuctionPayload
+  | StartSalePayload
+  | MintNFTPayload
+  | TransferNFTPayload
+  | ApproveNFTPayload;
 
-  saleNft: unknown;
-  nftSold: unknown;
-  auctionCreated: unknown;
-  bidAdded: unknown;
-  auctionClosed: unknown;
-}
-
-export interface CollectionPayload {
-  transferred: unknown;
-  minted: unknown;
-  approved: unknown;
-}
-
-const SUCCESS_MESSAGE = {
-  saleNft: 'NFT is put on sale',
-  collectionCreated: 'Collection is created',
-  nftSold: 'NFT is sold',
-  auctionCreated: 'Auction is created',
-  bidAdded: 'Bid is added',
-  auctionClosed: 'Auction is closed',
-  transferred: 'NFT is transfered',
-  minted: 'NFT is minted',
-  approved: 'NFT is approved to marketplace contract',
-};
+type Reply<T> = T extends CreateCollectionPayload
+  ? CreateCollectionReply
+  : T extends BuyNFTPayload
+  ? { nftSold: unknown }
+  : T extends MakeBidPayload
+  ? { bidAdded: unknown }
+  : T extends StartAuctionPayload
+  ? { auctionCreated: unknown }
+  : T extends StartSalePayload
+  ? { saleNft: unknown }
+  : T extends MintNFTPayload
+  ? { minted: unknown }
+  : T extends TransferNFTPayload
+  ? { transferred: unknown }
+  : T extends ApproveNFTPayload
+  ? { approved: unknown }
+  : AnyJson;
 
 const useSendMessageWithReply = (...args: Parameters<typeof useSendMessageHandler>) => {
   const { api, isApiReady } = useApi();
@@ -44,30 +44,33 @@ const useSendMessageWithReply = (...args: Parameters<typeof useSendMessageHandle
 
   const sendMessage = useSendMessageHandler(...args);
 
-  const navigate = useNavigate();
-
-  const getOnSuccess = (payload: MarketplacePayload | CollectionPayload) => {
-    const [key] = Object.keys(payload) as (keyof MarketplacePayload | keyof CollectionPayload)[];
-
-    switch (key) {
-      case 'collectionCreated': {
-        const _payload = payload as MarketplacePayload;
-        const { collectionAddress } = _payload.collectionCreated;
-
-        return () => navigate(generatePath(ROUTE.COLLECTION, { id: collectionAddress }));
-      }
-
-      default:
-        return () => {};
-    }
-  };
-
-  return (..._args: Parameters<typeof sendMessage>) => {
+  // TODO: different payload types for marketplace and collection hooks
+  return <T extends Payload>({
+    onSuccess = () => {},
+    onFinally = () => {},
+    ...sendMessageArgs
+  }: {
+    payload: T;
+    value?: string | number;
+    onSuccess?: (value: Reply<T>) => void;
+    onFinally?: () => void;
+  }) => {
     if (!isApiReady) throw new Error('API is not initialized');
     if (!account) throw new Error('Account is not found');
 
     const [address, metadata] = args;
     let unsub: UnsubscribePromise | undefined = undefined;
+
+    const _onFinally = () => {
+      onFinally();
+
+      unsub
+        ?.then((unsubCallback) => {
+          console.log('unsubCallback: ', unsubCallback);
+          unsubCallback();
+        })
+        .catch((error: Error) => alert.error(error.message));
+    };
 
     const handleUserMessageSent = ({ data }: UserMessageSent) => {
       if (!metadata) throw new Error('Metadata is not found');
@@ -92,26 +95,17 @@ const useSendMessageWithReply = (...args: Parameters<typeof useSendMessageHandle
       const isErrorPayload = Object.prototype.hasOwnProperty.call(decodedPayload, 'err');
 
       if (isSuccessPayload) {
-        const _payload = decodedPayload.ok as unknown as MarketplacePayload | CollectionPayload;
-
-        const [key] = Object.keys(_payload) as (keyof MarketplacePayload | keyof CollectionPayload)[];
-        const alertMessage = SUCCESS_MESSAGE[key];
-
-        const onSuccess = getOnSuccess(_payload);
-
-        onSuccess();
-        alert.success(alertMessage);
+        onSuccess(decodedPayload.ok as Reply<T>);
       }
 
       if (isErrorPayload) alert.error(decodedPayload.err?.toString());
 
-      unsub?.then((unsubCallback) => unsubCallback()).catch((error: Error) => alert.error(error.message));
+      _onFinally();
     };
 
     unsub = api.gearEvents.subscribeToGearEvent('UserMessageSent', handleUserMessageSent);
 
-    // TODO: unsub onError
-    sendMessage(..._args);
+    sendMessage({ ...sendMessageArgs, onError: _onFinally });
   };
 };
 
@@ -128,18 +122,24 @@ function useCollectionMessage(id: string, typeId: string) {
 }
 
 function useApprovedMessage(collectionId: string, collectionTypeId: string) {
+  const alert = useAlert();
+
   const sendMarketplaceMessage = useMarketplaceMessage();
   const sendCollectionMessage = useCollectionMessage(collectionId, collectionTypeId);
 
-  return (args: {
-    payload: Record<string, Record<'tokenId', string> | Record<string, AnyJson>>;
-    onSuccess: () => void;
-  }) => {
+  return <T extends StartAuctionPayload | StartSalePayload>(args: { payload: T; onSuccess: () => void }) => {
     const to = ADDRESS.CONTRACT;
-    const [{ tokenId }] = Object.values(args.payload);
+
+    const [{ tokenId }] = Object.values(args.payload) as unknown as
+      | StartAuctionPayload[keyof StartAuctionPayload][]
+      | StartSalePayload[keyof StartSalePayload][];
 
     const payload = { Approve: { to, tokenId } };
-    const onSuccess = () => sendMarketplaceMessage(args);
+
+    const onSuccess = () => {
+      alert.success('NFT is approved to Marketplace contract');
+      sendMarketplaceMessage(args);
+    };
 
     sendCollectionMessage({ payload, onSuccess });
   };
