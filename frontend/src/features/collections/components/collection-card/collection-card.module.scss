@@ -30,6 +30,8 @@
 }
 
 .logo {
+  flex-shrink: 0;
+
   width: 96px;
   height: 96px;
   object-fit: cover;
