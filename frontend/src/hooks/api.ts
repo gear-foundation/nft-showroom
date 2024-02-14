@@ -64,12 +64,7 @@ const useSendMessageWithReply = (...args: Parameters<typeof useSendMessageHandle
     const _onFinally = () => {
       onFinally();
 
-      unsub
-        ?.then((unsubCallback) => {
-          console.log('unsubCallback: ', unsubCallback);
-          unsubCallback();
-        })
-        .catch((error: Error) => alert.error(error.message));
+      unsub?.then((unsubCallback) => unsubCallback()).catch((error: Error) => alert.error(error.message));
     };
 
     const handleUserMessageSent = ({ data }: UserMessageSent) => {

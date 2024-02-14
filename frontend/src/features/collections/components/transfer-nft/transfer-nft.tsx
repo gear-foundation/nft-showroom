@@ -1,4 +1,5 @@
 import { decodeAddress } from '@gear-js/api';
+import { useAlert } from '@gear-js/react-hooks';
 import { Button, Input } from '@gear-js/vara-ui';
 import { z } from 'zod';
 
@@ -39,6 +40,7 @@ type Props = Pick<Nft, 'idInCollection' | 'name' | 'mediaUrl' | 'owner'> & {
 function Component({ collection, owner, ...nft }: Props) {
   const [isOpen, open, close] = useModal();
   const isOwner = useIsOwner(owner);
+  const alert = useAlert();
 
   const sendMessage = useCollectionMessage(collection.id, collection.type.id);
 
@@ -47,7 +49,11 @@ function Component({ collection, owner, ...nft }: Props) {
     const to = address;
 
     const payload = { Transfer: { tokenId, to } };
-    const onSuccess = close;
+
+    const onSuccess = () => {
+      alert.success('NFT transferred');
+      close();
+    };
 
     sendMessage({ payload, onSuccess });
   };
