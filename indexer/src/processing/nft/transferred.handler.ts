@@ -1,9 +1,11 @@
 import { TransferEvent } from '../../types/nft.events';
 import { EntitiesService } from '../entities.service';
 import { INftEventHandler } from './nft.handler';
-import { Transfer } from '../../model';
+import { Nft, Transfer } from '../../model';
 import { EventInfo } from '../event-info.type';
 import { v4 as uuidv4 } from 'uuid';
+
+const NullAddress = '0x0000000000000000000000000000000000000000000000000000000000000000'
 
 export class TransferredHandler implements INftEventHandler {
   async handle(
@@ -19,20 +21,22 @@ export class TransferredHandler implements INftEventHandler {
       );
       return;
     }
-    storage.addTransfer(
-      new Transfer({
-        id: uuidv4(),
-        nft,
-        from: owner,
-        to: recipient,
-        blockNumber,
-        timestamp,
-        txHash,
-      }),
-    );
-    await storage.setNft({
-      ...nft,
-      owner: recipient,
-    });
+    if (owner !== NullAddress && recipient !== NullAddress) {
+      storage.addTransfer(
+        new Transfer({
+          id: uuidv4(),
+          nft,
+          from: owner,
+          to: recipient,
+          blockNumber,
+          timestamp,
+          txHash,
+        }),
+      );
+      await storage.setNft(new Nft({
+        ...nft,
+        owner: recipient,
+      }));
+    }
   }
 }

@@ -113,12 +113,13 @@ export class EventsProcessing {
       if (!parsed || !parsed.ok) {
         return null;
       }
+      console.log(`${blockNumber}-${messageId}: extracting marketplace event ${JSON.stringify(parsed.ok)}`);
       const event = getMarketplaceEvent(parsed.ok);
       if (!event) {
         console.warn(`${blockNumber}-${messageId}: unknown event type`, parsed);
         return null;
       }
-      console.log(`${blockNumber}-${messageId}: detected event: ${event.type}`);
+      console.log(`${blockNumber}-${messageId}: detected event: ${event.type}\n${JSON.stringify(event)}`);
       await this.entitiesService
         .addEvent({
           blockNumber: eventInfo.blockNumber,
@@ -172,6 +173,7 @@ export class EventsProcessing {
         );
         return null;
       }
+      console.log(`${blockNumber}-${messageId}: extracting nft event ${JSON.stringify(parsed.ok)}`);
       const event = getNftEvent(parsed.ok);
       if (!event) {
         console.warn(
@@ -180,7 +182,7 @@ export class EventsProcessing {
         );
         return null;
       }
-      console.log(`${blockNumber}-${messageId}: detected event: ${event.type}`);
+      console.log(`${blockNumber}-${messageId}: detected event: ${event.type}\n${JSON.stringify(event)}`);
       const eventHandler = nftEventsToHandler[event.type];
       if (!eventHandler) {
         console.warn(

@@ -16,7 +16,7 @@ export function safeUnwrapToNumber(
 export function safeUnwrapOptional<E extends Codec, T>(
   value: Option<E> | T | null,
 ): T | null {
-  if (value === null) {
+  if (value === null || value === undefined) {
     return null;
   }
   if (isOption(value)) {

@@ -9,6 +9,11 @@ import { EntitiesService } from './processing/entities.service';
 import { getLocalStorage } from './processing/storage/local.storage';
 import { BatchService } from './processing/batch.service';
 
+// @ts-ignore
+BigInt.prototype["toJSON"] = function () {
+  return this.toString();
+};
+
 const NFT_INITIALIZED_CLEAR_TIME = 5 * 60 * 1000; // 5 minutes
 
 function getBlockDate(

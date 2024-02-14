@@ -348,7 +348,7 @@ export function getNftEvent(event: NftEventPlain): NftEvent | undefined {
         ),
         attendable: event.configChanged.config.attendable,
         totalNumberOfTokens: safeUnwrapToBigInt(
-          event.configChanged.totalNumberOfTokens,
+          safeUnwrapOptional(event.configChanged.totalNumberOfTokens),
         ),
       },
     };
