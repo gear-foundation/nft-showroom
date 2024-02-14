@@ -28,6 +28,7 @@ export class NftMintedHandler implements INftEventHandler {
         mediaUrl,
         name,
         owner,
+        mintedBy: owner,
         metadata: JSON.stringify(metadata),
         onSale: false,
         createdAt: timestamp,

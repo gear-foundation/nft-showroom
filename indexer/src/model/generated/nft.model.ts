@@ -28,6 +28,9 @@ export class Nft {
   name!: string;
 
   @Column_('text', { nullable: false })
+  mintedBy!: string;
+
+  @Column_('text', { nullable: false })
   description!: string;
 
   @Column_('int4', { nullable: false })

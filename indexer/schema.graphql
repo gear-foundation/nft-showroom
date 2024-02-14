@@ -76,6 +76,7 @@ type Nft @entity {
   id: ID!
   owner: String!
   name: String!
+  mintedBy: String!
   description: String!
   idInCollection: Int!
   collection: Collection!

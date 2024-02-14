@@ -33,10 +33,12 @@ export class BidAddedHandler implements INftMarketplaceEventHandler {
       );
       return;
     }
-    await storage.setAuction(new Auction({
-      ...auction,
-      lastPrice: price,
-    }))
+    await storage.setAuction(
+      new Auction({
+        ...auction,
+        lastPrice: price,
+      }),
+    );
     storage.addBid(
       new Bid({
         id: uuidv4(),

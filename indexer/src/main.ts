@@ -10,7 +10,7 @@ import { getLocalStorage } from './processing/storage/local.storage';
 import { BatchService } from './processing/batch.service';
 
 // @ts-ignore
-BigInt.prototype["toJSON"] = function () {
+BigInt.prototype['toJSON'] = function () {
   return this.toString();
 };
 

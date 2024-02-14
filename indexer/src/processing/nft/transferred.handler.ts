@@ -5,7 +5,8 @@ import { Nft, Transfer } from '../../model';
 import { EventInfo } from '../event-info.type';
 import { v4 as uuidv4 } from 'uuid';
 
-const NullAddress = '0x0000000000000000000000000000000000000000000000000000000000000000'
+const NullAddress =
+  '0x0000000000000000000000000000000000000000000000000000000000000000';
 
 export class TransferredHandler implements INftEventHandler {
   async handle(
@@ -33,10 +34,12 @@ export class TransferredHandler implements INftEventHandler {
           txHash,
         }),
       );
-      await storage.setNft(new Nft({
-        ...nft,
-        owner: recipient,
-      }));
+      await storage.setNft(
+        new Nft({
+          ...nft,
+          owner: recipient,
+        }),
+      );
     }
   }
 }
