@@ -6,7 +6,7 @@ import { generatePath, useNavigate } from 'react-router-dom';
 import { Container } from '@/components';
 import { ROUTE } from '@/consts';
 import { useIPFS, useMetadata } from '@/context';
-import { useMarketplaceMessage } from '@/hooks';
+import { useLoading, useMarketplaceMessage } from '@/hooks';
 
 import {
   COLLECTION_NAME,
@@ -28,7 +28,7 @@ function CreateSimpleCollectionModal({ close }: Pick<ModalProps, 'close'>) {
   const [stepIndex, setStepIndex] = useState(0);
   const [summaryValues, setSummaryValues] = useState(DEFAULT_SUMMARY_VALUES);
   const [parametersValues, setParametersValues] = useState(DEFAULT_PARAMETERS_VALUES);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, enableLoading, disableLoading] = useLoading();
 
   const { account } = useAccount();
   const { getChainBalanceValue } = useBalanceFormat();
@@ -117,7 +117,7 @@ function CreateSimpleCollectionModal({ close }: Pick<ModalProps, 'close'>) {
   };
 
   const handleNFTsSubmit = async ({ nfts }: NFTsValues) => {
-    setIsLoading(true);
+    enableLoading();
 
     const formPayload = await getFormPayload(nfts);
     const bytesPayload = getBytesPayload(formPayload);
@@ -131,7 +131,7 @@ function CreateSimpleCollectionModal({ close }: Pick<ModalProps, 'close'>) {
       alert.success('Collection created');
     };
 
-    const onFinally = () => setIsLoading(false);
+    const onFinally = disableLoading;
 
     sendMessage({ payload, onSuccess, onFinally });
   };

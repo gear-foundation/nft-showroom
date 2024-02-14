@@ -5,7 +5,7 @@ import { z } from 'zod';
 
 import { NFTActionFormModal, withAccount } from '@/components';
 import { Collection, CollectionType, Nft } from '@/graphql/graphql';
-import { useCollectionMessage, useIsOwner, useModal } from '@/hooks';
+import { useCollectionMessage, useIsOwner, useLoading, useModal } from '@/hooks';
 
 import PlaneSVG from '../../assets/plane.svg?react';
 
@@ -41,10 +41,13 @@ function Component({ collection, owner, ...nft }: Props) {
   const [isOpen, open, close] = useModal();
   const isOwner = useIsOwner(owner);
   const alert = useAlert();
+  const [isLoading, enableLoading, disableLoading] = useLoading();
 
   const sendMessage = useCollectionMessage(collection.id, collection.type.id);
 
   const onSubmit = ({ address }: typeof defaultValues) => {
+    enableLoading();
+
     const tokenId = nft.idInCollection;
     const to = address;
 
@@ -55,11 +58,13 @@ function Component({ collection, owner, ...nft }: Props) {
       close();
     };
 
-    sendMessage({ payload, onSuccess });
+    const onFinally = disableLoading;
+
+    sendMessage({ payload, onSuccess, onFinally });
   };
 
   const modalProps = { heading: 'Transfer NFT', close };
-  const formProps = { defaultValues, schema, onSubmit };
+  const formProps = { defaultValues, schema, isLoading, onSubmit };
 
   return isOwner && collection.transferable ? (
     <>
