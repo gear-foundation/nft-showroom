@@ -4,7 +4,7 @@ import { z } from 'zod';
 
 import { NFTActionFormModal, PriceInput, withAccount, withApi } from '@/components';
 import { Nft, Collection, CollectionType } from '@/graphql/graphql';
-import { useApprovedMessage, useIsOwner, useModal } from '@/hooks';
+import { useApprovedMessage, useIsOwner, useLoading, useModal } from '@/hooks';
 
 import TagSVG from '../../assets/tag.svg?react';
 import { usePriceSchema } from '../../hooks';
@@ -23,6 +23,7 @@ function Component({ collection, owner, ...nft }: Props) {
   const [isOpen, open, close] = useModal();
   const isOwner = useIsOwner(owner);
   const alert = useAlert();
+  const [isLoading, enableLoading, disableLoading] = useLoading();
 
   const { getPriceSchema } = usePriceSchema();
   const schema = z.object({ price: getPriceSchema() });
@@ -30,6 +31,8 @@ function Component({ collection, owner, ...nft }: Props) {
   const sendMessage = useApprovedMessage(collection.id, collection.type.id);
 
   const onSubmit = ({ price }: typeof defaultValues) => {
+    enableLoading();
+
     const tokenId = nft.idInCollection;
     const collectionAddress = collection.id;
 
@@ -40,11 +43,13 @@ function Component({ collection, owner, ...nft }: Props) {
       close();
     };
 
-    sendMessage({ payload, onSuccess });
+    const onFinally = disableLoading;
+
+    sendMessage({ payload, onSuccess, onFinally });
   };
 
   const modalProps = { heading: 'Start Sale', close };
-  const formProps = { defaultValues, schema, onSubmit };
+  const formProps = { defaultValues, schema, isLoading, onSubmit };
 
   return isOwner && collection.sellable ? (
     <>

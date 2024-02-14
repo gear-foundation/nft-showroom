@@ -122,7 +122,11 @@ function useApprovedMessage(collectionId: string, collectionTypeId: string) {
   const sendMarketplaceMessage = useMarketplaceMessage();
   const sendCollectionMessage = useCollectionMessage(collectionId, collectionTypeId);
 
-  return <T extends StartAuctionPayload | StartSalePayload>(args: { payload: T; onSuccess: () => void }) => {
+  return <T extends StartAuctionPayload | StartSalePayload>(args: {
+    payload: T;
+    onSuccess: () => void;
+    onFinally: () => void;
+  }) => {
     const to = ADDRESS.CONTRACT;
 
     const [{ tokenId }] = Object.values(args.payload) as unknown as

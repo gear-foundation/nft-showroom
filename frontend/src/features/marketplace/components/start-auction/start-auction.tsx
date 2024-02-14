@@ -4,7 +4,7 @@ import { z } from 'zod';
 
 import { NFTActionFormModal, PriceInput, withAccount, withApi } from '@/components';
 import { Collection, CollectionType, Nft } from '@/graphql/graphql';
-import { useApprovedMessage, useIsOwner, useModal } from '@/hooks';
+import { useApprovedMessage, useIsOwner, useLoading, useModal } from '@/hooks';
 
 import BidSVG from '../../assets/bid.svg?react';
 import { usePriceSchema } from '../../hooks';
@@ -27,6 +27,7 @@ function Component({ collection, owner, ...nft }: Props) {
   const [isOpen, open, close] = useModal();
   const isOwner = useIsOwner(owner);
   const alert = useAlert();
+  const [isLoading, enableLoading, disableLoading] = useLoading();
 
   const { getPriceSchema } = usePriceSchema();
   const schema = z.object({ minPrice: getPriceSchema(), duration: z.string() });
@@ -34,6 +35,8 @@ function Component({ collection, owner, ...nft }: Props) {
   const sendMessage = useApprovedMessage(collection.id, collection.type.id);
 
   const onSubmit = ({ minPrice, duration }: typeof defaultValues) => {
+    enableLoading();
+
     const collectionAddress = collection.id;
     const tokenId = nft.idInCollection;
     const durationMs = duration;
@@ -45,11 +48,13 @@ function Component({ collection, owner, ...nft }: Props) {
       close();
     };
 
-    sendMessage({ payload, onSuccess });
+    const onFinally = disableLoading;
+
+    sendMessage({ payload, onSuccess, onFinally });
   };
 
   const modalProps = { heading: 'Start Auction', close };
-  const formProps = { defaultValues, schema, onSubmit };
+  const formProps = { defaultValues, schema, isLoading, onSubmit };
 
   return isOwner && collection.sellable ? (
     <>

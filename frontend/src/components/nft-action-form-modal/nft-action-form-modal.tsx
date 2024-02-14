@@ -16,7 +16,7 @@ import styles from './nft-action-form-modal.module.scss';
 
 type Props<T> = {
   modal: Pick<ModalProps, 'heading' | 'close'>;
-  form: { defaultValues: DefaultValues<T>; onSubmit: (data: T) => void; schema?: ZodType };
+  form: { defaultValues: DefaultValues<T>; onSubmit: (data: T) => void; schema?: ZodType } & { isLoading: boolean };
   nft: Pick<Nft, 'name' | 'mediaUrl'>;
   collection: Pick<Collection, 'name'>;
   children: ReactNode;
@@ -25,7 +25,7 @@ type Props<T> = {
 
 function NFTActionFormModal<T extends FieldValues>({ modal, form, nft, collection, auction, children }: Props<T>) {
   const { heading, close } = modal;
-  const { defaultValues, schema, onSubmit } = form;
+  const { defaultValues, schema, isLoading, onSubmit } = form;
 
   const { getFormattedBalanceValue } = useBalanceFormat();
 
@@ -61,7 +61,7 @@ function NFTActionFormModal<T extends FieldValues>({ modal, form, nft, collectio
 
         <div className={styles.buttons}>
           <Button text="Cancel" color="grey" onClick={close} />
-          <Button type="submit" text="Submit" />
+          <Button type="submit" text="Submit" isLoading={isLoading} />
         </div>
       </Form>
     </Modal>
