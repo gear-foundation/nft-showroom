@@ -1,8 +1,10 @@
-import { useAccount, useBalanceFormat } from '@gear-js/react-hooks';
+import { useAccount, useAlert, useBalanceFormat } from '@gear-js/react-hooks';
 import { ModalProps } from '@gear-js/vara-ui';
 import { useState } from 'react';
+import { generatePath, useNavigate } from 'react-router-dom';
 
 import { Container } from '@/components';
+import { ROUTE } from '@/consts';
 import { useIPFS, useMetadata } from '@/context';
 import { useMarketplaceMessage } from '@/hooks';
 
@@ -13,7 +15,7 @@ import {
   DEFAULT_SUMMARY_VALUES,
   STEPS,
 } from '../../consts';
-import { NFT, NFTsValues, ParametersValues, SummaryValues } from '../../types';
+import { CreateCollectionReply, NFT, NFTsValues, ParametersValues, SummaryValues } from '../../types';
 import { FullScreenModal } from '../full-screen-modal';
 import { NFTForm } from '../nft-form';
 import { ParametersForm } from '../parameters-form';
@@ -28,10 +30,12 @@ function CreateSimpleCollectionModal({ close }: Pick<ModalProps, 'close'>) {
   const [parametersValues, setParametersValues] = useState(DEFAULT_PARAMETERS_VALUES);
   const [isLoading, setIsLoading] = useState(false);
 
-  const ipfs = useIPFS();
   const { account } = useAccount();
   const { getChainBalanceValue } = useBalanceFormat();
+  const alert = useAlert();
+  const navigate = useNavigate();
 
+  const ipfs = useIPFS();
   const { collectionsMetadata } = useMetadata();
   const collectionMetadata = collectionsMetadata?.[SIMPLE_COLLECTION_ID];
   const sendMessage = useMarketplaceMessage();
@@ -113,14 +117,23 @@ function CreateSimpleCollectionModal({ close }: Pick<ModalProps, 'close'>) {
   };
 
   const handleNFTsSubmit = async ({ nfts }: NFTsValues) => {
+    setIsLoading(true);
+
     const formPayload = await getFormPayload(nfts);
     const bytesPayload = getBytesPayload(formPayload);
     const payload = { CreateCollection: { typeName: COLLECTION_NAME, payload: bytesPayload } };
 
-    const onSuccess = close;
-    const onError = () => setIsLoading(false);
+    const onSuccess = ({ collectionCreated }: CreateCollectionReply) => {
+      const id = collectionCreated.collectionAddress;
+      const url = generatePath(ROUTE.COLLECTION, { id });
 
-    sendMessage({ payload, onSuccess, onError });
+      navigate(url);
+      alert.success('Collection created');
+    };
+
+    const onFinally = () => setIsLoading(false);
+
+    sendMessage({ payload, onSuccess, onFinally });
   };
 
   const getForm = () => {

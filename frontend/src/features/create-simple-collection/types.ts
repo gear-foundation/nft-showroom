@@ -28,4 +28,17 @@ type NFTsValues = {
   nfts: NFT[];
 };
 
-export type { SummaryValues, ParametersValues, NFT, NFTsValues };
+type CreateCollectionPayload = {
+  CreateCollection: {
+    typeName: string;
+    payload: number[];
+  };
+};
+
+type CreateCollectionReply = {
+  collectionCreated: {
+    collectionAddress: string;
+  };
+};
+
+export type { SummaryValues, ParametersValues, NFT, NFTsValues, CreateCollectionPayload, CreateCollectionReply };
