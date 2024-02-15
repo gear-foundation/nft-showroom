@@ -205,6 +205,10 @@ export enum AuctionOrderByInput {
   NftMetadataAscNullsFirst = 'nft_metadata_ASC_NULLS_FIRST',
   NftMetadataDesc = 'nft_metadata_DESC',
   NftMetadataDescNullsLast = 'nft_metadata_DESC_NULLS_LAST',
+  NftMintedByAsc = 'nft_mintedBy_ASC',
+  NftMintedByAscNullsFirst = 'nft_mintedBy_ASC_NULLS_FIRST',
+  NftMintedByDesc = 'nft_mintedBy_DESC',
+  NftMintedByDescNullsLast = 'nft_mintedBy_DESC_NULLS_LAST',
   NftNameAsc = 'nft_name_ASC',
   NftNameAscNullsFirst = 'nft_name_ASC_NULLS_FIRST',
   NftNameDesc = 'nft_name_DESC',
@@ -1602,6 +1606,7 @@ export type Nft = {
   idInCollection: Scalars['Int']['output'];
   mediaUrl: Scalars['String']['output'];
   metadata: Maybe<Scalars['String']['output']>;
+  mintedBy: Scalars['String']['output'];
   name: Scalars['String']['output'];
   offers: Array<Offer>;
   onSale: Scalars['Boolean']['output'];
@@ -1742,6 +1747,10 @@ export enum NftOrderByInput {
   MetadataAscNullsFirst = 'metadata_ASC_NULLS_FIRST',
   MetadataDesc = 'metadata_DESC',
   MetadataDescNullsLast = 'metadata_DESC_NULLS_LAST',
+  MintedByAsc = 'mintedBy_ASC',
+  MintedByAscNullsFirst = 'mintedBy_ASC_NULLS_FIRST',
+  MintedByDesc = 'mintedBy_DESC',
+  MintedByDescNullsLast = 'mintedBy_DESC_NULLS_LAST',
   NameAsc = 'name_ASC',
   NameAscNullsFirst = 'name_ASC_NULLS_FIRST',
   NameDesc = 'name_DESC',
@@ -1871,6 +1880,23 @@ export type NftWhereInput = {
   metadata_not_in: InputMaybe<Array<Scalars['String']['input']>>;
   metadata_not_startsWith: InputMaybe<Scalars['String']['input']>;
   metadata_startsWith: InputMaybe<Scalars['String']['input']>;
+  mintedBy_contains: InputMaybe<Scalars['String']['input']>;
+  mintedBy_containsInsensitive: InputMaybe<Scalars['String']['input']>;
+  mintedBy_endsWith: InputMaybe<Scalars['String']['input']>;
+  mintedBy_eq: InputMaybe<Scalars['String']['input']>;
+  mintedBy_gt: InputMaybe<Scalars['String']['input']>;
+  mintedBy_gte: InputMaybe<Scalars['String']['input']>;
+  mintedBy_in: InputMaybe<Array<Scalars['String']['input']>>;
+  mintedBy_isNull: InputMaybe<Scalars['Boolean']['input']>;
+  mintedBy_lt: InputMaybe<Scalars['String']['input']>;
+  mintedBy_lte: InputMaybe<Scalars['String']['input']>;
+  mintedBy_not_contains: InputMaybe<Scalars['String']['input']>;
+  mintedBy_not_containsInsensitive: InputMaybe<Scalars['String']['input']>;
+  mintedBy_not_endsWith: InputMaybe<Scalars['String']['input']>;
+  mintedBy_not_eq: InputMaybe<Scalars['String']['input']>;
+  mintedBy_not_in: InputMaybe<Array<Scalars['String']['input']>>;
+  mintedBy_not_startsWith: InputMaybe<Scalars['String']['input']>;
+  mintedBy_startsWith: InputMaybe<Scalars['String']['input']>;
   name_contains: InputMaybe<Scalars['String']['input']>;
   name_containsInsensitive: InputMaybe<Scalars['String']['input']>;
   name_endsWith: InputMaybe<Scalars['String']['input']>;
@@ -1995,6 +2021,10 @@ export enum OfferOrderByInput {
   NftMetadataAscNullsFirst = 'nft_metadata_ASC_NULLS_FIRST',
   NftMetadataDesc = 'nft_metadata_DESC',
   NftMetadataDescNullsLast = 'nft_metadata_DESC_NULLS_LAST',
+  NftMintedByAsc = 'nft_mintedBy_ASC',
+  NftMintedByAscNullsFirst = 'nft_mintedBy_ASC_NULLS_FIRST',
+  NftMintedByDesc = 'nft_mintedBy_DESC',
+  NftMintedByDescNullsLast = 'nft_mintedBy_DESC_NULLS_LAST',
   NftNameAsc = 'nft_name_ASC',
   NftNameAscNullsFirst = 'nft_name_ASC_NULLS_FIRST',
   NftNameDesc = 'nft_name_DESC',
@@ -2565,6 +2595,10 @@ export enum SaleOrderByInput {
   NftMetadataAscNullsFirst = 'nft_metadata_ASC_NULLS_FIRST',
   NftMetadataDesc = 'nft_metadata_DESC',
   NftMetadataDescNullsLast = 'nft_metadata_DESC_NULLS_LAST',
+  NftMintedByAsc = 'nft_mintedBy_ASC',
+  NftMintedByAscNullsFirst = 'nft_mintedBy_ASC_NULLS_FIRST',
+  NftMintedByDesc = 'nft_mintedBy_DESC',
+  NftMintedByDescNullsLast = 'nft_mintedBy_DESC_NULLS_LAST',
   NftNameAsc = 'nft_name_ASC',
   NftNameAscNullsFirst = 'nft_name_ASC_NULLS_FIRST',
   NftNameDesc = 'nft_name_DESC',
@@ -2954,6 +2988,10 @@ export enum TransferOrderByInput {
   NftMetadataAscNullsFirst = 'nft_metadata_ASC_NULLS_FIRST',
   NftMetadataDesc = 'nft_metadata_DESC',
   NftMetadataDescNullsLast = 'nft_metadata_DESC_NULLS_LAST',
+  NftMintedByAsc = 'nft_mintedBy_ASC',
+  NftMintedByAscNullsFirst = 'nft_mintedBy_ASC_NULLS_FIRST',
+  NftMintedByDesc = 'nft_mintedBy_DESC',
+  NftMintedByDescNullsLast = 'nft_mintedBy_DESC_NULLS_LAST',
   NftNameAsc = 'nft_name_ASC',
   NftNameAscNullsFirst = 'nft_name_ASC_NULLS_FIRST',
   NftNameDesc = 'nft_name_DESC',
@@ -3098,7 +3136,7 @@ export type CollectionQuerySubscriptionVariables = Exact<{
 }>;
 
 
-export type CollectionQuerySubscription = { __typename?: 'Subscription', collectionById: { __typename?: 'Collection', id: string, name: string, description: string, collectionBanner: string, collectionLogo: string, admin: string, tokensLimit: string | null, paymentForMint: string, transferable: string | null, sellable: string | null, nfts: Array<{ __typename?: 'Nft', id: string, idInCollection: number, name: string, mediaUrl: string, owner: string, sales: Array<{ __typename?: 'Sale', price: string }>, auctions: Array<{ __typename?: 'Auction', minPrice: string, lastPrice: string | null, endTimestamp: string | null }> }>, type: { __typename?: 'CollectionType', id: string }, additionalLinks: { __typename?: 'AdditionalLinks', discord: string | null, externalUrl: string | null, medium: string | null, xcom: string | null, telegram: string | null } | null } | null };
+export type CollectionQuerySubscription = { __typename?: 'Subscription', collectionById: { __typename?: 'Collection', id: string, name: string, description: string, collectionBanner: string, collectionLogo: string, admin: string, tokensLimit: string | null, userMintLimit: string | null, paymentForMint: string, transferable: string | null, sellable: string | null, nfts: Array<{ __typename?: 'Nft', id: string, idInCollection: number, name: string, mediaUrl: string, owner: string, mintedBy: string, sales: Array<{ __typename?: 'Sale', price: string }>, auctions: Array<{ __typename?: 'Auction', minPrice: string, lastPrice: string | null, endTimestamp: string | null }> }>, type: { __typename?: 'CollectionType', id: string }, additionalLinks: { __typename?: 'AdditionalLinks', discord: string | null, externalUrl: string | null, medium: string | null, xcom: string | null, telegram: string | null } | null } | null };
 
 export type CollectionsQuerySubscriptionVariables = Exact<{ [key: string]: never; }>;
 
@@ -3119,7 +3157,7 @@ export type NftQuerySubscription = { __typename?: 'Subscription', nftById: { __t
 
 
 export const MarketplaceQueryDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"MarketplaceQuery"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"marketplaceById"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"StringValue","value":"1","block":false}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"metadata"}},{"kind":"Field","name":{"kind":"Name","value":"collectionTypes"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"description"}},{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"metaUrl"}},{"kind":"Field","name":{"kind":"Name","value":"type"}}]}}]}}]}}]} as unknown as DocumentNode<MarketplaceQueryQuery, MarketplaceQueryQueryVariables>;
-export const CollectionQueryDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"subscription","name":{"kind":"Name","value":"CollectionQuery"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"collectionById"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"description"}},{"kind":"Field","name":{"kind":"Name","value":"collectionBanner"}},{"kind":"Field","name":{"kind":"Name","value":"collectionLogo"}},{"kind":"Field","name":{"kind":"Name","value":"admin"}},{"kind":"Field","name":{"kind":"Name","value":"tokensLimit"}},{"kind":"Field","name":{"kind":"Name","value":"paymentForMint"}},{"kind":"Field","name":{"kind":"Name","value":"transferable"}},{"kind":"Field","name":{"kind":"Name","value":"sellable"}},{"kind":"Field","name":{"kind":"Name","value":"nfts"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"idInCollection"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"mediaUrl"}},{"kind":"Field","name":{"kind":"Name","value":"owner"}},{"kind":"Field","name":{"kind":"Name","value":"sales"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"status_eq"},"value":{"kind":"StringValue","value":"open","block":false}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"price"}}]}},{"kind":"Field","name":{"kind":"Name","value":"auctions"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"status_eq"},"value":{"kind":"StringValue","value":"open","block":false}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"minPrice"}},{"kind":"Field","name":{"kind":"Name","value":"lastPrice"}},{"kind":"Field","name":{"kind":"Name","value":"endTimestamp"}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"type"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}},{"kind":"Field","name":{"kind":"Name","value":"additionalLinks"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"discord"}},{"kind":"Field","name":{"kind":"Name","value":"externalUrl"}},{"kind":"Field","name":{"kind":"Name","value":"medium"}},{"kind":"Field","name":{"kind":"Name","value":"xcom"}},{"kind":"Field","name":{"kind":"Name","value":"telegram"}}]}}]}}]}}]} as unknown as DocumentNode<CollectionQuerySubscription, CollectionQuerySubscriptionVariables>;
+export const CollectionQueryDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"subscription","name":{"kind":"Name","value":"CollectionQuery"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"collectionById"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"description"}},{"kind":"Field","name":{"kind":"Name","value":"collectionBanner"}},{"kind":"Field","name":{"kind":"Name","value":"collectionLogo"}},{"kind":"Field","name":{"kind":"Name","value":"admin"}},{"kind":"Field","name":{"kind":"Name","value":"tokensLimit"}},{"kind":"Field","name":{"kind":"Name","value":"userMintLimit"}},{"kind":"Field","name":{"kind":"Name","value":"paymentForMint"}},{"kind":"Field","name":{"kind":"Name","value":"transferable"}},{"kind":"Field","name":{"kind":"Name","value":"sellable"}},{"kind":"Field","name":{"kind":"Name","value":"nfts"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"idInCollection"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"mediaUrl"}},{"kind":"Field","name":{"kind":"Name","value":"owner"}},{"kind":"Field","name":{"kind":"Name","value":"mintedBy"}},{"kind":"Field","name":{"kind":"Name","value":"sales"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"status_eq"},"value":{"kind":"StringValue","value":"open","block":false}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"price"}}]}},{"kind":"Field","name":{"kind":"Name","value":"auctions"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"status_eq"},"value":{"kind":"StringValue","value":"open","block":false}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"minPrice"}},{"kind":"Field","name":{"kind":"Name","value":"lastPrice"}},{"kind":"Field","name":{"kind":"Name","value":"endTimestamp"}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"type"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}},{"kind":"Field","name":{"kind":"Name","value":"additionalLinks"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"discord"}},{"kind":"Field","name":{"kind":"Name","value":"externalUrl"}},{"kind":"Field","name":{"kind":"Name","value":"medium"}},{"kind":"Field","name":{"kind":"Name","value":"xcom"}},{"kind":"Field","name":{"kind":"Name","value":"telegram"}}]}}]}}]}}]} as unknown as DocumentNode<CollectionQuerySubscription, CollectionQuerySubscriptionVariables>;
 export const CollectionsQueryDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"subscription","name":{"kind":"Name","value":"CollectionsQuery"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"collections"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"description"}},{"kind":"Field","name":{"kind":"Name","value":"collectionBanner"}},{"kind":"Field","name":{"kind":"Name","value":"collectionLogo"}},{"kind":"Field","name":{"kind":"Name","value":"admin"}},{"kind":"Field","name":{"kind":"Name","value":"tokensLimit"}},{"kind":"Field","name":{"kind":"Name","value":"nfts"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"mediaUrl"}}]}}]}}]}}]} as unknown as DocumentNode<CollectionsQuerySubscription, CollectionsQuerySubscriptionVariables>;
 export const NfTsQueryDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"subscription","name":{"kind":"Name","value":"NFTsQuery"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"nfts"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"idInCollection"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"mediaUrl"}},{"kind":"Field","name":{"kind":"Name","value":"owner"}},{"kind":"Field","name":{"kind":"Name","value":"collection"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"transferable"}},{"kind":"Field","name":{"kind":"Name","value":"sellable"}}]}},{"kind":"Field","name":{"kind":"Name","value":"sales"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"status_eq"},"value":{"kind":"StringValue","value":"open","block":false}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"price"}}]}},{"kind":"Field","name":{"kind":"Name","value":"auctions"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"status_eq"},"value":{"kind":"StringValue","value":"open","block":false}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"minPrice"}},{"kind":"Field","name":{"kind":"Name","value":"lastPrice"}},{"kind":"Field","name":{"kind":"Name","value":"endTimestamp"}}]}}]}}]}}]} as unknown as DocumentNode<NfTsQuerySubscription, NfTsQuerySubscriptionVariables>;
 export const NftQueryDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"subscription","name":{"kind":"Name","value":"NFTQuery"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"nftById"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"idInCollection"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"description"}},{"kind":"Field","name":{"kind":"Name","value":"mediaUrl"}},{"kind":"Field","name":{"kind":"Name","value":"owner"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"collection"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"royalty"}},{"kind":"Field","name":{"kind":"Name","value":"sellable"}},{"kind":"Field","name":{"kind":"Name","value":"transferable"}},{"kind":"Field","name":{"kind":"Name","value":"type"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"sales"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"status_eq"},"value":{"kind":"StringValue","value":"open","block":false}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"price"}}]}},{"kind":"Field","name":{"kind":"Name","value":"auctions"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"status_eq"},"value":{"kind":"StringValue","value":"open","block":false}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"minPrice"}},{"kind":"Field","name":{"kind":"Name","value":"lastPrice"}},{"kind":"Field","name":{"kind":"Name","value":"endTimestamp"}}]}}]}}]}}]} as unknown as DocumentNode<NftQuerySubscription, NftQuerySubscriptionVariables>;
