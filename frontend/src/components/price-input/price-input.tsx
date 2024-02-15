@@ -1,12 +1,9 @@
-import { Input, InputProps } from '@gear-js/vara-ui';
-import { ForwardedRef, forwardRef } from 'react';
-
 import VaraSVG from '@/assets/vara.svg?react';
 
-function Component(props: Omit<InputProps, 'type' | 'icon'>, ref: ForwardedRef<HTMLInputElement>) {
-  return <Input type="number" step="any" icon={VaraSVG} {...props} ref={ref} />;
-}
+import { Input, InputProps } from '../form';
 
-const PriceInput = forwardRef(Component);
+function PriceInput(props: Omit<InputProps, 'type' | 'icon'>) {
+  return <Input type="number" step="any" icon={VaraSVG} {...props} />;
+}
 
 export { PriceInput };

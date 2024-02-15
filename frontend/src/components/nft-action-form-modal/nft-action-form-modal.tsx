@@ -14,9 +14,9 @@ import { PriceInfoCard } from '../price-info-card';
 import CalendarSVG from './calendar.svg?react';
 import styles from './nft-action-form-modal.module.scss';
 
-type Props<T> = {
+type Props<T extends FieldValues> = {
   modal: Pick<ModalProps, 'heading' | 'close'>;
-  form: { defaultValues: DefaultValues<T>; onSubmit: (data: T) => void; schema?: ZodType } & { isLoading: boolean };
+  form: { defaultValues: DefaultValues<T>; onSubmit: (data: T) => void; schema: ZodType } & { isLoading: boolean };
   nft: Pick<Nft, 'name' | 'mediaUrl'>;
   collection: Pick<Collection, 'name'>;
   children: ReactNode;

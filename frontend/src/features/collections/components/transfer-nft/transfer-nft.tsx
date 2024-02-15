@@ -1,9 +1,9 @@
 import { decodeAddress } from '@gear-js/api';
 import { useAlert } from '@gear-js/react-hooks';
-import { Button, Input } from '@gear-js/vara-ui';
+import { Button } from '@gear-js/vara-ui';
 import { z } from 'zod';
 
-import { NFTActionFormModal, withAccount } from '@/components';
+import { Input, NFTActionFormModal, withAccount } from '@/components';
 import { Collection, CollectionType, Nft } from '@/graphql/graphql';
 import { useCollectionMessage, useIsOwner, useLoading, useModal } from '@/hooks';
 
