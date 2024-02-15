@@ -1,3 +1,4 @@
+import { useAlert } from '@gear-js/react-hooks';
 import { Button, Input, Textarea } from '@gear-js/vara-ui';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
@@ -39,6 +40,8 @@ const schema = z.object({
 const resolver = zodResolver(schema);
 
 function SummaryForm({ defaultValues, onSubmit, onBack }: Props) {
+  const alert = useAlert();
+
   const { register, handleSubmit, formState } = useForm({ defaultValues, resolver });
   const { errors } = formState;
 
@@ -50,7 +53,11 @@ function SummaryForm({ defaultValues, onSubmit, onBack }: Props) {
 
   return (
     <form
-      onSubmit={handleSubmit((data) => onSubmit({ ...data, cover: cover.value, logo: logo.value }))}
+      onSubmit={handleSubmit((data) => {
+        if (!cover.value || !logo.value) return alert.error('Cover and logo are required');
+
+        onSubmit({ ...data, cover: cover.value, logo: logo.value });
+      })}
       className={styles.form}>
       <Container>
         <header className={styles.header}>
