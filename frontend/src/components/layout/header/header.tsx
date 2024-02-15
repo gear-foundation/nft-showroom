@@ -3,7 +3,7 @@ import { useAccount } from '@gear-js/react-hooks';
 import { ROUTE } from '@/consts';
 import { Wallet, Balance } from '@/features/wallet';
 
-import { ButtonLink } from '../button-link';
+import { ButtonLink } from '../../button-link';
 import { Container } from '../container';
 import { Logo } from '../logo';
 
