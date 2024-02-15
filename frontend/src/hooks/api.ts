@@ -8,6 +8,7 @@ import { useMetadata } from '@/context';
 import { ApproveNFTPayload, MintNFTPayload, TransferNFTPayload } from '@/features/collections';
 import { CreateCollectionPayload, CreateCollectionReply } from '@/features/create-simple-collection';
 import { BuyNFTPayload, MakeBidPayload, StartAuctionPayload, StartSalePayload } from '@/features/marketplace';
+import { isObject } from '@/utils';
 
 type Payload =
   | CreateCollectionPayload
@@ -58,42 +59,49 @@ const useSendMessageWithReply = (...args: Parameters<typeof useSendMessageHandle
     if (!isApiReady) throw new Error('API is not initialized');
     if (!account) throw new Error('Account is not found');
 
-    const [address, metadata] = args;
+    const [programId, metadata] = args;
     let unsub: UnsubscribePromise | undefined = undefined;
 
     const _onFinally = () => {
       onFinally();
 
-      unsub?.then((unsubCallback) => unsubCallback()).catch((error: Error) => alert.error(error.message));
+      // for dev purposes only, since unsub is tricky
+      if (!unsub) throw new Error('Failed to unsubscribe from reply');
+
+      unsub.then((unsubCallback) => unsubCallback()).catch((error: Error) => alert.error(error.message));
     };
 
     const handleUserMessageSent = ({ data }: UserMessageSent) => {
-      if (!metadata) throw new Error('Metadata is not found');
+      try {
+        if (!metadata) throw new Error('Failed to get transaction result: metadata is not found');
 
-      const typeIndex = metadata.types.handle.output;
-      if (typeIndex === null) throw new Error('handle.output type index is not found');
+        const typeIndex = metadata.types.handle.output;
+        if (typeIndex === null)
+          throw new Error('Failed to get transaction result: handle.output type index is not found');
 
-      const { message } = data;
-      // TODO: error if details.isSome && !details.unwrap().isSuccess
-      const { source, destination, payload } = message;
+        const { message } = data;
+        const { source, destination, payload, details } = message;
 
-      if (source.toHex() !== address || destination.toHex() !== account.decodedAddress) return;
+        if (source.toHex() !== programId || destination.toHex() !== account.decodedAddress) return;
 
-      const decodedPayload = metadata.createType(typeIndex, payload).toJSON();
+        const isSuccess = details.isSome ? details.unwrap().code.isSuccess : true;
+        if (!isSuccess) throw new Error(payload.toHuman()?.toString());
 
-      const isPayloadObject =
-        typeof decodedPayload === 'object' && !Array.isArray(decodedPayload) && decodedPayload !== null;
+        const decodedPayload = metadata.createType(typeIndex, payload).toJSON();
 
-      if (!isPayloadObject) return;
+        if (!isObject(decodedPayload)) throw new Error('Failed to get transaction result: payload is not an object');
 
-      const isSuccessPayload = Object.prototype.hasOwnProperty.call(decodedPayload, 'ok');
-      const isErrorPayload = Object.prototype.hasOwnProperty.call(decodedPayload, 'err');
+        const isErrorPayload = Object.prototype.hasOwnProperty.call(decodedPayload, 'err');
+        if (isErrorPayload) throw new Error(decodedPayload.err?.toString());
 
-      if (isSuccessPayload) {
+        const isSuccessPayload = Object.prototype.hasOwnProperty.call(decodedPayload, 'ok');
+        if (!isSuccessPayload) throw new Error('Failed to get transaction result: ok property is not found');
+
         onSuccess(decodedPayload.ok as Reply<T>);
+      } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : String(error);
+        alert.error(errorMessage);
       }
-
-      if (isErrorPayload) alert.error(decodedPayload.err?.toString());
 
       _onFinally();
     };
