@@ -1,15 +1,15 @@
+import { useAlert } from '@gear-js/react-hooks';
 import { Button } from '@gear-js/vara-ui';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useEffect } from 'react';
+import { ChangeEvent, useRef } from 'react';
 import { useFieldArray, useForm } from 'react-hook-form';
 import { z } from 'zod';
 
 import { Container } from '@/components';
 
-import { IMAGE_TYPES } from '../../consts';
-import { useImageInput } from '../../hooks';
+import { IMAGE_TYPES, MAX_IMAGE_SIZE_MB } from '../../consts';
 import { NFTsValues } from '../../types';
-import { getFileUrl } from '../../utils';
+import { getBytesSize, getFileUrl } from '../../utils';
 import { NFT } from '../nft';
 
 import styles from './nft-form.module.scss';
@@ -37,19 +37,27 @@ function NFTForm({ defaultValues, isLoading, onSubmit, onBack }: Props) {
   const { fields, append, remove } = useFieldArray({ control, name: 'nfts' });
   const nftsCount = fields.length;
 
-  const image = useImageInput(undefined, IMAGE_TYPES);
+  const alert = useAlert();
 
-  useEffect(() => {
-    if (!image.value) return;
+  const inputRef = useRef<HTMLInputElement>(null);
+  const handleInputClick = () => inputRef?.current?.click();
+  const handleInputChange = ({ target }: ChangeEvent<HTMLInputElement>) => {
+    const files = [...(target.files || [])];
 
-    const file = image.value;
-    const limit = '';
+    files.forEach((file) => {
+      const { type, size, name } = file;
 
-    append({ file, limit });
-    image.handleReset();
-  }, [image, append, setValue]);
+      const isValid = size <= getBytesSize(MAX_IMAGE_SIZE_MB) && IMAGE_TYPES.includes(type);
+      if (!isValid) return alert.error(`${name} - max size is exceeded or wrong format`);
 
-  const getNfts = () =>
+      const limit = '';
+      append({ file, limit });
+    });
+
+    target.value = '';
+  };
+
+  const renderNfts = () =>
     fields.map(({ id, file }, index) => {
       const inputName = `nfts.${index}.limit` as const;
 
@@ -71,14 +79,22 @@ function NFTForm({ defaultValues, isLoading, onSubmit, onBack }: Props) {
           <h4 className={styles.heading}>NFTs added: {nftsCount}</h4>
 
           <div className={styles.file}>
-            <input type="file" className={styles.fileInput} {...image.props} />
-            <Button text="Select File" size="small" color="dark" onClick={image.handleClick} />
+            <input
+              type="file"
+              className={styles.fileInput}
+              ref={inputRef}
+              onChange={handleInputChange}
+              accept={IMAGE_TYPES.join(',')}
+              multiple
+            />
+
+            <Button text="Select File" size="small" color="dark" onClick={handleInputClick} />
 
             <p>File formats: .jpg, .jpeg, .png. Max size: 5mb</p>
           </div>
         </header>
 
-        <ul className={styles.nfts}>{getNfts()}</ul>
+        <ul className={styles.nfts}>{renderNfts()}</ul>
 
         <Container maxWidth="sm" className={styles.buttons}>
           <Button text="Back" color="border" onClick={onBack} />
