@@ -1,4 +1,5 @@
 import { Breadcrumbs } from './breadcrumbs';
+import { ButtonLink } from './button-link';
 import { CopyButton } from './copy-button';
 import { FilterButton } from './filter-button';
 import { Form, Input, Checkbox, Radio, Select, Textarea } from './form';
@@ -37,6 +38,7 @@ export {
   Radio,
   Select,
   Textarea,
+  ButtonLink,
 };
 
 export type { InfoCardProps };
