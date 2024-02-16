@@ -2,7 +2,7 @@ import { useAccount } from '@gear-js/react-hooks';
 import { Identicon } from '@polkadot/react-identicon';
 import { generatePath, useParams } from 'react-router-dom';
 
-import { Breadcrumbs, Container, ResponsiveSquareImage, Tabs } from '@/components';
+import { Breadcrumbs, Container, CopyButton, ResponsiveSquareImage, Skeleton, Tabs } from '@/components';
 import { ROUTE } from '@/consts';
 import { TransferNFT } from '@/features/collections';
 import { BuyNFT, MakeBid, StartSale, StartAuction } from '@/features/marketplace';
@@ -14,7 +14,6 @@ import { ListingCard } from './components';
 import { useNFT } from './hooks';
 import InfoSVG from './info.svg?react';
 import styles from './nft.module.scss';
-import { getDetailEntries } from './utils';
 
 const TABS = ['Overview', 'Properties', 'Activities'];
 
@@ -29,22 +28,13 @@ function NFT() {
   const { collectionId, id } = useParams() as Params;
   const nft = useNFT(collectionId, id);
 
-  if (!nft) return null;
-  const { owner, name, collection, mediaUrl, description, createdAt, sales, auctions } = nft;
-  const { name: collectionName, royalty } = collection;
+  const { owner, name, collection, mediaUrl, description, createdAt, sales, auctions } = nft || {};
+  const { name: collectionName, royalty } = collection || {};
 
-  const [sale] = sales;
-  const [auction] = auctions;
+  const [sale] = sales || [];
+  const [auction] = auctions || [];
 
   const isOwner = account?.decodedAddress === owner;
-
-  const getDetails = () =>
-    getDetailEntries(collectionId, id, 'gNFT', createdAt, royalty).map(({ key, value }) => (
-      <li key={key} className={styles.row}>
-        <span>{key}:</span>
-        <span className={styles.value}>{value}</span>
-      </li>
-    ));
 
   return (
     <Container>
@@ -56,30 +46,48 @@ function NFT() {
       />
 
       <div className={styles.container}>
-        <ResponsiveSquareImage src={getIpfsLink(mediaUrl)} rounded />
+        {mediaUrl ? (
+          <ResponsiveSquareImage src={getIpfsLink(mediaUrl)} rounded />
+        ) : (
+          <Skeleton borderRadius="24px">
+            <ResponsiveSquareImage src="" rounded />
+          </Skeleton>
+        )}
 
         <div>
-          <h2 className={styles.name}>{name}</h2>
-          <p className={styles.description}>{description}</p>
+          <h2 className={styles.name}>{name || <Skeleton width="50%" borderRadius="4px" />}</h2>
+
+          <p className={styles.description}>
+            {description || <Skeleton width="100%" height="10rem" borderRadius="4px" />}
+          </p>
 
           <div className={styles.owner}>
-            <Identicon value={owner} size={24} theme="polkadot" />
+            {owner ? (
+              <Identicon value={owner} size={24} theme="polkadot" />
+            ) : (
+              <Skeleton borderRadius="50%">
+                <Identicon value={owner} size={24} theme="polkadot" />
+              </Skeleton>
+            )}
 
-            <p className={styles.ownerText}>
-              Owned by <span className={styles.ownerAddress}>{owner}</span>
-            </p>
+            {owner ? (
+              <p className={styles.ownerText}>
+                Owned by <span className={styles.ownerAddress}>{owner}</span>
+              </p>
+            ) : (
+              <Skeleton width="100%" borderRadius="4px" />
+            )}
           </div>
 
-          {sale && (
+          {nft && sale && (
             <ListingCard SVG={TagSVG} heading="Sale is Active" price={sale.price} priceHeading="Price">
               <BuyNFT {...{ ...nft, sale }} />
             </ListingCard>
           )}
 
-          {auction && (
+          {nft && auction && (
             <ListingCard
               SVG={BidSVG}
-              // TODOINDEXER:
               heading={`Auction Ends: ${new Date(auction.endTimestamp!).toLocaleString()}`}
               price={auction.lastPrice || auction.minPrice}
               priceHeading={auction.lastPrice ? 'Current bid' : 'Minimum bid'}>
@@ -87,7 +95,7 @@ function NFT() {
             </ListingCard>
           )}
 
-          {isOwner && collection.transferable && !sale && !auction && (
+          {nft && collection && isOwner && collection.transferable && !sale && !auction && (
             <div className={styles.buttons}>
               <StartSale {...nft} />
               <StartAuction {...nft} />
@@ -103,7 +111,39 @@ function NFT() {
                 <InfoSVG /> Details
               </h3>
 
-              <ul className={styles.table}>{getDetails()}</ul>
+              <ul className={styles.table}>
+                <li className={styles.row}>
+                  <span>Contract Address:</span>
+                  <span className={styles.value}>
+                    <span className={styles.address}>{collectionId}</span>
+                    <CopyButton value={collectionId} />
+                  </span>
+                </li>
+
+                <li className={styles.row}>
+                  <span>Token ID:</span>
+                  <span className={styles.value}>{id}</span>
+                </li>
+
+                <li className={styles.row}>
+                  <span>Token Standart:</span>
+                  <span className={styles.value}>gNFT</span>
+                </li>
+
+                <li className={styles.row}>
+                  <span>Mint Date:</span>
+                  <span className={styles.value}>
+                    {createdAt ? new Date(createdAt).toLocaleString() : <Skeleton width="25%" borderRadius="4px" />}
+                  </span>
+                </li>
+
+                <li className={styles.row}>
+                  <span>Creator Earnings:</span>
+                  <span className={styles.value}>
+                    {royalty !== undefined ? `${royalty}%` : <Skeleton width="25%" borderRadius="4px" />}
+                  </span>
+                </li>
+              </ul>
             </div>
           </div>
         </div>

@@ -7,7 +7,7 @@ type Props = ButtonProps & {
   to: string;
 };
 
-function ButtonLink({
+function LinkButton({
   to,
   children,
   color = 'primary',
@@ -42,4 +42,4 @@ function ButtonLink({
   );
 }
 
-export { ButtonLink };
+export { LinkButton };

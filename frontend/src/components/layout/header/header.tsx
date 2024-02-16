@@ -3,7 +3,7 @@ import { useAccount } from '@gear-js/react-hooks';
 import { ROUTE } from '@/consts';
 import { Wallet, Balance } from '@/features/wallet';
 
-import { ButtonLink } from '../button-link';
+import { LinkButton } from '../../buttons';
 import { Container } from '../container';
 import { Logo } from '../logo';
 
@@ -21,7 +21,7 @@ function Header() {
           <Balance />
 
           <div className={styles.buttons}>
-            {account && <ButtonLink to={ROUTE.CREATE_COLLECTION} text="Create" />}
+            {account && <LinkButton to={ROUTE.CREATE_COLLECTION} text="Create" />}
 
             <Wallet />
           </div>

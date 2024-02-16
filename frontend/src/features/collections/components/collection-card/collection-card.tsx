@@ -29,6 +29,7 @@ function CollectionCard({ id, name, collectionBanner, collectionLogo, admin, tok
       ));
 
   return (
+    // TODO: get rid of li
     <li className={styles.collection}>
       <Link to={generatePath(ROUTE.COLLECTION, { id })}>
         <div className={styles.cover}>
