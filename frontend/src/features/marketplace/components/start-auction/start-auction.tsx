@@ -1,8 +1,8 @@
 import { useAlert } from '@gear-js/react-hooks';
-import { Button, Select } from '@gear-js/vara-ui';
+import { Button } from '@gear-js/vara-ui';
 import { z } from 'zod';
 
-import { NFTActionFormModal, PriceInput, withAccount, withApi } from '@/components';
+import { NFTActionFormModal, PriceInput, Select, withAccount, withApi } from '@/components';
 import { Collection, CollectionType, Nft } from '@/graphql/graphql';
 import { useApprovedMessage, useIsOwner, useLoading, useModal } from '@/hooks';
 

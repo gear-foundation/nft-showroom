@@ -25,6 +25,7 @@ function NFTCard({ sales, auctions, ...nft }: Props) {
   const { getFormattedBalanceValue } = useBalanceFormat();
 
   return (
+    // TODO: get rid of li
     <li className={styles.nft}>
       <header>
         <Link to={generatePath(ROUTE.NFT, { collectionId: collection.id, id: idInCollection })}>

@@ -23,6 +23,7 @@ const COLLECTION_QUERY = graphql(`
       collectionLogo
       admin
       tokensLimit
+      userMintLimit
       paymentForMint
       transferable
       sellable
@@ -33,6 +34,7 @@ const COLLECTION_QUERY = graphql(`
         name
         mediaUrl
         owner
+        mintedBy
 
         sales(where: { status_eq: "open" }) {
           price

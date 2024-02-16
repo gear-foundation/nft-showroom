@@ -17,4 +17,7 @@ const getIpfsLink = (value: string) => {
   return `${ADDRESS.IPFS_GATEWAY}/${cid}`;
 };
 
-export { cx, getTypedEntries, getIpfsLink };
+const isObject = (value: unknown): value is Record<string, unknown> =>
+  typeof value === 'object' && !Array.isArray(value) && value !== null;
+
+export { cx, getTypedEntries, getIpfsLink, isObject };
