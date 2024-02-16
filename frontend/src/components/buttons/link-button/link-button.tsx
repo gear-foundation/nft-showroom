@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 
 import { cx } from '@/utils';
 
-type Props = ButtonProps & {
+type Props = Omit<ButtonProps, 'onClick'> & {
   to: string;
 };
 

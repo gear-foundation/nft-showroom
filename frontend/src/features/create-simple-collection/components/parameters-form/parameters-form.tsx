@@ -6,10 +6,10 @@ import { z } from 'zod';
 
 import VaraSVG from '@/assets/vara.svg?react';
 import { Container } from '@/components';
+import { useChangeEffect } from '@/hooks';
 
 import CrossSVG from '../../assets/cross-tag.svg?react';
 import PercentSVG from '../../assets/percent.svg?react';
-import { useChangeEffect } from '../../hooks';
 import { ParametersValues } from '../../types';
 
 import styles from './parameters-form.module.scss';
