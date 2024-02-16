@@ -1,4 +1,4 @@
-import { Container, ButtonLink } from '@/components';
+import { Container, LinkButton } from '@/components';
 import { ROUTE } from '@/consts';
 
 import styles from './not-found.module.scss';
@@ -11,7 +11,7 @@ function NotFound() {
         <p className={styles.text}>Page not found</p>
       </div>
 
-      <ButtonLink text="Back to Home" to={ROUTE.HOME} size="small" />
+      <LinkButton text="Back to Home" to={ROUTE.HOME} size="small" />
     </Container>
   );
 }

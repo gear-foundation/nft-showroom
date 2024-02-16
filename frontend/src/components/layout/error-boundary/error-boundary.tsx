@@ -1,6 +1,6 @@
 import { Component, ReactNode } from 'react';
 
-import { BackButton } from '../../back-button';
+import { BackButton } from '../../buttons';
 import { Container } from '../container';
 
 import styles from './error-boundary.module.scss';
