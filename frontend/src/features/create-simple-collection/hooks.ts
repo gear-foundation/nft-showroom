@@ -1,5 +1,5 @@
 import { useAlert } from '@gear-js/react-hooks';
-import { useRef, useEffect, useState, ChangeEvent, DependencyList, EffectCallback } from 'react';
+import { useRef, useState, ChangeEvent } from 'react';
 
 import { MAX_IMAGE_SIZE_MB } from './consts';
 import { getBytesSize } from './utils';
@@ -52,22 +52,4 @@ function useImageInput(defaultValue: File | undefined, types: string[]) {
   return { value, props, handleClick, handleReset };
 }
 
-function useChangeEffect(callback: EffectCallback, dependencies?: DependencyList) {
-  const mounted = useRef(false);
-
-  useEffect(
-    () => () => {
-      mounted.current = false;
-    },
-    [],
-  );
-
-  useEffect(() => {
-    if (mounted.current) return callback();
-
-    mounted.current = true;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, dependencies);
-}
-
-export { useImageInput, useChangeEffect };
+export { useImageInput };
