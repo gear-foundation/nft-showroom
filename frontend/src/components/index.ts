@@ -3,7 +3,7 @@ import { Form, Input, Checkbox, Radio, Select, Textarea } from './form';
 import { withAccount, withApi } from './hocs';
 import { InfoCard, InfoCardProps } from './info-card';
 import { PriceInput, SearchInput } from './inputs';
-import { Container, Footer, Header, ErrorBoundary, PrivateRoute, Breadcrumbs } from './layout';
+import { Container, Footer, Header, ErrorBoundary, PrivateRoute, Breadcrumbs, Skeleton } from './layout';
 import { NFTActionFormModal } from './nft-action-form-modal';
 import { PriceInfoCard } from './price-info-card';
 import { ResponsiveSquareImage } from './responsive-square-image';
@@ -34,6 +34,7 @@ export {
   Textarea,
   LinkButton,
   ErrorBoundary,
+  Skeleton,
 };
 
 export type { InfoCardProps };

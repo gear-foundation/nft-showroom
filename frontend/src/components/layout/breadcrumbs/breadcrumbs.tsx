@@ -3,10 +3,12 @@ import { Link } from 'react-router-dom';
 
 import { ROUTE } from '@/consts';
 
+import { Skeleton } from '../skeleton';
+
 import styles from './breadcrumbs.module.scss';
 
 type Props = {
-  list: { to: string; text: string }[];
+  list: { to: string; text: string | undefined }[];
 };
 
 function Breadcrumbs(props: Props) {
@@ -18,7 +20,7 @@ function Breadcrumbs(props: Props) {
 
       return (
         <Fragment key={to}>
-          <Link to={to}>{text}</Link>
+          {text ? <Link to={to}>{text}</Link> : <Skeleton width="5%" borderRadius="4px" />}
 
           {!isLast && <span>&gt;</span>}
         </Fragment>
