@@ -1,0 +1,30 @@
+.list {
+  display: grid;
+  gap: 32px 16px;
+}
+
+.notFound {
+  margin: 0 auto;
+  padding: 100px;
+
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  gap: 16px;
+
+  text-align: center;
+
+  .heading {
+    font-size: 32px;
+    font-weight: 600;
+    line-height: 35px;
+    letter-spacing: 0.01em;
+  }
+
+  .text {
+    font-size: 16px;
+    font-weight: 500;
+    line-height: 24px;
+    color: rgba(#000, 0.7);
+  }
+}

@@ -2,15 +2,14 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { generatePath, useParams } from 'react-router-dom';
 
-import { Breadcrumbs, Container, FilterButton, InfoCard, SearchInput } from '@/components';
+import { Breadcrumbs, Container, FilterButton, InfoCard, List, SearchInput } from '@/components';
 import { ROUTE } from '@/consts';
 import { MintLimitInfoCard, MintNFT, NFTCard, Skeleton } from '@/features/collections';
 import CollectionHeaderSkeletonSVG from '@/features/collections/assets/collection-header-skeleton.svg?react';
 import NFTCardSkeletonSVG from '@/features/collections/assets/nft-card-skeleton.svg?react';
-import { GridSize, useGridSize } from '@/features/lists';
-import { cx, getIpfsLink } from '@/utils';
+import { GRID_SIZE, GridSize, useGridSize } from '@/features/lists';
+import { getIpfsLink } from '@/utils';
 
-import NotFoundSVG from './assets/not-found.svg?react';
 import UserSVG from './assets/user.svg?react';
 import styles from './collection.module.scss';
 import { SOCIAL_ICON } from './consts';
@@ -29,7 +28,7 @@ type Params = {
   id: string;
 };
 
-const NFT_SKELETONS = new Array(4).fill(null);
+const NFT_SKELETONS = new Array<null>(4).fill(null);
 
 function Collection() {
   const { id } = useParams() as Params;
@@ -42,39 +41,6 @@ function Collection() {
 
   const searchedTokens = nfts?.filter((nft) => nft.name.toLocaleLowerCase().includes(query));
   const tokensCount = searchedTokens?.length || 0;
-
-  const renderNFTs = () => {
-    if (!searchedTokens || !collection)
-      return (
-        <ul className={cx(styles.list, styles[gridSize])}>
-          {NFT_SKELETONS.map((_nft, index) => (
-            <Skeleton key={index}>
-              <NFTCardSkeletonSVG />
-            </Skeleton>
-          ))}
-        </ul>
-      );
-
-    if (!searchedTokens.length)
-      return (
-        <div className={styles.notFound}>
-          <NotFoundSVG />
-
-          <p className={styles.notFoundHeading}>Oops, Nothing Found!</p>
-          <p className={styles.notFoundText}>
-            Looks like we&apos;re on a wild goose chase! Mint NFTs to have them displayed here.
-          </p>
-        </div>
-      );
-
-    return (
-      <ul className={cx(styles.list, styles[gridSize])}>
-        {searchedTokens.map((nft) => (
-          <NFTCard key={nft.id} {...{ ...nft, collection }} />
-        ))}
-      </ul>
-    );
-  };
 
   const socialEntries = Object.entries(additionalLinks || {});
 
@@ -141,7 +107,22 @@ function Collection() {
           </div>
         </header>
 
-        {renderNFTs()}
+        <List
+          items={searchedTokens || NFT_SKELETONS}
+          itemsPerRow={gridSize === GRID_SIZE.SMALL ? 4 : 3}
+          emptyText="Mint NFTs"
+          renderItem={(nft, index) =>
+            nft && collection ? (
+              <NFTCard key={nft.id} {...{ ...nft, collection }} />
+            ) : (
+              <li key={index}>
+                <Skeleton>
+                  <NFTCardSkeletonSVG />
+                </Skeleton>
+              </li>
+            )
+          }
+        />
       </div>
     </Container>
   );
