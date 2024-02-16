@@ -1,16 +1,22 @@
-import { Outlet, ScrollRestoration } from 'react-router-dom';
+import { Outlet, ScrollRestoration, useLocation } from 'react-router-dom';
 
-import { Footer, Header } from './components';
+import { ErrorBoundary, Footer, Header } from './components';
 import { withProviders } from './providers';
 
 function Component() {
+  const { pathname } = useLocation();
+
   return (
     <>
       <Header />
 
       <main>
-        <ScrollRestoration />
-        <Outlet />
+        {/* key to reset on route change */}
+        <ErrorBoundary key={pathname}>
+          <ScrollRestoration />
+
+          <Outlet />
+        </ErrorBoundary>
       </main>
 
       <Footer />

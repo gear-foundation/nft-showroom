@@ -4,7 +4,7 @@ import { CopyButton } from './copy-button';
 import { FilterButton } from './filter-button';
 import { Form, Input, Checkbox, Radio, Select, Textarea } from './form';
 import { InfoCard, InfoCardProps } from './info-card';
-import { Container, Footer, Header } from './layout';
+import { Container, Footer, Header, ErrorBoundary } from './layout';
 import { NFTActionFormModal } from './nft-action-form-modal';
 import { PriceInfoCard } from './price-info-card';
 import { PriceInput } from './price-input';
@@ -39,6 +39,7 @@ export {
   Select,
   Textarea,
   ButtonLink,
+  ErrorBoundary,
 };
 
 export type { InfoCardProps };
