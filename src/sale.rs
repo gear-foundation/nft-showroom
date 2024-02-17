@@ -167,7 +167,10 @@ impl NftMarketplace {
         let payment = msg::value();
 
         // check that such a sale exists and check the attached amount
-        let nft = self.sales.get(&(*collection_address, *token_id)).ok_or(NftMarketplaceError::SaleDoesNotExist)?;
+        let nft = self
+            .sales
+            .get(&(*collection_address, *token_id))
+            .ok_or(NftMarketplaceError::SaleDoesNotExist)?;
         if payment < nft.price {
             msg::send(*buyer, "", payment).expect("Error in sending value");
             return Err(NftMarketplaceError::ValueIsLessThanPrice);

@@ -120,7 +120,10 @@ impl NftMarketplace {
             return Err(NftMarketplaceError::AccessDenied);
         }
 
-        let auction = self.auctions.get(&(collection_address, token_id)).ok_or(NftMarketplaceError::ThereIsNoSuchAuction)?;
+        let auction = self
+            .auctions
+            .get(&(collection_address, token_id))
+            .ok_or(NftMarketplaceError::ThereIsNoSuchAuction)?;
 
         if auction.ended_at > exec::block_timestamp() {
             return Err(NftMarketplaceError::DeadlineError);
@@ -184,7 +187,10 @@ impl NftMarketplace {
         collection_address: ActorId,
         token_id: u64,
     ) -> Result<NftMarketplaceEvent, NftMarketplaceError> {
-        let auction = self.auctions.get(&(collection_address, token_id)).ok_or(NftMarketplaceError::ThereIsNoSuchAuction)?;
+        let auction = self
+            .auctions
+            .get(&(collection_address, token_id))
+            .ok_or(NftMarketplaceError::ThereIsNoSuchAuction)?;
 
         if auction.owner != msg::source() {
             return Err(NftMarketplaceError::AccessDenied);

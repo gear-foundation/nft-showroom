@@ -241,8 +241,10 @@ impl NftMarketplace {
     ) -> Result<NftMarketplaceEvent, NftMarketplaceError> {
         let msg_src = msg::source();
 
-        let (.., collection_owner) = self.collection_to_owner.get(&collection_address).ok_or(NftMarketplaceError::WrongCollectionAddress)?;
-
+        let (.., collection_owner) = self
+            .collection_to_owner
+            .get(&collection_address)
+            .ok_or(NftMarketplaceError::WrongCollectionAddress)?;
 
         if self.admins.contains(&msg_src) {
             self.collection_to_owner.remove(&collection_address);
@@ -371,7 +373,9 @@ impl NftMarketplace {
         &self,
         type_name: &str,
     ) -> Result<&TypeCollectionInfo, NftMarketplaceError> {
-        self.type_collections.get(type_name).ok_or(NftMarketplaceError::WrongCollectionName)
+        self.type_collections
+            .get(type_name)
+            .ok_or(NftMarketplaceError::WrongCollectionName)
     }
 }
 

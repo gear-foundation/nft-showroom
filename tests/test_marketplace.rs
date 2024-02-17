@@ -419,7 +419,11 @@ fn sale_failures() {
     // low price
     let res = sale(&marketplace, USERS[1], address_nft, 0, 9_000_000_000_000);
     assert!(!res.main_failed());
-    check_marketplace_error(USERS[1], &res, NftMarketplaceError::LessThanExistentialDeposit);
+    check_marketplace_error(
+        USERS[1],
+        &res,
+        NftMarketplaceError::LessThanExistentialDeposit,
+    );
 
     // Only owner can send this action
     let price = 150_000_000_000_000;
@@ -911,7 +915,11 @@ fn auction_failures() {
         duration_ms,
     );
     assert!(!res.main_failed());
-    check_marketplace_error(USERS[1], &res, NftMarketplaceError::LessThanExistentialDeposit);
+    check_marketplace_error(
+        USERS[1],
+        &res,
+        NftMarketplaceError::LessThanExistentialDeposit,
+    );
 
     // Only token owner can send
     let res = create_auction(

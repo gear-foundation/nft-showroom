@@ -119,7 +119,10 @@ impl NftContract {
         // checking for the possibility to transfer
         self.can_transfer(from, to, &token_id)?;
 
-        let nft = self.tokens.get_mut(&token_id).ok_or(NftError::TokenDoesNotExist)?;
+        let nft = self
+            .tokens
+            .get_mut(&token_id)
+            .ok_or(NftError::TokenDoesNotExist)?;
         let tokens = self
             .owners
             .get_mut(from)
@@ -163,12 +166,18 @@ impl NftContract {
         if nft_info.owner != msg::source() {
             return Err(NftError::AccessDenied);
         }
-        let _ = self.token_approvals.remove(&token_id).ok_or(NftError::NoApproval);
+        let _ = self
+            .token_approvals
+            .remove(&token_id)
+            .ok_or(NftError::NoApproval);
         Ok(NftEvent::ApprovalRevoked { token_id })
     }
 
     fn get_token_info(&self, token_id: NftId) -> Result<NftEvent, NftError> {
-        let nft = self.tokens.get(&token_id).ok_or(NftError::TokenDoesNotExist)?;
+        let nft = self
+            .tokens
+            .get(&token_id)
+            .ok_or(NftError::TokenDoesNotExist)?;
 
         let can_sell = self
             .config
@@ -240,7 +249,10 @@ impl NftContract {
             return Err(NftError::AccessDenied);
         }
 
-        let nft = self.tokens.get_mut(&token_id).ok_or(NftError::TokenDoesNotExist)?;
+        let nft = self
+            .tokens
+            .get_mut(&token_id)
+            .ok_or(NftError::TokenDoesNotExist)?;
         nft.media_url = img_link.clone();
 
         msg::send(
@@ -259,7 +271,10 @@ impl NftContract {
         if exec::program_id() != msg::source() {
             return Err(NftError::AccessDenied);
         }
-        let nft = self.tokens.get_mut(&token_id).ok_or(NftError::TokenDoesNotExist)?;
+        let nft = self
+            .tokens
+            .get_mut(&token_id)
+            .ok_or(NftError::TokenDoesNotExist)?;
         nft.metadata.push(metadata.clone());
 
         msg::send(
@@ -296,7 +311,10 @@ impl NftContract {
     fn delete_user_for_mint(&mut self, user: ActorId) -> Result<NftEvent, NftError> {
         let msg_src = msg::source();
         self.check_collection_owner(msg_src)?;
-        let allowed_users = self.permission_to_mint.as_mut().ok_or(NftError::NoListOfRestriction)?;
+        let allowed_users = self
+            .permission_to_mint
+            .as_mut()
+            .ok_or(NftError::NoListOfRestriction)?;
         if let Some(pos) = allowed_users
             .iter()
             .position(|allowed_user| *allowed_user == user)
@@ -386,7 +404,10 @@ impl NftContract {
 
     // approval check
     fn check_approve(&self, user: &ActorId, token_id: &NftId) -> Result<(), NftError> {
-        let approved_account = self.token_approvals.get(token_id).ok_or(NftError::AccessDenied)?;
+        let approved_account = self
+            .token_approvals
+            .get(token_id)
+            .ok_or(NftError::AccessDenied)?;
         if approved_account != user {
             return Err(NftError::AccessDenied);
         }
@@ -396,7 +417,10 @@ impl NftContract {
 
     // doing all the checks to verify that the transfer can be made
     fn can_transfer(&self, from: &ActorId, to: &ActorId, token_id: &NftId) -> Result<(), NftError> {
-        let nft = self.tokens.get(token_id).ok_or(NftError::TokenDoesNotExist)?;
+        let nft = self
+            .tokens
+            .get(token_id)
+            .ok_or(NftError::TokenDoesNotExist)?;
 
         let owner = nft.owner;
         if owner != *from {
@@ -469,7 +493,7 @@ extern "C" fn init() {
 
     let total_number_of_tokens = sum_limit_copies(&img_links_and_data);
     if let Some(users) = permission_to_mint.as_mut() {
-        if !users.contains(&collection_owner){
+        if !users.contains(&collection_owner) {
             users.push(collection_owner);
         }
     }

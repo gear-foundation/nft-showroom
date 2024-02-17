@@ -1,7 +1,9 @@
 use gstd::{ActorId, CodeId, Encode};
 use gtest::{Program, RunResult, System};
 use nft_io::{Config, ImageData, NftError, NftEvent, NftInit};
-use nft_marketplace_io::{NftMarketplaceAction, NftMarketplaceInit, NftMarketplaceError, NftMarketplaceEvent, Offer};
+use nft_marketplace_io::{
+    NftMarketplaceAction, NftMarketplaceError, NftMarketplaceEvent, NftMarketplaceInit, Offer,
+};
 
 mod common;
 pub mod prelude;
@@ -229,11 +231,14 @@ pub fn delete_collection(
 pub fn delete_admin(marketplace: &Program, admin: u64, user: ActorId) -> RunResult {
     marketplace.send(admin, NftMarketplaceAction::DeleteAdmin { user })
 }
-pub fn check_nft_error(from: u64, result: &RunResult, error: NftError){
+pub fn check_nft_error(from: u64, result: &RunResult, error: NftError) {
     assert!(result.contains(&(from, Err::<NftEvent, NftError>(error).encode())));
 }
-pub fn check_marketplace_error(from: u64, result: &RunResult, error: NftMarketplaceError ){
-    assert!(result.contains(&(from, Err::<NftMarketplaceEvent, NftMarketplaceError>(error).encode())));
+pub fn check_marketplace_error(from: u64, result: &RunResult, error: NftMarketplaceError) {
+    assert!(result.contains(&(
+        from,
+        Err::<NftMarketplaceEvent, NftMarketplaceError>(error).encode()
+    )));
 }
 
 pub fn get_init_nft_payload(

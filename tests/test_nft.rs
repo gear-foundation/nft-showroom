@@ -184,7 +184,10 @@ fn successful_basics() {
     assert!(!res.main_failed());
     let result = &res.decoded_log::<Result<NftEvent, NftError>>()[0];
     println!("RES {:?}", result);
-    assert!(res.contains(&(USERS[3], Err::<NftEvent, NftError>(NftError::ExhaustedLimit).encode())));
+    assert!(res.contains(&(
+        USERS[3],
+        Err::<NftEvent, NftError>(NftError::ExhaustedLimit).encode()
+    )));
 
     // Successful Expand NFT in the collection
     let img_data = ImageData {
@@ -740,8 +743,7 @@ fn permission_to_mint() {
         println!("Collection info: {:?}", state);
     }
     // Successful creation of a new collection
-    let init_nft_payload =
-        get_init_nft_payload(USERS[0].into(), 0, Some(3), 0, Some(vec![]));
+    let init_nft_payload = get_init_nft_payload(USERS[0].into(), 0, Some(3), 0, Some(vec![]));
 
     let res = create_collection(
         &marketplace,
@@ -776,7 +778,7 @@ fn permission_to_mint() {
     let res = nft_collection.send(USERS[1], NftAction::Mint);
     assert!(!res.main_failed());
 
-    // Fail mint NFT from user 
+    // Fail mint NFT from user
     let res = nft_collection.send(USERS[1], NftAction::Mint);
     assert!(!res.main_failed());
 
