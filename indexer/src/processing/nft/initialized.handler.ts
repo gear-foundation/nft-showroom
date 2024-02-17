@@ -33,6 +33,7 @@ export class InitializedHandler implements INftEventHandler {
       transferable,
       userMintLimit,
       totalNumberOfTokens,
+      permissionToMint,
     } = event.config;
     await storage.setCollection(
       new Collection({
@@ -55,6 +56,7 @@ export class InitializedHandler implements INftEventHandler {
         transferable,
         tokensLimit: totalNumberOfTokens,
         userMintLimit: userMintLimit,
+        permissionToMint,
         createdAt: timestamp,
       }),
     );

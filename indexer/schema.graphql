@@ -70,6 +70,7 @@ type Collection @entity {
   createdAt: DateTime!
   nfts: [Nft!]! @derivedFrom(field: "collection")
   tags: [String!]!
+  permissionToMint: [String!]
 }
 
 type Nft @entity {

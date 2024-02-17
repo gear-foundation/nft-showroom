@@ -32,6 +32,7 @@ export class ConfigChangedHandler implements INftEventHandler {
       sellable,
       transferable,
       userMintLimit,
+      permissionToMint,
     } = event.config;
     await storage.setCollection(
       new Collection({
@@ -50,6 +51,7 @@ export class ConfigChangedHandler implements INftEventHandler {
         sellable,
         transferable,
         userMintLimit: userMintLimit,
+        permissionToMint,
       }),
     );
   }

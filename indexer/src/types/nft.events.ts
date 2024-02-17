@@ -17,6 +17,9 @@ export enum NftEventType {
   ConfigChanged = 'ConfigChanged',
   ImageChanged = 'ImageChanged',
   MetadataAdded = 'MetadataAdded',
+  UsersForMintAdded = 'UsersForMintAdded',
+  UserForMintDeleted = 'UserForMintDeleted',
+  LiftRestrictionMint = 'LiftRestrictionMint',
 }
 
 export type TransferEvent = {
@@ -51,6 +54,7 @@ export type NftConfig = {
   sellable: bigint | null;
   attendable: boolean;
   totalNumberOfTokens: bigint | null;
+  permissionToMint: string[] | null;
 };
 
 export type InitializedEvent = {
@@ -113,6 +117,20 @@ export type AdditionalLink = {
   discord: string | null;
 };
 
+export type UsersForMintAddedEvent = {
+  type: NftEventType.UsersForMintAdded;
+  users: string[];
+};
+
+export type UserForMintDeletedEvent = {
+  type: NftEventType.UserForMintDeleted;
+  user: string;
+};
+
+export type LiftRestrictionMintEvent = {
+  type: NftEventType.LiftRestrictionMint;
+};
+
 export type NftEvent =
   | TransferEvent
   | TokenInfoReceivedEvent
@@ -123,7 +141,10 @@ export type NftEvent =
   | ExpandedEvent
   | ConfigChangedEvent
   | ImageChangedEvent
-  | MetadataAddedEvent;
+  | MetadataAddedEvent
+  | UsersForMintAddedEvent
+  | UserForMintDeletedEvent
+  | LiftRestrictionMintEvent;
 
 export interface AdditionalLinkPlain {
   externalUrl: Option<Text>;
@@ -166,6 +187,7 @@ export interface NftEventPlain extends Enum {
   initialized: {
     config: ConfigPlain;
     totalNumberOfTokens: u64;
+    permissionToMint: Option<Vec<Text>>
   };
   minted: {
     tokenId: u64;
@@ -190,6 +212,7 @@ export interface NftEventPlain extends Enum {
   configChanged: {
     config: ConfigPlain;
     totalNumberOfTokens: u64;
+    permissionToMint: Option<Vec<Text>>
   };
   imageChanged: {
     tokenId: u64;
@@ -199,6 +222,13 @@ export interface NftEventPlain extends Enum {
     tokenId: u64;
     metadata: Text;
   };
+  usersForMintAdded: {
+    users: Vec<Hash>
+  };
+  userForMintDeleted: {
+    user: Hash
+  };
+  liftRestrictionMint: {};
 }
 
 export function getNftEvent(event: NftEventPlain): NftEvent | undefined {
@@ -236,16 +266,16 @@ export function getNftEvent(event: NftEventPlain): NftEvent | undefined {
         ),
         additionalLinks: event.initialized.config.additionalLinks
           ? {
-              externalUrl:
-                event.initialized.config.additionalLinks.externalUrl.toString(),
-              telegram:
-                event.initialized.config.additionalLinks.telegram.toString(),
-              xcom: event.initialized.config.additionalLinks.xcom.toString(),
-              medium:
-                event.initialized.config.additionalLinks.medium.toString(),
-              discord:
-                event.initialized.config.additionalLinks.discord.toString(),
-            }
+            externalUrl:
+              event.initialized.config.additionalLinks.externalUrl.toString(),
+            telegram:
+              event.initialized.config.additionalLinks.telegram.toString(),
+            xcom: event.initialized.config.additionalLinks.xcom.toString(),
+            medium:
+              event.initialized.config.additionalLinks.medium.toString(),
+            discord:
+              event.initialized.config.additionalLinks.discord.toString(),
+          }
           : null,
         royalty: safeUnwrapToNumber(event.initialized.config.royalty)!,
         paymentForMint: safeUnwrapToBigInt(
@@ -263,6 +293,7 @@ export function getNftEvent(event: NftEventPlain): NftEvent | undefined {
         totalNumberOfTokens: safeUnwrapToBigInt(
           safeUnwrapOptional(event.initialized.totalNumberOfTokens),
         ),
+        permissionToMint: safeUnwrapOptional<Vec<Text>, Vec<Text>>(event.initialized.permissionToMint)?.map((m: Text) => m.toString()) ?? null,
       },
     };
   }
@@ -297,12 +328,12 @@ export function getNftEvent(event: NftEventPlain): NftEvent | undefined {
       type: NftEventType.Expanded,
       additionalLinks: event.expanded.additionalLinks
         ? {
-            externalUrl: event.expanded.additionalLinks.externalUrl.toString(),
-            telegram: event.expanded.additionalLinks.telegram.toString(),
-            xcom: event.expanded.additionalLinks.xcom.toString(),
-            medium: event.expanded.additionalLinks.medium.toString(),
-            discord: event.expanded.additionalLinks.discord.toString(),
-          }
+          externalUrl: event.expanded.additionalLinks.externalUrl.toString(),
+          telegram: event.expanded.additionalLinks.telegram.toString(),
+          xcom: event.expanded.additionalLinks.xcom.toString(),
+          medium: event.expanded.additionalLinks.medium.toString(),
+          discord: event.expanded.additionalLinks.discord.toString(),
+        }
         : null,
     };
   }
@@ -323,16 +354,16 @@ export function getNftEvent(event: NftEventPlain): NftEvent | undefined {
         ),
         additionalLinks: event.configChanged.config.additionalLinks
           ? {
-              externalUrl:
-                event.configChanged.config.additionalLinks.externalUrl.toString(),
-              telegram:
-                event.configChanged.config.additionalLinks.telegram.toString(),
-              xcom: event.configChanged.config.additionalLinks.xcom.toString(),
-              medium:
-                event.configChanged.config.additionalLinks.medium.toString(),
-              discord:
-                event.configChanged.config.additionalLinks.discord.toString(),
-            }
+            externalUrl:
+              event.configChanged.config.additionalLinks.externalUrl.toString(),
+            telegram:
+              event.configChanged.config.additionalLinks.telegram.toString(),
+            xcom: event.configChanged.config.additionalLinks.xcom.toString(),
+            medium:
+              event.configChanged.config.additionalLinks.medium.toString(),
+            discord:
+              event.configChanged.config.additionalLinks.discord.toString(),
+          }
           : null,
         royalty: safeUnwrapToNumber(event.configChanged.config.royalty)!,
         paymentForMint: safeUnwrapToBigInt(
@@ -350,6 +381,7 @@ export function getNftEvent(event: NftEventPlain): NftEvent | undefined {
         totalNumberOfTokens: safeUnwrapToBigInt(
           safeUnwrapOptional(event.configChanged.totalNumberOfTokens),
         ),
+        permissionToMint: safeUnwrapOptional<Vec<Text>, Vec<Text>>(event.configChanged.permissionToMint)?.map((m: Text) => m.toString()) ?? null,
       },
     };
   }
@@ -365,6 +397,23 @@ export function getNftEvent(event: NftEventPlain): NftEvent | undefined {
       type: NftEventType.MetadataAdded,
       tokenId: safeUnwrapToNumber(event.metadataAdded.tokenId)!,
       metadata: event.metadataAdded.metadata.toString(),
+    };
+  }
+  if (event.usersForMintAdded) {
+    return {
+      type: NftEventType.UsersForMintAdded,
+      users: event.usersForMintAdded.users.map((user) => user.toString()),
+    };
+  }
+  if (event.userForMintDeleted) {
+    return {
+      type: NftEventType.UserForMintDeleted,
+      user: event.userForMintDeleted.user.toString(),
+    };
+  }
+  if (event.liftRestrictionMint) {
+    return {
+      type: NftEventType.LiftRestrictionMint,
     };
   }
   return undefined;

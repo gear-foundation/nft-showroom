@@ -40,6 +40,9 @@ import { EventInfo } from './event-info.type';
 import { EntitiesService } from './entities.service';
 import { IStorage } from './storage/storage.inteface';
 import { ProgramMetadata } from '@gear-js/api';
+import { LiftRestrictionMintHandler } from './nft/lift-restriction-mint.handler';
+import { UserForMintDeletedHandler } from './nft/user-for-mint-deleted.handler';
+import { UsersForMintAddedHandler } from './nft/users-for-mint-added.handler';
 
 const marketplaceEventsToHandler: Record<
   NftMarketplaceEventType,
@@ -79,6 +82,9 @@ const nftEventsToHandler: Record<NftEventType, INftEventHandler | undefined> = {
   [NftEventType.MetadataAdded]: new MetadataAddedHandler(),
   [NftEventType.TokenInfoReceived]: undefined,
   [NftEventType.Transferred]: new TransferredHandler(),
+  [NftEventType.UserForMintDeleted]: new UserForMintDeletedHandler(),
+  [NftEventType.UsersForMintAdded]: new UsersForMintAddedHandler(),
+  [NftEventType.LiftRestrictionMint]: new LiftRestrictionMintHandler(),
 };
 
 export class EventsProcessing {

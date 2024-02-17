@@ -104,4 +104,7 @@ export class Collection {
 
   @Column_('text', { array: true, nullable: false })
   tags!: string[];
+
+  @Column_('text', { array: true, nullable: true })
+  permissionToMint!: string[] | undefined | null;
 }
