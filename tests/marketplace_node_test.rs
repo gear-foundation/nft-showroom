@@ -135,6 +135,7 @@ async fn create_test() -> Result<()> {
             sellable: Some(0),
         },
         img_links_and_data,
+        permission_to_mint: None,
     }
     .encode();
 
@@ -296,6 +297,7 @@ async fn sale_test() -> Result<()> {
             sellable: Some(0),
         },
         img_links_and_data,
+        permission_to_mint: None,
     }
     .encode();
 
@@ -554,6 +556,7 @@ async fn auction_test() -> Result<()> {
             sellable: Some(0),
         },
         img_links_and_data,
+        permission_to_mint: None,
     }
     .encode();
 
@@ -819,6 +822,7 @@ async fn offer_test() -> Result<()> {
             sellable: Some(0),
         },
         img_links_and_data,
+        permission_to_mint: None,
     }
     .encode();
 

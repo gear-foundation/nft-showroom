@@ -75,29 +75,20 @@ pub async fn check_token_info(
     {
         // nft should be sellable
         if !sellable {
-            return Err(NftMarketplaceError("Nft is not sellable".to_owned()));
+            return Err(NftMarketplaceError::NotSellable);
         }
         // the owner must be the same as the one who wants to sell
         if token_owner != *msg_src {
-            return Err(NftMarketplaceError(
-                "Only the owner of the token can perform this action.".to_owned(),
-            ));
+            return Err(NftMarketplaceError::AccessDenied);
         }
         // must be approved by the marketplace
-        if let Some(approve_acc) = approval {
-            if approve_acc != *address_marketplace {
-                return Err(NftMarketplaceError(
-                    "No approve to the marketplace".to_owned(),
-                ));
-            }
-        } else {
-            return Err(NftMarketplaceError(
-                "No approve to the marketplace".to_owned(),
-            ));
+        let approve_acc = approval.ok_or(NftMarketplaceError::NoApproveToMarketplace)?;
+        if approve_acc != *address_marketplace {
+            return Err(NftMarketplaceError::NoApproveToMarketplace);
         }
         (collection_owner, royalty)
     } else {
-        return Err(NftMarketplaceError("Wrong received reply".to_owned()));
+        return Err(NftMarketplaceError::WrongReply);
     };
     Ok((collection_owner, royalty))
 }
@@ -105,6 +96,6 @@ pub async fn check_token_info(
 fn check_reply(reply: Result<NftEvent, NftError>) -> Result<NftEvent, NftMarketplaceError> {
     match reply {
         Ok(result) => Ok(result),
-        Err(NftError(error_string)) => Err(NftMarketplaceError(error_string.clone())),
+        Err(_) => Err(NftMarketplaceError::ErrorFromCollection),
     }
 }

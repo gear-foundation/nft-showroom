@@ -11,16 +11,9 @@ impl NftMarketplace {
         token_id: u64,
     ) -> Result<NftMarketplaceEvent, NftMarketplaceError> {
         let current_price = msg::value();
-        if current_price < self.config.minimum_transfer_value {
-            return Err(NftMarketplaceError(format!(
-                "The price must be greater than existential deposit ({})",
-                self.config.minimum_transfer_value
-            )));
-        }
+
         if !self.collection_to_owner.contains_key(&collection_address) {
-            return Err(NftMarketplaceError(
-                "This collection address is not in the marketplace".to_owned(),
-            ));
+            return Err(NftMarketplaceError::WrongCollectionAddress);
         }
 
         let get_token_info_payload = NftAction::GetTokenInfo { token_id };
@@ -36,15 +29,15 @@ impl NftMarketplace {
         .expect("Problem with get token info");
 
         match reply {
-            Err(NftError(error_string)) => Err(NftMarketplaceError(error_string.clone())),
+            Err(_) => Err(NftMarketplaceError::ErrorFromCollection),
             Ok(NftEvent::TokenInfoReceived { sellable, .. }) => {
                 if !sellable {
-                    Err(NftMarketplaceError("Nft is not sellable".to_owned()))
+                    Err(NftMarketplaceError::NotSellable)
                 } else {
                     Ok(())
                 }
             }
-            _ => Err(NftMarketplaceError("Wrong received reply".to_owned())),
+            _ => Err(NftMarketplaceError::WrongReply),
         }?;
 
         let offer = Offer {
@@ -82,9 +75,7 @@ impl NftMarketplace {
             // use send_with_gas to transfer the value directly to the balance, not to the mailbox.
             msg::send_with_gas(offer.creator, "", 0, *price).expect("Error in sending value");
         } else {
-            return Err(NftMarketplaceError(
-                "This offer does not exist or you are not the creator of the offer".to_owned(),
-            ));
+            return Err(NftMarketplaceError::WrongDataOffer);
         }
         self.offers.remove(&offer);
 
@@ -102,21 +93,16 @@ impl NftMarketplace {
             .sales
             .contains_key(&(offer.collection_address, offer.token_id))
         {
-            return Err(NftMarketplaceError(
-                "This token is on sale, cancel the sale if you wish to accept the offer".to_owned(),
-            ));
+            return Err(NftMarketplaceError::AlreadyOnSale);
         }
         if self
             .auctions
             .contains_key(&(offer.collection_address, offer.token_id))
         {
-            return Err(NftMarketplaceError(
-                "This token is on auction, cancel the auction if you wish to accept the offer"
-                    .to_owned(),
-            ));
+            return Err(NftMarketplaceError::AlreadyOnAuction);
         }
         if !self.offers.contains_key(&offer) {
-            return Err(NftMarketplaceError("This offer does not exist".to_owned()));
+            return Err(NftMarketplaceError::OfferDoesNotExist);
         }
 
         // check token info

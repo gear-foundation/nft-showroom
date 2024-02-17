@@ -13,27 +13,17 @@ impl NftMarketplace {
         duration_ms: u32,
     ) -> Result<NftMarketplaceEvent, NftMarketplaceError> {
         if !self.collection_to_owner.contains_key(&collection_address) {
-            return Err(NftMarketplaceError(
-                "This collection address is not in the marketplace".to_owned(),
-            ));
+            return Err(NftMarketplaceError::WrongCollectionAddress);
         }
         if self.auctions.contains_key(&(collection_address, token_id)) {
-            return Err(NftMarketplaceError(
-                "This nft is already on auction".to_owned(),
-            ));
+            return Err(NftMarketplaceError::AlreadyOnAuction);
         }
         if self.sales.contains_key(&(collection_address, token_id)) {
-            return Err(NftMarketplaceError(
-                "This token is on sale, cancel the sale if you wish to create the auction"
-                    .to_owned(),
-            ));
+            return Err(NftMarketplaceError::AlreadyOnSale);
         }
 
         if min_price < self.config.minimum_transfer_value {
-            return Err(NftMarketplaceError(format!(
-                "Auction min price must be greater than existential deposit ({})",
-                self.config.minimum_transfer_value
-            )));
+            return Err(NftMarketplaceError::LessThanExistentialDeposit);
         }
 
         // check token info
@@ -73,7 +63,7 @@ impl NftMarketplace {
                     royalty,
                 });
         } else {
-            return Err(NftMarketplaceError("Wrong received reply".to_owned()));
+            return Err(NftMarketplaceError::WrongReply);
         }
 
         msg::send_with_gas_delayed(
@@ -102,14 +92,15 @@ impl NftMarketplace {
         token_id: u64,
     ) -> Result<NftMarketplaceEvent, NftMarketplaceError> {
         let msg_value = msg::value();
-        let auction = self.check_auction(&collection_address, &token_id, &msg_value)?;
+        let msg_src = msg::source();
+        let auction = self.check_auction(&msg_src, &collection_address, &token_id, &msg_value)?;
 
         if auction.current_winner != ActorId::zero() {
-            // use send_with_gas to transfer the value directly to the balance, not to the mailbox.
+            // use send_with_gas with gas_limit = 0 to transfer the value directly to the balance, not to the mailbox.
             msg::send_with_gas(auction.current_winner, "", 0, auction.current_price)
                 .expect("Error in sending value");
         }
-        auction.current_winner = msg::source();
+        auction.current_winner = msg_src;
         auction.current_price = msg_value;
 
         Ok(NftMarketplaceEvent::BidAdded {
@@ -126,54 +117,59 @@ impl NftMarketplace {
     ) -> Result<NftMarketplaceEvent, NftMarketplaceError> {
         let msg_src = msg::source();
         if msg_src != exec::program_id() && !self.admins.contains(&msg_src) {
-            return Err(NftMarketplaceError(
-                "Only program or admin can send this message.".to_owned(),
-            ));
+            return Err(NftMarketplaceError::AccessDenied);
         }
 
-        let (price, current_owner) =
-            if let Some(auction) = self.auctions.get(&(collection_address, token_id)) {
-                if auction.ended_at > exec::block_timestamp() {
-                    return Err(NftMarketplaceError(
-                        "The auction must not end before the deadline".to_owned(),
-                    ));
-                }
-                if auction.current_winner == ActorId::zero() {
-                    transfer_token(
-                        collection_address,
-                        auction.owner,
-                        token_id,
-                        self.config.gas_for_transfer_token,
-                    )
-                    .await?;
-                } else {
-                    transfer_token(
-                        collection_address,
-                        auction.current_winner,
-                        token_id,
-                        self.config.gas_for_transfer_token,
-                    )
-                    .await?;
+        let auction = self.auctions.get(&(collection_address, token_id)).ok_or(NftMarketplaceError::ThereIsNoSuchAuction)?;
 
-                    // transfer value to buyer and percent to collection creator
-                    currency_transfer(
-                        auction.collection_owner,
-                        auction.owner,
-                        auction.current_price,
-                        auction.royalty,
-                        self.config.minimum_transfer_value,
-                    );
-                }
-                let price = auction.current_price;
-                let current_owner = auction.current_winner;
-                (price, current_owner)
-            } else {
-                return Err(NftMarketplaceError("There is no such auction".to_owned()));
-            };
+        if auction.ended_at > exec::block_timestamp() {
+            return Err(NftMarketplaceError::DeadlineError);
+        }
+        if auction.current_winner == ActorId::zero() {
+            transfer_token(
+                collection_address,
+                auction.owner,
+                token_id,
+                self.config.gas_for_transfer_token,
+            )
+            .await?;
+        } else {
+            transfer_token(
+                collection_address,
+                auction.current_winner,
+                token_id,
+                self.config.gas_for_transfer_token,
+            )
+            .await?;
+
+            // transfer value to buyer and percent to collection creator
+            currency_transfer(
+                auction.collection_owner,
+                auction.owner,
+                auction.current_price,
+                auction.royalty,
+                self.config.minimum_transfer_value,
+            );
+        }
+        let price = auction.current_price;
+        let current_owner = auction.current_winner;
+        let auction_creator = auction.owner;
 
         self.auctions
             .remove(&(collection_address, token_id))
             .expect("Can't be None");
+
+        msg::send(
+            auction_creator,
+            Ok::<NftMarketplaceEvent, NftMarketplaceError>(NftMarketplaceEvent::AuctionClosed {
+                collection_address,
+                token_id,
+                price,
+                current_owner,
+            }),
+            0,
+        )
+        .expect("Error during send to owner `NftMarketplaceEvent::AuctionClosed`");
 
         Ok(NftMarketplaceEvent::AuctionClosed {
             collection_address,
@@ -188,29 +184,23 @@ impl NftMarketplace {
         collection_address: ActorId,
         token_id: u64,
     ) -> Result<NftMarketplaceEvent, NftMarketplaceError> {
-        if let Some(auction) = self.auctions.get(&(collection_address, token_id)) {
-            if auction.owner != msg::source() {
-                return Err(NftMarketplaceError(
-                    "Only the creator of the auction can send this message".to_owned(),
-                ));
-            }
-            transfer_token(
-                collection_address,
-                auction.owner,
-                token_id,
-                self.config.gas_for_transfer_token,
-            )
-            .await?;
+        let auction = self.auctions.get(&(collection_address, token_id)).ok_or(NftMarketplaceError::ThereIsNoSuchAuction)?;
 
-            if auction.current_winner != ActorId::zero() {
-                // use send_with_gas to transfer the value directly to the balance, not to the mailbox.
-                msg::send_with_gas(auction.current_winner, "", 0, auction.current_price)
-                    .expect("Error in sending value");
-            }
-        } else {
-            return Err(NftMarketplaceError(
-                "There is no auction with this collection address and token id".to_owned(),
-            ));
+        if auction.owner != msg::source() {
+            return Err(NftMarketplaceError::AccessDenied);
+        }
+        transfer_token(
+            collection_address,
+            auction.owner,
+            token_id,
+            self.config.gas_for_transfer_token,
+        )
+        .await?;
+
+        if auction.current_winner != ActorId::zero() {
+            // use send_with_gas to transfer the value directly to the balance, not to the mailbox.
+            msg::send_with_gas(auction.current_winner, "", 0, auction.current_price)
+                .expect("Error in sending value");
         }
 
         self.auctions
@@ -225,6 +215,7 @@ impl NftMarketplace {
 
     fn check_auction(
         &mut self,
+        msg_src: &ActorId,
         collection_address: &ActorId,
         token_id: &u64,
         bid: &u128,
@@ -232,18 +223,17 @@ impl NftMarketplace {
         let auction =
             if let Some(auction) = self.auctions.get_mut(&(*collection_address, *token_id)) {
                 if auction.ended_at < exec::block_timestamp() {
-                    return Err(NftMarketplaceError("Auction is already ended.".to_owned()));
+                    msg::send_with_gas(*msg_src, "", 0, *bid).expect("Error in sending value");
+                    return Err(NftMarketplaceError::AuctionClosed);
                 }
                 if *bid <= auction.current_price {
-                    return Err(NftMarketplaceError(
-                        "Less than or equal to the current bid rate.".to_owned(),
-                    ));
+                    msg::send_with_gas(*msg_src, "", 0, *bid).expect("Error in sending value");
+                    return Err(NftMarketplaceError::LessOrEqualThanBid);
                 }
                 auction
             } else {
-                return Err(NftMarketplaceError(
-                    "There is no auction with this collection address and token id".to_owned(),
-                ));
+                msg::send_with_gas(*msg_src, "", 0, *bid).expect("Error in sending value");
+                return Err(NftMarketplaceError::ThereIsNoSuchAuction);
             };
         Ok(auction)
     }

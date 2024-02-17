@@ -1,7 +1,7 @@
-use gstd::{ActorId, CodeId};
+use gstd::{ActorId, CodeId, Encode};
 use gtest::{Program, RunResult, System};
-use nft_io::{Config, ImageData, NftInit};
-use nft_marketplace_io::{NftMarketplaceAction, NftMarketplaceInit, Offer};
+use nft_io::{Config, ImageData, NftError, NftEvent, NftInit};
+use nft_marketplace_io::{NftMarketplaceAction, NftMarketplaceInit, NftMarketplaceError, NftMarketplaceEvent, Offer};
 
 mod common;
 pub mod prelude;
@@ -229,11 +229,11 @@ pub fn delete_collection(
 pub fn delete_admin(marketplace: &Program, admin: u64, user: ActorId) -> RunResult {
     marketplace.send(admin, NftMarketplaceAction::DeleteAdmin { user })
 }
-pub fn check_payload(log_number: usize, result: &RunResult, message: String) -> bool {
-    result.log()[log_number]
-        .payload()
-        .windows(message.as_bytes().len())
-        .any(|window| window == message.as_bytes())
+pub fn check_nft_error(from: u64, result: &RunResult, error: NftError){
+    assert!(result.contains(&(from, Err::<NftEvent, NftError>(error).encode())));
+}
+pub fn check_marketplace_error(from: u64, result: &RunResult, error: NftMarketplaceError ){
+    assert!(result.contains(&(from, Err::<NftMarketplaceEvent, NftMarketplaceError>(error).encode())));
 }
 
 pub fn get_init_nft_payload(
@@ -241,6 +241,7 @@ pub fn get_init_nft_payload(
     royalty: u16,
     user_mint_limit: Option<u32>,
     payment_for_mint: u128,
+    permission_to_mint: Option<Vec<ActorId>>,
 ) -> NftInit {
     let img_data = ImageData {
         limit_copies: Some(1),
@@ -266,6 +267,7 @@ pub fn get_init_nft_payload(
             sellable: Some(0),
         },
         img_links_and_data,
+        permission_to_mint,
     }
 }
 // pub fn get_state(

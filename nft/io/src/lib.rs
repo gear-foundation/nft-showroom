@@ -25,6 +25,7 @@ pub struct NftInit {
     pub collection_owner: ActorId,
     pub config: Config,
     pub img_links_and_data: Vec<(String, ImageData)>,
+    pub permission_to_mint: Option<Vec<ActorId>>,
 }
 
 #[derive(Debug, Clone, Encode, Decode, TypeInfo)]
@@ -100,6 +101,13 @@ pub enum NftAction {
         token_id: NftId,
         metadata: String,
     },
+    AddUsersForMint {
+        users: Vec<ActorId>,
+    },
+    DeleteUserForMint {
+        user: ActorId,
+    },
+    LiftRestrictionMint,
 }
 
 #[derive(Debug, Clone, Encode, Decode, TypeInfo)]
@@ -120,6 +128,7 @@ pub enum NftEvent {
     Initialized {
         config: Config,
         total_number_of_tokens: Option<u64>,
+        permission_to_mint: Option<Vec<ActorId>>,
     },
     Minted {
         token_id: NftId,
@@ -147,9 +156,34 @@ pub enum NftEvent {
         token_id: NftId,
         metadata: String,
     },
+    UsersForMintAdded {
+        users: Vec<ActorId>,
+    },
+    UserForMintDeleted {
+        user: ActorId,
+    },
+    LiftRestrictionMint,
 }
 #[derive(Debug, Clone, Encode, Decode, TypeInfo)]
-pub struct NftError(pub String);
+pub enum NftError {
+    MathOverflow,
+    ErrorGettingRandom,
+    TokenDoesNotExist,
+    AllTokensMinted,
+    OwnerDoesNotHaveNft,
+    AccessDenied,
+    NoApproval,
+    ThereIsApproval,
+    LimitIsZero,
+    ConfigCannotBeChanged,
+    WrongRoyalty,
+    NotTransferable,
+    UserRestrictionCannotBeChanged,
+    NoListOfRestriction,
+    ThereIsNoSuchUser,
+    ExhaustedLimit,
+    WrongValue,
+}
 
 #[derive(Debug, Clone, Encode, Decode, TypeInfo)]
 pub struct NftState {
@@ -161,6 +195,7 @@ pub struct NftState {
     pub img_links_and_data: Vec<(String, ImageData)>,
     pub collection_owner: ActorId,
     pub total_number_of_tokens: Option<u64>,
+    pub permission_to_mint: Option<Vec<ActorId>>,
 }
 
 #[derive(Debug, Clone, Encode, Decode, TypeInfo)]

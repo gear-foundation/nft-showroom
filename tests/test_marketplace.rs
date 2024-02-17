@@ -90,7 +90,7 @@ fn create_success() {
         println!("CONFIG: {:?}", config);
     }
 
-    let init_nft_payload = get_init_nft_payload(USERS[0].into(), 0, Some(3), 0);
+    let init_nft_payload = get_init_nft_payload(USERS[0].into(), 0, Some(3), 0, None);
 
     // Create collection
     let res = create_collection(
@@ -167,18 +167,10 @@ fn create_failures() {
         name_simple_nft.clone(),
     );
 
-    assert!(check_payload(
-        0,
-        &res,
-        "Only admin can send this message".to_string()
-    ));
+    check_marketplace_error(USERS[0], &res, NftMarketplaceError::AccessDenied);
 
     let res = add_admin(&marketplace, USERS[0], vec![100.into()]);
-    assert!(check_payload(
-        0,
-        &res,
-        "Only admin can send this message".to_string()
-    ));
+    check_marketplace_error(USERS[0], &res, NftMarketplaceError::AccessDenied);
 
     let res = update_config(
         &marketplace,
@@ -192,11 +184,7 @@ fn create_failures() {
         Some(11_000_000_000_000),
         None,
     );
-    assert!(check_payload(
-        0,
-        &res,
-        "Only admin can send this message".to_string()
-    ));
+    check_marketplace_error(USERS[0], &res, NftMarketplaceError::AccessDenied);
 
     // Add type of collection
     let res = add_new_collection(
@@ -207,7 +195,7 @@ fn create_failures() {
     );
     assert!(!res.main_failed());
 
-    let init_nft_payload = get_init_nft_payload(USERS[0].into(), 0, Some(3), 0);
+    let init_nft_payload = get_init_nft_payload(USERS[0].into(), 0, Some(3), 0, None);
 
     // Сan only create one collection per hour
     let res = create_collection(
@@ -224,11 +212,7 @@ fn create_failures() {
         name_simple_nft.clone(),
         init_nft_payload.encode(),
     );
-    assert!(check_payload(
-        0,
-        &res,
-        "The time limit for creating a collection has not yet expired.".to_string()
-    ));
+    check_marketplace_error(USERS[0], &res, NftMarketplaceError::DeadlineError);
 
     // Delete collection
     let state_reply = marketplace
@@ -242,18 +226,10 @@ fn create_failures() {
     };
     let res = delete_collection(&marketplace, USERS[0], 1.into());
     assert!(!res.main_failed());
-    assert!(check_payload(
-        0,
-        &res,
-        "There is no collection with that address".to_string()
-    ));
+    check_marketplace_error(USERS[0], &res, NftMarketplaceError::WrongCollectionAddress);
     let res = delete_collection(&marketplace, USERS[1], address_nft);
     assert!(!res.main_failed());
-    assert!(check_payload(
-        0,
-        &res,
-        "Only the owner of the collection can send this message".to_string()
-    ));
+    check_marketplace_error(USERS[1], &res, NftMarketplaceError::AccessDenied);
 
     // Mint token
     let address_nft_array: [u8; 32] = address_nft.into();
@@ -265,7 +241,7 @@ fn create_failures() {
 
     let res = delete_collection(&marketplace, USERS[0], address_nft);
     assert!(!res.main_failed());
-    assert!(check_payload(0, &res, "Removal denied".to_string()));
+    check_marketplace_error(USERS[0], &res, NftMarketplaceError::AccessDenied);
 }
 
 #[test]
@@ -303,7 +279,7 @@ fn sale_success() {
 
     // Create collection
     let royalty = 1_000;
-    let init_nft_payload = get_init_nft_payload(USERS[0].into(), royalty, Some(3), 0);
+    let init_nft_payload = get_init_nft_payload(USERS[0].into(), royalty, Some(3), 0, None);
 
     let res = create_collection(
         &marketplace,
@@ -412,7 +388,7 @@ fn sale_failures() {
 
     // Create collection
     let royalty = 1_000;
-    let init_nft_payload = get_init_nft_payload(USERS[0].into(), royalty, Some(3), 0);
+    let init_nft_payload = get_init_nft_payload(USERS[0].into(), royalty, Some(3), 0, None);
 
     let res = create_collection(
         &marketplace,
@@ -443,39 +419,23 @@ fn sale_failures() {
     // low price
     let res = sale(&marketplace, USERS[1], address_nft, 0, 9_000_000_000_000);
     assert!(!res.main_failed());
-    assert!(check_payload(
-        0,
-        &res,
-        "The price must be greater than existential deposit (10000000000000)".to_string()
-    ));
+    check_marketplace_error(USERS[1], &res, NftMarketplaceError::LessThanExistentialDeposit);
 
     // Only owner can send this action
     let price = 150_000_000_000_000;
     let res = sale(&marketplace, USERS[2], address_nft, 0, price);
     assert!(!res.main_failed());
-    assert!(check_payload(
-        0,
-        &res,
-        "Only the owner of the token can perform this action.".to_string()
-    ));
+    check_marketplace_error(USERS[2], &res, NftMarketplaceError::AccessDenied);
 
     // No approve to the marketplace
     let res = sale(&marketplace, USERS[1], address_nft, 0, price);
     assert!(!res.main_failed());
-    assert!(check_payload(
-        0,
-        &res,
-        "No approve to the marketplace".to_string()
-    ));
+    check_marketplace_error(USERS[1], &res, NftMarketplaceError::NoApproveToMarketplace);
 
     // wrong collection address
     let res = sale(&marketplace, USERS[1], 1.into(), 0, price);
     assert!(!res.main_failed());
-    assert!(check_payload(
-        0,
-        &res,
-        "This collection address is not in the marketplace".to_string()
-    ));
+    check_marketplace_error(USERS[1], &res, NftMarketplaceError::WrongCollectionAddress);
 
     // Successful approve NFT in the collection
     let addres_marketplace: [u8; 32] = marketplace.id().into();
@@ -502,28 +462,17 @@ fn sale_failures() {
     // is already on sale
     let res = sale(&marketplace, USERS[1], address_nft, 0, price);
     assert!(!res.main_failed());
-    assert!(check_payload(
-        0,
-        &res,
-        "This nft is already on sale.".to_string()
-    ));
+    check_marketplace_error(USERS[1], &res, NftMarketplaceError::AlreadyOnSale);
 
     // wrong owner
     let res = cancel_sale(&marketplace, USERS[2], address_nft, 0);
     assert!(!res.main_failed());
-    assert!(check_payload(
-        0,
-        &res,
-        "Only the nft owner can cancel the sale.".to_string()
-    ));
+    check_marketplace_error(USERS[2], &res, NftMarketplaceError::AccessDenied);
+
     // Wrong token_id
     let res = cancel_sale(&marketplace, USERS[1], address_nft, 1);
     assert!(!res.main_failed());
-    assert!(check_payload(
-        0,
-        &res,
-        "This sale does not exist".to_string()
-    ));
+    check_marketplace_error(USERS[1], &res, NftMarketplaceError::SaleDoesNotExist);
 
     // value is less than the price
     sys.mint_to(USERS[2], price);
@@ -532,11 +481,7 @@ fn sale_failures() {
 
     let res = buy(&marketplace, USERS[2], address_nft, 0, price - 1);
     assert!(!res.main_failed());
-    assert!(check_payload(
-        1,
-        &res,
-        "The specified value is less than the price of the token".to_string()
-    ));
+    check_marketplace_error(USERS[2], &res, NftMarketplaceError::ValueIsLessThanPrice);
 
     let balance = sys.balance_of(1);
     println!("BALANCE {:?}", balance);
@@ -548,12 +493,7 @@ fn sale_failures() {
     // sale does not exist
     let res = buy(&marketplace, USERS[2], address_nft, 1, price - 1);
     assert!(!res.main_failed());
-
-    assert!(check_payload(
-        0,
-        &res,
-        "This sale does not exist".to_string()
-    ));
+    check_marketplace_error(USERS[2], &res, NftMarketplaceError::SaleDoesNotExist);
 }
 
 #[test]
@@ -592,7 +532,7 @@ fn auction_success() {
     // Create collection
 
     let royalty = 1_000;
-    let init_nft_payload = get_init_nft_payload(USERS[0].into(), royalty, Some(3), 0);
+    let init_nft_payload = get_init_nft_payload(USERS[0].into(), royalty, Some(3), 0, None);
 
     let res = create_collection(
         &marketplace,
@@ -748,7 +688,7 @@ fn auction_cancel() {
 
     // Create collection
     let royalty = 1_000;
-    let init_nft_payload = get_init_nft_payload(USERS[0].into(), royalty, Some(3), 0);
+    let init_nft_payload = get_init_nft_payload(USERS[0].into(), royalty, Some(3), 0, None);
 
     let res = create_collection(
         &marketplace,
@@ -930,7 +870,7 @@ fn auction_failures() {
 
     // Create collection
     let royalty = 1_000;
-    let init_nft_payload = get_init_nft_payload(USERS[0].into(), royalty, Some(3), 0);
+    let init_nft_payload = get_init_nft_payload(USERS[0].into(), royalty, Some(3), 0, None);
 
     let res = create_collection(
         &marketplace,
@@ -971,11 +911,7 @@ fn auction_failures() {
         duration_ms,
     );
     assert!(!res.main_failed());
-    assert!(check_payload(
-        0,
-        &res,
-        "Auction min price must be greater than existential deposit (10000000000000)".to_string()
-    ));
+    check_marketplace_error(USERS[1], &res, NftMarketplaceError::LessThanExistentialDeposit);
 
     // Only token owner can send
     let res = create_auction(
@@ -987,11 +923,7 @@ fn auction_failures() {
         duration_ms,
     );
     assert!(!res.main_failed());
-    assert!(check_payload(
-        0,
-        &res,
-        "Only the owner of the token can perform this action.".to_string()
-    ));
+    check_marketplace_error(USERS[2], &res, NftMarketplaceError::AccessDenied);
 
     // No approve
     let res = create_auction(
@@ -1003,11 +935,7 @@ fn auction_failures() {
         duration_ms,
     );
     assert!(!res.main_failed());
-    assert!(check_payload(
-        0,
-        &res,
-        "No approve to the marketplace".to_string()
-    ));
+    check_marketplace_error(USERS[1], &res, NftMarketplaceError::NoApproveToMarketplace);
 
     // Successful approve NFT in the collection
     let addres_marketplace: [u8; 32] = marketplace.id().into();
@@ -1034,42 +962,33 @@ fn auction_failures() {
     // No auction with this collection address and token id
     let res = cancel_auction(&marketplace, USERS[1], address_nft, 1);
     assert!(!res.main_failed());
-    assert!(check_payload(
-        0,
-        &res,
-        "There is no auction with this collection address and token id".to_string()
-    ));
+    check_marketplace_error(USERS[1], &res, NftMarketplaceError::ThereIsNoSuchAuction);
 
     // Only the creator of the auction can send cancel_auction
     let res = cancel_auction(&marketplace, USERS[2], address_nft, 0);
     assert!(!res.main_failed());
-    assert!(check_payload(
-        0,
-        &res,
-        "Only the creator of the auction can send this message".to_string()
-    ));
+    check_marketplace_error(USERS[2], &res, NftMarketplaceError::AccessDenied);
 
     let current_balance = 20_000_000_000_000;
     sys.mint_to(USERS[2], current_balance);
 
     let res = add_bid(&marketplace, USERS[2], address_nft, 0, 10_000_000_000_000);
     assert!(!res.main_failed());
-    assert!(check_payload(
-        0,
-        &res,
-        "Less than or equal to the current bid rate.".to_string()
-    ));
-    // let balance = sys.balance_of(USERS[2]);
-    // assert_eq!(balance, 100_000_000_000_000, "Wrong balance");
+    check_marketplace_error(USERS[2], &res, NftMarketplaceError::LessOrEqualThanBid);
+
+    sys.claim_value_from_mailbox(USERS[2]);
+    let balance = sys.balance_of(USERS[2]);
+    assert_eq!(balance, 20_000_000_000_000, "Wrong balance");
+
     sys.spend_blocks(duration_blocks);
     sys.mint_to(USERS[3], 15_000_000_000_000);
     let res = add_bid(&marketplace, USERS[3], address_nft, 0, 15_000_000_000_000);
     assert!(!res.main_failed());
-    assert!(check_payload(
-        0,
-        &res,
-        "There is no auction with this collection address and token id".to_string()
-    ));
+    check_marketplace_error(USERS[3], &res, NftMarketplaceError::ThereIsNoSuchAuction);
+
+    sys.claim_value_from_mailbox(USERS[3]);
+    let balance = sys.balance_of(USERS[3]);
+    assert_eq!(balance, 15_000_000_000_000, "Wrong balance");
 }
 
 #[test]
@@ -1107,7 +1026,7 @@ fn offer_success() {
 
     // Create collection
     let royalty = 1_000;
-    let init_nft_payload = get_init_nft_payload(USERS[0].into(), royalty, Some(3), 0);
+    let init_nft_payload = get_init_nft_payload(USERS[0].into(), royalty, Some(3), 0, None);
 
     let res = create_collection(
         &marketplace,
@@ -1231,7 +1150,7 @@ fn offer_failures() {
 
     // Create collection
     let royalty = 1_000;
-    let init_nft_payload = get_init_nft_payload(USERS[0].into(), royalty, Some(3), 0);
+    let init_nft_payload = get_init_nft_payload(USERS[0].into(), royalty, Some(3), 0, None);
 
     let res = create_collection(
         &marketplace,
@@ -1260,22 +1179,14 @@ fn offer_failures() {
     sys.mint_to(USERS[2], offer_price);
     let res = create_offer(&marketplace, USERS[2], address_nft, 0, offer_price);
     assert!(!res.main_failed());
-    assert!(check_payload(
-        0,
-        &res,
-        "NonFungibleToken: token does not exist".to_string()
-    ));
+    check_marketplace_error(USERS[2], &res, NftMarketplaceError::ErrorFromCollection);
 
     // wrong collection address
     let offer_price = 150_000_000_000_000;
     sys.mint_to(USERS[2], offer_price);
     let res = create_offer(&marketplace, USERS[2], 1.into(), 0, offer_price);
     assert!(!res.main_failed());
-    assert!(check_payload(
-        0,
-        &res,
-        "This collection address is not in the marketplace".to_string()
-    ));
+    check_marketplace_error(USERS[2], &res, NftMarketplaceError::WrongCollectionAddress);
 
     // Successful mint NFT in the new collection
     let res = nft_collection.send(USERS[1], nft_io::NftAction::Mint);
@@ -1322,11 +1233,7 @@ fn offer_failures() {
     let res = accept_offer(&marketplace, USERS[1], address_nft, 0, USERS[2].into());
     let result = &res.decoded_log::<Result<NftMarketplaceEvent, NftMarketplaceError>>();
     println!("RES: {:?}", result);
-    assert!(check_payload(
-        0,
-        &res,
-        "This token is on sale, cancel the sale if you wish to accept the offer".to_string()
-    ));
+    check_marketplace_error(USERS[1], &res, NftMarketplaceError::AlreadyOnSale);
     assert!(!res.main_failed());
 
     let res = cancel_sale(&marketplace, USERS[1], address_nft, 0);
@@ -1354,11 +1261,8 @@ fn offer_failures() {
     );
     assert!(!res.main_failed());
     let res = accept_offer(&marketplace, USERS[1], address_nft, 0, USERS[2].into());
-    assert!(check_payload(
-        0,
-        &res,
-        "This token is on auction, cancel the auction if you wish to accept the offer".to_string()
-    ));
+    check_marketplace_error(USERS[1], &res, NftMarketplaceError::AlreadyOnAuction);
+
     assert!(!res.main_failed());
 
     let res = cancel_auction(&marketplace, USERS[1], address_nft, 0);

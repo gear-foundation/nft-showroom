@@ -241,18 +241,12 @@ impl NftMarketplace {
     ) -> Result<NftMarketplaceEvent, NftMarketplaceError> {
         let msg_src = msg::source();
 
-        let collection_owner =
-            if let Some((.., owner)) = self.collection_to_owner.get(&collection_address) {
-                *owner
-            } else {
-                return Err(NftMarketplaceError(
-                    "There is no collection with that address".to_owned(),
-                ));
-            };
+        let (.., collection_owner) = self.collection_to_owner.get(&collection_address).ok_or(NftMarketplaceError::WrongCollectionAddress)?;
+
 
         if self.admins.contains(&msg_src) {
             self.collection_to_owner.remove(&collection_address);
-        } else if collection_owner == msg_src {
+        } else if *collection_owner == msg_src {
             let reply = msg::send_with_gas_for_reply_as::<NftAction, Result<NftEvent, NftError>>(
                 collection_address,
                 NftAction::CanDelete,
@@ -268,15 +262,13 @@ impl NftMarketplace {
                 if answer {
                     self.collection_to_owner.remove(&collection_address);
                 } else {
-                    return Err(NftMarketplaceError("Removal denied".to_owned()));
+                    return Err(NftMarketplaceError::AccessDenied);
                 }
             } else {
-                return Err(NftMarketplaceError("Wrong received reply".to_owned()));
+                return Err(NftMarketplaceError::WrongReply);
             }
         } else {
-            return Err(NftMarketplaceError(
-                "Only the owner of the collection can send this message".to_owned(),
-            ));
+            return Err(NftMarketplaceError::AccessDenied);
         }
 
         Ok(NftMarketplaceEvent::CollectionDeleted { collection_address })
@@ -352,9 +344,7 @@ impl NftMarketplace {
             if exec::block_timestamp() - time < self.config.time_between_create_collections
                 && !self.admins.contains(user)
             {
-                return Err(NftMarketplaceError(
-                    "The time limit for creating a collection has not yet expired.".to_owned(),
-                ));
+                return Err(NftMarketplaceError::DeadlineError);
             }
         }
         Ok(())
@@ -362,9 +352,7 @@ impl NftMarketplace {
 
     fn check_admin(&self) -> Result<(), NftMarketplaceError> {
         if !self.admins.contains(&msg::source()) {
-            return Err(NftMarketplaceError(
-                "Only admin can send this message".to_owned(),
-            ));
+            return Err(NftMarketplaceError::AccessDenied);
         }
         Ok(())
     }
@@ -375,7 +363,7 @@ impl NftMarketplace {
     ) -> Result<NftEvent, NftMarketplaceError> {
         match reply {
             Ok(result) => Ok(result),
-            Err(NftError(error_string)) => Err(NftMarketplaceError(error_string.clone())),
+            Err(_) => Err(NftMarketplaceError::ErrorFromCollection),
         }
     }
 
@@ -383,13 +371,7 @@ impl NftMarketplace {
         &self,
         type_name: &str,
     ) -> Result<&TypeCollectionInfo, NftMarketplaceError> {
-        if let Some(collection_info) = self.type_collections.get(type_name) {
-            Ok(collection_info)
-        } else {
-            Err(NftMarketplaceError(
-                "There is no collection with this name yet.".to_owned(),
-            ))
-        }
+        self.type_collections.get(type_name).ok_or(NftMarketplaceError::WrongCollectionName)
     }
 }
 

@@ -13,29 +13,19 @@ impl NftMarketplace {
     ) -> Result<NftMarketplaceEvent, NftMarketplaceError> {
         // check that this collection already exists in the marketplace
         if !self.collection_to_owner.contains_key(&collection_address) {
-            return Err(NftMarketplaceError(
-                "This collection address is not in the marketplace".to_owned(),
-            ));
+            return Err(NftMarketplaceError::WrongCollectionAddress);
         }
         // check that this nft is not sale at this moment
         if self.sales.contains_key(&(collection_address, token_id)) {
-            return Err(NftMarketplaceError(
-                "This nft is already on sale.".to_owned(),
-            ));
+            return Err(NftMarketplaceError::AlreadyOnSale);
         }
         // check if this nft is currently at auction
         if self.auctions.contains_key(&(collection_address, token_id)) {
-            return Err(NftMarketplaceError(
-                "This token is on auction, cancel the auction if you wish to sale the nft"
-                    .to_owned(),
-            ));
+            return Err(NftMarketplaceError::AlreadyOnAuction);
         }
         // check that the price is more than the minimum transfer value
         if price < self.config.minimum_transfer_value {
-            return Err(NftMarketplaceError(format!(
-                "The price must be greater than existential deposit ({})",
-                self.config.minimum_transfer_value
-            )));
+            return Err(NftMarketplaceError::LessThanExistentialDeposit);
         }
 
         // send a message to the nft contract to find out information about the token
@@ -76,7 +66,7 @@ impl NftMarketplace {
                 },
             );
         } else {
-            return Err(NftMarketplaceError("Wrong received reply".to_owned()));
+            return Err(NftMarketplaceError::WrongReply);
         }
 
         Ok(NftMarketplaceEvent::SaleNft {
@@ -110,15 +100,13 @@ impl NftMarketplace {
                     // in case of successful token transfer, remove the sale from the marketplace
                     self.sales.remove(&(collection_address, token_id));
                 } else {
-                    return Err(NftMarketplaceError("Wrong received reply".to_owned()));
+                    return Err(NftMarketplaceError::WrongReply);
                 }
             } else {
-                return Err(NftMarketplaceError(
-                    "Only the nft owner can cancel the sale.".to_owned(),
-                ));
+                return Err(NftMarketplaceError::AccessDenied);
             }
         } else {
-            return Err(NftMarketplaceError("This sale does not exist".to_owned()));
+            return Err(NftMarketplaceError::SaleDoesNotExist);
         }
 
         Ok(NftMarketplaceEvent::SaleNftCanceled {
@@ -177,18 +165,14 @@ impl NftMarketplace {
         buyer: &ActorId,
     ) -> Result<(), NftMarketplaceError> {
         let payment = msg::value();
-        let nft = self.sales.get(&(*collection_address, *token_id));
+
         // check that such a sale exists and check the attached amount
-        if let Some(nft) = nft {
-            if payment < nft.price {
-                msg::send(*buyer, "", payment).expect("Error in sending value");
-                return Err(NftMarketplaceError(
-                    "The specified value is less than the price of the token".to_owned(),
-                ));
-            }
-        } else {
-            return Err(NftMarketplaceError("This sale does not exist".to_owned()));
+        let nft = self.sales.get(&(*collection_address, *token_id)).ok_or(NftMarketplaceError::SaleDoesNotExist)?;
+        if payment < nft.price {
+            msg::send(*buyer, "", payment).expect("Error in sending value");
+            return Err(NftMarketplaceError::ValueIsLessThanPrice);
         }
+
         Ok(())
     }
 }

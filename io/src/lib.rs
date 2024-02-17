@@ -195,7 +195,26 @@ pub enum NftMarketplaceEvent {
 }
 
 #[derive(Debug, Clone, Encode, Decode, TypeInfo)]
-pub struct NftMarketplaceError(pub String);
+pub enum NftMarketplaceError {
+    WrongCollectionAddress,
+    AlreadyOnAuction,
+    AuctionClosed,
+    AlreadyOnSale,
+    LessThanExistentialDeposit,
+    WrongReply,
+    WrongCollectionName,
+    AccessDenied,
+    DeadlineError,
+    ThereIsNoSuchAuction,
+    LessOrEqualThanBid,
+    NotSellable,
+    NoApproveToMarketplace,
+    ErrorFromCollection,
+    WrongDataOffer,
+    OfferDoesNotExist,
+    SaleDoesNotExist,
+    ValueIsLessThanPrice,
+}
 
 #[derive(Encode, Decode, TypeInfo)]
 pub enum StateQuery {
@@ -318,4 +337,22 @@ pub enum NftEvent {
 }
 
 #[derive(Debug, Clone, Encode, Decode, TypeInfo)]
-pub struct NftError(pub String);
+pub enum NftError {
+    MathOverflow,
+    ErrorGettingRandom,
+    TokenDoesNotExist,
+    AllTokensMinted,
+    OwnerDoesNotHaveNft,
+    AccessDenied,
+    NoApproval,
+    ThereIsApproval,
+    LimitIsZero,
+    ConfigCannotBeChanged,
+    WrongRoyalty,
+    NotTransferable,
+    UserRestrictionCannotBeChanged,
+    NoListOfRestriction,
+    ThereIsNoSuchUser,
+    ExhaustedLimit,
+    WrongValue,
+}
