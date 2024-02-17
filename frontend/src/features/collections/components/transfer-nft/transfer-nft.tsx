@@ -1,9 +1,9 @@
-import { decodeAddress } from '@gear-js/api';
 import { useAlert } from '@gear-js/react-hooks';
 import { Button } from '@gear-js/vara-ui';
 import { z } from 'zod';
 
 import { Input, NFTActionFormModal, withAccount } from '@/components';
+import { SCHEMA } from '@/consts';
 import { Collection, CollectionType, Nft } from '@/graphql/graphql';
 import { useCollectionMessage, useIsOwner, useLoading, useModal } from '@/hooks';
 
@@ -13,22 +13,8 @@ const defaultValues = {
   address: '',
 };
 
-const isValidAddress = (address: string) => {
-  try {
-    decodeAddress(address);
-    return true;
-  } catch {
-    return false;
-  }
-};
-
 const schema = z.object({
-  address: z
-    .string()
-    .trim()
-    .min(0)
-    .refine((value) => isValidAddress(value), 'Invalid address')
-    .transform((value) => decodeAddress(value)),
+  address: SCHEMA.ADDRESS,
 });
 
 type Props = Pick<Nft, 'idInCollection' | 'name' | 'mediaUrl' | 'owner'> & {
