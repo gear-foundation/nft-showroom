@@ -17,6 +17,10 @@ const DEFAULT_SUMMARY_VALUES: SummaryValues = {
 };
 
 const DEFAULT_PARAMETERS_VALUES: ParametersValues = {
+  mintPermission: {
+    value: 'any',
+    addresses: [],
+  },
   mintLimit: '',
   mintPrice: '',
   royalty: '',

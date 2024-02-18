@@ -1,3 +1,7 @@
+import { decodeAddress } from '@gear-js/api';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { ZodType, z } from 'zod';
+
 import { ADDRESS } from './consts';
 import { Entries } from './types';
 
@@ -20,4 +24,13 @@ const getIpfsLink = (value: string) => {
 const isObject = (value: unknown): value is Record<string, unknown> =>
   typeof value === 'object' && !Array.isArray(value) && value !== null;
 
-export { cx, getTypedEntries, getIpfsLink, isObject };
+const isValidAddress = (address: string) => {
+  try {
+    decodeAddress(address);
+    return true;
+  } catch {
+    return false;
+  }
+};
+
+export { cx, getTypedEntries, getIpfsLink, isObject, isValidAddress };
