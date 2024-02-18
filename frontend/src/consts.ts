@@ -1,4 +1,7 @@
-import { HexString } from '@gear-js/api';
+import { HexString, decodeAddress } from '@gear-js/api';
+import { z } from 'zod';
+
+import { isValidAddress } from './utils';
 
 const ADDRESS = {
   NODE: import.meta.env.VITE_NODE_ADDRESS as string,
@@ -17,4 +20,12 @@ const ROUTE = {
   NFTS: '/nfts',
 };
 
-export { ADDRESS, ROUTE };
+const SCHEMA = {
+  ADDRESS: z
+    .string()
+    .trim()
+    .refine((value) => isValidAddress(value), 'Invalid address')
+    .transform((value) => decodeAddress(value)),
+};
+
+export { ADDRESS, ROUTE, SCHEMA };

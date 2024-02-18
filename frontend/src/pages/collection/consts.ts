@@ -23,6 +23,7 @@ const COLLECTION_QUERY = graphql(`
       collectionLogo
       admin
       tokensLimit
+      permissionToMint
       userMintLimit
       paymentForMint
       transferable

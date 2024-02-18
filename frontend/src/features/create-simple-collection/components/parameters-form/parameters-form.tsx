@@ -8,9 +8,10 @@ import VaraSVG from '@/assets/vara.svg?react';
 import { Container } from '@/components';
 import { useChangeEffect } from '@/hooks';
 
-import CrossSVG from '../../assets/cross-tag.svg?react';
 import PercentSVG from '../../assets/percent.svg?react';
 import { ParametersValues } from '../../types';
+import { MintPermissionForm } from '../mint-permission-form/mint-permission-form';
+import { Tag } from '../tag';
 
 import styles from './parameters-form.module.scss';
 
@@ -23,22 +24,31 @@ type Props = {
 const PLACEHOLDER_TAG = { value: '', label: 'Select tag' };
 const TAGS = ['Game', 'Metaverse', 'Hero'];
 
-const schema = z.object({
-  mintLimit: z.string().trim(),
-  mintPrice: z.string().trim(),
-  tags: z.array(z.object({ value: z.string() })),
-  royalty: z.coerce
-    .number()
-    .max(100)
-    .transform((value) => value.toString()),
-  isSellable: z.boolean(),
-  isTransferable: z.boolean(),
-});
+const schema = z
+  .object({
+    mintPermission: z.object({
+      value: z.string(),
+      addresses: z.array(z.object({ value: z.string() })),
+    }),
+    mintLimit: z.string().trim(),
+    mintPrice: z.string().trim(),
+    tags: z.array(z.object({ value: z.string() })),
+    royalty: z.coerce
+      .number()
+      .max(100)
+      .transform((value) => value.toString()),
+    isSellable: z.boolean(),
+    isTransferable: z.boolean(),
+  })
+  .refine(({ mintPermission }) => mintPermission.value !== 'custom' || mintPermission.addresses.length, {
+    message: 'No specifed address',
+    path: ['mintPermission.value'],
+  });
 
 const resolver = zodResolver(schema);
 
 function ParametersForm({ defaultValues, onSubmit, onBack }: Props) {
-  const { control, formState, register, handleSubmit, setValue } = useForm({ defaultValues, resolver });
+  const { control, formState, register, handleSubmit, setValue, clearErrors } = useForm({ defaultValues, resolver });
   const { errors } = formState;
   const isSellable = useWatch({ control, name: 'isSellable' });
 
@@ -56,13 +66,11 @@ function ParametersForm({ defaultValues, onSubmit, onBack }: Props) {
     target.value = ''; // reset to placeholder value, since selected options will be deleted
   };
 
-  const getTags = () =>
+  const renderTags = () =>
     fields.map(({ value }, index) => (
-      <li key={value} className={styles.tag}>
+      <Tag key={value} onRemoveClick={() => remove(index)}>
         {value}
-
-        <Button icon={CrossSVG} color="transparent" onClick={() => remove(index)} />
-      </li>
+      </Tag>
     ));
 
   return (
@@ -70,38 +78,49 @@ function ParametersForm({ defaultValues, onSubmit, onBack }: Props) {
       <h3 className={styles.heading}>Set Collection Parameters</h3>
       <p className={styles.text}>Once the collection is created, they cannot be modified.</p>
 
-      <form onSubmit={handleSubmit(onSubmit)} className={styles.form}>
-        <Input type="number" label={`Minting limit per user`} {...register('mintLimit')} />
-        <Input type="number" icon={VaraSVG} label={'Minting price'} {...register('mintPrice')} />
-
-        <div>
-          <Select
-            label="Tags"
-            options={[PLACEHOLDER_TAG, ...options]}
-            onChange={handleTagChange}
-            disabled={!options.length}
-          />
-
-          <ul className={styles.tags}>{getTags()}</ul>
-        </div>
-
-        <Checkbox label="Allow transferring" type="switch" {...register('isTransferable')} disabled={isSellable} />
-        <Checkbox label="Allow selling" type="switch" {...register('isSellable')} />
-
-        <Input
-          type="number"
-          icon={PercentSVG}
-          label="Creator royalties"
-          disabled={!isSellable}
-          {...register('royalty')}
-          error={errors.royalty?.message}
+      <div className={styles.form}>
+        <MintPermissionForm
+          onChange={(value) => {
+            setValue('mintPermission', value);
+            clearErrors('mintPermission.value'); // TODO: find more clear way to handle nested forms
+          }}
+          defaultValues={defaultValues.mintPermission}
+          error={errors.mintPermission?.value?.message}
         />
 
-        <div className={styles.buttons}>
-          <Button text="Back" color="border" onClick={onBack} />
-          <Button type="submit" text="Continue" />
-        </div>
-      </form>
+        <form onSubmit={handleSubmit(onSubmit)} className={styles.form}>
+          <Input type="number" label={`Minting limit per user`} {...register('mintLimit')} />
+          <Input type="number" icon={VaraSVG} label={'Minting price'} {...register('mintPrice')} />
+
+          <div>
+            <Select
+              label="Tags"
+              options={[PLACEHOLDER_TAG, ...options]}
+              onChange={handleTagChange}
+              disabled={!options.length}
+            />
+
+            {Boolean(fields.length) && <ul className={styles.tags}>{renderTags()}</ul>}
+          </div>
+
+          <Checkbox label="Allow transferring" type="switch" {...register('isTransferable')} disabled={isSellable} />
+          <Checkbox label="Allow selling" type="switch" {...register('isSellable')} />
+
+          <Input
+            type="number"
+            icon={PercentSVG}
+            label="Creator royalties"
+            disabled={!isSellable}
+            {...register('royalty')}
+            error={errors.royalty?.message}
+          />
+
+          <div className={styles.buttons}>
+            <Button text="Back" color="border" onClick={onBack} />
+            <Button type="submit" text="Continue" />
+          </div>
+        </form>
+      </div>
     </Container>
   );
 }
