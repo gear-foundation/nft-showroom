@@ -78,10 +78,6 @@ function CreateSimpleCollectionModal({ close }: Pick<ModalProps, 'close'>) {
     const collectionLogo = logo ? await uploadToIpfs(logo) : null;
     const additionalLinks = { telegram, medium, discord, externalUrl, xcom };
 
-    const permissionToMint = ['admin', 'custom'].includes(mintPermission.value)
-      ? mintPermission.addresses.map(({ value }) => value)
-      : null;
-
     const userMintLimit = mintLimit || null;
     const transferable = isTransferable ? '0' : null;
     const sellable = isSellable ? '0' : null;
@@ -91,13 +87,16 @@ function CreateSimpleCollectionModal({ close }: Pick<ModalProps, 'close'>) {
 
     const imgLinksAndData = await Promise.all(nfts.map((nft) => getNftPayload(nft)));
 
+    const permissionToMint = ['admin', 'custom'].includes(mintPermission.value)
+      ? mintPermission.addresses.map(({ value }) => value)
+      : null;
+
     const config = {
       name,
       description,
       collectionBanner,
       collectionLogo,
       additionalLinks,
-      permissionToMint,
       userMintLimit,
       royalty,
       paymentForMint,
@@ -106,7 +105,7 @@ function CreateSimpleCollectionModal({ close }: Pick<ModalProps, 'close'>) {
       collectionTags,
     };
 
-    return { collectionOwner, config, imgLinksAndData };
+    return { collectionOwner, config, imgLinksAndData, permissionToMint };
   };
 
   const getBytesPayload = (payload: Awaited<ReturnType<typeof getFormPayload>>) => {
