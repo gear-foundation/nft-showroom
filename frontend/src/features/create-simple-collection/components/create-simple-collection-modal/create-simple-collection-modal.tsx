@@ -72,11 +72,15 @@ function CreateSimpleCollectionModal({ close }: Pick<ModalProps, 'close'>) {
     const collectionOwner = account?.decodedAddress;
 
     const { cover, logo, name, description, telegram, medium, discord, url: externalUrl, x: xcom } = summaryValues;
-    const { isTransferable, isSellable, tags, royalty, mintLimit, mintPrice } = parametersValues;
+    const { mintPermission, isTransferable, isSellable, tags, royalty, mintLimit, mintPrice } = parametersValues;
 
     const collectionBanner = cover ? await uploadToIpfs(cover) : null;
     const collectionLogo = logo ? await uploadToIpfs(logo) : null;
     const additionalLinks = { telegram, medium, discord, externalUrl, xcom };
+
+    const permissionToMint = ['admin', 'custom'].includes(mintPermission.value)
+      ? mintPermission.addresses.map(({ value }) => value)
+      : null;
 
     const userMintLimit = mintLimit || null;
     const transferable = isTransferable ? '0' : null;
@@ -93,6 +97,7 @@ function CreateSimpleCollectionModal({ close }: Pick<ModalProps, 'close'>) {
       collectionBanner,
       collectionLogo,
       additionalLinks,
+      permissionToMint,
       userMintLimit,
       royalty,
       paymentForMint,

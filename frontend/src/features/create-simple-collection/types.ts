@@ -11,6 +11,10 @@ type SummaryValues = {
 };
 
 type ParametersValues = {
+  mintPermission: {
+    value: 'any' | 'admin' | 'custom';
+    addresses: { value: string }[];
+  };
   mintLimit: string;
   mintPrice: string;
   tags: { value: string }[];
