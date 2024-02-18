@@ -22,7 +22,7 @@ import { ParametersForm } from '../parameters-form';
 import { SummaryForm } from '../summary-form';
 
 // TODO: get collection type metadata
-const SIMPLE_COLLECTION_ID = '0x605b40eca154cc101178294a214ca8742dd1012f91111d5aecbfa9efe0aa9dfc';
+const SIMPLE_COLLECTION_ID = '0x45c6b76956d38a14530a755ed6ca5b5f143d47f7a7d011b17cee740fe42c8f45';
 
 function CreateSimpleCollectionModal({ close }: Pick<ModalProps, 'close'>) {
   const [stepIndex, setStepIndex] = useState(0);
