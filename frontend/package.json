@@ -12,7 +12,7 @@
   },
   "dependencies": {
     "@gear-js/api": "0.36.3",
-    "@gear-js/react-hooks": "0.10.2",
+    "@gear-js/react-hooks": "0.10.3",
     "@gear-js/vara-ui": "0.0.6",
     "@hookform/resolvers": "3.3.3",
     "@polkadot/api": "10.11.2",

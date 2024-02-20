@@ -1,5 +1,5 @@
-import { HexString, UserMessageSent } from '@gear-js/api';
-import { useAccount, useAlert, useApi, useSendMessageHandler } from '@gear-js/react-hooks';
+import { HexString, ProgramMetadata, UserMessageSent } from '@gear-js/api';
+import { useAccount, useAlert, useApi, useSendMessageWithGas } from '@gear-js/react-hooks';
 import { UnsubscribePromise } from '@polkadot/api/types';
 import { AnyJson } from '@polkadot/types/types';
 
@@ -38,12 +38,12 @@ type Reply<T> = T extends CreateCollectionPayload
   ? { approved: unknown }
   : AnyJson;
 
-const useSendMessageWithReply = (...args: Parameters<typeof useSendMessageHandler>) => {
+const useSendMessageWithReply = (programId: HexString, metadata: ProgramMetadata | undefined) => {
   const { api, isApiReady } = useApi();
   const { account } = useAccount();
   const alert = useAlert();
 
-  const sendMessage = useSendMessageHandler(...args);
+  const sendMessage = useSendMessageWithGas(programId, metadata, { disableAlerts: true, gasMultiplier: 1.1 });
 
   // TODO: different payload types for marketplace and collection hooks
   return <T extends Payload>({
@@ -59,7 +59,6 @@ const useSendMessageWithReply = (...args: Parameters<typeof useSendMessageHandle
     if (!isApiReady) throw new Error('API is not initialized');
     if (!account) throw new Error('Account is not found');
 
-    const [programId, metadata] = args;
     let unsub: UnsubscribePromise | undefined = undefined;
 
     const _onFinally = () => {
@@ -115,13 +114,13 @@ const useSendMessageWithReply = (...args: Parameters<typeof useSendMessageHandle
 function useMarketplaceMessage() {
   const { marketplaceMetadata } = useMetadata();
 
-  return useSendMessageWithReply(ADDRESS.CONTRACT, marketplaceMetadata, { disableAlerts: true });
+  return useSendMessageWithReply(ADDRESS.CONTRACT, marketplaceMetadata);
 }
 
 function useCollectionMessage(id: string, typeId: string) {
   const { collectionsMetadata } = useMetadata();
 
-  return useSendMessageWithReply(id as HexString, collectionsMetadata?.[typeId], { disableAlerts: true });
+  return useSendMessageWithReply(id as HexString, collectionsMetadata?.[typeId]);
 }
 
 function useApprovedMessage(collectionId: string, collectionTypeId: string) {
