@@ -62,9 +62,9 @@ impl NftContract {
                 personal_id: *id,
             },
             0,
-            60,
+            200, // delay is 200 = 10 minutes
         )
-        .expect("Error in sending delayed message"); // delay is 60 = 3 minutes
+        .expect("Error in sending delayed message"); 
 
         Ok(NftEvent::PhaseOneOfMintDone {
             minter_to_personal_id: (msg_src, *id),

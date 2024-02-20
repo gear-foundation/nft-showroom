@@ -1,4 +1,4 @@
-use nft_io::ContractMetadata;
+use ai_nft_io::ContractMetadata;
 
 fn main() {
     gear_wasm_builder::build_with_metadata::<ContractMetadata>();
