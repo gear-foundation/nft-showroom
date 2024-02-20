@@ -1,6 +1,7 @@
 [workspace]
 
 members = [
+    "ai-nft",
     "auto-changed-nft",
     "nft",
     "composable-nft",
@@ -25,6 +26,7 @@ nft-io = { path = "nft/io" }
 music-nft-io = { path = "music-nft/io" }
 composable-nft-io = { path = "composable-nft/io" }
 auto-changed-nft-io = { path = "auto-changed-nft/io" }
+ai-nft-io = { path = "ai-nft/io" }
 gcore.workspace = true
 
 
@@ -68,6 +70,7 @@ nft-io = { path = "nft/io" }
 composable-nft-io = { path = "composable-nft/io" }
 music-nft-io = { path = "music-nft/io" }
 auto-changed-nft-io = { path = "auto-changed-nft/io" }
+ai-nft-io = { path = "ai-nft/io" }
 tokio = "1"
 scale-info = { version = "2", default-features = false }
 parity-scale-codec = { version = "3", default-features = false }
