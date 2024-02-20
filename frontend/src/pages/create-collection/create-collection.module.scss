@@ -17,3 +17,9 @@
   line-height: 26px;
   color: #535352;
 }
+
+.collections {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}

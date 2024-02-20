@@ -1,5 +1,5 @@
-import { CreateSimpleCollection } from './components';
+import { CreateSimpleCollection, CreateAICollection } from './components';
 import { CreateCollectionPayload, CreateCollectionReply } from './types';
 
-export { CreateSimpleCollection };
+export { CreateSimpleCollection, CreateAICollection };
 export type { CreateCollectionPayload, CreateCollectionReply };

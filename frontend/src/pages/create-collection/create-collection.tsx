@@ -1,5 +1,5 @@
 import { Container } from '@/components';
-import { CreateSimpleCollection } from '@/features/create-simple-collection';
+import { CreateAICollection, CreateSimpleCollection } from '@/features/create-simple-collection';
 
 import styles from './create-collection.module.scss';
 
@@ -13,7 +13,14 @@ function CreateCollection() {
         compositions, or NFT Collections for Music Creators to craft musical NFTs.
       </p>
 
-      <CreateSimpleCollection />
+      <ul className={styles.collections}>
+        <li>
+          <CreateSimpleCollection />
+        </li>
+        <li>
+          <CreateAICollection />
+        </li>
+      </ul>
     </Container>
   );
 }
