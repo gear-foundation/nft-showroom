@@ -50,7 +50,7 @@ export const useSendMessageWithReply = (programId: HexString, metadata: ProgramM
   const { account } = useAccount();
   const alert = useAlert();
 
-  const sendMessage = useSendMessageWithGas(programId, metadata, { disableAlerts: true, gasMultiplier: 1.1 });
+  const sendMessage = useSendMessageWithGas(programId, metadata, { disableAlerts: true, gasMultiplier: 30 });
 
   // TODO: different payload types for marketplace and collection hooks
   return <T extends Payload>({

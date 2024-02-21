@@ -10,7 +10,7 @@ const ADDRESS = {
   CONTRACT: import.meta.env.VITE_CONTRACT_ADDRESS as HexString,
   INDEXER: import.meta.env.VITE_INDEXER_ADDRESS as string,
   INDEXER_WS: import.meta.env.VITE_INDEXER_WS_ADDRESS as string,
-  AI_COLLECTION: '0xa6f47f4245d70a51ca208bf0dc824c079a3c34260ebecd348f06083022876d3d' as HexString,
+  AI_COLLECTION: '0xb9d63a40b4c39746170eee04ac1713ba7df4ad30ccacc0ea64921b4cfb5d6ebb' as HexString,
 };
 
 const ROUTE = {
