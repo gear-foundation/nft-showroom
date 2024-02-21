@@ -5,7 +5,7 @@ import { generatePath, useNavigate } from 'react-router-dom';
 
 import { Container } from '@/components';
 import { ROUTE } from '@/consts';
-import { useIPFS, useMetadata } from '@/context';
+import { useMetadata } from '@/context';
 import { useLoading, useMarketplaceMessage } from '@/hooks';
 
 import {
@@ -16,6 +16,7 @@ import {
   STEPS,
 } from '../../consts';
 import { CreateCollectionReply, NFT, NFTsValues, ParametersValues, SummaryValues } from '../../types';
+import { uploadToIpfs } from '../../utils';
 import { FullScreenModal } from '../full-screen-modal';
 import { NFTForm } from '../nft-form';
 import { ParametersForm } from '../parameters-form';
@@ -35,7 +36,6 @@ function CreateSimpleCollectionModal({ close }: Pick<ModalProps, 'close'>) {
   const alert = useAlert();
   const navigate = useNavigate();
 
-  const ipfs = useIPFS();
   const { collectionsMetadata } = useMetadata();
   const collectionMetadata = collectionsMetadata?.[SIMPLE_COLLECTION_ID];
   const sendMessage = useMarketplaceMessage();
@@ -53,12 +53,6 @@ function CreateSimpleCollectionModal({ close }: Pick<ModalProps, 'close'>) {
     nextStep();
   };
 
-  const uploadToIpfs = async (file: File) => {
-    const { cid } = await ipfs.add(file);
-
-    return `ipfs://${cid.toString()}`;
-  };
-
   const getNftPayload = async ({ file, limit }: NFT) => {
     const cid = await uploadToIpfs(file);
 
@@ -74,6 +68,7 @@ function CreateSimpleCollectionModal({ close }: Pick<ModalProps, 'close'>) {
     const { cover, logo, name, description, telegram, medium, discord, url: externalUrl, x: xcom } = summaryValues;
     const { mintPermission, isTransferable, isSellable, tags, royalty, mintLimit, mintPrice } = parametersValues;
 
+    // TODO: upload in batch
     const collectionBanner = cover ? await uploadToIpfs(cover) : null;
     const collectionLogo = logo ? await uploadToIpfs(logo) : null;
     const additionalLinks = { telegram, medium, discord, externalUrl, xcom };
@@ -121,23 +116,28 @@ function CreateSimpleCollectionModal({ close }: Pick<ModalProps, 'close'>) {
   };
 
   const handleNFTsSubmit = async ({ nfts }: NFTsValues) => {
-    enableLoading();
-
-    const formPayload = await getFormPayload(nfts);
-    const bytesPayload = getBytesPayload(formPayload);
-    const payload = { CreateCollection: { typeName: COLLECTION_NAME, payload: bytesPayload } };
-
-    const onSuccess = ({ collectionCreated }: CreateCollectionReply) => {
-      const id = collectionCreated.collectionAddress;
-      const url = generatePath(ROUTE.COLLECTION, { id });
-
-      navigate(url);
-      alert.success('Collection created');
-    };
-
     const onFinally = disableLoading;
 
-    sendMessage({ payload, onSuccess, onFinally });
+    try {
+      enableLoading();
+
+      const formPayload = await getFormPayload(nfts);
+      const bytesPayload = getBytesPayload(formPayload);
+      const payload = { CreateCollection: { typeName: COLLECTION_NAME, payload: bytesPayload } };
+
+      const onSuccess = ({ collectionCreated }: CreateCollectionReply) => {
+        const id = collectionCreated.collectionAddress;
+        const url = generatePath(ROUTE.COLLECTION, { id });
+
+        navigate(url);
+        alert.success('Collection created');
+      };
+
+      sendMessage({ payload, onSuccess, onFinally });
+    } catch (error) {
+      alert.error(error instanceof Error ? error.message : String(error));
+      onFinally();
+    }
   };
 
   const getForm = () => {
