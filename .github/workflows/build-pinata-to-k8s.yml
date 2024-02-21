@@ -70,6 +70,7 @@ jobs:
       - name: Build and push image
         uses: docker/build-push-action@v5
         with:
+          context: pinata-proxy
           file: pinata-proxy/Dockerfile
           push: true
           tags: ${{ needs.prepair.outputs.image_name }}
