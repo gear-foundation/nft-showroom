@@ -9,6 +9,7 @@ import { useIPFS, useMetadata } from '@/context';
 import { useLoading, useMarketplaceMessage } from '@/hooks';
 
 import {
+  COLLECTION_CODE_ID,
   COLLECTION_NAME,
   DEFAULT_NFTS_VALUES,
   DEFAULT_PARAMETERS_VALUES,
@@ -20,9 +21,6 @@ import { FullScreenModal } from '../full-screen-modal';
 import { NFTForm } from '../nft-form';
 import { ParametersForm } from '../parameters-form';
 import { SummaryForm } from '../summary-form';
-
-// TODO: get collection type metadata
-const SIMPLE_COLLECTION_ID = '0x45c6b76956d38a14530a755ed6ca5b5f143d47f7a7d011b17cee740fe42c8f45';
 
 function CreateSimpleCollectionModal({ close }: Pick<ModalProps, 'close'>) {
   const [stepIndex, setStepIndex] = useState(0);
@@ -37,7 +35,7 @@ function CreateSimpleCollectionModal({ close }: Pick<ModalProps, 'close'>) {
 
   const ipfs = useIPFS();
   const { collectionsMetadata } = useMetadata();
-  const collectionMetadata = collectionsMetadata?.[SIMPLE_COLLECTION_ID];
+  const collectionMetadata = collectionsMetadata?.[COLLECTION_CODE_ID.SIMPLE];
   const sendMessage = useMarketplaceMessage();
 
   const nextStep = () => setStepIndex((prevIndex) => prevIndex + 1);
@@ -125,7 +123,7 @@ function CreateSimpleCollectionModal({ close }: Pick<ModalProps, 'close'>) {
 
     const formPayload = await getFormPayload(nfts);
     const bytesPayload = getBytesPayload(formPayload);
-    const payload = { CreateCollection: { typeName: COLLECTION_NAME, payload: bytesPayload } };
+    const payload = { CreateCollection: { typeName: COLLECTION_NAME.SIMPLE, payload: bytesPayload } };
 
     const onSuccess = ({ collectionCreated }: CreateCollectionReply) => {
       const id = collectionCreated.collectionAddress;
@@ -166,7 +164,7 @@ function CreateSimpleCollectionModal({ close }: Pick<ModalProps, 'close'>) {
   };
 
   return (
-    <FullScreenModal heading="Create Simple NFT Collection" steps={STEPS} stepIndex={stepIndex} close={close}>
+    <FullScreenModal heading="Create Simple NFT Collection" steps={STEPS.SIMPLE} stepIndex={stepIndex} close={close}>
       {getForm()}
     </FullScreenModal>
   );

@@ -32,6 +32,10 @@ type NFTsValues = {
   nfts: NFT[];
 };
 
+type DictionaryValues = {
+  words: { value: string }[];
+};
+
 type CreateCollectionPayload = {
   CreateCollection: {
     typeName: string;
@@ -45,4 +49,12 @@ type CreateCollectionReply = {
   };
 };
 
-export type { SummaryValues, ParametersValues, NFT, NFTsValues, CreateCollectionPayload, CreateCollectionReply };
+export type {
+  SummaryValues,
+  ParametersValues,
+  NFT,
+  NFTsValues,
+  DictionaryValues,
+  CreateCollectionPayload,
+  CreateCollectionReply,
+};
