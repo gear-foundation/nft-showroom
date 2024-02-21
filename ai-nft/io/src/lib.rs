@@ -26,6 +26,7 @@ pub struct NftInit {
     pub permission_to_mint: Option<Vec<ActorId>>,
     pub dictionary: Vec<String>,
     pub total_number_of_tokens: Option<u64>,
+    pub waiting_time_sec: u32, 
 }
 
 #[derive(Debug, Clone, Encode, Decode, TypeInfo)]
@@ -109,6 +110,7 @@ pub enum NftAction {
         minter: ActorId,
         personal_id: u32,
     },
+    ChangeWaitingTime(u32)
 }
 
 #[derive(Debug, Clone, Encode, Decode, TypeInfo)]
@@ -165,6 +167,7 @@ pub enum NftEvent {
     LiftRestrictionMint,
     DictionaryExpanded,
     Checked,
+    WaitingTimeChanged(u32),
 }
 #[derive(Debug, Clone, Encode, Decode, TypeInfo)]
 pub enum NftError {
@@ -199,6 +202,7 @@ pub struct NftState {
     pub permission_to_mint: Option<Vec<ActorId>>,
     pub pending_mint: Vec<((ActorId, u32), Vec<String>)>,
     pub total_number_of_tokens: Option<u64>,
+    pub waiting_time_sec: u32,
 }
 
 #[derive(Debug, Clone, Encode, Decode, TypeInfo)]

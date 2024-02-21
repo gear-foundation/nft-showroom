@@ -23,6 +23,7 @@ struct NftContract {
     pub permission_to_mint: Option<Vec<ActorId>>,
     pub dictionary: Vec<String>,
     pub total_number_of_tokens: Option<u64>,
+    pub waiting_time_sec: u32,
 }
 static mut NFT_CONTRACT: Option<NftContract> = None;
 
@@ -62,7 +63,7 @@ impl NftContract {
                 personal_id: *id,
             },
             0,
-            200, // delay is 200 = 10 minutes
+            self.waiting_time_sec/3 + 1,
         )
         .expect("Error in sending delayed message"); 
 
@@ -352,7 +353,14 @@ impl NftContract {
 
         Ok(NftEvent::DictionaryExpanded)
     }
+    fn change_waiting_time(&mut self, time: u32) -> Result<NftEvent, NftError> {
+        let msg_src = msg::source();
+        self.check_collection_owner(msg_src)?;
 
+        self.waiting_time_sec = time;
+        Ok(NftEvent::WaitingTimeChanged(time))
+    }
+    
     fn can_delete(&self) -> Result<NftEvent, NftError> {
         Ok(NftEvent::CanDelete(self.tokens.is_empty()))
     }
@@ -475,6 +483,7 @@ extern "C" fn init() {
         mut permission_to_mint,
         dictionary,
         total_number_of_tokens,
+        waiting_time_sec,
     } = msg::load().expect("Unable to decode `NftInit`.");
 
     assert!(
@@ -526,6 +535,7 @@ extern "C" fn init() {
             permission_to_mint: permission_to_mint.clone(),
             total_number_of_tokens,
             dictionary,
+            waiting_time_sec
         })
     };
     msg::send(
@@ -596,6 +606,7 @@ extern "C" fn handle() {
         NftAction::DeleteUserForMint { user } => nft_contract.delete_user_for_mint(user),
         NftAction::LiftRestrictionMint => nft_contract.lift_restrictions_mint(),
         NftAction::ExpandDictionary(new_words) => nft_contract.expand_dictionary(new_words),
+        NftAction::ChangeWaitingTime(time_sec) => nft_contract.change_waiting_time(time_sec),
     };
 
     msg::reply(result, 0).expect("Failed to encode or reply with `Result<NftEvent, NftError>`.");
@@ -633,6 +644,7 @@ impl From<NftContract> for NftState {
             permission_to_mint,
             pending_mint,
             total_number_of_tokens,
+            waiting_time_sec,
             ..
         } = value;
 
@@ -660,7 +672,8 @@ impl From<NftContract> for NftState {
             collection_owner,
             permission_to_mint,
             pending_mint,
-            total_number_of_tokens
+            total_number_of_tokens,
+            waiting_time_sec
         }
     }
 }
