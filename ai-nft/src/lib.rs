@@ -99,11 +99,13 @@ impl NftContract {
             .or_insert_with(|| HashSet::from([token_id]));
 
         let name = format!("{} - {}", self.config.name, token_id);
+        let words = self.pending_mint.get(&(minter, personal_id)).expect("Critical error").join(", ");
+
         let nft_data = Nft {
             owner: minter,
             name,
             description: self.config.description.clone(),
-            metadata: vec![],
+            metadata: vec![words],
             media_url: img_link.clone(),
             mint_time: exec::block_timestamp(),
         };
