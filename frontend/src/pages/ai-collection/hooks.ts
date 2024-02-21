@@ -1,12 +1,10 @@
 import { ProgramMetadata, HexString } from '@gear-js/api';
 import { useAlert, useReadFullState, withoutCommas } from '@gear-js/react-hooks';
-import { AnyJson } from '@polkadot/types/types';
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect } from 'react';
 
 import { ADDRESS } from '@/consts';
 import { COLLECTION_CODE_ID } from '@/features/create-simple-collection/consts';
 import { useSendMessageWithReply } from '@/hooks/api';
-import { getIpfsLink } from '@/utils';
 
 import metadataSource from './assets/ai_nft.meta.txt';
 
@@ -77,16 +75,6 @@ function useProgramMetadata(source: string) {
 
   return metadata;
 }
-
-// function useMarketplaceMetadata() {
-//   return useProgramMetadata(metadataSource);
-// }
-
-// function useMarketplaceState<T>(payload: AnyJson) {
-//   const metadata = useMarketplaceMetadata();
-
-//   return useReadFullState<T>(ADDRESS.CONTRACT, metadata, payload);
-// }
 
 function useCollectionMetadata() {
   return useProgramMetadata(metadataSource);
