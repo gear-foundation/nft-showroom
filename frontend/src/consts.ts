@@ -5,7 +5,7 @@ import { isValidAddress } from './utils';
 
 const ADDRESS = {
   NODE: import.meta.env.VITE_NODE_ADDRESS as string,
-  IPFS: import.meta.env.VITE_IPFS_ADDRESS as string,
+  IPFS_UPLOAD: import.meta.env.VITE_IPFS_UPLOAD_ADDRESS as string,
   IPFS_GATEWAY: import.meta.env.VITE_IPFS_GATEWAY_ADDRESS as string,
   CONTRACT: import.meta.env.VITE_CONTRACT_ADDRESS as HexString,
   INDEXER: import.meta.env.VITE_INDEXER_ADDRESS as string,

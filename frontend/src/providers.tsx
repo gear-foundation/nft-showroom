@@ -10,14 +10,10 @@ import { ComponentType } from 'react';
 import { Client, Provider as UrqlProvider, cacheExchange, fetchExchange, subscriptionExchange } from 'urql';
 
 import { ADDRESS } from './consts';
-import { IPFSProvider as GearIPFSProvider, MetadataProvider } from './context';
+import { MetadataProvider } from './context';
 
 function ApiProvider({ children }: ProviderProps) {
   return <GearApiProvider initialArgs={{ endpoint: ADDRESS.NODE }}>{children}</GearApiProvider>;
-}
-
-function IPFSProvider({ children }: ProviderProps) {
-  return <GearIPFSProvider url={ADDRESS.IPFS}>{children}</GearIPFSProvider>;
 }
 
 const wsClient = createClient({ url: ADDRESS.INDEXER_WS });
@@ -55,7 +51,7 @@ function AlertProvider({ children }: ProviderProps) {
   );
 }
 
-const providers = [ApiProvider, IPFSProvider, AccountProvider, AlertProvider, IndexerProvider, MetadataProvider];
+const providers = [ApiProvider, AccountProvider, AlertProvider, IndexerProvider, MetadataProvider];
 
 const withProviders = (Component: ComponentType) => () =>
   providers.reduceRight((children, Provider) => <Provider>{children}</Provider>, <Component />);
