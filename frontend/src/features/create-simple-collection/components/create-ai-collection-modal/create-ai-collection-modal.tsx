@@ -23,7 +23,7 @@ import { ParametersForm } from '../parameters-form';
 import { SummaryForm } from '../summary-form';
 
 function CreateAICollectionModal({ close }: Pick<ModalProps, 'close'>) {
-  const [stepIndex, setStepIndex] = useState(2);
+  const [stepIndex, setStepIndex] = useState(0);
   const [summaryValues, setSummaryValues] = useState(DEFAULT_SUMMARY_VALUES);
   const [parametersValues, setParametersValues] = useState(DEFAULT_PARAMETERS_VALUES);
   const [isLoading, enableLoading, disableLoading] = useLoading();
