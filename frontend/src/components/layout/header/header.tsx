@@ -1,6 +1,7 @@
 import { useAccount } from '@gear-js/react-hooks';
+import { generatePath } from 'react-router-dom';
 
-import { ROUTE } from '@/consts';
+import { ADDRESS, ROUTE } from '@/consts';
 import { Wallet, Balance } from '@/features/wallet';
 
 import { LinkButton } from '../../buttons';
@@ -15,7 +16,16 @@ function Header() {
   return (
     <header className={styles.header}>
       <Container className={styles.container}>
-        <Logo />
+        <div>
+          <Logo />
+          <LinkButton
+            text="AI Collection"
+            to={generatePath(ROUTE.COLLECTION, { id: ADDRESS.AI_COLLECTION })}
+            className={styles.aiLink}
+            size="small"
+            color="dark"
+          />
+        </div>
 
         <div className={styles.wallet}>
           <Balance />

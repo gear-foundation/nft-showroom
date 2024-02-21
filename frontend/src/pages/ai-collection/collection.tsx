@@ -3,19 +3,18 @@ import { useForm } from 'react-hook-form';
 import { generatePath, useParams } from 'react-router-dom';
 
 import { Breadcrumbs, Container, FilterButton, InfoCard, List, SearchInput } from '@/components';
-import { ADDRESS, ROUTE } from '@/consts';
-import { MintLimitInfoCard, MintNFT, NFTCard, Skeleton } from '@/features/collections';
+import { ROUTE } from '@/consts';
+import { MintLimitInfoCard, NFTCard, Skeleton } from '@/features/collections';
 import CollectionHeaderSkeletonSVG from '@/features/collections/assets/collection-header-skeleton.svg?react';
 import NFTCardSkeletonSVG from '@/features/collections/assets/nft-card-skeleton.svg?react';
 import { GRID_SIZE, GridSize, useGridSize } from '@/features/lists';
 import { getIpfsLink } from '@/utils';
 
-import { AICollection } from '../ai-collection';
-
 import UserSVG from './assets/user.svg?react';
 import styles from './collection.module.scss';
 import { SOCIAL_ICON } from './consts';
 import { useCollection } from './hooks';
+import { MintAINFT } from './mint-ai-nft';
 
 function useSearchQuery() {
   const { handleSubmit, register } = useForm({ defaultValues: { query: '' } });
@@ -32,10 +31,10 @@ type Params = {
 
 const NFT_SKELETONS = new Array<null>(4).fill(null);
 
-function SimpleCollection() {
+function AICollection() {
   const { id } = useParams() as Params;
-
   const collection = useCollection(id);
+  console.log('collection: ', collection);
 
   const { gridSize, setGridSize } = useGridSize();
   const { query, onSubmit, register } = useSearchQuery();
@@ -87,7 +86,7 @@ function SimpleCollection() {
             <div>
               <ul className={styles.socials}>{renderSocials()}</ul>
 
-              <MintNFT {...collection} />
+              <MintAINFT {...collection} />
             </div>
           </div>
         </header>
@@ -131,10 +130,4 @@ function SimpleCollection() {
   );
 }
 
-function Collection() {
-  const { id } = useParams() as Params;
-
-  return id === ADDRESS.AI_COLLECTION ? <AICollection /> : <SimpleCollection />;
-}
-
-export { Collection };
+export { AICollection };

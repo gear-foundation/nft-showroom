@@ -10,6 +10,10 @@ import { CreateCollectionPayload, CreateCollectionReply } from '@/features/creat
 import { BuyNFTPayload, MakeBidPayload, StartAuctionPayload, StartSalePayload } from '@/features/marketplace';
 import { isObject } from '@/utils';
 
+type MintAINFTPayload = {
+  FirstPhaseOfMint: null;
+};
+
 type Payload =
   | CreateCollectionPayload
   | BuyNFTPayload
@@ -18,7 +22,8 @@ type Payload =
   | StartSalePayload
   | MintNFTPayload
   | TransferNFTPayload
-  | ApproveNFTPayload;
+  | ApproveNFTPayload
+  | MintAINFTPayload;
 
 type Reply<T> = T extends CreateCollectionPayload
   ? CreateCollectionReply
@@ -36,9 +41,11 @@ type Reply<T> = T extends CreateCollectionPayload
   ? { transferred: unknown }
   : T extends ApproveNFTPayload
   ? { approved: unknown }
+  : T extends MintAINFTPayload
+  ? { phaseOneOfMintDone: unknown }
   : AnyJson;
 
-const useSendMessageWithReply = (programId: HexString, metadata: ProgramMetadata | undefined) => {
+export const useSendMessageWithReply = (programId: HexString, metadata: ProgramMetadata | undefined) => {
   const { api, isApiReady } = useApi();
   const { account } = useAccount();
   const alert = useAlert();
