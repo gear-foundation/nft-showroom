@@ -33,6 +33,7 @@ export type Initialized = {
   feePerUploadedFile: bigint | null;
   royaltyToMarketplaceForTrade: number | null;
   royaltyToMarketplaceForMint: number | null;
+  minimumTransferValue: bigint | null;
 };
 
 export type NewCollectionAdded = {
@@ -177,6 +178,7 @@ export interface NftMarketplaceEventPlain extends Enum {
   initialized: {
     timeBetweenCreateCollections: u64;
     feePerUploadedFile: u128;
+    minimumTransferValue: u128;
     royaltyToMarketplaceForTrade: u16;
     royaltyToMarketplaceForMint: u16;
   };
@@ -450,6 +452,9 @@ export function getMarketplaceEvent(
       ),
       feePerUploadedFile: safeUnwrapToBigInt(
         event.initialized.feePerUploadedFile,
+      ),
+      minimumTransferValue: safeUnwrapToBigInt(
+        event.initialized.minimumTransferValue,
       ),
       royaltyToMarketplaceForTrade: safeUnwrapToNumber(
         event.initialized.royaltyToMarketplaceForTrade,
