@@ -1,5 +1,6 @@
 import { ModalProps } from '@gear-js/vara-ui';
 
+import { Skeleton } from '@/components';
 import { useModal } from '@/hooks';
 import { SVGComponent } from '@/types';
 
@@ -38,5 +39,12 @@ function CreateCollection({ heading, tag, text, SVG, modal: Modal }: Props) {
     </>
   );
 }
+
+// TODO: skeleton details
+function CreateCollectionSkeleton() {
+  return <Skeleton width="100%" height="7.5rem" borderRadius="15px" />;
+}
+
+CreateCollection.Skeleton = CreateCollectionSkeleton;
 
 export { CreateCollection };

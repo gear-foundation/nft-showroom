@@ -4,7 +4,9 @@ import { Navigate, Outlet } from 'react-router-dom';
 import { ROUTE } from '@/consts';
 
 function PrivateRoute() {
-  const { account } = useAccount();
+  const { isAccountReady, account } = useAccount();
+
+  if (!isAccountReady) return null;
 
   return account ? <Outlet /> : <Navigate to={ROUTE.HOME} replace />;
 }
