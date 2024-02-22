@@ -3,7 +3,6 @@ import {
   Collection,
   CollectionType,
   Marketplace,
-  MarketplaceConfig,
   Nft,
   Offer,
   Sale,
@@ -12,7 +11,6 @@ import { Store } from '@subsquid/typeorm-store';
 import { IStorage } from './storage.inteface';
 import { config } from '../../config';
 import { readFileSync } from 'fs';
-import { v4 as uuidv4 } from 'uuid';
 
 let storage: LocalStorage | undefined;
 
@@ -108,6 +106,17 @@ export class LocalStorage implements IStorage {
           id: collectionAddress,
         },
         idInCollection: tokenId,
+      },
+      relations: { collection: true },
+    });
+  }
+
+  getNfts(collectionAddress: string): Promise<Nft[]> {
+    return this.store.find(Nft, {
+      where: {
+        collection: {
+          id: collectionAddress,
+        },
       },
       relations: { collection: true },
     });

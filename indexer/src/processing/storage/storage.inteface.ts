@@ -17,6 +17,7 @@ export interface IStorage {
   updateCollection(collection: Collection): Promise<void>;
 
   getNft(collectionAddress: string, tokenId: number): Promise<Nft | undefined>;
+  getNfts(collectionAddress: string): Promise<Nft[]>;
   updateNft(nft: Nft): Promise<void>;
 
   getSale(nft: Nft): Promise<Sale | undefined>;

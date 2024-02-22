@@ -93,6 +93,10 @@ export class EntitiesService {
 
   async deleteCollection(collection: Collection) {
     await this.storage.deleteCollection(collection);
+    const nfts = await this.storage.getNfts(collection.id);
+    if (nfts.length) {
+      await this.store.remove(nfts);
+    }
     await this.store.remove(collection);
   }
 
