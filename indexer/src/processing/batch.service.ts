@@ -27,6 +27,9 @@ export class BatchService {
   constructor(private readonly store: Store) {}
 
   async saveAll() {
+    await (this.marketplace?.config
+      ? this.store.save(this.marketplace.config)
+      : Promise.resolve());
     await Promise.all([
       this.marketplace ? this.store.save(this.marketplace) : Promise.resolve(),
       this.store.save(this.collectionTypes),

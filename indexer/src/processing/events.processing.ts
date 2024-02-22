@@ -16,7 +16,7 @@ import { AuctionCreatedHandler } from './marketplace/auction-created.handler';
 import { AuctionCanceledHandler } from './marketplace/auction-canceled.handler';
 import { CollectionDeletedHandler } from './marketplace/collection-deleted.handler';
 import { NftSoldHandler } from './marketplace/nft-sold.handler';
-import { InitializedHandler } from './nft/initialized.handler';
+import { NftInitializedHandler } from './nft/initialized.handler';
 import { INftEventHandler } from './nft/nft.handler';
 import { NftMintedHandler } from './nft/nft-minted.handler';
 import { CollectionCreatedHandler } from './marketplace/collection-created.handler';
@@ -43,11 +43,13 @@ import { ProgramMetadata } from '@gear-js/api';
 import { LiftRestrictionMintHandler } from './nft/lift-restriction-mint.handler';
 import { UserForMintDeletedHandler } from './nft/user-for-mint-deleted.handler';
 import { UsersForMintAddedHandler } from './nft/users-for-mint-added.handler';
+import { MarketplaceInitializedHandler } from './marketplace/initialized.handler';
 
 const marketplaceEventsToHandler: Record<
   NftMarketplaceEventType,
   INftMarketplaceEventHandler | undefined
 > = {
+  [NftMarketplaceEventType.Initialized]: new MarketplaceInitializedHandler(),
   [NftMarketplaceEventType.NewCollectionAdded]: new NewCollectionAddedHandler(),
   [NftMarketplaceEventType.CollectionCreated]: new CollectionCreatedHandler(),
   [NftMarketplaceEventType.CollectionDeleted]: new CollectionDeletedHandler(),
@@ -72,7 +74,7 @@ const marketplaceEventsToHandler: Record<
 };
 
 const nftEventsToHandler: Record<NftEventType, INftEventHandler | undefined> = {
-  [NftEventType.Initialized]: new InitializedHandler(),
+  [NftEventType.Initialized]: new NftInitializedHandler(),
   [NftEventType.Minted]: new NftMintedHandler(),
   [NftEventType.Approved]: new NftApprovedHandler(),
   [NftEventType.ApprovalRevoked]: new NftApprovalRevokedHandler(),

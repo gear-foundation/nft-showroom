@@ -1,12 +1,12 @@
-import { ConfigUpdated } from '../../types/marketplace.events';
 import { EntitiesService } from '../entities.service';
 import { INftMarketplaceEventHandler } from './nft-marketplace.handler';
 import { MarketplaceConfig } from '../../model';
 import { EventInfo } from '../event-info.type';
+import { Initialized } from '../../types/marketplace.events';
 
-export class ConfigUpdatedHandler implements INftMarketplaceEventHandler {
+export class MarketplaceInitializedHandler implements INftMarketplaceEventHandler {
   async handle(
-    event: ConfigUpdated,
+    event: Initialized,
     eventInfo: EventInfo,
     storage: EntitiesService,
   ): Promise<void> {

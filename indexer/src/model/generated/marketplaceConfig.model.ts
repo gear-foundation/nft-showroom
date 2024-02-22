@@ -35,6 +35,18 @@ export class MarketplaceConfig {
   @Column_('int4', { nullable: true })
   timeBetweenCreateCollections!: number | undefined | null;
 
+  @Column_('int4', { nullable: true })
+  royaltyToMarketplaceForMint!: number | undefined | null;
+
+  @Column_('int4', { nullable: true })
+  royaltyToMarketplaceForTrade!: number | undefined | null;
+
+  @Column_('numeric', {
+    transformer: marshal.bigintTransformer,
+    nullable: true,
+  })
+  feePerUploadedFile!: bigint | undefined | null;
+
   @Column_('numeric', {
     transformer: marshal.bigintTransformer,
     nullable: true,

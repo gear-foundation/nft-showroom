@@ -21,7 +21,9 @@ export class UserForMintDeletedHandler implements INftEventHandler {
     await storage.setCollection(
       new Collection({
         ...collection,
-        permissionToMint: (collection.permissionToMint || []).filter((u) => u !== user),
+        permissionToMint: (collection.permissionToMint || []).filter(
+          (u) => u !== user,
+        ),
       }),
     );
   }

@@ -17,6 +17,9 @@ type MarketplaceConfig @entity {
   gasForDeleteCollection: Int
   gasForGetTokenInfo: Int
   timeBetweenCreateCollections: Int
+  royaltyToMarketplaceForMint: Int
+  royaltyToMarketplaceForTrade: Int
+  feePerUploadedFile: BigInt
   minimumTransferValue: BigInt
   msInBlock: Int
   marketplace: Marketplace!

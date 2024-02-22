@@ -118,6 +118,9 @@ export class EntitiesService {
 
   async setMarketplaceConfig(marketplaceConfig: MarketplaceConfig) {
     const marketplace = this.storage.getMarketplace();
+    if (marketplaceConfig.id === undefined) {
+      marketplaceConfig.id = uuidv4();
+    }
     marketplace.config = marketplaceConfig;
     await this.storage.updateMarketplace(marketplace);
     this.batchService.setMarketplace(marketplace);

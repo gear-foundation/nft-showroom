@@ -1,4 +1,4 @@
-import { Enum, Option, Text, Vec, u64, u128, u32 } from '@polkadot/types';
+import { Enum, Option, Text, Vec, u64, u128, u32, u16 } from '@polkadot/types';
 import { Hash } from '@polkadot/types/interfaces';
 import { CodeId } from '@gear-js/api';
 import {
@@ -8,6 +8,7 @@ import {
 } from './event.utils';
 
 export enum NftMarketplaceEventType {
+  Initialized = 'isInitialized',
   NewCollectionAdded = 'isNewCollectionAdded',
   CollectionCreated = 'isCollectionCreated',
   SaleNft = 'isSaleNft',
@@ -25,6 +26,14 @@ export enum NftMarketplaceEventType {
   AdminDeleted = 'isAdminDeleted',
   ConfigUpdated = 'isConfigUpdated',
 }
+
+export type Initialized = {
+  type: NftMarketplaceEventType.Initialized;
+  timeBetweenCreateCollections: number | null;
+  feePerUploadedFile: bigint | null;
+  royaltyToMarketplaceForTrade: number | null;
+  royaltyToMarketplaceForMint: number | null;
+};
 
 export type NewCollectionAdded = {
   type: NftMarketplaceEventType.NewCollectionAdded;
@@ -138,11 +147,15 @@ export type ConfigUpdated = {
   gasForDeleteCollection: number | null;
   gasForGetTokenInfo: number | null;
   timeBetweenCreateCollections: number | null;
+  feePerUploadedFile: bigint | null;
+  royaltyToMarketplaceForTrade: number | null;
+  royaltyToMarketplaceForMint: number | null;
   minimumTransferValue: bigint | null;
   msInBlock: number | null;
 };
 
 export type NftMarketplaceEvent =
+  | Initialized
   | NewCollectionAdded
   | CollectionCreated
   | SaleNft
@@ -161,6 +174,12 @@ export type NftMarketplaceEvent =
   | ConfigUpdated;
 
 export interface NftMarketplaceEventPlain extends Enum {
+  initialized: {
+    timeBetweenCreateCollections: u64;
+    feePerUploadedFile: u128;
+    royaltyToMarketplaceForTrade: u16;
+    royaltyToMarketplaceForMint: u16;
+  };
   newCollectionAdded: {
     codeId: CodeId;
     metaLink: Text;
@@ -244,6 +263,9 @@ export interface NftMarketplaceEventPlain extends Enum {
     timeBetweenCreateCollections: Option<u64>;
     minimumTransferValue: Option<u128>;
     msInBlock: Option<u32>;
+    feePerUploadedFile: Option<u128>;
+    royaltyToMarketplaceForTrade: Option<u16>;
+    royaltyToMarketplaceForMint: Option<u16>;
   };
 }
 
@@ -402,6 +424,38 @@ export function getMarketplaceEvent(
       ),
       msInBlock: safeUnwrapToNumber(
         safeUnwrapOptional<u32, number>(event.configUpdated.msInBlock),
+      ),
+      feePerUploadedFile: safeUnwrapToBigInt(
+        safeUnwrapOptional<u128, bigint>(
+          event.configUpdated.feePerUploadedFile,
+        ),
+      ),
+      royaltyToMarketplaceForTrade: safeUnwrapToNumber(
+        safeUnwrapOptional<u16, number>(
+          event.configUpdated.royaltyToMarketplaceForTrade,
+        ),
+      ),
+      royaltyToMarketplaceForMint: safeUnwrapToNumber(
+        safeUnwrapOptional<u16, number>(
+          event.configUpdated.royaltyToMarketplaceForMint,
+        ),
+      ),
+    };
+  }
+  if (event.initialized) {
+    return {
+      type: NftMarketplaceEventType.Initialized,
+      timeBetweenCreateCollections: safeUnwrapToNumber(
+        event.initialized.timeBetweenCreateCollections,
+      ),
+      feePerUploadedFile: safeUnwrapToBigInt(
+        event.initialized.feePerUploadedFile,
+      ),
+      royaltyToMarketplaceForTrade: safeUnwrapToNumber(
+        event.initialized.royaltyToMarketplaceForTrade,
+      ),
+      royaltyToMarketplaceForMint: safeUnwrapToNumber(
+        event.initialized.royaltyToMarketplaceForMint,
       ),
     };
   }

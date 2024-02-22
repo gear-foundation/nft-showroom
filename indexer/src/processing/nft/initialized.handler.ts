@@ -4,7 +4,7 @@ import { INftEventHandler } from './nft.handler';
 import { AdditionalLinks, Collection } from '../../model';
 import { EventInfo } from '../event-info.type';
 
-export class InitializedHandler implements INftEventHandler {
+export class NftInitializedHandler implements INftEventHandler {
   async handle(
     event: InitializedEvent,
     { source: collectionAddress, destination, timestamp }: EventInfo,
@@ -17,7 +17,7 @@ export class InitializedHandler implements INftEventHandler {
       );
       return;
     }
-    let {
+    const {
       name,
       description,
       additionalLinks,
