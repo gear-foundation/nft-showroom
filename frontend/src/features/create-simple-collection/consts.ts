@@ -1,6 +1,8 @@
 import { NFTsValues, ParametersValues, SummaryValues } from './types';
 
-const COLLECTION_NAME = 'Simple NFT Collection';
+const COLLECTION_TYPE_NAME = {
+  SIMPLE: 'Simple NFT Collection',
+};
 
 const STEPS = ['Fill info', 'Set parameters', 'Add NFTs'];
 
@@ -38,7 +40,7 @@ const IMAGE_TYPES = ['image/svg+xml', 'image/png', 'image/jpeg'];
 const IMAGE_TYPES_ACCEPT = IMAGE_TYPES.join(', ');
 
 export {
-  COLLECTION_NAME,
+  COLLECTION_TYPE_NAME,
   STEPS,
   DEFAULT_SUMMARY_VALUES,
   DEFAULT_PARAMETERS_VALUES,

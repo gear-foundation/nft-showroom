@@ -1,3 +1,4 @@
-import { CreateSimpleCollection } from './create-simple-collection';
+import { CreateCollection } from './create-collection';
+import { CreateSimpleCollectionModal } from './create-simple-collection-modal';
 
-export { CreateSimpleCollection };
+export { CreateCollection, CreateSimpleCollectionModal };

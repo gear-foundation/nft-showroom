@@ -25,7 +25,7 @@ const useMetadata = () => useContext(MetadataContext);
 const MARKETPLACE_QUERY = graphql(`
   query MarketplaceQuery {
     marketplaceById(id: "1") {
-      id
+      address
       metadata
       collectionTypes {
         description
