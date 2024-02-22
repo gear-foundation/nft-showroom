@@ -9,7 +9,7 @@ import { useMetadata } from '@/context';
 import { useLoading, useMarketplaceMessage } from '@/hooks';
 
 import {
-  COLLECTION_NAME,
+  COLLECTION_TYPE_NAME,
   DEFAULT_NFTS_VALUES,
   DEFAULT_PARAMETERS_VALUES,
   DEFAULT_SUMMARY_VALUES,
@@ -123,7 +123,7 @@ function CreateSimpleCollectionModal({ close }: Pick<ModalProps, 'close'>) {
 
       const formPayload = await getFormPayload(nfts);
       const bytesPayload = getBytesPayload(formPayload);
-      const payload = { CreateCollection: { typeName: COLLECTION_NAME, payload: bytesPayload } };
+      const payload = { CreateCollection: { typeName: COLLECTION_TYPE_NAME.SIMPLE, payload: bytesPayload } };
 
       const onSuccess = ({ collectionCreated }: CreateCollectionReply) => {
         const id = collectionCreated.collectionAddress;
