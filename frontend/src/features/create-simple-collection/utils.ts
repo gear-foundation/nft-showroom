@@ -16,7 +16,7 @@ const uploadToIpfs = async (file: File) => {
   const response = await fetch(ADDRESS.IPFS_UPLOAD, { method: 'POST', body: formData });
   if (!response.ok) throw new Error(response.statusText);
 
-  const { ipfsHash } = await (response.json() as Promise<Record<'ipfsHash', string>>);
+  const [{ ipfsHash }] = await (response.json() as Promise<Record<'ipfsHash', string>[]>);
   return `ipfs://${ipfsHash}`;
 };
 
