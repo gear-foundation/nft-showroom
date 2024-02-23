@@ -116,7 +116,7 @@ function ParametersForm({ defaultValues, onSubmit, onBack }: Props) {
           />
 
           <div className={styles.buttons}>
-            <Button text="Back" color="border" onClick={onBack} />
+            <Button text="Back" color="grey" onClick={onBack} />
             <Button type="submit" text="Continue" />
           </div>
         </form>

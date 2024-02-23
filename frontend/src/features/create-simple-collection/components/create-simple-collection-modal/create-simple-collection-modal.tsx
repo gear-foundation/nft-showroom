@@ -26,7 +26,7 @@ import { SummaryForm } from '../summary-form';
 const SIMPLE_COLLECTION_ID = '0x45c6b76956d38a14530a755ed6ca5b5f143d47f7a7d011b17cee740fe42c8f45';
 
 function CreateSimpleCollectionModal({ close }: Pick<ModalProps, 'close'>) {
-  const [stepIndex, setStepIndex] = useState(0);
+  const [stepIndex, setStepIndex] = useState(2);
   const [summaryValues, setSummaryValues] = useState(DEFAULT_SUMMARY_VALUES);
   const [parametersValues, setParametersValues] = useState(DEFAULT_PARAMETERS_VALUES);
   const [isLoading, enableLoading, disableLoading] = useLoading();

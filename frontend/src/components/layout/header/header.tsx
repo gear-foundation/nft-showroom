@@ -1,7 +1,7 @@
 import { useAccount } from '@gear-js/react-hooks';
 
 import { ROUTE } from '@/consts';
-import { Wallet, Balance } from '@/features/wallet';
+import { Wallet, AccountBalance } from '@/features/wallet';
 
 import { LinkButton } from '../../buttons';
 import { Container } from '../container';
@@ -18,7 +18,7 @@ function Header() {
         <Logo />
 
         <div className={styles.wallet}>
-          <Balance />
+          <AccountBalance />
 
           <div className={styles.buttons}>
             {account && <LinkButton to={ROUTE.CREATE_COLLECTION} text="Create" />}

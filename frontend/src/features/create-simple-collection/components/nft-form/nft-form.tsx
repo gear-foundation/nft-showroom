@@ -3,9 +3,11 @@ import { Button } from '@gear-js/vara-ui';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { ChangeEvent, useRef } from 'react';
 import { useFieldArray, useForm } from 'react-hook-form';
+import { useQuery } from 'urql';
 import { z } from 'zod';
 
-import { Container } from '@/components';
+import { Balance, Container } from '@/components';
+import { graphql } from '@/graphql';
 
 import { IMAGE_TYPES, MAX_IMAGE_SIZE_MB } from '../../consts';
 import { NFTsValues } from '../../types';
@@ -31,6 +33,22 @@ const schema = z.object({
 });
 
 const resolver = zodResolver(schema);
+
+const CONFIG_QUERY = graphql(`
+  query ConfigQuery {
+    marketplaceById(id: "1") {
+      config {
+        feePerUploadedFile
+      }
+    }
+  }
+`);
+
+function useConfig() {
+  const [result] = useQuery({ query: CONFIG_QUERY });
+
+  return result.data?.marketplaceById?.config;
+}
 
 function NFTForm({ defaultValues, isLoading, onSubmit, onBack }: Props) {
   const { control, register, setValue, handleSubmit } = useForm({ defaultValues, resolver });
@@ -72,9 +90,14 @@ function NFTForm({ defaultValues, isLoading, onSubmit, onBack }: Props) {
       );
     });
 
+  const config = useConfig();
+  const { feePerUploadedFile } = config || {};
+
+  const fee = feePerUploadedFile ? Number(feePerUploadedFile) * nftsCount : 0;
+
   return (
-    <Container>
-      <form onSubmit={handleSubmit(onSubmit)}>
+    <form onSubmit={handleSubmit(onSubmit)} className={styles.form}>
+      <Container>
         <header className={styles.header}>
           <h4 className={styles.heading}>NFTs added: {nftsCount}</h4>
 
@@ -93,16 +116,27 @@ function NFTForm({ defaultValues, isLoading, onSubmit, onBack }: Props) {
             <p>File formats: .jpg, .jpeg, .png. Max size: 5mb</p>
           </div>
         </header>
-
         <ul className={styles.nfts}>{renderNfts()}</ul>
+      </Container>
 
-        <Container maxWidth="sm" className={styles.buttons}>
-          <Button text="Back" color="border" onClick={onBack} />
+      <footer className={styles.footer}>
+        <Container className={styles.buttons}>
+          <Button text="Back" color="grey" onClick={onBack} />
 
-          {nftsCount > 0 && <Button type="submit" text="Submit" isLoading={isLoading} />}
+          <div className={styles.submit}>
+            <div>
+              <h4 className={styles.submitHeading}>
+                Creation fee: <Balance value={fee} />
+              </h4>
+
+              <p className={styles.submitText}>Calculated based on the number of unique images.</p>
+            </div>
+
+            <Button type="submit" text="Submit" isLoading={isLoading} disabled={nftsCount === 0} />
+          </div>
         </Container>
-      </form>
-    </Container>
+      </footer>
+    </form>
   );
 }
 
