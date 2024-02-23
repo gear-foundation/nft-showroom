@@ -33,8 +33,7 @@ function CreateSimpleCollectionModal({ close }: Pick<ModalProps, 'close'>) {
   const alert = useAlert();
   const navigate = useNavigate();
 
-  const { collectionsMetadata } = useMarketplace();
-  const collectionMetadata = collectionsMetadata?.[COLLECTION_TYPE_NAME.SIMPLE];
+  const { marketplace, collectionsMetadata } = useMarketplace();
   const sendMessage = useMarketplaceMessage();
 
   const nextStep = () => setStepIndex((prevIndex) => prevIndex + 1);
@@ -61,6 +60,7 @@ function CreateSimpleCollectionModal({ close }: Pick<ModalProps, 'close'>) {
 
   const getFormPayload = async (nfts: NFT[]) => {
     const collectionOwner = account?.decodedAddress;
+    const { feePerUploadedFile } = marketplace?.config || {};
 
     const { cover, logo, name, description, telegram, medium, discord, url: externalUrl, x: xcom } = summaryValues;
     const { mintPermission, isTransferable, isSellable, tags, royalty, mintLimit, mintPrice } = parametersValues;
@@ -97,14 +97,14 @@ function CreateSimpleCollectionModal({ close }: Pick<ModalProps, 'close'>) {
       collectionTags,
     };
 
-    return { collectionOwner, config, imgLinksAndData, permissionToMint };
+    return { collectionOwner, config, imgLinksAndData, permissionToMint, feePerUploadedFile };
   };
 
   const getBytesPayload = (payload: Awaited<ReturnType<typeof getFormPayload>>) => {
+    const collectionMetadata = collectionsMetadata?.[COLLECTION_TYPE_NAME.SIMPLE];
     if (!collectionMetadata) throw new Error('Collection metadata not found');
 
     const initTypeIndex = collectionMetadata.types.init.input;
-
     if (initTypeIndex == null) throw new Error('init.input type index not found in NFT metadata');
 
     const encoded = collectionMetadata.createType(initTypeIndex, payload).toU8a();
@@ -112,7 +112,7 @@ function CreateSimpleCollectionModal({ close }: Pick<ModalProps, 'close'>) {
     return Array.from(encoded);
   };
 
-  const handleNFTsSubmit = async ({ nfts }: NFTsValues) => {
+  const handleNFTsSubmit = async ({ nfts }: NFTsValues, fee: bigint) => {
     const onFinally = disableLoading;
 
     try {
@@ -121,6 +121,7 @@ function CreateSimpleCollectionModal({ close }: Pick<ModalProps, 'close'>) {
       const formPayload = await getFormPayload(nfts);
       const bytesPayload = getBytesPayload(formPayload);
       const payload = { CreateCollection: { typeName: COLLECTION_TYPE_NAME.SIMPLE, payload: bytesPayload } };
+      const value = fee.toString();
 
       const onSuccess = ({ collectionCreated }: CreateCollectionReply) => {
         const id = collectionCreated.collectionAddress;
@@ -130,7 +131,7 @@ function CreateSimpleCollectionModal({ close }: Pick<ModalProps, 'close'>) {
         alert.success('Collection created');
       };
 
-      sendMessage({ payload, onSuccess, onFinally });
+      sendMessage({ payload, onSuccess, onFinally, value });
     } catch (error) {
       alert.error(error instanceof Error ? error.message : String(error));
       onFinally();

@@ -1,4 +1,4 @@
-import { useAlert } from '@gear-js/react-hooks';
+import { useAlert, useApi } from '@gear-js/react-hooks';
 import { Button } from '@gear-js/vara-ui';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { ChangeEvent, useRef } from 'react';
@@ -18,7 +18,7 @@ import styles from './nft-form.module.scss';
 type Props = {
   defaultValues: NFTsValues;
   isLoading: boolean;
-  onSubmit: (values: NFTsValues) => void;
+  onSubmit: (values: NFTsValues, fee: bigint) => void;
   onBack: () => void;
 };
 
@@ -73,13 +73,18 @@ function NFTForm({ defaultValues, isLoading, onSubmit, onBack }: Props) {
       );
     });
 
+  // TODO: better to calculate only if loaded?
   const { marketplace } = useMarketplace();
-  const { feePerUploadedFile } = marketplace?.config || {};
+  const feePerUploadedFile = marketplace?.config.feePerUploadedFile || '0';
 
-  const fee = feePerUploadedFile ? BigInt(feePerUploadedFile) * BigInt(nftsCount) : BigInt(0);
+  const { api } = useApi();
+  const existentialDeposit = api?.existentialDeposit.toString() || '0';
+
+  const potentialFee = BigInt(feePerUploadedFile) * BigInt(nftsCount);
+  const fee = potentialFee > BigInt(existentialDeposit) ? potentialFee : BigInt(existentialDeposit);
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className={styles.form}>
+    <form onSubmit={handleSubmit((values) => onSubmit(values, fee))} className={styles.form}>
       <Container>
         <header className={styles.header}>
           <h4 className={styles.heading}>NFTs added: {nftsCount}</h4>
