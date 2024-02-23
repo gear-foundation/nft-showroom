@@ -6,7 +6,7 @@ import VaraSVG from '@/assets/vara.svg?react';
 import styles from './balance.module.scss';
 
 type Props = {
-  value: BalanceType | number;
+  value: BalanceType | bigint;
 };
 
 // TODO: group with AccountBalance in a common folder

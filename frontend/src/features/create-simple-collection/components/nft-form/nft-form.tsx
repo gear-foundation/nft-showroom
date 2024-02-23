@@ -3,11 +3,10 @@ import { Button } from '@gear-js/vara-ui';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { ChangeEvent, useRef } from 'react';
 import { useFieldArray, useForm } from 'react-hook-form';
-import { useQuery } from 'urql';
 import { z } from 'zod';
 
 import { Balance, Container } from '@/components';
-import { graphql } from '@/graphql';
+import { useMarketplace } from '@/context';
 
 import { IMAGE_TYPES, MAX_IMAGE_SIZE_MB } from '../../consts';
 import { NFTsValues } from '../../types';
@@ -33,22 +32,6 @@ const schema = z.object({
 });
 
 const resolver = zodResolver(schema);
-
-const CONFIG_QUERY = graphql(`
-  query ConfigQuery {
-    marketplaceById(id: "1") {
-      config {
-        feePerUploadedFile
-      }
-    }
-  }
-`);
-
-function useConfig() {
-  const [result] = useQuery({ query: CONFIG_QUERY });
-
-  return result.data?.marketplaceById?.config;
-}
 
 function NFTForm({ defaultValues, isLoading, onSubmit, onBack }: Props) {
   const { control, register, setValue, handleSubmit } = useForm({ defaultValues, resolver });
@@ -90,10 +73,10 @@ function NFTForm({ defaultValues, isLoading, onSubmit, onBack }: Props) {
       );
     });
 
-  const config = useConfig();
-  const { feePerUploadedFile } = config || {};
+  const { marketplace } = useMarketplace();
+  const { feePerUploadedFile } = marketplace?.config || {};
 
-  const fee = feePerUploadedFile ? Number(feePerUploadedFile) * nftsCount : 0;
+  const fee = feePerUploadedFile ? BigInt(feePerUploadedFile) * BigInt(nftsCount) : BigInt(0);
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className={styles.form}>
