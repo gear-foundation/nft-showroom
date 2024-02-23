@@ -4,7 +4,7 @@ import { UnsubscribePromise } from '@polkadot/api/types';
 import { AnyJson } from '@polkadot/types/types';
 
 import { ADDRESS } from '@/consts';
-import { useMetadata } from '@/context';
+import { useMarketplace } from '@/context';
 import { ApproveNFTPayload, MintNFTPayload, TransferNFTPayload } from '@/features/collections';
 import { CreateCollectionPayload, CreateCollectionReply } from '@/features/create-simple-collection';
 import { BuyNFTPayload, MakeBidPayload, StartAuctionPayload, StartSalePayload } from '@/features/marketplace';
@@ -112,22 +112,22 @@ const useSendMessageWithReply = (programId: HexString, metadata: ProgramMetadata
 };
 
 function useMarketplaceMessage() {
-  const { marketplaceMetadata } = useMetadata();
+  const { marketplaceMetadata } = useMarketplace();
 
   return useSendMessageWithReply(ADDRESS.CONTRACT, marketplaceMetadata);
 }
 
-function useCollectionMessage(id: string, typeId: string) {
-  const { collectionsMetadata } = useMetadata();
+function useCollectionMessage(id: string, typeName: string) {
+  const { collectionsMetadata } = useMarketplace();
 
-  return useSendMessageWithReply(id as HexString, collectionsMetadata?.[typeId]);
+  return useSendMessageWithReply(id as HexString, collectionsMetadata?.[typeName]);
 }
 
-function useApprovedMessage(collectionId: string, collectionTypeId: string) {
+function useApprovedMessage(collectionId: string, collectionTypeName: string) {
   const alert = useAlert();
 
   const sendMarketplaceMessage = useMarketplaceMessage();
-  const sendCollectionMessage = useCollectionMessage(collectionId, collectionTypeId);
+  const sendCollectionMessage = useCollectionMessage(collectionId, collectionTypeName);
 
   return <T extends StartAuctionPayload | StartSalePayload>(args: {
     payload: T;

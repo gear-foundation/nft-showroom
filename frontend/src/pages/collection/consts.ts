@@ -49,7 +49,7 @@ const COLLECTION_QUERY = graphql(`
       }
 
       type {
-        id
+        type
       }
 
       additionalLinks {

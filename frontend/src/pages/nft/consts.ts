@@ -19,7 +19,7 @@ const NFT_QUERY = graphql(`
         transferable
 
         type {
-          id
+          type
         }
       }
 

@@ -11,11 +11,11 @@ type Props = Pick<
 > & {
   nfts: Pick<Nft, 'id' | 'mintedBy'>[];
 } & {
-  type: Pick<CollectionType, 'id'>;
+  type: Pick<CollectionType, 'type'>;
 };
 
 function Component({ id, type, tokensLimit, paymentForMint, userMintLimit, permissionToMint, admin, nfts }: Props) {
-  const sendMessage = useCollectionMessage(id, type.id);
+  const sendMessage = useCollectionMessage(id, type.type);
   const alert = useAlert();
   const [isLoading, enableLoading, disableLoading] = useLoading();
   const isAdmin = useIsOwner(admin);

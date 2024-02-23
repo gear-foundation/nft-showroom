@@ -12,7 +12,7 @@ import { getDurationOptions } from '../../utils';
 
 type Props = Pick<Nft, 'idInCollection' | 'name' | 'mediaUrl' | 'owner'> & {
   collection: Pick<Collection, 'id' | 'name' | 'sellable'> & {
-    type: Pick<CollectionType, 'id'>;
+    type: Pick<CollectionType, 'type'>;
   };
 };
 
@@ -32,7 +32,7 @@ function Component({ collection, owner, ...nft }: Props) {
   const { getPriceSchema } = usePriceSchema();
   const schema = z.object({ minPrice: getPriceSchema(), duration: z.string() });
 
-  const sendMessage = useApprovedMessage(collection.id, collection.type.id);
+  const sendMessage = useApprovedMessage(collection.id, collection.type.type);
 
   const onSubmit = ({ minPrice, duration }: typeof defaultValues) => {
     enableLoading();
