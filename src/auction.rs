@@ -10,7 +10,7 @@ impl NftMarketplace {
         collection_address: ActorId,
         token_id: u64,
         min_price: u128,
-        duration_ms: u32,
+        duration: u32,
     ) -> Result<NftMarketplaceEvent, NftMarketplaceError> {
         if !self.collection_to_owner.contains_key(&collection_address) {
             return Err(NftMarketplaceError::WrongCollectionAddress);
@@ -32,7 +32,7 @@ impl NftMarketplace {
         let (collection_owner, royalty) = check_token_info(
             &collection_address,
             token_id,
-            self.config.gas_for_get_token_info,
+            self.config.gas_for_get_info,
             &msg_src,
             &address_marketplace,
         )
@@ -56,7 +56,7 @@ impl NftMarketplace {
                 .or_insert(Auction {
                     owner: msg_src,
                     started_at: exec::block_timestamp(),
-                    ended_at: exec::block_timestamp() + duration_ms as u64,
+                    ended_at: exec::block_timestamp() + (duration * self.config.ms_in_block) as u64,
                     current_price: min_price,
                     current_winner: ActorId::zero(),
                     collection_owner,
@@ -74,7 +74,7 @@ impl NftMarketplace {
             },
             self.config.gas_for_close_auction,
             0,
-            duration_ms / self.config.ms_in_block + 1,
+            duration,
         )
         .expect("Error in sending delayed message");
 
@@ -82,7 +82,7 @@ impl NftMarketplace {
             collection_address,
             token_id,
             min_price,
-            duration_ms,
+            duration,
         })
     }
 
@@ -151,6 +151,7 @@ impl NftMarketplace {
                 auction.owner,
                 auction.current_price,
                 auction.royalty,
+                self.config.royalty_to_marketplace_for_trade,
                 self.config.minimum_transfer_value,
             );
         }

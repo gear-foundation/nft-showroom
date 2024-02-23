@@ -26,6 +26,7 @@ pub struct NftInit {
     pub config: Config,
     pub img_links_and_data: Vec<(String, ImageData)>,
     pub permission_to_mint: Option<Vec<ActorId>>,
+    pub fee_per_uploaded_file: u128,
 }
 
 #[derive(Debug, Clone, Encode, Decode, TypeInfo)]
@@ -79,7 +80,10 @@ pub enum NftAction {
         token_id: NftId,
     },
     CanDelete,
-    Mint,
+    GetPaymentForMint,
+    Mint {
+        minter: ActorId,
+    },
     Approve {
         to: ActorId,
         token_id: NftId,
@@ -125,14 +129,18 @@ pub enum NftEvent {
         royalty: u16,
     },
     CanDelete(bool),
+    PaymentForMintReceived {
+        payment_for_mint: u128,
+    },
+    SuccessfullyMinted,
+    Minted {
+        token_id: NftId,
+        nft_data: Nft,
+    },
     Initialized {
         config: Config,
         total_number_of_tokens: Option<u64>,
         permission_to_mint: Option<Vec<ActorId>>,
-    },
-    Minted {
-        token_id: NftId,
-        nft_data: Nft,
     },
     Approved {
         to: ActorId,

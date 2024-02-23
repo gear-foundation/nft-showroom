@@ -34,7 +34,7 @@ impl NftMarketplace {
         let (collection_owner, royalty) = check_token_info(
             &collection_address,
             token_id,
-            self.config.gas_for_get_token_info,
+            self.config.gas_for_get_info,
             &msg_src,
             &address_marketplace,
         )
@@ -119,9 +119,10 @@ impl NftMarketplace {
         &mut self,
         collection_address: ActorId,
         token_id: u64,
+        buyer: ActorId,
+        msg_value: u128,
     ) -> Result<NftMarketplaceEvent, NftMarketplaceError> {
-        let buyer = msg::source();
-        self.check_sale(&collection_address, &token_id, &buyer)?;
+        self.check_sale(&collection_address, &token_id, msg_value)?;
 
         // transfer the token to the buyer
         transfer_token(
@@ -144,6 +145,7 @@ impl NftMarketplace {
             nft.token_owner,
             nft.price,
             nft.royalty,
+            self.config.royalty_to_marketplace_for_trade,
             self.config.minimum_transfer_value,
         );
         // remove the sale from the marketplace
@@ -162,17 +164,14 @@ impl NftMarketplace {
         &self,
         collection_address: &ActorId,
         token_id: &u64,
-        buyer: &ActorId,
+        payment: u128,
     ) -> Result<(), NftMarketplaceError> {
-        let payment = msg::value();
-
         // check that such a sale exists and check the attached amount
         let nft = self
             .sales
             .get(&(*collection_address, *token_id))
             .ok_or(NftMarketplaceError::SaleDoesNotExist)?;
         if payment < nft.price {
-            msg::send(*buyer, "", payment).expect("Error in sending value");
             return Err(NftMarketplaceError::ValueIsLessThanPrice);
         }
 

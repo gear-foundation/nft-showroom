@@ -2,6 +2,8 @@
 use gmeta::{In, InOut, Metadata};
 use gstd::{prelude::*, ActorId, CodeId};
 
+pub const EXISTENTIAL_DEPOSIT: u128 = 10_000_000_000_000;
+
 pub struct NftMarketplaceMetadata;
 impl Metadata for NftMarketplaceMetadata {
     type Init = In<NftMarketplaceInit>;
@@ -18,7 +20,7 @@ impl Metadata for NftMarketplaceMetadata {
 /// (this action includes a transfer, so gas_for_close_auction must be greater than gas_for_transfer_token)
 /// * gas_for_delete_collection - gas that is needed to delete a collection
 /// (a message is sent to the collection contract to see if the collection can be deleted)
-/// * gas_for_get_token_info - gas which is needed to get information from the collection about the token
+/// * gas_for_get_info - gas which is needed to get information from the collection
 /// (used for sale, auction and offers)
 /// * time_between_create_collections - time between collection creation
 /// (to avoid regular users from creating collections too often)
@@ -29,10 +31,14 @@ impl Metadata for NftMarketplaceMetadata {
 pub struct NftMarketplaceInit {
     pub gas_for_creation: u64,
     pub gas_for_transfer_token: u64,
+    pub gas_for_mint: u64,
     pub gas_for_close_auction: u64,
     pub gas_for_delete_collection: u64,
-    pub gas_for_get_token_info: u64,
+    pub gas_for_get_info: u64,
     pub time_between_create_collections: u64,
+    pub fee_per_uploaded_file: u128,
+    pub royalty_to_marketplace_for_trade: u16,
+    pub royalty_to_marketplace_for_mint: u16,
     pub minimum_transfer_value: u128,
     pub ms_in_block: u32,
 }
@@ -48,6 +54,9 @@ pub enum NftMarketplaceAction {
     CreateCollection {
         type_name: String,
         payload: Vec<u8>,
+    },
+    Mint {
+        collection_address: ActorId,
     },
     SaleNft {
         collection_address: ActorId,
@@ -66,7 +75,7 @@ pub enum NftMarketplaceAction {
         collection_address: ActorId,
         token_id: u64,
         min_price: u128,
-        duration_ms: u32,
+        duration: u32,
     },
     AddBid {
         collection_address: ActorId,
@@ -102,11 +111,15 @@ pub enum NftMarketplaceAction {
     },
     UpdateConfig {
         gas_for_creation: Option<u64>,
+        gas_for_mint: Option<u64>,
         gas_for_transfer_token: Option<u64>,
         gas_for_close_auction: Option<u64>,
         gas_for_delete_collection: Option<u64>,
-        gas_for_get_token_info: Option<u64>,
+        gas_for_get_info: Option<u64>,
         time_between_create_collections: Option<u64>,
+        fee_per_uploaded_file: Option<u128>,
+        royalty_to_marketplace_for_trade: Option<u16>,
+        royalty_to_marketplace_for_mint: Option<u16>,
         minimum_transfer_value: Option<u128>,
         ms_in_block: Option<u32>,
     },
@@ -114,6 +127,13 @@ pub enum NftMarketplaceAction {
 
 #[derive(Encode, Decode, Debug, TypeInfo)]
 pub enum NftMarketplaceEvent {
+    Initialized {
+        time_between_create_collections: u64,
+        fee_per_uploaded_file: u128,
+        royalty_to_marketplace_for_trade: u16,
+        royalty_to_marketplace_for_mint: u16,
+        minimum_transfer_value: u128,
+    },
     NewCollectionAdded {
         code_id: CodeId,
         meta_link: String,
@@ -123,6 +143,10 @@ pub enum NftMarketplaceEvent {
     CollectionCreated {
         type_name: String,
         collection_address: ActorId,
+    },
+    Minted {
+        collection_address: ActorId,
+        minter: ActorId,
     },
     SaleNft {
         collection_address: ActorId,
@@ -144,7 +168,7 @@ pub enum NftMarketplaceEvent {
         collection_address: ActorId,
         token_id: u64,
         min_price: u128,
-        duration_ms: u32,
+        duration: u32,
     },
     AuctionClosed {
         collection_address: ActorId,
@@ -184,13 +208,20 @@ pub enum NftMarketplaceEvent {
     },
     ConfigUpdated {
         gas_for_creation: Option<u64>,
+        gas_for_mint: Option<u64>,
         gas_for_transfer_token: Option<u64>,
         gas_for_close_auction: Option<u64>,
         gas_for_delete_collection: Option<u64>,
-        gas_for_get_token_info: Option<u64>,
+        gas_for_get_info: Option<u64>,
         time_between_create_collections: Option<u64>,
+        fee_per_uploaded_file: Option<u128>,
+        royalty_to_marketplace_for_trade: Option<u16>,
+        royalty_to_marketplace_for_mint: Option<u16>,
         minimum_transfer_value: Option<u128>,
         ms_in_block: Option<u32>,
+    },
+    BalanceHasBeenWithdrawn {
+        value: u128,
     },
 }
 
@@ -214,6 +245,10 @@ pub enum NftMarketplaceError {
     OfferDoesNotExist,
     SaleDoesNotExist,
     ValueIsLessThanPrice,
+    CreationError,
+    ErrorGetInfo,
+    WrongValue,
+    MintError,
 }
 
 #[derive(Encode, Decode, TypeInfo)]
@@ -269,11 +304,15 @@ pub struct CollectionInfo {
 #[derive(Default, Debug, Encode, Decode, TypeInfo, Clone)]
 pub struct Config {
     pub gas_for_creation: u64,
+    pub gas_for_mint: u64,
     pub gas_for_transfer_token: u64,
     pub gas_for_close_auction: u64,
     pub gas_for_delete_collection: u64,
-    pub gas_for_get_token_info: u64,
+    pub gas_for_get_info: u64,
     pub time_between_create_collections: u64,
+    pub fee_per_uploaded_file: u128,
+    pub royalty_to_marketplace_for_trade: u16,
+    pub royalty_to_marketplace_for_mint: u16,
     pub minimum_transfer_value: u128,
     pub ms_in_block: u32,
 }
@@ -317,6 +356,10 @@ pub enum NftAction {
         token_id: u64,
     },
     CanDelete,
+    GetPaymentForMint,
+    Mint {
+        minter: ActorId,
+    },
 }
 
 #[derive(Debug, Clone, Encode, Decode, TypeInfo)]
@@ -334,6 +377,10 @@ pub enum NftEvent {
         royalty: u16,
     },
     CanDelete(bool),
+    PaymentForMintReceived {
+        payment_for_mint: u128,
+    },
+    SuccessfullyMinted,
 }
 
 #[derive(Debug, Clone, Encode, Decode, TypeInfo)]

@@ -3,7 +3,7 @@ use utils::prelude::*;
 mod utils;
 use gtest::Program;
 use nft_io::{
-    Action, AdditionalLinks, Config, ImageData, NftAction, NftError, NftEvent, NftInit, NftState,
+    Action, AdditionalLinks, Config, ImageData, NftAction, NftError, NftInit, NftState,
     StateQuery as StateQueryNft, StateReply as StateReplyNft,
 };
 use nft_marketplace_io::*;
@@ -13,8 +13,7 @@ const USERS: &[u64] = &[5, 6, 7, 8];
 #[test]
 fn successful_basics() {
     let sys = utils::initialize_system();
-    init_marketplace(&sys);
-    let marketplace = sys.get_program(1);
+    let marketplace = Program::init_marketplace(&sys);
     let nft_collection_code_id =
         sys.submit_code("target/wasm32-unknown-unknown/debug/nft.opt.wasm");
 
@@ -27,13 +26,13 @@ fn successful_basics() {
     }
     // Successful addition of a new collection
     let name_simple_nft = "Simple NFT".to_string();
-    let res = add_new_collection(
-        &marketplace,
+    marketplace.add_new_collection(
         ADMINS[0],
         nft_collection_code_id.into_bytes().into(),
         name_simple_nft.clone(),
+        None,
     );
-    assert!(!res.main_failed());
+
     let state_reply = marketplace
         .read_state(StateQuery::CollectionsInfo)
         .expect("Unexpected invalid state.");
@@ -43,16 +42,15 @@ fn successful_basics() {
     }
     // Successful creation of a new collection
     let init_nft_payload = get_init_nft_payload(USERS[0].into(), 0, Some(3), 0, None);
-
-    let res = create_collection(
-        &marketplace,
+    sys.mint_to(USERS[0], 100_000_000_000_000);
+    marketplace.create_collection(
         USERS[0],
         name_simple_nft.clone(),
         init_nft_payload.encode(),
+        10_000_000_000_000,
+        None,
     );
-    assert!(!res.main_failed());
-    let result = &res.decoded_log::<Result<NftMarketplaceEvent, NftMarketplaceError>>();
-    println!("RES: {:?}", result);
+
     let state_reply = marketplace
         .read_state(StateQuery::AllCollections)
         .expect("Unexpected invalid state.");
@@ -65,8 +63,8 @@ fn successful_basics() {
         0.into()
     };
 
-    let address_nft: [u8; 32] = address_nft.into();
-    let nft_collection = sys.get_program(address_nft);
+    let address_nft_list: [u8; 32] = address_nft.into();
+    let nft_collection = sys.get_program(address_nft_list);
     let state_reply = nft_collection
         .read_state(StateQueryNft::All)
         .expect("Unexpected invalid state.");
@@ -100,8 +98,7 @@ fn successful_basics() {
     }
 
     // Successful mint NFT in the new collection
-    let res = nft_collection.send(USERS[1], NftAction::Mint);
-    assert!(!res.main_failed());
+    marketplace.mint(USERS[1], address_nft, None);
 
     let state_reply = nft_collection
         .read_state(StateQueryNft::All)
@@ -174,20 +171,14 @@ fn successful_basics() {
     }
 
     // Check limit of mint = 3
-    let res = nft_collection.send(USERS[3], NftAction::Mint);
-    assert!(!res.main_failed());
-    let res = nft_collection.send(USERS[3], NftAction::Mint);
-    assert!(!res.main_failed());
-    let res = nft_collection.send(USERS[3], NftAction::Mint);
-    assert!(!res.main_failed());
-    let res = nft_collection.send(USERS[3], NftAction::Mint);
-    assert!(!res.main_failed());
-    let result = &res.decoded_log::<Result<NftEvent, NftError>>()[0];
-    println!("RES {:?}", result);
-    assert!(res.contains(&(
+    marketplace.mint(USERS[3], address_nft, None);
+    marketplace.mint(USERS[3], address_nft, None);
+    marketplace.mint(USERS[3], address_nft, None);
+    marketplace.mint(
         USERS[3],
-        Err::<NftEvent, NftError>(NftError::ExhaustedLimit).encode()
-    )));
+        address_nft,
+        Some(NftMarketplaceError::ErrorFromCollection),
+    );
 
     // Successful Expand NFT in the collection
     let img_data = ImageData {
@@ -220,41 +211,46 @@ fn successful_basics() {
 #[test]
 fn failures() {
     let sys = utils::initialize_system();
-    init_marketplace(&sys);
-    let marketplace = sys.get_program(1);
+    let marketplace = Program::init_marketplace(&sys);
     let nft_collection_code_id =
         sys.submit_code("target/wasm32-unknown-unknown/debug/nft.opt.wasm");
 
     let name_simple_nft = "Simple NFT".to_string();
-    let res = add_new_collection(
-        &marketplace,
+    marketplace.add_new_collection(
         ADMINS[0],
         nft_collection_code_id.into_bytes().into(),
         name_simple_nft.clone(),
+        None,
     );
-    assert!(!res.main_failed());
 
     // The mint limit must be greater than zero
     let mut init_nft_payload = get_init_nft_payload(USERS[0].into(), 0, Some(0), 0, None);
-
-    let res = create_collection(
-        &marketplace,
+    sys.mint_to(USERS[0], 100_000_000_000_000);
+    marketplace.create_collection(
         USERS[0],
         name_simple_nft.clone(),
         init_nft_payload.encode(),
+        10_000_000_000_000,
+        Some(NftMarketplaceError::CreationError),
     );
-    assert!(res.main_failed());
+    sys.claim_value_from_mailbox(USERS[0]);
+    let balance = sys.balance_of(USERS[0]);
+    assert_eq!(balance, 100_000_000_000_000, "Wrong balance");
 
     // There must be at least one link to create a collection
     init_nft_payload.config.user_mint_limit = 4.into();
     init_nft_payload.img_links_and_data = vec![];
-    let res = create_collection(
-        &marketplace,
+    marketplace.create_collection(
         USERS[0],
         name_simple_nft.clone(),
         init_nft_payload.encode(),
+        10_000_000_000_000,
+        Some(NftMarketplaceError::CreationError),
     );
-    assert!(res.main_failed());
+
+    sys.claim_value_from_mailbox(USERS[0]);
+    let balance = sys.balance_of(USERS[0]);
+    assert_eq!(balance, 100_000_000_000_000, "Wrong balance");
 
     // Limit of copies value is equal to 0
     let img_data = ImageData {
@@ -262,13 +258,16 @@ fn failures() {
         auto_changing_rules: None,
     };
     init_nft_payload.img_links_and_data = vec![("Img-0".to_owned(), img_data.clone())];
-    let res = create_collection(
-        &marketplace,
+    marketplace.create_collection(
         USERS[0],
         name_simple_nft.clone(),
         init_nft_payload.encode(),
+        10_000_000_000_000,
+        Some(NftMarketplaceError::CreationError),
     );
-    assert!(res.main_failed());
+    sys.claim_value_from_mailbox(USERS[0]);
+    let balance = sys.balance_of(USERS[0]);
+    assert_eq!(balance, 100_000_000_000_000, "Wrong balance");
 
     let img_data = ImageData {
         limit_copies: Some(1),
@@ -279,13 +278,13 @@ fn failures() {
         .collect();
 
     init_nft_payload.img_links_and_data = img_links_and_data;
-    let res = create_collection(
-        &marketplace,
+    marketplace.create_collection(
         USERS[0],
         name_simple_nft.clone(),
         init_nft_payload.encode(),
+        10_000_000_000_000,
+        None,
     );
-    assert!(!res.main_failed());
 
     let state_reply = marketplace
         .read_state(StateQuery::AllCollections)
@@ -299,23 +298,23 @@ fn failures() {
         0.into()
     };
 
-    let address_nft: [u8; 32] = address_nft.into();
-    let nft_collection = sys.get_program(address_nft);
+    let address_nft_list: [u8; 32] = address_nft.into();
+    let nft_collection = sys.get_program(address_nft_list);
 
     for _ in 0..4 {
-        let res = nft_collection.send(USERS[1], NftAction::Mint);
-        assert!(!res.main_failed());
+        marketplace.mint(USERS[1], address_nft, None);
     }
-    let res = nft_collection.send(USERS[1], NftAction::Mint);
-    check_nft_error(USERS[1], &res, NftError::ExhaustedLimit);
-
-    assert!(!res.main_failed());
-
-    let res = nft_collection.send(USERS[2], NftAction::Mint);
-    assert!(!res.main_failed());
-    let res = nft_collection.send(USERS[2], NftAction::Mint);
-    check_nft_error(USERS[2], &res, NftError::AllTokensMinted);
-    assert!(!res.main_failed());
+    marketplace.mint(
+        USERS[1],
+        address_nft,
+        Some(NftMarketplaceError::ErrorFromCollection),
+    );
+    marketplace.mint(USERS[2], address_nft, None);
+    marketplace.mint(
+        USERS[2],
+        address_nft,
+        Some(NftMarketplaceError::ErrorFromCollection),
+    );
 
     let config = Config {
         name: "User Collection".to_string(),
@@ -352,8 +351,8 @@ fn failures() {
         },
     );
     assert!(!res.main_failed());
-    let res = nft_collection.send(USERS[2], NftAction::Mint);
-    assert!(!res.main_failed());
+    marketplace.mint(USERS[2], address_nft, None);
+
     let res = nft_collection.send(
         USERS[2],
         NftAction::Approve {
@@ -397,8 +396,7 @@ fn failures() {
 #[test]
 fn check_auto_changing_rules() {
     let sys = utils::initialize_system();
-    init_marketplace(&sys);
-    let marketplace = sys.get_program(1);
+    let marketplace = Program::init_marketplace(&sys);
     let nft_collection_code_id =
         sys.submit_code("target/wasm32-unknown-unknown/debug/nft.opt.wasm");
 
@@ -411,13 +409,13 @@ fn check_auto_changing_rules() {
     }
     // Successful addition of a new collection
     let name_simple_nft = "Simple NFT".to_string();
-    let res = add_new_collection(
-        &marketplace,
+    marketplace.add_new_collection(
         ADMINS[0],
         nft_collection_code_id.into_bytes().into(),
         name_simple_nft.clone(),
+        None,
     );
-    assert!(!res.main_failed());
+
     let state_reply = marketplace
         .read_state(StateQuery::CollectionsInfo)
         .expect("Unexpected invalid state.");
@@ -462,16 +460,16 @@ fn check_auto_changing_rules() {
         },
         img_links_and_data,
         permission_to_mint: None,
+        fee_per_uploaded_file: 257_142_857_100,
     };
-    let res = create_collection(
-        &marketplace,
+    sys.mint_to(USERS[0], 100_000_000_000_000);
+    marketplace.create_collection(
         USERS[0],
         name_simple_nft.clone(),
         init_nft_payload.encode(),
+        10_000_000_000_000,
+        None,
     );
-    assert!(!res.main_failed());
-    let result = &res.decoded_log::<Result<NftMarketplaceEvent, NftMarketplaceError>>();
-    println!("RES: {:?}", result);
     let state_reply = marketplace
         .read_state(StateQuery::AllCollections)
         .expect("Unexpected invalid state.");
@@ -484,8 +482,8 @@ fn check_auto_changing_rules() {
         0.into()
     };
 
-    let address_nft: [u8; 32] = address_nft.into();
-    let nft_collection = sys.get_program(address_nft);
+    let address_nft_list: [u8; 32] = address_nft.into();
+    let nft_collection = sys.get_program(address_nft_list);
     let state_reply = nft_collection
         .read_state(StateQueryNft::All)
         .expect("Unexpected invalid state.");
@@ -495,8 +493,7 @@ fn check_auto_changing_rules() {
     }
 
     // Successful mint NFT in the new collection
-    let res = nft_collection.send(USERS[1], NftAction::Mint);
-    assert!(!res.main_failed());
+    marketplace.mint(USERS[1], address_nft, None);
 
     let state_reply = nft_collection
         .read_state(StateQueryNft::All)
@@ -534,33 +531,30 @@ fn check_auto_changing_rules() {
 #[test]
 fn check_transferable() {
     let sys = utils::initialize_system();
-    init_marketplace(&sys);
-    let marketplace = sys.get_program(1);
+    let marketplace = Program::init_marketplace(&sys);
     let nft_collection_code_id =
         sys.submit_code("target/wasm32-unknown-unknown/debug/nft.opt.wasm");
 
     // Successful addition of a new collection
     let name_simple_nft = "Simple NFT".to_string();
-    let res = add_new_collection(
-        &marketplace,
+    marketplace.add_new_collection(
         ADMINS[0],
         nft_collection_code_id.into_bytes().into(),
         name_simple_nft.clone(),
+        None,
     );
-    assert!(!res.main_failed());
 
     let mut init_nft_payload = get_init_nft_payload(USERS[0].into(), 0, Some(3), 0, None);
     let transferable_time = 9_000;
     init_nft_payload.config.transferable = Some(transferable_time);
-    let res = create_collection(
-        &marketplace,
+    sys.mint_to(USERS[0], 100_000_000_000_000);
+    marketplace.create_collection(
         USERS[0],
         name_simple_nft.clone(),
         init_nft_payload.encode(),
+        10_000_000_000_000,
+        None,
     );
-    assert!(!res.main_failed());
-    let result = &res.decoded_log::<Result<NftMarketplaceEvent, NftMarketplaceError>>();
-    println!("RES: {:?}", result);
     let state_reply = marketplace
         .read_state(StateQuery::AllCollections)
         .expect("Unexpected invalid state.");
@@ -573,8 +567,8 @@ fn check_transferable() {
         0.into()
     };
 
-    let address_nft: [u8; 32] = address_nft.into();
-    let nft_collection = sys.get_program(address_nft);
+    let address_nft_list: [u8; 32] = address_nft.into();
+    let nft_collection = sys.get_program(address_nft_list);
     let state_reply = nft_collection
         .read_state(StateQueryNft::All)
         .expect("Unexpected invalid state.");
@@ -584,8 +578,7 @@ fn check_transferable() {
     }
 
     // Successful mint NFT in the new collection
-    let res = nft_collection.send(USERS[1], NftAction::Mint);
-    assert!(!res.main_failed());
+    marketplace.mint(USERS[1], address_nft, None);
 
     // Transfer NFT in the collection
     let res = nft_collection.send(
@@ -622,8 +615,7 @@ fn check_transferable() {
 #[test]
 fn check_payment_for_mint() {
     let sys = utils::initialize_system();
-    init_marketplace(&sys);
-    let marketplace = sys.get_program(1);
+    let marketplace = Program::init_marketplace(&sys);
     let nft_collection_code_id =
         sys.submit_code("target/wasm32-unknown-unknown/debug/nft.opt.wasm");
 
@@ -636,13 +628,13 @@ fn check_payment_for_mint() {
     }
     // Successful addition of a new collection
     let name_simple_nft = "Simple NFT".to_string();
-    let res = add_new_collection(
-        &marketplace,
+    marketplace.add_new_collection(
         ADMINS[0],
         nft_collection_code_id.into_bytes().into(),
         name_simple_nft.clone(),
+        None,
     );
-    assert!(!res.main_failed());
+
     let state_reply = marketplace
         .read_state(StateQuery::CollectionsInfo)
         .expect("Unexpected invalid state.");
@@ -655,27 +647,29 @@ fn check_payment_for_mint() {
     let mut init_nft_payload = get_init_nft_payload(USERS[0].into(), 0, Some(3), 0, None);
     let payment_for_mint = 9_000_000_000_000;
     init_nft_payload.config.payment_for_mint = payment_for_mint;
-    let res = create_collection(
-        &marketplace,
+    sys.mint_to(USERS[0], 100_000_000_000_000);
+    marketplace.create_collection(
         USERS[0],
         name_simple_nft.clone(),
         init_nft_payload.encode(),
+        10_000_000_000_000,
+        Some(NftMarketplaceError::CreationError),
     );
-    assert!(res.main_failed());
+    sys.claim_value_from_mailbox(USERS[0]);
+    let balance = sys.balance_of(USERS[0]);
+    assert_eq!(balance, 100_000_000_000_000, "Wrong balance");
 
     // Successful creation of a new collection
     let payment_for_mint = 11_000_000_000_000;
     init_nft_payload.config.payment_for_mint = payment_for_mint;
-    let res = create_collection(
-        &marketplace,
+    marketplace.create_collection(
         USERS[0],
         name_simple_nft.clone(),
         init_nft_payload.encode(),
+        10_000_000_000_000,
+        None,
     );
-    assert!(!res.main_failed());
 
-    let result = &res.decoded_log::<Result<NftMarketplaceEvent, NftMarketplaceError>>();
-    println!("RES: {:?}", result);
     let state_reply = marketplace
         .read_state(StateQuery::AllCollections)
         .expect("Unexpected invalid state.");
@@ -688,8 +682,8 @@ fn check_payment_for_mint() {
         0.into()
     };
 
-    let address_nft: [u8; 32] = address_nft.into();
-    let nft_collection = sys.get_program(address_nft);
+    let address_nft_list: [u8; 32] = address_nft.into();
+    let nft_collection = sys.get_program(address_nft_list);
     let state_reply = nft_collection
         .read_state(StateQueryNft::All)
         .expect("Unexpected invalid state.");
@@ -699,23 +693,43 @@ fn check_payment_for_mint() {
     }
 
     // Successful mint NFT in the new collection
-    sys.mint_to(USERS[1], 2 * payment_for_mint);
-    let res = nft_collection.send_with_value(USERS[1], NftAction::Mint, payment_for_mint);
+    sys.mint_to(USERS[1], 3 * payment_for_mint);
+    let res = marketplace.send_with_value(
+        USERS[1],
+        NftMarketplaceAction::Mint {
+            collection_address: address_nft,
+        },
+        payment_for_mint + payment_for_mint * 200 / 10_000,
+    );
     assert!(!res.main_failed());
 
+    let old_balance = sys.balance_of(USERS[0]);
     sys.claim_value_from_mailbox(USERS[0]);
     let balance = sys.balance_of(USERS[0]);
-    assert_eq!(balance, payment_for_mint, "Wrong balance");
-    let res = nft_collection.send_with_value(USERS[1], NftAction::Mint, payment_for_mint - 1);
+    assert_eq!(balance - old_balance, payment_for_mint, "Wrong balance");
+    let res = marketplace.send_with_value(
+        USERS[1],
+        NftMarketplaceAction::Mint {
+            collection_address: address_nft,
+        },
+        payment_for_mint,
+    );
+
+    let result = &res.decoded_log::<Result<NftMarketplaceEvent, NftMarketplaceError>>();
+    println!("RES: {:?}", result);
+
     assert!(!res.main_failed());
-    check_nft_error(USERS[1], &res, NftError::WrongValue);
+
+    assert!(res.contains(&(
+        USERS[1],
+        Err::<NftMarketplaceEvent, NftMarketplaceError>(NftMarketplaceError::WrongValue).encode()
+    )));
 }
 
 #[test]
 fn permission_to_mint() {
     let sys = utils::initialize_system();
-    init_marketplace(&sys);
-    let marketplace = sys.get_program(1);
+    let marketplace = Program::init_marketplace(&sys);
     let nft_collection_code_id =
         sys.submit_code("target/wasm32-unknown-unknown/debug/nft.opt.wasm");
 
@@ -728,13 +742,12 @@ fn permission_to_mint() {
     }
     // Successful addition of a new collection
     let name_simple_nft = "Simple NFT".to_string();
-    let res = add_new_collection(
-        &marketplace,
+    marketplace.add_new_collection(
         ADMINS[0],
         nft_collection_code_id.into_bytes().into(),
         name_simple_nft.clone(),
+        None,
     );
-    assert!(!res.main_failed());
     let state_reply = marketplace
         .read_state(StateQuery::CollectionsInfo)
         .expect("Unexpected invalid state.");
@@ -744,14 +757,14 @@ fn permission_to_mint() {
     }
     // Successful creation of a new collection
     let init_nft_payload = get_init_nft_payload(USERS[0].into(), 0, Some(3), 0, Some(vec![]));
-
-    let res = create_collection(
-        &marketplace,
+    sys.mint_to(USERS[0], 100_000_000_000_000);
+    marketplace.create_collection(
         USERS[0],
         name_simple_nft.clone(),
         init_nft_payload.encode(),
+        10_000_000_000_000,
+        None,
     );
-    assert!(!res.main_failed());
 
     let state_reply = marketplace
         .read_state(StateQuery::AllCollections)
@@ -765,8 +778,8 @@ fn permission_to_mint() {
         0.into()
     };
 
-    let address_nft: [u8; 32] = address_nft.into();
-    let nft_collection = sys.get_program(address_nft);
+    let address_nft_list: [u8; 32] = address_nft.into();
+    let nft_collection = sys.get_program(address_nft_list);
     let state_reply = nft_collection
         .read_state(StateQueryNft::All)
         .expect("Unexpected invalid state.");
@@ -775,14 +788,14 @@ fn permission_to_mint() {
     }
 
     // Succes mint NFT from admin
-    let res = nft_collection.send(USERS[1], NftAction::Mint);
-    assert!(!res.main_failed());
+    marketplace.mint(USERS[0], address_nft, None);
 
     // Fail mint NFT from user
-    let res = nft_collection.send(USERS[1], NftAction::Mint);
-    assert!(!res.main_failed());
-
-    check_nft_error(USERS[1], &res, NftError::AccessDenied);
+    marketplace.mint(
+        USERS[1],
+        address_nft,
+        Some(NftMarketplaceError::ErrorFromCollection),
+    );
 
     let res = nft_collection.send(
         USERS[0],
@@ -793,8 +806,7 @@ fn permission_to_mint() {
     assert!(!res.main_failed());
 
     // Success mint
-    let res = nft_collection.send(USERS[1], NftAction::Mint);
-    assert!(!res.main_failed());
+    marketplace.mint(USERS[1], address_nft, None);
 
     let state_reply = nft_collection
         .read_state(StateQueryNft::All)
@@ -802,9 +814,9 @@ fn permission_to_mint() {
     if let StateReplyNft::All(state) = state_reply {
         println!("Collection NFT info: {:?}", state);
         assert_eq!(state.collection_owner, USERS[0].into(), "Wrong Admin");
-        let (owner, token_id) = state.owners.get(0).expect("Can't be None");
+        let (owner, token_id) = state.owners.get(1).expect("Can't be None");
         assert_eq!(*owner, USERS[1].into(), "Wrong owner");
-        assert_eq!(*token_id, vec![0], "Wrong token id");
+        assert_eq!(*token_id, vec![1], "Wrong token id");
     }
     let res = nft_collection.send(
         USERS[0],
@@ -815,10 +827,11 @@ fn permission_to_mint() {
     assert!(!res.main_failed());
 
     // Fail mint NFT in the new collection
-    let res = nft_collection.send(USERS[1], NftAction::Mint);
-    assert!(!res.main_failed());
-
-    check_nft_error(USERS[1], &res, NftError::AccessDenied);
+    marketplace.mint(
+        USERS[1],
+        address_nft,
+        Some(NftMarketplaceError::ErrorFromCollection),
+    );
 }
 
 fn get_state(nft_collection: &Program) -> Option<NftState> {
@@ -839,9 +852,9 @@ fn get_state(nft_collection: &Program) -> Option<NftState> {
 
 // #[test]
 // fn check() {
-//     let input = "00033c5573657220436f6c6c656374696f6e3c5573657220436f6c6c656374696f6e04107461673144436f6c6c656374696f6e2062616e6e65723c436f6c6c656374696f6e206c6f676f010300000000000000000000000000000000000000000000010000000000000000010000000000000000";
+//     let input = "000080ee3600000000008c9de8de3b0000000000000000000000c800c800";
 //     let decoded = hex::decode(input).expect("Decoding failed");
 //     let mut res: &[u8] = &decoded;
-//     let result = Result::<NftEvent, NftError>::decode(&mut res).ok();
+//     let result = Result::<NftMarketplaceEvent, NftMarketplaceError>::decode(&mut res).ok();
 //     println!("RES: {:?}", result);
 // }
