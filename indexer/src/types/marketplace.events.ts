@@ -29,12 +29,12 @@ export enum NftMarketplaceEventType {
 
 export type Initialized = {
   type: NftMarketplaceEventType.Initialized;
-  gasForCreation: number | null;
-  gasForTransferToken: number | null;
-  gasForCloseAuction: number | null;
-  gasForDeleteCollection: number | null;
-  gasForGetTokenInfo: number | null;
-  timeBetweenCreateCollections: number | null;
+  gasForCreation: bigint | null;
+  gasForTransferToken: bigint | null;
+  gasForCloseAuction: bigint | null;
+  gasForDeleteCollection: bigint | null;
+  gasForGetTokenInfo: bigint | null;
+  timeBetweenCreateCollections: bigint | null;
   feePerUploadedFile: bigint | null;
   royaltyToMarketplaceForTrade: number | null;
   royaltyToMarketplaceForMint: number | null;
@@ -148,12 +148,12 @@ export type AdminDeleted = {
 
 export type ConfigUpdated = {
   type: NftMarketplaceEventType.ConfigUpdated;
-  gasForCreation: number | null;
-  gasForTransferToken: number | null;
-  gasForCloseAuction: number | null;
-  gasForDeleteCollection: number | null;
-  gasForGetTokenInfo: number | null;
-  timeBetweenCreateCollections: number | null;
+  gasForCreation: bigint | null;
+  gasForTransferToken: bigint | null;
+  gasForCloseAuction: bigint | null;
+  gasForDeleteCollection: bigint | null;
+  gasForGetTokenInfo: bigint | null;
+  timeBetweenCreateCollections: bigint | null;
   feePerUploadedFile: bigint | null;
   royaltyToMarketplaceForTrade: number | null;
   royaltyToMarketplaceForMint: number | null;
@@ -407,26 +407,26 @@ export function getMarketplaceEvent(
   if (event.configUpdated) {
     return {
       type: NftMarketplaceEventType.ConfigUpdated,
-      gasForCreation: safeUnwrapToNumber(
+      gasForCreation: safeUnwrapToBigInt(
         safeUnwrapOptional<u64, number>(event.configUpdated.gasForCreation),
       ),
-      gasForTransferToken: safeUnwrapToNumber(
+      gasForTransferToken: safeUnwrapToBigInt(
         safeUnwrapOptional<u64, number>(
           event.configUpdated.gasForTransferToken,
         ),
       ),
-      gasForCloseAuction: safeUnwrapToNumber(
+      gasForCloseAuction: safeUnwrapToBigInt(
         safeUnwrapOptional<u64, number>(event.configUpdated.gasForCloseAuction),
       ),
-      gasForDeleteCollection: safeUnwrapToNumber(
+      gasForDeleteCollection: safeUnwrapToBigInt(
         safeUnwrapOptional<u64, number>(
           event.configUpdated.gasForDeleteCollection,
         ),
       ),
-      gasForGetTokenInfo: safeUnwrapToNumber(
+      gasForGetTokenInfo: safeUnwrapToBigInt(
         safeUnwrapOptional<u64, number>(event.configUpdated.gasForGetTokenInfo),
       ),
-      timeBetweenCreateCollections: safeUnwrapToNumber(
+      timeBetweenCreateCollections: safeUnwrapToBigInt(
         safeUnwrapOptional<u64, number>(
           event.configUpdated.timeBetweenCreateCollections,
         ),
@@ -459,24 +459,24 @@ export function getMarketplaceEvent(
   if (event.initialized) {
     return {
       type: NftMarketplaceEventType.Initialized,
-      gasForCreation: safeUnwrapToNumber(
+      gasForCreation: safeUnwrapToBigInt(
         safeUnwrapOptional<u64, number>(event.initialized.gasForCreation),
       ),
-      gasForTransferToken: safeUnwrapToNumber(
+      gasForTransferToken: safeUnwrapToBigInt(
         safeUnwrapOptional<u64, number>(event.initialized.gasForTransferToken),
       ),
-      gasForCloseAuction: safeUnwrapToNumber(
+      gasForCloseAuction: safeUnwrapToBigInt(
         safeUnwrapOptional<u64, number>(event.initialized.gasForCloseAuction),
       ),
-      gasForDeleteCollection: safeUnwrapToNumber(
+      gasForDeleteCollection: safeUnwrapToBigInt(
         safeUnwrapOptional<u64, number>(
           event.initialized.gasForDeleteCollection,
         ),
       ),
-      gasForGetTokenInfo: safeUnwrapToNumber(
+      gasForGetTokenInfo: safeUnwrapToBigInt(
         safeUnwrapOptional<u64, number>(event.initialized.gasForGetTokenInfo),
       ),
-      timeBetweenCreateCollections: safeUnwrapToNumber(
+      timeBetweenCreateCollections: safeUnwrapToBigInt(
         event.initialized.timeBetweenCreateCollections,
       ),
       minimumTransferValue: safeUnwrapToBigInt(

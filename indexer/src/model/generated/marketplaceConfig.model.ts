@@ -17,23 +17,41 @@ export class MarketplaceConfig {
   @PrimaryColumn_()
   id!: string;
 
-  @Column_('int4', { nullable: false })
-  gasForCreation!: number;
+  @Column_('numeric', {
+    transformer: marshal.bigintTransformer,
+    nullable: false,
+  })
+  gasForCreation!: bigint;
 
-  @Column_('int4', { nullable: false })
-  gasForTransferToken!: number;
+  @Column_('numeric', {
+    transformer: marshal.bigintTransformer,
+    nullable: false,
+  })
+  gasForTransferToken!: bigint;
 
-  @Column_('int4', { nullable: false })
-  gasForCloseAuction!: number;
+  @Column_('numeric', {
+    transformer: marshal.bigintTransformer,
+    nullable: false,
+  })
+  gasForCloseAuction!: bigint;
 
-  @Column_('int4', { nullable: false })
-  gasForDeleteCollection!: number;
+  @Column_('numeric', {
+    transformer: marshal.bigintTransformer,
+    nullable: false,
+  })
+  gasForDeleteCollection!: bigint;
 
-  @Column_('int4', { nullable: false })
-  gasForGetTokenInfo!: number;
+  @Column_('numeric', {
+    transformer: marshal.bigintTransformer,
+    nullable: false,
+  })
+  gasForGetTokenInfo!: bigint;
 
-  @Column_('int4', { nullable: false })
-  timeBetweenCreateCollections!: number;
+  @Column_('numeric', {
+    transformer: marshal.bigintTransformer,
+    nullable: false,
+  })
+  timeBetweenCreateCollections!: bigint;
 
   @Column_('int4', { nullable: false })
   royaltyToMarketplaceForMint!: number;

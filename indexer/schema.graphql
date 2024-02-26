@@ -11,12 +11,12 @@ type Marketplace @entity {
 }
 
 type MarketplaceConfig @entity {
-  gasForCreation: Int!
-  gasForTransferToken: Int!
-  gasForCloseAuction: Int!
-  gasForDeleteCollection: Int!
-  gasForGetTokenInfo: Int!
-  timeBetweenCreateCollections: Int!
+  gasForCreation: BigInt!
+  gasForTransferToken: BigInt!
+  gasForCloseAuction: BigInt!
+  gasForDeleteCollection: BigInt!
+  gasForGetTokenInfo: BigInt!
+  timeBetweenCreateCollections: BigInt!
   royaltyToMarketplaceForMint: Int!
   royaltyToMarketplaceForTrade: Int!
   feePerUploadedFile: BigInt!
