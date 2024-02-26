@@ -7,20 +7,12 @@ import { Collection, CollectionType, Nft } from '@/graphql/graphql';
 import { useApprovedMessage, useIsOwner, useLoading, useModal } from '@/hooks';
 
 import BidSVG from '../../assets/bid.svg?react';
-import { usePriceSchema } from '../../hooks';
-import { getDurationOptions } from '../../utils';
+import { useDefaultValues, usePriceSchema } from '../../hooks';
 
 type Props = Pick<Nft, 'idInCollection' | 'name' | 'mediaUrl' | 'owner'> & {
   collection: Pick<Collection, 'id' | 'name' | 'sellable'> & {
     type: Pick<CollectionType, 'type'>;
   };
-};
-
-const defaultOptions = getDurationOptions();
-
-const defaultValues = {
-  duration: defaultOptions[0].value,
-  minPrice: '',
 };
 
 function Component({ collection, owner, ...nft }: Props) {
@@ -29,6 +21,7 @@ function Component({ collection, owner, ...nft }: Props) {
   const alert = useAlert();
   const [isLoading, enableLoading, disableLoading] = useLoading();
 
+  const { defaultValues, defaultOptions } = useDefaultValues();
   const { getPriceSchema } = usePriceSchema();
   const schema = z.object({ minPrice: getPriceSchema(), duration: z.string() });
 
@@ -39,9 +32,8 @@ function Component({ collection, owner, ...nft }: Props) {
 
     const collectionAddress = collection.id;
     const tokenId = nft.idInCollection;
-    const durationMs = duration;
 
-    const payload = { CreateAuction: { collectionAddress, tokenId, minPrice, durationMs } };
+    const payload = { CreateAuction: { collectionAddress, tokenId, minPrice, duration } };
 
     const onSuccess = () => {
       alert.success('Auction started');

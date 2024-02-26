@@ -43,7 +43,7 @@ function ParametersForm({ defaultValues, onSubmit, onBack }: Props) {
         .string()
         .transform((value) => getChainBalanceValue(value))
         .refine((value) => value.isEqualTo(0) || value.isGreaterThanOrEqualTo(existentialDeposit), {
-          message: `Value should be equal 0 or bigger than ${getFormattedBalanceValue(existentialDeposit).toFixed()}`,
+          message: `Minimum value is ${getFormattedBalanceValue(existentialDeposit).toFixed()} or 0`,
         })
         .refine((value) => value.isInteger(), 'Maximum amount of decimal places exceeded')
         .transform((value) => getFormattedBalanceValue(value.toFixed()).toFixed()),
