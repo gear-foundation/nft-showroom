@@ -1,5 +1,5 @@
 type MintNFTPayload = {
-  Mint: null;
+  Mint: { collectionAddress: string };
 };
 
 type TransferNFTPayload = {

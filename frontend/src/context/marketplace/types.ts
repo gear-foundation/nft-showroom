@@ -13,6 +13,9 @@ type Marketplace = {
   }[];
   config: {
     feePerUploadedFile: string;
+    minimumValueForTrade: string;
+    royaltyToMarketplaceForMint: number;
+    royaltyToMarketplaceForTrade: number;
   };
 };
 
@@ -22,4 +25,4 @@ type Value = {
   collectionsMetadata: MetadataRecord | undefined;
 };
 
-export type { MetadataRecord, Marketplace, Value };
+export type { MetadataRecord, Value };

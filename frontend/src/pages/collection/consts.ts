@@ -48,10 +48,6 @@ const COLLECTION_QUERY = graphql(`
         }
       }
 
-      type {
-        type
-      }
-
       additionalLinks {
         discord
         externalUrl

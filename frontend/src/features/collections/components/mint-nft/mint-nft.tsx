@@ -2,20 +2,19 @@ import { useAccount, useAlert } from '@gear-js/react-hooks';
 import { Button } from '@gear-js/vara-ui';
 
 import { withAccount } from '@/components';
-import { Collection, CollectionType, Nft } from '@/graphql/graphql';
-import { useCollectionMessage, useIsOwner, useLoading } from '@/hooks';
+import { useMarketplace } from '@/context';
+import { Collection, Nft } from '@/graphql/graphql';
+import { useIsOwner, useLoading, useMarketplaceMessage } from '@/hooks';
 
 type Props = Pick<
   Collection,
   'id' | 'tokensLimit' | 'paymentForMint' | 'userMintLimit' | 'permissionToMint' | 'admin'
 > & {
   nfts: Pick<Nft, 'id' | 'mintedBy'>[];
-} & {
-  type: Pick<CollectionType, 'type'>;
 };
 
-function Component({ id, type, tokensLimit, paymentForMint, userMintLimit, permissionToMint, admin, nfts }: Props) {
-  const sendMessage = useCollectionMessage(id, type.type);
+function Component({ id, tokensLimit, paymentForMint, userMintLimit, permissionToMint, admin, nfts }: Props) {
+  const sendMessage = useMarketplaceMessage();
   const alert = useAlert();
   const [isLoading, enableLoading, disableLoading] = useLoading();
   const isAdmin = useIsOwner(admin);
@@ -28,13 +27,21 @@ function Component({ id, type, tokensLimit, paymentForMint, userMintLimit, permi
   const isAllowedToMint = permissionToMint ? permissionToMint.includes(account!.decodedAddress) : true;
   const isUserMintLimitUnmet = userMintLimit ? mintedTokensCount < Number(userMintLimit) : true;
 
+  const { marketplace } = useMarketplace();
+  const { royaltyToMarketplaceForMint } = marketplace?.config || {};
+
   const handleClick = () => {
     if (!paymentForMint) throw new Error('paymentForMint is not exists');
+    if (royaltyToMarketplaceForMint === undefined) throw new Error('royaltyToMarketplaceForMint is not initialized');
 
     enableLoading();
 
-    const payload = { Mint: null };
-    const value = paymentForMint;
+    const payload = { Mint: { collectionAddress: id } };
+
+    const FEE_MULTIPLIER = 10000;
+    const percentage = (BigInt(paymentForMint) * BigInt(200)) / BigInt(FEE_MULTIPLIER);
+    const value = (BigInt(paymentForMint) + percentage).toString();
+
     const onSuccess = () => alert.success('NFT minted');
     const onFinally = disableLoading;
 
@@ -42,7 +49,7 @@ function Component({ id, type, tokensLimit, paymentForMint, userMintLimit, permi
   };
 
   return tokensToMint && (isAdmin || (isAllowedToMint && isUserMintLimitUnmet)) ? (
-    <Button text="Mint NFT" size="small" onClick={handleClick} isLoading={isLoading} block />
+    <Button text="Mint NFT" size="small" onClick={handleClick} isLoading={isLoading || !marketplace} block />
   ) : null;
 }
 

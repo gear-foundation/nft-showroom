@@ -23,7 +23,7 @@ import { ParametersForm } from '../parameters-form';
 import { SummaryForm } from '../summary-form';
 
 function CreateSimpleCollectionModal({ close }: Pick<ModalProps, 'close'>) {
-  const [stepIndex, setStepIndex] = useState(2);
+  const [stepIndex, setStepIndex] = useState(0);
   const [summaryValues, setSummaryValues] = useState(DEFAULT_SUMMARY_VALUES);
   const [parametersValues, setParametersValues] = useState(DEFAULT_PARAMETERS_VALUES);
   const [isLoading, enableLoading, disableLoading] = useLoading();
@@ -73,7 +73,7 @@ function CreateSimpleCollectionModal({ close }: Pick<ModalProps, 'close'>) {
     const userMintLimit = mintLimit || null;
     const transferable = isTransferable ? '0' : null;
     const sellable = isSellable ? '0' : null;
-    const paymentForMint = getChainBalanceValue(mintPrice || '0').toFixed();
+    const paymentForMint = getChainBalanceValue(mintPrice).toFixed();
 
     const collectionTags = tags.map(({ value }) => value);
 

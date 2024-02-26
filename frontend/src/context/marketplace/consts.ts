@@ -18,6 +18,9 @@ const MARKETPLACE_QUERY = graphql(`
       metadata
       config {
         feePerUploadedFile
+        minimumValueForTrade
+        royaltyToMarketplaceForMint
+        royaltyToMarketplaceForTrade
       }
     }
   }

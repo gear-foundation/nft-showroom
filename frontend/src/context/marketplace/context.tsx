@@ -1,12 +1,12 @@
 import { ProgramMetadata } from '@gear-js/api';
 import { ProviderProps, useAlert } from '@gear-js/react-hooks';
-import { createContext, useContext, useEffect, useMemo, useState } from 'react';
+import { createContext, useContext, useEffect, useState } from 'react';
 import { useQuery } from 'urql';
 
 import { getIpfsLink } from '@/utils';
 
 import { DEFAULT_VALUE, MARKETPLACE_QUERY } from './consts';
-import { Marketplace, MetadataRecord, Value } from './types';
+import { MetadataRecord, Value } from './types';
 
 const MarketplaceContext = createContext<Value>(DEFAULT_VALUE);
 const { Provider } = MarketplaceContext;
@@ -16,15 +16,15 @@ function MarketplaceProvider({ children }: ProviderProps) {
   const alert = useAlert();
 
   const [result] = useQuery({ query: MARKETPLACE_QUERY });
-  const marketplaceQuery = result.data?.marketplaceById;
+  const marketplace = result.data?.marketplaceById;
 
   const [marketplaceMetadata, setMarketplaceMetadata] = useState<ProgramMetadata>();
   const [collectionsMetadata, setCollectionsMetadata] = useState<MetadataRecord>();
 
   useEffect(() => {
-    if (!marketplaceQuery) return;
+    if (!marketplace) return;
 
-    const { metadata, collectionTypes } = marketplaceQuery;
+    const { metadata, collectionTypes } = marketplace;
     const collectionURLs = collectionTypes.map(({ metaUrl }) => fetch(getIpfsLink(metaUrl)));
 
     const getMetadata = (value: string) => ProgramMetadata.from(`0x${value}`);
@@ -43,17 +43,7 @@ function MarketplaceProvider({ children }: ProviderProps) {
       .catch(({ message }: Error) => alert.error(message));
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [marketplaceQuery]);
-
-  // TDOO: drop after indexer update
-  const config = useMemo(() => {
-    const entries = Object.entries(marketplaceQuery?.config || {});
-    const nonNullableEntries = entries.filter(([, value]) => Boolean(value));
-
-    return Object.fromEntries(nonNullableEntries) as Marketplace['config'];
-  }, [marketplaceQuery?.config]);
-
-  const marketplace = marketplaceQuery ? { ...marketplaceQuery, config } : undefined;
+  }, [marketplace]);
 
   return <Provider value={{ marketplace, marketplaceMetadata, collectionsMetadata }}>{children}</Provider>;
 }

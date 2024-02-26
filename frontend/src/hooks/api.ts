@@ -48,7 +48,9 @@ function useApprovedMessage(collectionId: string, collectionTypeName: string) {
       sendMarketplaceMessage(args);
     };
 
-    sendCollectionMessage({ payload, onSuccess });
+    const onFinally = args.onFinally;
+
+    sendCollectionMessage({ payload, onSuccess, onFinally });
   };
 }
 
