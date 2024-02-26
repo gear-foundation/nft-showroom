@@ -71,6 +71,18 @@ export class MarketplaceConfig {
   })
   minimumTransferValue!: bigint;
 
+  @Column_('numeric', {
+    transformer: marshal.bigintTransformer,
+    nullable: false,
+  })
+  minimumValueForTrade!: bigint;
+
+  @Column_('numeric', {
+    transformer: marshal.bigintTransformer,
+    nullable: false,
+  })
+  minimumValueForMint!: bigint;
+
   @Column_('int4', { nullable: false })
   msInBlock!: number;
 

@@ -29,17 +29,12 @@ export enum NftMarketplaceEventType {
 
 export type Initialized = {
   type: NftMarketplaceEventType.Initialized;
-  gasForCreation: bigint | null;
-  gasForTransferToken: bigint | null;
-  gasForCloseAuction: bigint | null;
-  gasForDeleteCollection: bigint | null;
-  gasForGetTokenInfo: bigint | null;
   timeBetweenCreateCollections: bigint | null;
   feePerUploadedFile: bigint | null;
   royaltyToMarketplaceForTrade: number | null;
   royaltyToMarketplaceForMint: number | null;
-  minimumTransferValue: bigint | null;
-  msInBlock: number | null;
+  minimumValueForTrade: bigint | null;
+  minimumValueForMint: bigint | null;
 };
 
 export type NewCollectionAdded = {
@@ -159,6 +154,8 @@ export type ConfigUpdated = {
   royaltyToMarketplaceForMint: number | null;
   minimumTransferValue: bigint | null;
   msInBlock: number | null;
+  minimumValueForTrade: bigint | null;
+  minimumValueForMint: bigint | null;
 };
 
 export type NftMarketplaceEvent =
@@ -184,15 +181,10 @@ export interface NftMarketplaceEventPlain extends Enum {
   initialized: {
     timeBetweenCreateCollections: u64;
     feePerUploadedFile: u128;
-    minimumTransferValue: u128;
     royaltyToMarketplaceForTrade: u16;
     royaltyToMarketplaceForMint: u16;
-    gasForCreation: Option<u64>;
-    gasForTransferToken: Option<u64>;
-    gasForCloseAuction: Option<u64>;
-    gasForDeleteCollection: Option<u64>;
-    gasForGetTokenInfo: Option<u64>;
-    msInBlock: Option<u32>;
+    minimumValueForTrade: u128;
+    minimumValueForMint: u128;
   };
   newCollectionAdded: {
     codeId: CodeId;
@@ -280,6 +272,8 @@ export interface NftMarketplaceEventPlain extends Enum {
     feePerUploadedFile: Option<u128>;
     royaltyToMarketplaceForTrade: Option<u16>;
     royaltyToMarketplaceForMint: Option<u16>;
+    minimumValueForTrade: Option<u128>;
+    minimumValueForMint: Option<u128>;
   };
 }
 
@@ -454,39 +448,32 @@ export function getMarketplaceEvent(
           event.configUpdated.royaltyToMarketplaceForMint,
         ),
       ),
+      minimumValueForTrade: safeUnwrapToBigInt(
+        safeUnwrapOptional<u128, number>(
+          event.configUpdated.minimumValueForTrade,
+        ),
+      ),
+      minimumValueForMint: safeUnwrapToBigInt(
+        safeUnwrapOptional<u128, number>(
+          event.configUpdated.minimumValueForMint,
+        ),
+      ),
     };
   }
   if (event.initialized) {
     return {
       type: NftMarketplaceEventType.Initialized,
-      gasForCreation: safeUnwrapToBigInt(
-        safeUnwrapOptional<u64, number>(event.initialized.gasForCreation),
-      ),
-      gasForTransferToken: safeUnwrapToBigInt(
-        safeUnwrapOptional<u64, number>(event.initialized.gasForTransferToken),
-      ),
-      gasForCloseAuction: safeUnwrapToBigInt(
-        safeUnwrapOptional<u64, number>(event.initialized.gasForCloseAuction),
-      ),
-      gasForDeleteCollection: safeUnwrapToBigInt(
-        safeUnwrapOptional<u64, number>(
-          event.initialized.gasForDeleteCollection,
-        ),
-      ),
-      gasForGetTokenInfo: safeUnwrapToBigInt(
-        safeUnwrapOptional<u64, number>(event.initialized.gasForGetTokenInfo),
-      ),
       timeBetweenCreateCollections: safeUnwrapToBigInt(
         event.initialized.timeBetweenCreateCollections,
       ),
-      minimumTransferValue: safeUnwrapToBigInt(
-        event.initialized.minimumTransferValue,
-      ),
-      msInBlock: safeUnwrapToNumber(
-        safeUnwrapOptional<u32, number>(event.initialized.msInBlock),
-      ),
       feePerUploadedFile: safeUnwrapToBigInt(
         event.initialized.feePerUploadedFile,
+      ),
+      minimumValueForTrade: safeUnwrapToBigInt(
+        event.initialized.minimumValueForTrade,
+      ),
+      minimumValueForMint: safeUnwrapToBigInt(
+        event.initialized.minimumValueForMint,
       ),
       royaltyToMarketplaceForTrade: safeUnwrapToNumber(
         event.initialized.royaltyToMarketplaceForTrade,

@@ -21,6 +21,8 @@ type MarketplaceConfig @entity {
   royaltyToMarketplaceForTrade: Int!
   feePerUploadedFile: BigInt!
   minimumTransferValue: BigInt!
+  minimumValueForTrade: BigInt!
+  minimumValueForMint: BigInt!
   msInBlock: Int!
   marketplace: Marketplace!
 }
