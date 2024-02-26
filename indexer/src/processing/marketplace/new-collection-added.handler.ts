@@ -12,12 +12,6 @@ export class NewCollectionAddedHandler implements INftMarketplaceEventHandler {
   ): Promise<void> {
     const { codeId, metaLink, typeName, typeDescription } = event;
     const existingCollectionType = await storage.getCollectionType(typeName);
-    if (existingCollectionType !== undefined) {
-      console.warn(
-        `[NewCollectionAddedHandler]: Collection type ${typeName} already exists`,
-      );
-      return;
-    }
     if (!typeName) {
       console.warn(
         `[NewCollectionAddedHandler]: Collection type ${typeName} is not valid`,
@@ -26,6 +20,7 @@ export class NewCollectionAddedHandler implements INftMarketplaceEventHandler {
     }
     await storage.setCollectionType(
       new CollectionType({
+        ...(existingCollectionType ?? {}),
         id: codeId,
         description: typeDescription,
         type: typeName,

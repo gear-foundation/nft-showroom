@@ -17,44 +17,44 @@ export class MarketplaceConfig {
   @PrimaryColumn_()
   id!: string;
 
-  @Column_('int4', { nullable: true })
-  gasForCreation!: number | undefined | null;
+  @Column_('int4', { nullable: false })
+  gasForCreation!: number;
 
-  @Column_('int4', { nullable: true })
-  gasForTransferToken!: number | undefined | null;
+  @Column_('int4', { nullable: false })
+  gasForTransferToken!: number;
 
-  @Column_('int4', { nullable: true })
-  gasForCloseAuction!: number | undefined | null;
+  @Column_('int4', { nullable: false })
+  gasForCloseAuction!: number;
 
-  @Column_('int4', { nullable: true })
-  gasForDeleteCollection!: number | undefined | null;
+  @Column_('int4', { nullable: false })
+  gasForDeleteCollection!: number;
 
-  @Column_('int4', { nullable: true })
-  gasForGetTokenInfo!: number | undefined | null;
+  @Column_('int4', { nullable: false })
+  gasForGetTokenInfo!: number;
 
-  @Column_('int4', { nullable: true })
-  timeBetweenCreateCollections!: number | undefined | null;
+  @Column_('int4', { nullable: false })
+  timeBetweenCreateCollections!: number;
 
-  @Column_('int4', { nullable: true })
-  royaltyToMarketplaceForMint!: number | undefined | null;
+  @Column_('int4', { nullable: false })
+  royaltyToMarketplaceForMint!: number;
 
-  @Column_('int4', { nullable: true })
-  royaltyToMarketplaceForTrade!: number | undefined | null;
-
-  @Column_('numeric', {
-    transformer: marshal.bigintTransformer,
-    nullable: true,
-  })
-  feePerUploadedFile!: bigint | undefined | null;
+  @Column_('int4', { nullable: false })
+  royaltyToMarketplaceForTrade!: number;
 
   @Column_('numeric', {
     transformer: marshal.bigintTransformer,
-    nullable: true,
+    nullable: false,
   })
-  minimumTransferValue!: bigint | undefined | null;
+  feePerUploadedFile!: bigint;
 
-  @Column_('int4', { nullable: true })
-  msInBlock!: number | undefined | null;
+  @Column_('numeric', {
+    transformer: marshal.bigintTransformer,
+    nullable: false,
+  })
+  minimumTransferValue!: bigint;
+
+  @Column_('int4', { nullable: false })
+  msInBlock!: number;
 
   @Index_()
   @ManyToOne_(() => Marketplace, { nullable: true })

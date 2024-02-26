@@ -4,7 +4,9 @@ import { MarketplaceConfig } from '../../model';
 import { EventInfo } from '../event-info.type';
 import { Initialized } from '../../types/marketplace.events';
 
-export class MarketplaceInitializedHandler implements INftMarketplaceEventHandler {
+export class MarketplaceInitializedHandler
+  implements INftMarketplaceEventHandler
+{
   async handle(
     event: Initialized,
     eventInfo: EventInfo,

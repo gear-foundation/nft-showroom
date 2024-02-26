@@ -11,17 +11,17 @@ type Marketplace @entity {
 }
 
 type MarketplaceConfig @entity {
-  gasForCreation: Int
-  gasForTransferToken: Int
-  gasForCloseAuction: Int
-  gasForDeleteCollection: Int
-  gasForGetTokenInfo: Int
-  timeBetweenCreateCollections: Int
-  royaltyToMarketplaceForMint: Int
-  royaltyToMarketplaceForTrade: Int
-  feePerUploadedFile: BigInt
-  minimumTransferValue: BigInt
-  msInBlock: Int
+  gasForCreation: Int!
+  gasForTransferToken: Int!
+  gasForCloseAuction: Int!
+  gasForDeleteCollection: Int!
+  gasForGetTokenInfo: Int!
+  timeBetweenCreateCollections: Int!
+  royaltyToMarketplaceForMint: Int!
+  royaltyToMarketplaceForTrade: Int!
+  feePerUploadedFile: BigInt!
+  minimumTransferValue: BigInt!
+  msInBlock: Int!
   marketplace: Marketplace!
 }
 
