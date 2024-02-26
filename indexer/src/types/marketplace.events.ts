@@ -30,11 +30,9 @@ export enum NftMarketplaceEventType {
 export type Initialized = {
   type: NftMarketplaceEventType.Initialized;
   timeBetweenCreateCollections: bigint | null;
-  feePerUploadedFile: bigint | null;
   royaltyToMarketplaceForTrade: number | null;
   royaltyToMarketplaceForMint: number | null;
   minimumValueForTrade: bigint | null;
-  minimumValueForMint: bigint | null;
 };
 
 export type NewCollectionAdded = {
@@ -180,11 +178,9 @@ export type NftMarketplaceEvent =
 export interface NftMarketplaceEventPlain extends Enum {
   initialized: {
     timeBetweenCreateCollections: u64;
-    feePerUploadedFile: u128;
     royaltyToMarketplaceForTrade: u16;
     royaltyToMarketplaceForMint: u16;
     minimumValueForTrade: u128;
-    minimumValueForMint: u128;
   };
   newCollectionAdded: {
     codeId: CodeId;
@@ -466,14 +462,8 @@ export function getMarketplaceEvent(
       timeBetweenCreateCollections: safeUnwrapToBigInt(
         event.initialized.timeBetweenCreateCollections,
       ),
-      feePerUploadedFile: safeUnwrapToBigInt(
-        event.initialized.feePerUploadedFile,
-      ),
       minimumValueForTrade: safeUnwrapToBigInt(
         event.initialized.minimumValueForTrade,
-      ),
-      minimumValueForMint: safeUnwrapToBigInt(
-        event.initialized.minimumValueForMint,
       ),
       royaltyToMarketplaceForTrade: safeUnwrapToNumber(
         event.initialized.royaltyToMarketplaceForTrade,
