@@ -29,11 +29,17 @@ export enum NftMarketplaceEventType {
 
 export type Initialized = {
   type: NftMarketplaceEventType.Initialized;
+  gasForCreation: number | null;
+  gasForTransferToken: number | null;
+  gasForCloseAuction: number | null;
+  gasForDeleteCollection: number | null;
+  gasForGetTokenInfo: number | null;
   timeBetweenCreateCollections: number | null;
   feePerUploadedFile: bigint | null;
   royaltyToMarketplaceForTrade: number | null;
   royaltyToMarketplaceForMint: number | null;
   minimumTransferValue: bigint | null;
+  msInBlock: number | null;
 };
 
 export type NewCollectionAdded = {
@@ -181,6 +187,12 @@ export interface NftMarketplaceEventPlain extends Enum {
     minimumTransferValue: u128;
     royaltyToMarketplaceForTrade: u16;
     royaltyToMarketplaceForMint: u16;
+    gasForCreation: Option<u64>;
+    gasForTransferToken: Option<u64>;
+    gasForCloseAuction: Option<u64>;
+    gasForDeleteCollection: Option<u64>;
+    gasForGetTokenInfo: Option<u64>;
+    msInBlock: Option<u32>;
   };
   newCollectionAdded: {
     codeId: CodeId;
@@ -447,14 +459,34 @@ export function getMarketplaceEvent(
   if (event.initialized) {
     return {
       type: NftMarketplaceEventType.Initialized,
+      gasForCreation: safeUnwrapToNumber(
+        safeUnwrapOptional<u64, number>(event.initialized.gasForCreation),
+      ),
+      gasForTransferToken: safeUnwrapToNumber(
+        safeUnwrapOptional<u64, number>(event.initialized.gasForTransferToken),
+      ),
+      gasForCloseAuction: safeUnwrapToNumber(
+        safeUnwrapOptional<u64, number>(event.initialized.gasForCloseAuction),
+      ),
+      gasForDeleteCollection: safeUnwrapToNumber(
+        safeUnwrapOptional<u64, number>(
+          event.initialized.gasForDeleteCollection,
+        ),
+      ),
+      gasForGetTokenInfo: safeUnwrapToNumber(
+        safeUnwrapOptional<u64, number>(event.initialized.gasForGetTokenInfo),
+      ),
       timeBetweenCreateCollections: safeUnwrapToNumber(
         event.initialized.timeBetweenCreateCollections,
       ),
-      feePerUploadedFile: safeUnwrapToBigInt(
-        event.initialized.feePerUploadedFile,
-      ),
       minimumTransferValue: safeUnwrapToBigInt(
         event.initialized.minimumTransferValue,
+      ),
+      msInBlock: safeUnwrapToNumber(
+        safeUnwrapOptional<u32, number>(event.initialized.msInBlock),
+      ),
+      feePerUploadedFile: safeUnwrapToBigInt(
+        event.initialized.feePerUploadedFile,
       ),
       royaltyToMarketplaceForTrade: safeUnwrapToNumber(
         event.initialized.royaltyToMarketplaceForTrade,
