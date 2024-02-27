@@ -45,11 +45,6 @@
   display: flex;
   align-items: flex-start;
   gap: 16px;
-
-  // TODO: get rid after @gear-js/vara-ui input block prop update
-  > *:first-child {
-    width: 100%;
-  }
 }
 
 .addresses {
