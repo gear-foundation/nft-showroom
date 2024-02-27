@@ -97,7 +97,7 @@ function MintPermissionForm({ defaultValues, error, onChange }: Props) {
 
         {selectedValue === 'custom' && (
           <div className={styles.addAddress}>
-            <Input label="Address" size="small" {...register('address')} error={errors?.address?.message} />
+            <Input label="Address" size="small" {...register('address')} error={errors?.address?.message} block />
             <Button text="Add" size="small" color="border" type="submit" />
           </div>
         )}
