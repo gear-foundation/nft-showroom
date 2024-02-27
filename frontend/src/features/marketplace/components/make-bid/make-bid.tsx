@@ -26,7 +26,7 @@ function Component({ collection, auction, ...nft }: Props) {
   const [isLoading, enableLoading, disableLoading] = useLoading();
 
   const { getPriceSchema } = usePriceSchema();
-  const schema = z.object({ value: getPriceSchema(auction.lastPrice || auction.minPrice) });
+  const schema = z.object({ value: getPriceSchema(auction.lastPrice || auction.minPrice, Boolean(auction.lastPrice)) });
 
   const onSubmit = ({ value }: typeof defaultValues) => {
     enableLoading();
