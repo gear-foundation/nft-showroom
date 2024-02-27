@@ -10,7 +10,7 @@ import { ComponentType } from 'react';
 import { Client, Provider as UrqlProvider, cacheExchange, fetchExchange, subscriptionExchange } from 'urql';
 
 import { ADDRESS } from './consts';
-import { MetadataProvider } from './context';
+import { MarketplaceProvider } from './context';
 
 function ApiProvider({ children }: ProviderProps) {
   return <GearApiProvider initialArgs={{ endpoint: ADDRESS.NODE }}>{children}</GearApiProvider>;
@@ -51,7 +51,7 @@ function AlertProvider({ children }: ProviderProps) {
   );
 }
 
-const providers = [ApiProvider, AccountProvider, AlertProvider, IndexerProvider, MetadataProvider];
+const providers = [ApiProvider, AccountProvider, AlertProvider, IndexerProvider, MarketplaceProvider];
 
 const withProviders = (Component: ComponentType) => () =>
   providers.reduceRight((children, Provider) => <Provider>{children}</Provider>, <Component />);

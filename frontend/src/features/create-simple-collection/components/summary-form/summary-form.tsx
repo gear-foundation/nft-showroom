@@ -112,7 +112,7 @@ function SummaryForm({ defaultValues, onSubmit, onBack }: Props) {
           <Input icon={DiscordSVG} label="Discord" {...register('discord')} />
 
           <div className={styles.buttons}>
-            <Button text="Cancel" color="border" onClick={onBack} />
+            <Button text="Cancel" color="grey" onClick={onBack} />
             <Button type="submit" text="Continue" />
           </div>
         </div>

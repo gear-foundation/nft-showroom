@@ -17,7 +17,7 @@ type StartAuctionPayload = {
     tokenId: number;
     collectionAddress: string;
     minPrice: string;
-    durationMs: string;
+    duration: string;
   };
 };
 

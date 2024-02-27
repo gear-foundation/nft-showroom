@@ -2,7 +2,7 @@ import { Button } from '@gear-js/vara-ui';
 import { ReactNode, useEffect } from 'react';
 
 import { Container } from '@/components';
-import { Balance } from '@/features/wallet';
+import { AccountBalance } from '@/features/wallet';
 import { cx } from '@/utils';
 
 import CrossSVG from '../../assets/cross.svg?react';
@@ -53,7 +53,7 @@ function FullScreenModal({ heading, steps, stepIndex, children, className, close
           <div className={styles.balanceWrapper}>
             <ul className={styles.progress}>{getSteps()}</ul>
 
-            <Balance />
+            <AccountBalance />
           </div>
         </Container>
       </header>

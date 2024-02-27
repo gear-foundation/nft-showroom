@@ -5,7 +5,7 @@ import { generatePath, useNavigate } from 'react-router-dom';
 
 import { Container } from '@/components';
 import { ROUTE } from '@/consts';
-import { useMetadata } from '@/context';
+import { useMarketplace } from '@/context';
 import { useLoading, useMarketplaceMessage } from '@/hooks';
 
 import {
@@ -22,9 +22,6 @@ import { NFTForm } from '../nft-form';
 import { ParametersForm } from '../parameters-form';
 import { SummaryForm } from '../summary-form';
 
-// TODO: get collection type metadata
-const SIMPLE_COLLECTION_ID = '0x45c6b76956d38a14530a755ed6ca5b5f143d47f7a7d011b17cee740fe42c8f45';
-
 function CreateSimpleCollectionModal({ close }: Pick<ModalProps, 'close'>) {
   const [stepIndex, setStepIndex] = useState(0);
   const [summaryValues, setSummaryValues] = useState(DEFAULT_SUMMARY_VALUES);
@@ -36,8 +33,7 @@ function CreateSimpleCollectionModal({ close }: Pick<ModalProps, 'close'>) {
   const alert = useAlert();
   const navigate = useNavigate();
 
-  const { collectionsMetadata } = useMetadata();
-  const collectionMetadata = collectionsMetadata?.[SIMPLE_COLLECTION_ID];
+  const { marketplace, collectionsMetadata } = useMarketplace();
   const sendMessage = useMarketplaceMessage();
 
   const nextStep = () => setStepIndex((prevIndex) => prevIndex + 1);
@@ -64,6 +60,7 @@ function CreateSimpleCollectionModal({ close }: Pick<ModalProps, 'close'>) {
 
   const getFormPayload = async (nfts: NFT[]) => {
     const collectionOwner = account?.decodedAddress;
+    const { feePerUploadedFile } = marketplace?.config || {};
 
     const { cover, logo, name, description, telegram, medium, discord, url: externalUrl, x: xcom } = summaryValues;
     const { mintPermission, isTransferable, isSellable, tags, royalty, mintLimit, mintPrice } = parametersValues;
@@ -76,7 +73,7 @@ function CreateSimpleCollectionModal({ close }: Pick<ModalProps, 'close'>) {
     const userMintLimit = mintLimit || null;
     const transferable = isTransferable ? '0' : null;
     const sellable = isSellable ? '0' : null;
-    const paymentForMint = getChainBalanceValue(mintPrice || '0').toFixed();
+    const paymentForMint = getChainBalanceValue(mintPrice).toFixed();
 
     const collectionTags = tags.map(({ value }) => value);
 
@@ -100,14 +97,14 @@ function CreateSimpleCollectionModal({ close }: Pick<ModalProps, 'close'>) {
       collectionTags,
     };
 
-    return { collectionOwner, config, imgLinksAndData, permissionToMint };
+    return { collectionOwner, config, imgLinksAndData, permissionToMint, feePerUploadedFile };
   };
 
   const getBytesPayload = (payload: Awaited<ReturnType<typeof getFormPayload>>) => {
-    if (!collectionMetadata) throw new Error('NFT metadata not found');
+    const collectionMetadata = collectionsMetadata?.[COLLECTION_TYPE_NAME.SIMPLE];
+    if (!collectionMetadata) throw new Error('Collection metadata not found');
 
     const initTypeIndex = collectionMetadata.types.init.input;
-
     if (initTypeIndex == null) throw new Error('init.input type index not found in NFT metadata');
 
     const encoded = collectionMetadata.createType(initTypeIndex, payload).toU8a();
@@ -115,7 +112,7 @@ function CreateSimpleCollectionModal({ close }: Pick<ModalProps, 'close'>) {
     return Array.from(encoded);
   };
 
-  const handleNFTsSubmit = async ({ nfts }: NFTsValues) => {
+  const handleNFTsSubmit = async ({ nfts }: NFTsValues, fee: bigint) => {
     const onFinally = disableLoading;
 
     try {
@@ -124,6 +121,7 @@ function CreateSimpleCollectionModal({ close }: Pick<ModalProps, 'close'>) {
       const formPayload = await getFormPayload(nfts);
       const bytesPayload = getBytesPayload(formPayload);
       const payload = { CreateCollection: { typeName: COLLECTION_TYPE_NAME.SIMPLE, payload: bytesPayload } };
+      const value = fee.toString();
 
       const onSuccess = ({ collectionCreated }: CreateCollectionReply) => {
         const id = collectionCreated.collectionAddress;
@@ -133,7 +131,7 @@ function CreateSimpleCollectionModal({ close }: Pick<ModalProps, 'close'>) {
         alert.success('Collection created');
       };
 
-      sendMessage({ payload, onSuccess, onFinally });
+      sendMessage({ payload, onSuccess, onFinally, value });
     } catch (error) {
       alert.error(error instanceof Error ? error.message : String(error));
       onFinally();

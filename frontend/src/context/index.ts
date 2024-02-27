@@ -1,3 +1,3 @@
-import { MetadataProvider, useMetadata } from './metadata';
+import { MarketplaceProvider, useMarketplace } from './marketplace';
 
-export { MetadataProvider, useMetadata };
+export { MarketplaceProvider, useMarketplace };

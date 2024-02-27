@@ -19,7 +19,7 @@ const schema = z.object({
 
 type Props = Pick<Nft, 'idInCollection' | 'name' | 'mediaUrl' | 'owner'> & {
   collection: Pick<Collection, 'id' | 'name' | 'transferable'> & {
-    type: Pick<CollectionType, 'id'>;
+    type: Pick<CollectionType, 'type'>;
   };
 };
 
@@ -29,7 +29,7 @@ function Component({ collection, owner, ...nft }: Props) {
   const alert = useAlert();
   const [isLoading, enableLoading, disableLoading] = useLoading();
 
-  const sendMessage = useCollectionMessage(collection.id, collection.type.id);
+  const sendMessage = useCollectionMessage(collection.id, collection.type.type);
 
   const onSubmit = ({ address }: typeof defaultValues) => {
     enableLoading();
