@@ -21,7 +21,7 @@ export class NewCollectionAddedHandler implements INftMarketplaceEventHandler {
     await storage.setCollectionType(
       new CollectionType({
         ...(existingCollectionType ?? {}),
-        id: codeId,
+        id: typeName,
         description: typeDescription,
         type: typeName,
         metaUrl: metaLink,
