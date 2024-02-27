@@ -13,6 +13,7 @@ import {
   Skeleton,
   TruncatedText,
   Identicon,
+  Balance,
 } from './layout';
 import { List } from './list';
 import { NFTActionFormModal } from './nft-action-form-modal';
@@ -49,6 +50,7 @@ export {
   List,
   TruncatedText,
   Identicon,
+  Balance,
 };
 
 export type { InfoCardProps };

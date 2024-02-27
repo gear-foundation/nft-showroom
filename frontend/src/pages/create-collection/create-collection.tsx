@@ -1,15 +1,15 @@
 import { Container } from '@/components';
+import { useMarketplace } from '@/context';
 import { CreateCollection as CollectionType } from '@/features/create-simple-collection';
 
 import { COLLECTION_TYPE } from './consts';
 import styles from './create-collection.module.scss';
-import { useCollectionTypes } from './hooks';
 
 const COLLECTION_TYPE_SKELETONS = [null];
 
 function CreateCollection() {
-  // TODO: since we're fetching collectionTypes in metadata context, it's probably worth to reuse it
-  const collectionTypes = useCollectionTypes();
+  const { marketplace } = useMarketplace();
+  const { collectionTypes } = marketplace || {};
 
   const renderCollectionTypes = () =>
     (collectionTypes || COLLECTION_TYPE_SKELETONS).map((item, index) =>

@@ -1,140 +1,41 @@
-import { HexString, ProgramMetadata, UserMessageSent } from '@gear-js/api';
-import { useAccount, useAlert, useApi, useSendMessageWithGas } from '@gear-js/react-hooks';
-import { UnsubscribePromise } from '@polkadot/api/types';
-import { AnyJson } from '@polkadot/types/types';
+import { HexString } from '@gear-js/api';
+import { useAlert } from '@gear-js/react-hooks';
 
-import { ADDRESS } from '@/consts';
-import { useMetadata } from '@/context';
-import { ApproveNFTPayload, MintNFTPayload, TransferNFTPayload } from '@/features/collections';
-import { CreateCollectionPayload, CreateCollectionReply } from '@/features/create-simple-collection';
-import { BuyNFTPayload, MakeBidPayload, StartAuctionPayload, StartSalePayload } from '@/features/marketplace';
-import { isObject } from '@/utils';
+import { useMarketplace } from '@/context';
+import { StartAuctionPayload, StartSalePayload } from '@/features/marketplace';
 
-type Payload =
-  | CreateCollectionPayload
-  | BuyNFTPayload
-  | MakeBidPayload
-  | StartAuctionPayload
-  | StartSalePayload
-  | MintNFTPayload
-  | TransferNFTPayload
-  | ApproveNFTPayload;
-
-type Reply<T> = T extends CreateCollectionPayload
-  ? CreateCollectionReply
-  : T extends BuyNFTPayload
-  ? { nftSold: unknown }
-  : T extends MakeBidPayload
-  ? { bidAdded: unknown }
-  : T extends StartAuctionPayload
-  ? { auctionCreated: unknown }
-  : T extends StartSalePayload
-  ? { saleNft: unknown }
-  : T extends MintNFTPayload
-  ? { minted: unknown }
-  : T extends TransferNFTPayload
-  ? { transferred: unknown }
-  : T extends ApproveNFTPayload
-  ? { approved: unknown }
-  : AnyJson;
-
-const useSendMessageWithReply = (programId: HexString, metadata: ProgramMetadata | undefined) => {
-  const { api, isApiReady } = useApi();
-  const { account } = useAccount();
-  const alert = useAlert();
-
-  const sendMessage = useSendMessageWithGas(programId, metadata, { disableAlerts: true, gasMultiplier: 1.1 });
-
-  // TODO: different payload types for marketplace and collection hooks
-  return <T extends Payload>({
-    onSuccess = () => {},
-    onFinally = () => {},
-    ...sendMessageArgs
-  }: {
-    payload: T;
-    value?: string | number;
-    onSuccess?: (value: Reply<T>) => void;
-    onFinally?: () => void;
-  }) => {
-    if (!isApiReady) throw new Error('API is not initialized');
-    if (!account) throw new Error('Account is not found');
-
-    let unsub: UnsubscribePromise | undefined = undefined;
-
-    const _onFinally = () => {
-      onFinally();
-
-      // for dev purposes only, since unsub is tricky
-      if (!unsub) throw new Error('Failed to unsubscribe from reply');
-
-      unsub.then((unsubCallback) => unsubCallback()).catch((error: Error) => alert.error(error.message));
-    };
-
-    const handleUserMessageSent = ({ data }: UserMessageSent) => {
-      try {
-        if (!metadata) throw new Error('Failed to get transaction result: metadata is not found');
-
-        const typeIndex = metadata.types.handle.output;
-        if (typeIndex === null)
-          throw new Error('Failed to get transaction result: handle.output type index is not found');
-
-        const { message } = data;
-        const { source, destination, payload, details } = message;
-
-        if (source.toHex() !== programId || destination.toHex() !== account.decodedAddress) return;
-
-        const isSuccess = details.isSome ? details.unwrap().code.isSuccess : true;
-        if (!isSuccess) throw new Error(payload.toHuman()?.toString());
-
-        const decodedPayload = metadata.createType(typeIndex, payload).toJSON();
-
-        if (!isObject(decodedPayload)) throw new Error('Failed to get transaction result: payload is not an object');
-
-        const isErrorPayload = Object.prototype.hasOwnProperty.call(decodedPayload, 'err');
-        if (isErrorPayload) throw new Error(decodedPayload.err?.toString());
-
-        const isSuccessPayload = Object.prototype.hasOwnProperty.call(decodedPayload, 'ok');
-        if (!isSuccessPayload) throw new Error('Failed to get transaction result: ok property is not found');
-
-        onSuccess(decodedPayload.ok as Reply<T>);
-      } catch (error) {
-        const errorMessage = error instanceof Error ? error.message : String(error);
-        alert.error(errorMessage);
-      }
-
-      _onFinally();
-    };
-
-    unsub = api.gearEvents.subscribeToGearEvent('UserMessageSent', handleUserMessageSent);
-
-    sendMessage({ ...sendMessageArgs, onError: _onFinally });
-  };
-};
+import { useSendMessageWithReply } from './use-send-message-with-reply';
 
 function useMarketplaceMessage() {
-  const { marketplaceMetadata } = useMetadata();
+  const { marketplace, marketplaceMetadata } = useMarketplace();
+  // TODO: drop after @gear-js/react-hooks update
+  const address = (marketplace?.address || '0x00') as HexString;
 
-  return useSendMessageWithReply(ADDRESS.CONTRACT, marketplaceMetadata);
+  return useSendMessageWithReply(address, marketplaceMetadata);
 }
 
-function useCollectionMessage(id: string, typeId: string) {
-  const { collectionsMetadata } = useMetadata();
+function useCollectionMessage(id: string, typeName: string) {
+  const { collectionsMetadata } = useMarketplace();
 
-  return useSendMessageWithReply(id as HexString, collectionsMetadata?.[typeId]);
+  return useSendMessageWithReply(id as HexString, collectionsMetadata?.[typeName]);
 }
 
-function useApprovedMessage(collectionId: string, collectionTypeId: string) {
+function useApprovedMessage(collectionId: string, collectionTypeName: string) {
   const alert = useAlert();
 
+  const { marketplace } = useMarketplace();
+  // TODO: drop after @gear-js/react-hooks update
+  const address = (marketplace?.address || '0x00') as HexString;
+
   const sendMarketplaceMessage = useMarketplaceMessage();
-  const sendCollectionMessage = useCollectionMessage(collectionId, collectionTypeId);
+  const sendCollectionMessage = useCollectionMessage(collectionId, collectionTypeName);
 
   return <T extends StartAuctionPayload | StartSalePayload>(args: {
     payload: T;
     onSuccess: () => void;
     onFinally: () => void;
   }) => {
-    const to = ADDRESS.CONTRACT;
+    const to = address;
 
     const [{ tokenId }] = Object.values(args.payload) as unknown as
       | StartAuctionPayload[keyof StartAuctionPayload][]
@@ -147,7 +48,9 @@ function useApprovedMessage(collectionId: string, collectionTypeId: string) {
       sendMarketplaceMessage(args);
     };
 
-    sendCollectionMessage({ payload, onSuccess });
+    const onFinally = args.onFinally;
+
+    sendCollectionMessage({ payload, onSuccess, onFinally });
   };
 }
 

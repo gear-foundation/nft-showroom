@@ -1,4 +1,4 @@
-import { Balance } from './balance';
+import { AccountBalance } from './account-balance';
 import { Wallet } from './wallet';
 
-export { Wallet, Balance };
+export { Wallet, AccountBalance };

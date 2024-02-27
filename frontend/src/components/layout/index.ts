@@ -1,3 +1,4 @@
+import { Balance } from './balance';
 import { Breadcrumbs } from './breadcrumbs';
 import { Container } from './container';
 import { ErrorBoundary } from './error-boundary';
@@ -8,4 +9,15 @@ import { PrivateRoute } from './private-route';
 import { Skeleton } from './skeleton';
 import { TruncatedText } from './truncated-text';
 
-export { Breadcrumbs, Container, Footer, Header, PrivateRoute, ErrorBoundary, Skeleton, TruncatedText, Identicon };
+export {
+  Breadcrumbs,
+  Container,
+  Footer,
+  Header,
+  PrivateRoute,
+  ErrorBoundary,
+  Skeleton,
+  TruncatedText,
+  Identicon,
+  Balance,
+};
