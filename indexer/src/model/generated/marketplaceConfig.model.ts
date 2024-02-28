@@ -89,4 +89,13 @@ export class MarketplaceConfig {
   @Index_()
   @ManyToOne_(() => Marketplace, { nullable: true })
   marketplace!: Marketplace;
+
+  @Column_('int4', { nullable: false })
+  maxCreatorRoyalty!: number;
+
+  @Column_('numeric', {
+    transformer: marshal.bigintTransformer,
+    nullable: false,
+  })
+  maxNumberOfImages!: bigint;
 }

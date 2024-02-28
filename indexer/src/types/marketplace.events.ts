@@ -33,6 +33,9 @@ export type Initialized = {
   royaltyToMarketplaceForTrade: number | null;
   royaltyToMarketplaceForMint: number | null;
   minimumValueForTrade: bigint | null;
+  feePerUploadedFile: bigint | null;
+  maxCreatorRoyalty: number | null;
+  maxNumberOfImages: bigint | null;
 };
 
 export type NewCollectionAdded = {
@@ -154,6 +157,8 @@ export type ConfigUpdated = {
   msInBlock: number | null;
   minimumValueForTrade: bigint | null;
   minimumValueForMint: bigint | null;
+  maxCreatorRoyalty: number | null;
+  maxNumberOfImages: bigint | null;
 };
 
 export type NftMarketplaceEvent =
@@ -181,6 +186,9 @@ export interface NftMarketplaceEventPlain extends Enum {
     royaltyToMarketplaceForTrade: u16;
     royaltyToMarketplaceForMint: u16;
     minimumValueForTrade: u128;
+    feePerUploadedFile: u128;
+    maxCreatorRoyalty: u16;
+    maxNumberOfImages: u64;
   };
   newCollectionAdded: {
     codeId: CodeId;
@@ -270,6 +278,8 @@ export interface NftMarketplaceEventPlain extends Enum {
     royaltyToMarketplaceForMint: Option<u16>;
     minimumValueForTrade: Option<u128>;
     minimumValueForMint: Option<u128>;
+    maxCreatorRoyalty: Option<u16>;
+    maxNumberOfImages: Option<u64>;
   };
 }
 
@@ -454,6 +464,12 @@ export function getMarketplaceEvent(
           event.configUpdated.minimumValueForMint,
         ),
       ),
+      maxCreatorRoyalty: safeUnwrapToNumber(
+        safeUnwrapOptional<u16, number>(event.configUpdated.maxCreatorRoyalty),
+      ),
+      maxNumberOfImages: safeUnwrapToBigInt(
+        safeUnwrapOptional<u64, number>(event.configUpdated.maxNumberOfImages),
+      ),
     };
   }
   if (event.initialized) {
@@ -470,6 +486,15 @@ export function getMarketplaceEvent(
       ),
       royaltyToMarketplaceForMint: safeUnwrapToNumber(
         event.initialized.royaltyToMarketplaceForMint,
+      ),
+      feePerUploadedFile: safeUnwrapToBigInt(
+        event.initialized.feePerUploadedFile,
+      ),
+      maxCreatorRoyalty: safeUnwrapToNumber(
+        event.initialized.maxCreatorRoyalty,
+      ),
+      maxNumberOfImages: safeUnwrapToBigInt(
+        event.initialized.maxNumberOfImages,
       ),
     };
   }

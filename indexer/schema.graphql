@@ -25,6 +25,8 @@ type MarketplaceConfig @entity {
   minimumValueForMint: BigInt!
   msInBlock: Int!
   marketplace: Marketplace!
+  maxCreatorRoyalty: Int!
+  maxNumberOfImages: BigInt!
 }
 
 type MarketplaceEvent @entity {
