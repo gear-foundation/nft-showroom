@@ -13,10 +13,11 @@ import {
   DEFAULT_NFTS_VALUES,
   DEFAULT_PARAMETERS_VALUES,
   DEFAULT_SUMMARY_VALUES,
+  MAX_SIZE_MB,
   STEPS,
 } from '../../consts';
 import { CreateCollectionReply, NFT, NFTsValues, ParametersValues, SummaryValues } from '../../types';
-import { uploadToIpfs } from '../../utils';
+import { getBytes, getFileChunks, uploadToIpfs } from '../../utils';
 import { FullScreenModal } from '../full-screen-modal';
 import { NFTForm } from '../nft-form';
 import { ParametersForm } from '../parameters-form';
@@ -49,13 +50,23 @@ function CreateSimpleCollectionModal({ close }: Pick<ModalProps, 'close'>) {
     nextStep();
   };
 
-  const getNftPayload = async ({ file, limit }: NFT) => {
-    const cid = await uploadToIpfs(file);
+  const getNftsPayload = async (nfts: NFT[]) => {
+    const images = nfts.map(({ file }) => file);
+    const chunks = getFileChunks(images, getBytes(MAX_SIZE_MB.NFTS_CHUNK));
+    const chunkPromises = chunks.map((chunk) => uploadToIpfs(chunk));
+    const cidChunks = await Promise.all(chunkPromises);
+    const cids = cidChunks.flat();
 
-    const limitCopies = limit || null;
-    const autoChangingRules = null;
+    const getNftPayload = (cid: string, index: number) => {
+      const { limit } = nfts[index]; // order of requests is important
 
-    return [cid, { limitCopies, autoChangingRules }];
+      const limitCopies = limit || null;
+      const autoChangingRules = null;
+
+      return [cid, { limitCopies, autoChangingRules }];
+    };
+
+    return cids.map((cid, index) => getNftPayload(cid, index));
   };
 
   const getFormPayload = async (nfts: NFT[]) => {
@@ -65,9 +76,8 @@ function CreateSimpleCollectionModal({ close }: Pick<ModalProps, 'close'>) {
     const { cover, logo, name, description, telegram, medium, discord, url: externalUrl, x: xcom } = summaryValues;
     const { mintPermission, isTransferable, isSellable, tags, royalty, mintLimit, mintPrice } = parametersValues;
 
-    // TODO: upload in batch
-    const collectionBanner = cover ? await uploadToIpfs(cover) : null;
-    const collectionLogo = logo ? await uploadToIpfs(logo) : null;
+    if (!cover || !logo) throw new Error('Cover and logo are required');
+    const [collectionBanner, collectionLogo] = await uploadToIpfs([cover, logo]);
     const additionalLinks = { telegram, medium, discord, externalUrl, xcom };
 
     const userMintLimit = mintLimit || null;
@@ -77,7 +87,7 @@ function CreateSimpleCollectionModal({ close }: Pick<ModalProps, 'close'>) {
 
     const collectionTags = tags.map(({ value }) => value);
 
-    const imgLinksAndData = await Promise.all(nfts.map((nft) => getNftPayload(nft)));
+    const imgLinksAndData = await getNftsPayload(nfts);
 
     const permissionToMint = ['admin', 'custom'].includes(mintPermission.value)
       ? mintPermission.addresses.map(({ value }) => value)
