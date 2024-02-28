@@ -1,6 +1,6 @@
 import { ADDRESS } from '@/consts';
 
-function getBytesSize(mb: number) {
+function getBytes(mb: number) {
   const B_MULTIPLIER = 1024;
   const KB_MULTIPLIER = 1024;
 
@@ -9,15 +9,38 @@ function getBytesSize(mb: number) {
 
 const getFileUrl = (file: File) => URL.createObjectURL(file);
 
-const uploadToIpfs = async (file: File) => {
+const getFileChunks = (files: File[], chunkSizeBytes: number) => {
+  const chunks: File[][] = [];
+  let chunk: File[] = [];
+  let chunkSize = 0;
+
+  files.forEach((file) => {
+    const potentialChunkSize = chunkSize + file.size;
+
+    if (potentialChunkSize > chunkSizeBytes) {
+      chunks.push(chunk);
+      chunk = [];
+      chunkSize = 0;
+    }
+
+    chunk.push(file);
+    chunkSize += file.size;
+  });
+
+  if (chunk.length > 0) chunks.push(chunk);
+
+  return chunks;
+};
+
+const uploadToIpfs = async (files: File[]) => {
   const formData = new FormData();
-  formData.append('file', file);
+  files.forEach((file) => formData.append('file', file));
 
   const response = await fetch(ADDRESS.IPFS_UPLOAD, { method: 'POST', body: formData });
   if (!response.ok) throw new Error(response.statusText);
 
-  const [{ ipfsHash }] = await (response.json() as Promise<Record<'ipfsHash', string>[]>);
-  return `ipfs://${ipfsHash}`;
+  const result = await (response.json() as Promise<Record<'ipfsHash', string>[]>);
+  return result.map(({ ipfsHash }) => `ipfs://${ipfsHash}`);
 };
 
-export { getBytesSize, getFileUrl, uploadToIpfs };
+export { getBytes, getFileUrl, getFileChunks, uploadToIpfs };
