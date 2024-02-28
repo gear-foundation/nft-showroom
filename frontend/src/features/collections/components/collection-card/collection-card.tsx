@@ -24,6 +24,7 @@ function CollectionCard({ id, name, collectionBanner, collectionLogo, admin, tok
       .slice(0, PREVIEW_NFTS_COUNT)
       .map((nft, index) => (
         <li key={nft ? nft.id : `${id}-${index}`}>
+          {/* TODO: should be background color instead of placeholder svg  */}
           <ResponsiveSquareImage src={nft ? getIpfsLink(nft.mediaUrl) : PlaceholderSrc} />
         </li>
       ));
