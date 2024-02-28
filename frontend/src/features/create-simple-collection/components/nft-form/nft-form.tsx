@@ -8,7 +8,7 @@ import { z } from 'zod';
 import { Balance, Container } from '@/components';
 import { useMarketplace } from '@/context';
 
-import { IMAGE_TYPES, MAX_SIZE_MB } from '../../consts';
+import { IMAGE_TYPES, MAX } from '../../consts';
 import { NFTsValues } from '../../types';
 import { getBytes, getFileUrl } from '../../utils';
 import { NFT } from '../nft';
@@ -45,10 +45,13 @@ function NFTForm({ defaultValues, isLoading, onSubmit, onBack }: Props) {
   const handleInputChange = ({ target }: ChangeEvent<HTMLInputElement>) => {
     const files = [...(target.files || [])];
 
+    const potentialNftsCount = nftsCount + files.length;
+    if (potentialNftsCount > MAX.NFTS_COUNT) return alert.error(`Maximum number of NFTs is ${MAX.NFTS_COUNT}`);
+
     files.forEach((file) => {
       const { type, size, name } = file;
 
-      const isValid = size <= getBytes(MAX_SIZE_MB.IMAGE) && IMAGE_TYPES.includes(type);
+      const isValid = size <= getBytes(MAX.SIZE_MB.IMAGE) && IMAGE_TYPES.includes(type);
       if (!isValid) return alert.error(`${name} - max size is exceeded or wrong format`);
 
       const limit = '';

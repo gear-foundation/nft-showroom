@@ -13,7 +13,7 @@ import {
   DEFAULT_NFTS_VALUES,
   DEFAULT_PARAMETERS_VALUES,
   DEFAULT_SUMMARY_VALUES,
-  MAX_SIZE_MB,
+  MAX,
   STEPS,
 } from '../../consts';
 import { CreateCollectionReply, NFT, NFTsValues, ParametersValues, SummaryValues } from '../../types';
@@ -52,7 +52,7 @@ function CreateSimpleCollectionModal({ close }: Pick<ModalProps, 'close'>) {
 
   const getNftsPayload = async (nfts: NFT[]) => {
     const images = nfts.map(({ file }) => file);
-    const chunks = getFileChunks(images, getBytes(MAX_SIZE_MB.NFTS_CHUNK));
+    const chunks = getFileChunks(images, getBytes(MAX.SIZE_MB.NFTS_CHUNK));
     const chunkPromises = chunks.map((chunk) => uploadToIpfs(chunk));
     const cidChunks = await Promise.all(chunkPromises);
     const cids = cidChunks.flat();

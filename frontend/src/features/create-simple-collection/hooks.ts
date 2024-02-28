@@ -1,7 +1,7 @@
 import { useAlert } from '@gear-js/react-hooks';
 import { useRef, useState, ChangeEvent } from 'react';
 
-import { MAX_SIZE_MB } from './consts';
+import { MAX } from './consts';
 import { getBytes } from './utils';
 
 function useImageInput(defaultValue: File | undefined, types: string[]) {
@@ -24,7 +24,7 @@ function useImageInput(defaultValue: File | undefined, types: string[]) {
     const [file] = files;
     const { size, type } = file;
 
-    if (size > getBytes(MAX_SIZE_MB.IMAGE)) {
+    if (size > getBytes(MAX.SIZE_MB.IMAGE)) {
       target.value = '';
       return alert.error('Max file size is exceeded');
     }
