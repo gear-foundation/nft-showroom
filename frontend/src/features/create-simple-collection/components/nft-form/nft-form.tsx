@@ -8,9 +8,9 @@ import { z } from 'zod';
 import { Balance, Container } from '@/components';
 import { useMarketplace } from '@/context';
 
-import { IMAGE_TYPES, MAX_IMAGE_SIZE_MB } from '../../consts';
+import { IMAGE_TYPES, MAX_SIZE_MB } from '../../consts';
 import { NFTsValues } from '../../types';
-import { getBytesSize, getFileUrl } from '../../utils';
+import { getBytes, getFileUrl } from '../../utils';
 import { NFT } from '../nft';
 
 import styles from './nft-form.module.scss';
@@ -48,7 +48,7 @@ function NFTForm({ defaultValues, isLoading, onSubmit, onBack }: Props) {
     files.forEach((file) => {
       const { type, size, name } = file;
 
-      const isValid = size <= getBytesSize(MAX_IMAGE_SIZE_MB) && IMAGE_TYPES.includes(type);
+      const isValid = size <= getBytes(MAX_SIZE_MB.IMAGE) && IMAGE_TYPES.includes(type);
       if (!isValid) return alert.error(`${name} - max size is exceeded or wrong format`);
 
       const limit = '';
