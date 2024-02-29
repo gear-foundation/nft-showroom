@@ -14,6 +14,8 @@ function CreateCollection() {
   const { collectionTypes } = marketplace || {};
 
   const msTillCreateIsAvailable = useCreateCountdown();
+  const isCreateAvailable = msTillCreateIsAvailable === 0;
+  const isReady = Boolean(collectionTypes) && msTillCreateIsAvailable !== undefined;
 
   const renderCollectionTypes = () =>
     collectionTypes?.map((item) => (
@@ -31,37 +33,30 @@ function CreateCollection() {
 
   return (
     <Container maxWidth="sm" className={styles.container}>
-      <h2 className={styles.heading}>Create Collection</h2>
+      <header className={styles.header}>
+        <h2 className={styles.heading}>Create Collection</h2>
 
-      {collectionTypes && msTillCreateIsAvailable !== undefined ? (
-        <>
-          {msTillCreateIsAvailable === 0 && (
-            <>
-              <p className={styles.text}>
-                Choose your collection type: Simple NFT for pre-existing images, Composable NFT to generate layers and
-                compositions, or NFT Collections for Music Creators to craft musical NFTs.
-              </p>
+        {isReady && isCreateAvailable && (
+          <p className={styles.text}>
+            Choose your collection type: Simple NFT for pre-existing images, Composable NFT to generate layers and
+            compositions, or NFT Collections for Music Creators to craft musical NFTs.
+          </p>
+        )}
 
-              <ul>{renderCollectionTypes()}</ul>
-            </>
-          )}
+        {isReady && !isCreateAvailable && (
+          <>
+            <p className={styles.text}>
+              You&apos;ve recently created a collection. Please wait a little bit before creating another one.
+            </p>
+            <p className={styles.text}>{getTimer(msTillCreateIsAvailable)}</p>
+          </>
+        )}
 
-          {msTillCreateIsAvailable !== 0 && (
-            <>
-              <p className={styles.text}>
-                You&apos;ve recently created a collection. Please wait a little bit before creating another one.
-              </p>
+        {!isReady && <Skeleton width="100%" height="5rem" borderRadius="15px" />}
+      </header>
 
-              <p className={styles.text}>{getTimer(msTillCreateIsAvailable)}</p>
-            </>
-          )}
-        </>
-      ) : (
-        <>
-          <Skeleton width="100%" height="5rem" borderRadius="15px" />
-          <ul>{renderSkeletons()}</ul>
-        </>
-      )}
+      {isReady && isCreateAvailable && <ul>{renderCollectionTypes()}</ul>}
+      {!isReady && <ul>{renderSkeletons()}</ul>}
     </Container>
   );
 }

@@ -6,22 +6,28 @@
   justify-content: center;
 }
 
-.heading,
-.text {
-  text-align: center;
-}
-
-.heading {
-  margin-bottom: 16px;
-  font-size: 32px;
-  font-weight: 700;
-  line-height: 38px;
-  letter-spacing: 0.02em;
-}
-
-.text {
+.header {
   margin-bottom: 48px;
-  font-size: 16px;
-  line-height: 26px;
-  color: #535352;
+
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+
+  .heading,
+  .text {
+    text-align: center;
+  }
+
+  .heading {
+    font-size: 32px;
+    font-weight: 700;
+    line-height: 38px;
+    letter-spacing: 0.02em;
+  }
+
+  .text {
+    font-size: 16px;
+    line-height: 26px;
+    color: #535352;
+  }
 }

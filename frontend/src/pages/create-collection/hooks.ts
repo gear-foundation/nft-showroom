@@ -22,12 +22,14 @@ function useCreateCountdown() {
   const { marketplace } = useMarketplace();
   const { config } = marketplace || {};
   const msBetweenCollections = Number(config?.timeBetweenCreateCollections || '0');
+  const isConfigReady = Boolean(msBetweenCollections);
 
   const { lastCollection, isLastCollectionReady } = useLastCollection();
   const lastCollectionTimestamp = new Date(lastCollection?.createdAt || 0).getTime();
 
   const potentialCreateTimestamp = lastCollectionTimestamp + msBetweenCollections;
-  return useCountdown(isLastCollectionReady ? potentialCreateTimestamp : undefined);
+
+  return useCountdown(isLastCollectionReady && isConfigReady ? potentialCreateTimestamp : undefined);
 }
 
 export { useCreateCountdown };
