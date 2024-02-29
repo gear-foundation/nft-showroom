@@ -1,6 +1,6 @@
-import { Outlet } from 'react-router-dom';
+import { Outlet, ScrollRestoration } from 'react-router-dom';
 
-import { Footer, Header } from './components';
+import { ErrorBoundary, Footer, Header } from './components';
 import { withProviders } from './providers';
 
 function Component() {
@@ -9,7 +9,11 @@ function Component() {
       <Header />
 
       <main>
-        <Outlet />
+        <ErrorBoundary>
+          <ScrollRestoration />
+
+          <Outlet />
+        </ErrorBoundary>
       </main>
 
       <Footer />

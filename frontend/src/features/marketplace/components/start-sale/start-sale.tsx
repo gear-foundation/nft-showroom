@@ -1,70 +1,69 @@
-import { HexString } from '@gear-js/api';
-import { useBalanceFormat } from '@gear-js/react-hooks';
-import { Button, ModalProps } from '@gear-js/vara-ui';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm } from 'react-hook-form';
+import { useAlert } from '@gear-js/react-hooks';
+import { Button } from '@gear-js/vara-ui';
 import { z } from 'zod';
 
-import { PriceInput, withAccount } from '@/components';
-import { useModal, useNFTSendMessage } from '@/hooks';
+import { NFTActionFormModal, PriceInput, withAccount, withApi } from '@/components';
+import { Nft, Collection, CollectionType } from '@/graphql/graphql';
+import { useApprovedMessage, useIsOwner, useLoading, useModal } from '@/hooks';
 
 import TagSVG from '../../assets/tag.svg?react';
-import { NFTActionFormModal } from '../nft-action-form-modal';
+import { usePriceSchema } from '../../hooks';
 
-type Props = {
-  nft: { id: string; name: string; mediaUrl: string };
-  collection: { id: HexString; name: string };
+type Props = Pick<Nft, 'idInCollection' | 'name' | 'mediaUrl' | 'owner'> & {
+  collection: Pick<Collection, 'id' | 'name' | 'sellable'> & {
+    type: Pick<CollectionType, 'type'>;
+  };
 };
 
 const defaultValues = {
   price: '',
 };
 
-const schema = z.object({
-  price: z.string().trim().min(1),
-});
+function Component({ collection, owner, ...nft }: Props) {
+  const [isOpen, open, close] = useModal();
+  const isOwner = useIsOwner(owner);
+  const alert = useAlert();
+  const [isLoading, enableLoading, disableLoading] = useLoading();
 
-const resolver = zodResolver(schema);
+  const { getPriceSchema } = usePriceSchema();
+  const schema = z.object({ price: getPriceSchema() });
 
-function StartSaleModal({ nft, collection, close }: Props & Pick<ModalProps, 'close'>) {
-  const { getChainBalanceValue } = useBalanceFormat();
-  const sendMessage = useNFTSendMessage(collection.id);
+  const sendMessage = useApprovedMessage(collection.id, collection.type.type);
 
-  const { handleSubmit, register, formState } = useForm({ defaultValues, resolver });
-  const { errors } = formState;
+  const onSubmit = ({ price }: typeof defaultValues) => {
+    enableLoading();
 
-  const onSubmit = handleSubmit((data) => {
-    const tokenId = nft.id;
+    const tokenId = nft.idInCollection;
     const collectionAddress = collection.id;
-    const price = getChainBalanceValue(data.price).toFixed();
 
-    const onSuccess = close;
     const payload = { SaleNft: { price, collectionAddress, tokenId } };
 
-    sendMessage({ payload, onSuccess });
-  });
+    const onSuccess = () => {
+      alert.success('Sale started');
+      close();
+    };
 
-  const modalProps = { heading: 'Start Sale', close, onSubmit };
+    const onFinally = disableLoading;
 
-  return (
-    <NFTActionFormModal modal={modalProps} nft={nft} collection={collection}>
-      <PriceInput label="Price" {...register('price')} error={errors.price?.message} />
-    </NFTActionFormModal>
-  );
-}
+    sendMessage({ payload, onSuccess, onFinally });
+  };
 
-function Component({ nft, collection }: Props) {
-  const [isOpen, open, close] = useModal();
+  const modalProps = { heading: 'Start Sale', close };
+  const formProps = { defaultValues, schema, isLoading, onSubmit };
 
-  return (
+  return isOwner && collection.sellable ? (
     <>
       <Button icon={TagSVG} text="Start sale" size="small" onClick={open} />
 
-      {isOpen && <StartSaleModal nft={nft} collection={collection} close={close} />}
+      {isOpen && (
+        <NFTActionFormModal modal={modalProps} form={formProps} nft={nft} collection={collection}>
+          <PriceInput label="Price" name="price" />
+        </NFTActionFormModal>
+      )}
     </>
-  );
+  ) : null;
 }
 
-const StartSale = withAccount(Component);
+const StartSale = withAccount(withApi(Component));
 
 export { StartSale };

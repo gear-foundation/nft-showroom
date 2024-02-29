@@ -1,3 +1,6 @@
-import { CreateSimpleCollectionModal } from './components';
+import { CreateCollection, CreateSimpleCollectionModal } from './components';
+import { COLLECTION_TYPE_NAME } from './consts';
+import { CreateCollectionPayload, CreateCollectionReply } from './types';
 
-export { CreateSimpleCollectionModal };
+export { COLLECTION_TYPE_NAME, CreateCollection, CreateSimpleCollectionModal };
+export type { CreateCollectionPayload, CreateCollectionReply };

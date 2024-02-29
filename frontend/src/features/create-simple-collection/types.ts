@@ -11,6 +11,10 @@ type SummaryValues = {
 };
 
 type ParametersValues = {
+  mintPermission: {
+    value: 'any' | 'admin' | 'custom';
+    addresses: { value: string }[];
+  };
   mintLimit: string;
   mintPrice: string;
   tags: { value: string }[];
@@ -28,4 +32,17 @@ type NFTsValues = {
   nfts: NFT[];
 };
 
-export type { SummaryValues, ParametersValues, NFT, NFTsValues };
+type CreateCollectionPayload = {
+  CreateCollection: {
+    typeName: string;
+    payload: number[];
+  };
+};
+
+type CreateCollectionReply = {
+  collectionCreated: {
+    collectionAddress: string;
+  };
+};
+
+export type { SummaryValues, ParametersValues, NFT, NFTsValues, CreateCollectionPayload, CreateCollectionReply };

@@ -1,3 +1,3 @@
-import { IPFSProvider, useIPFS } from './ipfs';
+import { MarketplaceProvider, useMarketplace } from './marketplace';
 
-export { IPFSProvider, useIPFS };
+export { MarketplaceProvider, useMarketplace };

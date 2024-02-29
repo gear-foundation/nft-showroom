@@ -1,8 +1,8 @@
 import { useAlert } from '@gear-js/react-hooks';
-import { useRef, useEffect, useState, ChangeEvent, DependencyList, EffectCallback } from 'react';
+import { useRef, useState, ChangeEvent } from 'react';
 
-import { MAX_IMAGE_SIZE_MB } from './consts';
-import { getBytesSize } from './utils';
+import { MAX } from './consts';
+import { getBytes } from './utils';
 
 function useImageInput(defaultValue: File | undefined, types: string[]) {
   const alert = useAlert();
@@ -24,7 +24,7 @@ function useImageInput(defaultValue: File | undefined, types: string[]) {
     const [file] = files;
     const { size, type } = file;
 
-    if (size > getBytesSize(MAX_IMAGE_SIZE_MB)) {
+    if (size > getBytes(MAX.SIZE_MB.IMAGE)) {
       target.value = '';
       return alert.error('Max file size is exceeded');
     }
@@ -52,22 +52,4 @@ function useImageInput(defaultValue: File | undefined, types: string[]) {
   return { value, props, handleClick, handleReset };
 }
 
-function useChangeEffect(callback: EffectCallback, dependencies?: DependencyList) {
-  const mounted = useRef(false);
-
-  useEffect(
-    () => () => {
-      mounted.current = false;
-    },
-    [],
-  );
-
-  useEffect(() => {
-    if (mounted.current) return callback();
-
-    mounted.current = true;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, dependencies);
-}
-
-export { useImageInput, useChangeEffect };
+export { useImageInput };

@@ -1,3 +1,16 @@
+.form {
+  flex: 1;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+
+  .footer {
+    // hack to make the footer stick to the bottom
+    margin: 50px 0 -50px;
+  }
+}
+
 .header {
   margin-bottom: 24px;
   padding: 24px;
@@ -33,9 +46,39 @@
   gap: 16px;
 }
 
-.buttons {
-  margin-top: 48px;
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(0, 1fr));
-  gap: 24px;
+.footer {
+  padding: 24px 0;
+
+  background-color: #fff;
+
+  .buttons {
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .submit {
+    display: flex;
+    align-items: center;
+    gap: 32px;
+
+    &Heading {
+      margin-bottom: 4px;
+
+      display: flex;
+      align-items: center;
+      gap: 6px;
+
+      font-weight: 600;
+      font-size: 16px;
+      line-height: 110%;
+      letter-spacing: 0.16px;
+    }
+
+    &Text {
+      font-size: 12px;
+      line-height: 16px;
+
+      color: rgba(#000, 0.7);
+    }
+  }
 }

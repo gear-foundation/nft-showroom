@@ -6,7 +6,7 @@
 
   img {
     width: 100%;
-    max-height: 180px;
+    height: 180px;
     object-fit: cover;
   }
 
@@ -28,6 +28,13 @@
   padding: 12px 16px;
 }
 
+.name,
+.owner {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .name {
   margin-bottom: 4px;
 
@@ -39,10 +46,6 @@
   font-size: 11px;
   line-height: 13px;
   color: #93989a;
-
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 
   .address {
     font-weight: 600;

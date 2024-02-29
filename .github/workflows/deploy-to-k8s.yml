@@ -75,9 +75,10 @@ jobs:
           tags: ${{ needs.prepair.outputs.image_name }}
           build-args: |
             VITE_NODE_ADDRESS=${{ secrets.VITE_NODE_ADDRESS }}
-            VITE_IPFS_ADDRESS=${{ secrets.VITE_IPFS_ADDRESS }}
+            VITE_IPFS_UPLOAD_ADDRESS=${{ secrets.VITE_IPFS_UPLOAD_ADDRESS }}
             VITE_IPFS_GATEWAY_ADDRESS=${{ secrets.VITE_IPFS_GATEWAY_ADDRESS }}
-            VITE_CONTRACT_ADDRESS=${{ secrets.VITE_CONTRACT_ADDRESS }}
+            VITE_INDEXER_ADDRESS=${{ secrets.VITE_INDEXER_ADDRESS }}
+            VITE_INDEXER_WS_ADDRESS=${{ secrets.VITE_INDEXER_WS_ADDRESS }}
 
   deploy-to-k8s:
     needs: [prepair, build-and-push-image]

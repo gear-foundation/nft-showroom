@@ -15,13 +15,11 @@ function Tabs({ list, value, size = 'large', outlined, className, onChange }: Pr
   const renderButtons = () =>
     list.map((button, index) => {
       const isActive = index === value;
-      const isDisabled = isActive || index !== 0;
 
       return (
         <li key={button}>
           <button
             type="button"
-            disabled={isDisabled}
             className={cx(styles.button, isActive && styles.active)}
             onClick={() => onChange(index)}>
             {button}
