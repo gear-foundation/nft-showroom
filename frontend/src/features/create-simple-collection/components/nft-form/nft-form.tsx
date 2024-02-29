@@ -123,7 +123,12 @@ function NFTForm({ defaultValues, isLoading, onSubmit, onBack }: Props) {
               <p className={styles.submitText}>Calculated based on the number of unique images.</p>
             </div>
 
-            <Button type="submit" text="Submit" isLoading={isLoading} disabled={nftsCount === 0} />
+            <Button
+              type="submit"
+              text={isLoading ? 'Uploading...' : 'Submit'}
+              isLoading={isLoading}
+              disabled={nftsCount === 0}
+            />
           </div>
         </Container>
       </footer>
