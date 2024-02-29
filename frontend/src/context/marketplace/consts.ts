@@ -21,7 +21,9 @@ const MARKETPLACE_QUERY = graphql(`
         minimumValueForTrade
         royaltyToMarketplaceForMint
         royaltyToMarketplaceForTrade
+        timeBetweenCreateCollections
       }
+      admins
     }
   }
 `);
