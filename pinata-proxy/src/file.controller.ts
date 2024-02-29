@@ -8,6 +8,7 @@ import {
 } from '@nestjs/common';
 import { PinataService } from './pinata.service';
 import { AnyFilesInterceptor } from '@nestjs/platform-express';
+import { Express } from 'express';
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 import { Readable } from 'stream';
