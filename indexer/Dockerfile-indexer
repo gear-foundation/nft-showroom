@@ -1,0 +1,21 @@
+FROM node:16-alpine AS node
+RUN apk add g++ make python3
+RUN npm i -g @subsquid/cli@latest
+RUN npm i -g typescript@5.2.2
+WORKDIR /squid
+ADD package.json .
+ADD package-lock.json .
+RUN npm i @types/node
+# remove if needed
+ADD assets assets
+# remove if needed
+ADD db db
+# remove if needed
+ADD schema.graphql .
+ADD tsconfig.json .
+ADD src src
+RUN npm run build
+
+ADD commands.json .
+ENV PROCESSOR_PROMETHEUS_PORT 3000
+CMD ["sqd", "process"]

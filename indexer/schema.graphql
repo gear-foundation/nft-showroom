@@ -1,0 +1,160 @@
+type Marketplace @entity {
+  id: ID!
+  admins: [String!]!
+  config: MarketplaceConfig!
+  collections: [Collection!]! @derivedFrom(field: "marketplace")
+  collectionTypes: [CollectionType!]! @derivedFrom(field: "marketplace")
+  events: [MarketplaceEvent!]! @derivedFrom(field: "marketplace")
+  address: String!
+  metadata: String!
+  nftMetadata: String!
+}
+
+type MarketplaceConfig @entity {
+  gasForCreation: BigInt!
+  gasForTransferToken: BigInt!
+  gasForCloseAuction: BigInt!
+  gasForDeleteCollection: BigInt!
+  gasForGetTokenInfo: BigInt!
+  timeBetweenCreateCollections: BigInt!
+  royaltyToMarketplaceForMint: Int!
+  royaltyToMarketplaceForTrade: Int!
+  feePerUploadedFile: BigInt!
+  minimumTransferValue: BigInt!
+  minimumValueForTrade: BigInt!
+  minimumValueForMint: BigInt!
+  msInBlock: Int!
+  marketplace: Marketplace!
+  maxCreatorRoyalty: Int!
+  maxNumberOfImages: BigInt!
+}
+
+type MarketplaceEvent @entity {
+  id: ID!
+  type: String!
+  raw: String!
+  marketplace: Marketplace!
+  blockNumber: Int!
+  txHash: String!
+  timestamp: DateTime!
+}
+
+type CollectionType @entity {
+  id: ID!
+  description: String!
+  type: String!
+  metaUrl: String!
+  metaStr: String!
+  marketplace: Marketplace!
+}
+type AdditionalLinks {
+  externalUrl: String
+  telegram: String
+  xcom: String
+  medium: String
+  discord: String
+}
+
+type Collection @entity {
+  id: ID!
+  marketplace: Marketplace!
+  type: CollectionType!
+  admin: String!
+  name: String!
+  description: String!
+  additionalLinks: AdditionalLinks
+  userMintLimit: BigInt
+  tokensLimit: BigInt
+  paymentForMint: BigInt!
+  royalty: Int!
+  collectionLogo: String!
+  collectionBanner: String!
+  transferable: BigInt
+  approvable: Boolean
+  burnable: Boolean
+  sellable: BigInt
+  attendable: Boolean
+  createdAt: DateTime!
+  nfts: [Nft!]! @derivedFrom(field: "collection")
+  tags: [String!]!
+  permissionToMint: [String!]
+}
+
+type Nft @entity {
+  id: ID!
+  owner: String!
+  name: String!
+  mintedBy: String!
+  description: String!
+  idInCollection: Int!
+  collection: Collection!
+  mediaUrl: String!
+  approvedAccount: String
+  metadata: String
+  onSale: Boolean!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  transfers: [Transfer!]! @derivedFrom(field: "nft")
+  sales: [Sale!]! @derivedFrom(field: "nft")
+  auctions: [Auction!]! @derivedFrom(field: "nft")
+  offers: [Offer!]! @derivedFrom(field: "nft")
+}
+
+type Transfer @entity {
+  id: ID!
+  nft: Nft!
+  from: String!
+  to: String!
+  timestamp: DateTime!
+  blockNumber: Int!
+  txHash: String!
+}
+
+type Sale @entity {
+  id: ID!
+  nft: Nft!
+  owner: String!
+  newOwner: String
+  price: BigInt!
+  timestamp: DateTime!
+  updatedAt: DateTime!
+  blockNumber: Int!
+  status: String!
+}
+
+type Auction @entity {
+  id: ID!
+  nft: Nft!
+  owner: String!
+  minPrice: BigInt!
+  newOwner: String
+  lastPrice: BigInt
+  status: String!
+  durationMs: Int!
+  timestamp: DateTime!
+  updatedAt: DateTime!
+  endTimestamp: DateTime
+  blockNumber: Int!
+  bids: [Bid!]! @derivedFrom(field: "auction")
+}
+
+type Bid @entity {
+  id: ID!
+  auction: Auction!
+  bidder: String!
+  price: BigInt!
+  timestamp: DateTime!
+  blockNumber: Int!
+}
+
+type Offer @entity {
+  id: ID!
+  nft: Nft!
+  owner: String!
+  price: BigInt!
+  status: String!
+  creator: String!
+  timestamp: DateTime!
+  updatedAt: DateTime!
+  blockNumber: Int!
+}
