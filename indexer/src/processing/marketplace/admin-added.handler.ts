@@ -12,10 +12,11 @@ export class AdminAddedHandler implements INftMarketplaceEventHandler {
   ): Promise<void> {
     const { users } = event;
     const marketplace = storage.getMarketplace();
+    const newAdmins = new Set([...marketplace.admins, ...users]);
     await storage.setMarketplace(
       new Marketplace({
         ...marketplace,
-        admins: [...marketplace.admins, ...users],
+        admins: Array.from(newAdmins.values()),
       }),
     );
   }

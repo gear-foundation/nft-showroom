@@ -1,6 +1,6 @@
 import { EntitiesService } from '../entities.service';
 import { INftMarketplaceEventHandler } from './nft-marketplace.handler';
-import { MarketplaceConfig } from '../../model';
+import { Marketplace, MarketplaceConfig } from '../../model';
 import { EventInfo } from '../event-info.type';
 import { Initialized } from '../../types/marketplace.events';
 
@@ -13,6 +13,12 @@ export class MarketplaceInitializedHandler
     storage: EntitiesService,
   ): Promise<void> {
     const marketplace = storage.getMarketplace();
+    await storage.setMarketplace(
+      new Marketplace({
+        ...marketplace,
+        admins: [eventInfo.destination],
+      }),
+    );
     await storage.setMarketplaceConfig(
       new MarketplaceConfig({
         ...(marketplace.config || {}),
