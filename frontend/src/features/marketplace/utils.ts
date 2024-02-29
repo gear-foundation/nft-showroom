@@ -1,4 +1,5 @@
 function getMilliseconds(value: number, unit: 'second' | 'minute' | 'hour' | 'day') {
+  // TODO: global constants
   const MULTIPLIER = { MS: 1000, S: 60, M: 60, H: 24 };
 
   const UNIT_MULTIPLIER = {

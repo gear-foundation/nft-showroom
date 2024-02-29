@@ -16,6 +16,7 @@ type Marketplace = {
     minimumValueForTrade: string;
     royaltyToMarketplaceForMint: number;
     royaltyToMarketplaceForTrade: number;
+    timeBetweenCreateCollections: string;
   };
 };
 

@@ -1,3 +1,11 @@
+.container {
+  flex: 1;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
 .heading,
 .text {
   text-align: center;
