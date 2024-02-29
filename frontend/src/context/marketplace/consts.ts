@@ -23,6 +23,7 @@ const MARKETPLACE_QUERY = graphql(`
         royaltyToMarketplaceForTrade
         timeBetweenCreateCollections
       }
+      admins
     }
   }
 `);

@@ -18,6 +18,7 @@ type Marketplace = {
     royaltyToMarketplaceForTrade: number;
     timeBetweenCreateCollections: string;
   };
+  admins: string[];
 };
 
 type Value = {
