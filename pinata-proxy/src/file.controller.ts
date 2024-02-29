@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Controller,
   Logger,
   Post,
@@ -7,7 +8,6 @@ import {
 } from '@nestjs/common';
 import { PinataService } from './pinata.service';
 import { AnyFilesInterceptor } from '@nestjs/platform-express';
-import { Express } from 'express';
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 import { Readable } from 'stream';
@@ -30,30 +30,24 @@ export class FileController {
     @UploadedFiles() files: Express.Multer.File[],
   ): Promise<Result[]> {
     const names = files.map((file) => file.filename ?? file.originalname);
-    const results = await Promise.allSettled(
-      files.map((file, index) => {
-        return this.pinataService.uploadFile(
-          Readable.from(file.buffer),
-          names[index],
-        );
-      }),
-    );
-    return results.map((response, index) => {
-      const result = {
-        fileName: names[index],
-      };
-      if (response.status === 'fulfilled') {
+    try {
+      const results = await Promise.all(
+        files.map((file, index) => {
+          return this.pinataService.uploadFile(
+            Readable.from(file.buffer),
+            names[index],
+          );
+        }),
+      );
+      return results.map((response, index) => {
         return {
-          ...result,
-          ipfsHash: response.value,
+          fileName: names[index],
+          ipfsHash: response,
         };
-      }
-      this.logger.error(response.reason);
-      console.error(response.reason);
-      return {
-        ...result,
-        error: response.reason.message ?? 'unknown error',
-      };
-    });
+      });
+    } catch (error) {
+      this.logger.error(error);
+      throw new BadRequestException('failed to upload files');
+    }
   }
 }
