@@ -4,7 +4,7 @@ import styles from './list.module.scss';
 import NotFoundSVG from './not-found.svg?react';
 
 type Props<T> = {
-  items: T[] | undefined;
+  items: T[] | undefined; // shouldn't be undefined?
   itemsPerRow: number;
   emptyText: string;
   renderItem: (item: T, index: number) => ReactNode;

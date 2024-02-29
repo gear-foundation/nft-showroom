@@ -3,4 +3,9 @@ const GRID_SIZE = {
   LARGE: 'largeGrid',
 } as const;
 
-export { GRID_SIZE };
+const ACCOUNT_FILTER_VALUE = {
+  ALL: 'all',
+  MY: 'my',
+} as const;
+
+export { GRID_SIZE, ACCOUNT_FILTER_VALUE };

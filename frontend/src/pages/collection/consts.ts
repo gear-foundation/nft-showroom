@@ -14,7 +14,7 @@ const SOCIAL_ICON = {
 };
 
 const COLLECTION_QUERY = graphql(`
-  subscription CollectionQuery($id: String!) {
+  subscription CollectionQuery($id: String!, $owner: String!) {
     collectionById(id: $id) {
       id
       name
@@ -29,7 +29,7 @@ const COLLECTION_QUERY = graphql(`
       transferable
       sellable
 
-      nfts {
+      nfts(where: { owner_contains: $owner }) {
         id
         idInCollection
         name

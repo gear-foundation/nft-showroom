@@ -2,16 +2,22 @@ import { useSubscription } from 'urql';
 
 import { COLLECTIONS_QUERY, NFTS_QUERY } from './consts';
 
-function useCollections() {
-  const [result] = useSubscription({ query: COLLECTIONS_QUERY });
+function useCollections(admin: string) {
+  const [result] = useSubscription({ query: COLLECTIONS_QUERY, variables: { admin } });
 
-  return result.data?.collections;
+  const collections = result.data?.collections;
+  const isCollectionsQueryReady = !result.fetching;
+
+  return { collections, isCollectionsQueryReady };
 }
 
-function useNFTs() {
-  const [result] = useSubscription({ query: NFTS_QUERY });
+function useNFTs(owner: string) {
+  const [result] = useSubscription({ query: NFTS_QUERY, variables: { owner } });
 
-  return result.data?.nfts;
+  const nfts = result.data?.nfts;
+  const isNFTsQueryReady = !result.fetching;
+
+  return { nfts, isNFTsQueryReady };
 }
 
 export { useNFTs, useCollections };

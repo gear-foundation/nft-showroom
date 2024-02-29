@@ -5,7 +5,7 @@ import { ROUTE } from '@/consts';
 import { CollectionCard, NFTCard, Skeleton } from '@/features/collections';
 import CollectionCardSkeletonSVG from '@/features/collections/assets/collection-card-skeleton.svg?react';
 import NFTCardSkeletonSVG from '@/features/collections/assets/nft-card-skeleton.svg?react';
-import { GridSize, useGridSize } from '@/features/lists';
+import { AccountFilter, GridSize, useAccountFilter, useGridSize } from '@/features/lists';
 import { GRID_SIZE } from '@/features/lists/consts';
 import { cx } from '@/utils';
 
@@ -25,9 +25,10 @@ function Lists() {
   const match = useMatch(ROUTE.NFTS);
 
   const { gridSize, setGridSize } = useGridSize();
+  const { accountFilterValue, accountFilterAddress, setAccountFilterValue } = useAccountFilter();
 
-  const collections = useCollections();
-  const nfts = useNFTs();
+  const { collections, isCollectionsQueryReady } = useCollections(accountFilterAddress);
+  const { nfts, isNFTsQueryReady } = useNFTs(accountFilterAddress);
 
   const renderTabs = () =>
     TABS.map(({ to, text }, index) => {
@@ -46,12 +47,16 @@ function Lists() {
     <Container>
       <header className={styles.header}>
         <ul className={styles.tabs}>{renderTabs()}</ul>
-        <GridSize value={gridSize} onChange={setGridSize} />
+
+        <div className={styles.options}>
+          <AccountFilter value={accountFilterValue} onChange={setAccountFilterValue} />
+          <GridSize value={gridSize} onChange={setGridSize} />
+        </div>
       </header>
 
       {match ? (
         <List
-          items={nfts || NFT_SKELETONS}
+          items={isNFTsQueryReady ? nfts : NFT_SKELETONS}
           itemsPerRow={gridSize === GRID_SIZE.SMALL ? 4 : 3}
           emptyText="Mint NFTs"
           renderItem={(nft, index) =>
@@ -68,7 +73,7 @@ function Lists() {
         />
       ) : (
         <List
-          items={collections || COLLECTION_SKELETONS}
+          items={isCollectionsQueryReady ? collections : COLLECTION_SKELETONS}
           itemsPerRow={gridSize === GRID_SIZE.SMALL ? 3 : 2}
           emptyText="Create collections"
           renderItem={(collection, index) =>
