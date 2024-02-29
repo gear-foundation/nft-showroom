@@ -21,7 +21,21 @@ export class MarketplaceInitializedHandler
     );
     await storage.setMarketplaceConfig(
       new MarketplaceConfig({
-        ...(marketplace.config || {}),
+        feePerUploadedFile: 0n,
+        gasForCloseAuction: 0n,
+        gasForDeleteCollection: 0n,
+        gasForGetTokenInfo: 0n,
+        gasForTransferToken: 0n,
+        maxCreatorRoyalty: 0,
+        maxNumberOfImages: 0n,
+        minimumTransferValue: 0n,
+        minimumValueForMint: 0n,
+        minimumValueForTrade: 0n,
+        msInBlock: 0,
+        royaltyToMarketplaceForMint: 0,
+        royaltyToMarketplaceForTrade: 0,
+        timeBetweenCreateCollections: 0n,
+        gasForCreation: 0n,
         ...Object.fromEntries(
           Object.entries(event).filter(([, value]) => value !== null),
         ),

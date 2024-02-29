@@ -50,7 +50,6 @@ export class LocalStorage implements IStorage {
     }
     await this.loadEntities();
     this.initialized = true;
-    setInterval(() => this.loadMarketplace(), 10 * 1000); // 10 seconds
   }
 
   setStore(store: Store) {
