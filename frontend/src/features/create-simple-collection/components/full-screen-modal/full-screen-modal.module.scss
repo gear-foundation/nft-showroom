@@ -1,0 +1,105 @@
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 2;
+
+  width: 100%;
+  height: 100%;
+
+  display: flex;
+  flex-direction: column;
+
+  overflow: auto;
+}
+
+.header {
+  background-color: #fff;
+  padding: 31px 0;
+
+  .container {
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .headingWrapper,
+  .progress,
+  .balanceWrapper {
+    display: flex;
+    align-items: center;
+  }
+
+  .headingWrapper {
+    gap: 16px;
+  }
+
+  .balanceWrapper {
+    gap: 44px;
+  }
+
+  .heading {
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 22px;
+    letter-spacing: 0.02em;
+  }
+
+  .progress {
+    display: flex;
+    gap: 32px;
+    font-weight: 700;
+    line-height: 24px;
+  }
+}
+
+.step {
+  display: flex;
+
+  &::before {
+    width: 24px;
+    height: 24px;
+    margin-right: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    border-radius: 50%;
+  }
+
+  &.active {
+    color: #0ed3a3;
+
+    &::before {
+      content: attr(data-number);
+      background-color: #0ed3a3;
+    }
+  }
+
+  &.awaiting {
+    color: #93989a;
+
+    &::before {
+      content: attr(data-number);
+      background-color: #93989a;
+    }
+  }
+
+  &.complete {
+    color: #000;
+
+    &::before {
+      content: url(../../assets/check.svg);
+      background-color: #000;
+    }
+  }
+}
+
+.body {
+  flex: 1;
+  padding: 50px 0;
+  background-color: #f7f9fa;
+}
+
+.disabledScroll {
+  overflow: hidden;
+}

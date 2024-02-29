@@ -17,6 +17,7 @@ struct NftContract {
     pub nonce: NftId,
     pub links_and_data: Vec<(Links, ImageData)>,
     pub collection_owner: ActorId,
+    pub total_number_of_tokens: Option<u64>,
 }
 static mut NFT_CONTRACT: Option<NftContract> = None;
 
@@ -223,6 +224,12 @@ impl NftContract {
         }
 
         self.links_and_data.extend(additional_links.clone());
+
+        let mut number_tokens = sum_limit_copies(&self.links_and_data);
+        if let Some(all_copies) = number_tokens.as_mut() {
+            *all_copies += self.tokens.len() as u64;
+        }
+        self.total_number_of_tokens = number_tokens;
 
         Ok(MusicNftEvent::Expanded { additional_links })
     }
@@ -467,6 +474,7 @@ extern "C" fn init() {
     {
         panic!("Limit of copies value is equal to 0");
     }
+    let total_number_of_tokens = sum_limit_copies(&links_and_data);
 
     unsafe {
         NFT_CONTRACT = Some(NftContract {
@@ -478,14 +486,15 @@ extern "C" fn init() {
             nonce: 0,
             links_and_data,
             collection_owner,
+            total_number_of_tokens,
         })
     };
 
     msg::send(
         collection_owner,
-        MusicNftEvent::Initialized {
+    Ok::<MusicNftEvent, MusicNftError>(MusicNftEvent::Initialized {
             config: config.clone(),
-        },
+        }),
         0,
     )
     .expect("Error during send to owner `MusicNftEvent::Initialized`");
@@ -564,6 +573,7 @@ impl From<NftContract> for NftState {
             nonce,
             links_and_data,
             collection_owner,
+            total_number_of_tokens,
             ..
         } = value;
 
@@ -588,8 +598,16 @@ impl From<NftContract> for NftState {
             nonce,
             links_and_data,
             collection_owner,
+            total_number_of_tokens,
         }
     }
+}
+
+fn sum_limit_copies(links_and_data: &[(Links, ImageData)]) -> Option<u64> {
+    let sum = links_and_data
+        .iter()
+        .try_fold(0, |acc, (_, img_data)| img_data.limit_copies.map(|y| acc + y as u64));
+    sum
 }
 
 static mut SEED: u8 = 0;

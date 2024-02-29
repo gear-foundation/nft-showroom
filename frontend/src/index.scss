@@ -1,0 +1,40 @@
+body {
+  font-size: 14px;
+  font-weight: 400;
+  color: #000;
+  background-color: #f7f9fa;
+}
+
+#root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+main {
+  flex: 1;
+  padding: 50px 0;
+}
+
+// resets
+
+a {
+  text-decoration: none;
+  color: inherit;
+  transition: opacity 0.25s;
+}
+
+button {
+  padding: 0;
+  border: none;
+  outline: none;
+
+  &:not(:disabled) {
+    cursor: pointer;
+  }
+}
+
+button,
+small {
+  font: inherit;
+}

@@ -1017,7 +1017,7 @@ pub async fn get_all_state_nft(api: &GearApi, program_id: &ProgramId) -> Option<
 pub async fn get_all_collection_state(
     api: &GearApi,
     program_id: &ProgramId,
-) -> Option<Vec<(ActorId, ActorId)>> {
+) -> Option<Vec<(ActorId, (String, ActorId))>> {
     let reply = api
         .read_state(*program_id, StateQuery::AllCollections.encode())
         .await

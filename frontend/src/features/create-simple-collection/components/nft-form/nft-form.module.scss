@@ -1,0 +1,41 @@
+.header {
+  margin-bottom: 24px;
+  padding: 24px;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  background-color: #959da533;
+  border-radius: 15px;
+
+  .file {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+  }
+}
+
+.heading {
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 22px;
+  letter-spacing: 0.02em;
+}
+
+.fileInput {
+  display: none;
+}
+
+.nfts {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+
+.buttons {
+  margin-top: 48px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(0, 1fr));
+  gap: 24px;
+}
