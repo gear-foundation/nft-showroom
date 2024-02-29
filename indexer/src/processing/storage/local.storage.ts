@@ -54,6 +54,10 @@ export class LocalStorage implements IStorage {
 
   setStore(store: Store) {
     this.store = store;
+    this.nfts = {};
+    this.sale = {};
+    this.auctions = {};
+    this.offers = {};
   }
 
   async updateNft(nft: Nft): Promise<void> {
