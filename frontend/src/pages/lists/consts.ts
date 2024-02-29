@@ -1,7 +1,7 @@
 import { graphql } from '@/graphql';
 
 const COLLECTIONS_QUERY = graphql(`
-  subscription CollectionsQuery($admin: String) {
+  subscription CollectionsQuery($admin: String!) {
     collections(where: { admin_contains: $admin }) {
       id
       name
@@ -20,7 +20,7 @@ const COLLECTIONS_QUERY = graphql(`
 `);
 
 const NFTS_QUERY = graphql(`
-  subscription NFTsQuery($owner: String) {
+  subscription NFTsQuery($owner: String!) {
     nfts(where: { owner_contains: $owner }) {
       id
       idInCollection

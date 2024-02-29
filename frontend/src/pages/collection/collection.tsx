@@ -2,12 +2,12 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { generatePath, useParams } from 'react-router-dom';
 
-import { Breadcrumbs, Container, FilterButton, InfoCard, List, SearchInput } from '@/components';
+import { Breadcrumbs, Container, InfoCard, List, SearchInput } from '@/components';
 import { ROUTE } from '@/consts';
 import { MintLimitInfoCard, MintNFT, NFTCard, Skeleton } from '@/features/collections';
 import CollectionHeaderSkeletonSVG from '@/features/collections/assets/collection-header-skeleton.svg?react';
 import NFTCardSkeletonSVG from '@/features/collections/assets/nft-card-skeleton.svg?react';
-import { GRID_SIZE, GridSize, useGridSize } from '@/features/lists';
+import { AccountFilter, GRID_SIZE, GridSize, useAccountFilter, useGridSize } from '@/features/lists';
 import { getIpfsLink } from '@/utils';
 
 import UserSVG from './assets/user.svg?react';
@@ -32,13 +32,14 @@ const NFT_SKELETONS = new Array<null>(4).fill(null);
 
 function Collection() {
   const { id } = useParams() as Params;
-  const collection = useCollection(id);
 
   const { gridSize, setGridSize } = useGridSize();
-  const { query, onSubmit, register } = useSearchQuery();
+  const { accountFilterValue, accountFilterAddress, setAccountFilterValue } = useAccountFilter();
 
+  const { collection, isCollectionQueryReady } = useCollection(id, accountFilterAddress);
   const { name, nfts, additionalLinks } = collection || {};
 
+  const { query, onSubmit, register } = useSearchQuery();
   const searchedTokens = nfts?.filter((nft) => nft.name.toLocaleLowerCase().includes(query));
   const tokensCount = searchedTokens?.length || 0;
 
@@ -96,19 +97,18 @@ function Collection() {
 
       <div className={styles.nfts}>
         <header className={styles.nftsHeader}>
-          <FilterButton text={`All: ${tokensCount}`} onClick={() => {}} isActive />
+          <form onSubmit={onSubmit}>
+            <SearchInput label="Search by name" {...register('query')} disabled={!searchedTokens} />
+          </form>
 
-          <div className={styles.interaction}>
-            <form onSubmit={onSubmit}>
-              <SearchInput label="Search by name" {...register('query')} disabled={!searchedTokens} />
-            </form>
-
+          <div className={styles.options}>
+            <AccountFilter value={accountFilterValue} onChange={setAccountFilterValue} />
             <GridSize value={gridSize} onChange={setGridSize} />
           </div>
         </header>
 
         <List
-          items={searchedTokens || NFT_SKELETONS}
+          items={isCollectionQueryReady ? searchedTokens : NFT_SKELETONS}
           itemsPerRow={gridSize === GRID_SIZE.SMALL ? 4 : 3}
           emptyText="Mint NFTs"
           renderItem={(nft, index) =>
