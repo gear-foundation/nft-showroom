@@ -53,20 +53,23 @@ function CreateSimpleCollectionModal({ close }: Pick<ModalProps, 'close'>) {
   const getNftsPayload = async (nfts: NFT[]) => {
     const images = nfts.map(({ file }) => file);
     const chunks = getFileChunks(images, getBytes(MAX.SIZE_MB.NFTS_CHUNK));
-    const chunkPromises = chunks.map((chunk) => uploadToIpfs(chunk));
-    const cidChunks = await Promise.all(chunkPromises);
-    const cids = cidChunks.flat();
+    const urls: string[] = [];
 
-    const getNftPayload = (cid: string, index: number) => {
+    for (const chunk of chunks) {
+      const result = await uploadToIpfs(chunk);
+      urls.push(...result);
+    }
+
+    const getNftPayload = (url: string, index: number) => {
       const { limit } = nfts[index]; // order of requests is important
 
       const limitCopies = limit || null;
       const autoChangingRules = null;
 
-      return [cid, { limitCopies, autoChangingRules }];
+      return [url, { limitCopies, autoChangingRules }];
     };
 
-    return cids.map((cid, index) => getNftPayload(cid, index));
+    return urls.map((cid, index) => getNftPayload(cid, index));
   };
 
   const getFormPayload = async (nfts: NFT[]) => {
