@@ -24,7 +24,9 @@ export class PinataService {
   async uploadFile(file, fileName: string, retries = 0): Promise<string> {
     try {
       await this.limiter.removeTokens(1);
-      this.logger.log(`uploading file ${fileName} to IPFS. ${this.limiter.getTokensRemaining()} remaining`);
+      this.logger.log(
+        `uploading file ${fileName} to IPFS. ${this.limiter.getTokensRemaining()} remaining`,
+      );
       const pinataInfo = await this.pinata.pinFileToIPFS(file, {
         pinataMetadata: {
           name: fileName,
