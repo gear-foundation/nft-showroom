@@ -23,9 +23,8 @@ export class PinataService {
 
   async uploadFile(file, fileName: string, retries = 0): Promise<string> {
     try {
-      this.logger.log(`start to uploading file ${fileName} to IPFS`);
       await this.limiter.removeTokens(1);
-      this.logger.log(`uploading file ${fileName} to IPFS`);
+      this.logger.log(`uploading file ${fileName} to IPFS. ${this.limiter.getTokensRemaining()} remaining`);
       const pinataInfo = await this.pinata.pinFileToIPFS(file, {
         pinataMetadata: {
           name: fileName,
@@ -35,10 +34,9 @@ export class PinataService {
       this.logger.log(`file ${fileName} uploaded to IPFS`);
       return pinataInfo.IpfsHash;
     } catch (e) {
-      this.logger.error(e);
-      this.logger.error(e.message);
       if (e.message.includes('429')) {
         if (retries >= 10) {
+          this.logger.error(`file ${fileName} 429, retries limit reached`);
           throw e;
         }
         this.logger.log(
@@ -47,6 +45,8 @@ export class PinataService {
         await new Promise((resolve) => setTimeout(resolve, 30 * 1000));
         return this.uploadFile(file, fileName, retries + 1);
       }
+      this.logger.error(e);
+      this.logger.error(e.message);
       throw e;
     }
   }
