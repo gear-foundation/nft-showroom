@@ -35,6 +35,8 @@ export class PinataService {
       this.logger.log(`file ${fileName} uploaded to IPFS`);
       return pinataInfo.IpfsHash;
     } catch (e) {
+      this.logger.error(e);
+      this.logger.error(e.message);
       if (e.message.includes('429')) {
         if (retries >= 10) {
           throw e;
@@ -45,6 +47,7 @@ export class PinataService {
         await new Promise((resolve) => setTimeout(resolve, 30 * 1000));
         return this.uploadFile(file, fileName, retries + 1);
       }
+      throw e;
     }
   }
 }
