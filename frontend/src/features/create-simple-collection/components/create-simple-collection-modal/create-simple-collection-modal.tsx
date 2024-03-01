@@ -52,7 +52,7 @@ function CreateSimpleCollectionModal({ close }: Pick<ModalProps, 'close'>) {
 
   const getNftsPayload = async (nfts: NFT[]) => {
     const images = nfts.map(({ file }) => file);
-    const chunks = getFileChunks(images, getBytes(MAX.SIZE_MB.NFTS_CHUNK));
+    const chunks = getFileChunks(images, getBytes(MAX.SIZE_MB.NFTS_CHUNK), MAX.FILES_PER_CHUNK);
     const urls: string[] = [];
 
     for (const chunk of chunks) {
