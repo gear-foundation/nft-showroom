@@ -21,17 +21,27 @@ export class PinataService {
     this.pinata = new PinataClient(apiKey, secretKey);
   }
 
-  async uploadFile(file, fileName: string): Promise<string> {
-    this.logger.log(`start to uploading file ${fileName} to IPFS`);
-    await this.limiter.removeTokens(1);
-    this.logger.log(`uploading file ${fileName} to IPFS`);
-    const pinataInfo = await this.pinata.pinFileToIPFS(file, {
-      pinataMetadata: {
-        name: fileName,
-      },
-      pinataOptions: { cidVersion: 0 },
-    });
-    this.logger.log(`file ${fileName} uploaded to IPFS`);
-    return pinataInfo.IpfsHash;
+  async uploadFile(file, fileName: string, retries = 0): Promise<string> {
+    try {
+      this.logger.log(`start to uploading file ${fileName} to IPFS`);
+      await this.limiter.removeTokens(1);
+      this.logger.log(`uploading file ${fileName} to IPFS`);
+      const pinataInfo = await this.pinata.pinFileToIPFS(file, {
+        pinataMetadata: {
+          name: fileName,
+        },
+        pinataOptions: { cidVersion: 0 },
+      });
+      this.logger.log(`file ${fileName} uploaded to IPFS`);
+      return pinataInfo.IpfsHash;
+    } catch (e) {
+      if (e.message.includes('429')) {
+        if (retries >= 10) {
+          throw e;
+        }
+        await new Promise((resolve) => setTimeout(resolve, 30 * 1000));
+        return this.uploadFile(file, fileName, retries + 1);
+      }
+    }
   }
 }
