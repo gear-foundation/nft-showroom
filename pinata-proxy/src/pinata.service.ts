@@ -39,6 +39,9 @@ export class PinataService {
         if (retries >= 10) {
           throw e;
         }
+        this.logger.log(
+          `file ${fileName} 429, retrying ${retries} after 30s...`,
+        );
         await new Promise((resolve) => setTimeout(resolve, 30 * 1000));
         return this.uploadFile(file, fileName, retries + 1);
       }
