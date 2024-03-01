@@ -15,7 +15,7 @@ export class PinataService {
       'PINATA_SECRET_API_KEY',
     );
     this.limiter = new RateLimiter({
-      tokensPerInterval: 150,
+      tokensPerInterval: 75,
       interval: 'minute',
     });
     this.pinata = new PinataClient(apiKey, secretKey);
