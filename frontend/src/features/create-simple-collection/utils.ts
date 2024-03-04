@@ -9,7 +9,7 @@ function getBytes(mb: number) {
 
 const getFileUrl = (file: File) => URL.createObjectURL(file);
 
-const getFileChunks = (files: File[], chunkSizeBytes: number) => {
+const getFileChunks = (files: File[], chunkSizeBytes: number, maxFilesPerChunk: number) => {
   const chunks: File[][] = [];
   let chunk: File[] = [];
   let chunkSize = 0;
@@ -17,7 +17,7 @@ const getFileChunks = (files: File[], chunkSizeBytes: number) => {
   files.forEach((file) => {
     const potentialChunkSize = chunkSize + file.size;
 
-    if (potentialChunkSize > chunkSizeBytes) {
+    if (chunk.length === maxFilesPerChunk || potentialChunkSize > chunkSizeBytes) {
       chunks.push(chunk);
       chunk = [];
       chunkSize = 0;

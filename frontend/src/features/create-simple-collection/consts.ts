@@ -40,6 +40,7 @@ const IMAGE_TYPES_ACCEPT = IMAGE_TYPES.join(', ');
 
 const MAX = {
   NFTS_COUNT: 10000,
+  FILES_PER_CHUNK: 50,
 
   SIZE_MB: {
     IMAGE: 5,

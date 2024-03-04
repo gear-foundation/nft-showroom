@@ -28,8 +28,8 @@ function useLastCollection() {
 function useCreateCountdown() {
   const { marketplace } = useMarketplace();
   const { config, admins } = marketplace || {};
+  const isConfigReady = Boolean(config);
   const msBetweenCollections = Number(config?.timeBetweenCreateCollections || '0');
-  const isConfigReady = Boolean(msBetweenCollections);
 
   const { account } = useAccount();
   const isAdmin = admins?.includes(account?.decodedAddress || '');
