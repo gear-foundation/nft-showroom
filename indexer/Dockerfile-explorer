@@ -38,4 +38,4 @@ COPY --from=builder /squid/schema.graphql schema.graphql
 # remove if no commands.json is in the root
 ADD commands.json .
 ENV PROCESSOR_PROMETHEUS_PORT 3000
-CMD ["npm", "run", "serve"]
+CMD ["npm", "run", "serve:prod"]
