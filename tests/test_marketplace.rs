@@ -78,8 +78,6 @@ fn create_success() {
         None,
         None,
         None,
-        Some(11_000_000_000_000),
-        None,
         None,
     );
     let state_reply = marketplace
@@ -191,8 +189,6 @@ fn create_failures() {
         Some(7_200_000),
         None,
         None,
-        None,
-        Some(11_000_000_000_000),
         None,
         Some(NftMarketplaceError::AccessDenied),
     );
@@ -443,7 +439,7 @@ fn sale_failures() {
         address_nft,
         0,
         9_000_000_000_000,
-        Some(NftMarketplaceError::LessThanExistentialDeposit),
+        Some(NftMarketplaceError::LessThanMinimumValueForTrade),
     );
 
     // Only owner can send this action
@@ -662,7 +658,7 @@ fn auction_success() {
         println!("STATE: {:?}", state);
     }
 
-    sys.spend_blocks(duration);
+    sys.spend_blocks(duration+1);
 
     let percent_to_collection_owner = final_bid * royalty as u128 / 10_000;
     let percent_to_marketplace = final_bid * 200 as u128 / 10_000;
@@ -844,7 +840,7 @@ fn auction_cancel() {
         assert!(!state.auctions.is_empty());
     }
 
-    sys.spend_blocks(duration_1);
+    sys.spend_blocks(duration_1+1);
 
     // the delayed message from the first version of the auction will come,
     // but it should end with an error, because the auction was canceled and a new one was created.
@@ -946,7 +942,7 @@ fn auction_failures() {
         0,
         9_000_000_000_000,
         duration,
-        Some(NftMarketplaceError::LessThanExistentialDeposit),
+        Some(NftMarketplaceError::LessThanMinimumValueForTrade),
     );
 
     // Only token owner can send
@@ -1014,7 +1010,7 @@ fn auction_failures() {
     let balance = sys.balance_of(USERS[2]);
     assert_eq!(balance, 20_000_000_000_000, "Wrong balance");
 
-    sys.spend_blocks(duration);
+    sys.spend_blocks(duration+1);
     sys.mint_to(USERS[3], 15_000_000_000_000);
     marketplace.add_bid(
         USERS[3],

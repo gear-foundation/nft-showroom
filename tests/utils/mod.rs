@@ -104,10 +104,8 @@ pub trait NftMarketplace {
         gas_for_delete_collection: Option<u64>,
         gas_for_get_info: Option<u64>,
         time_between_create_collections: Option<u64>,
-        fee_per_uploaded_file: Option<u128>,
         royalty_to_marketplace_for_trade: Option<u16>,
         royalty_to_marketplace_for_mint: Option<u16>,
-        minimum_transfer_value: Option<u128>,
         ms_in_block: Option<u32>,
         error: Option<NftMarketplaceError>,
     );
@@ -124,18 +122,19 @@ impl NftMarketplace for Program<'_> {
     fn init_marketplace(sys: &System) -> Program<'_> {
         let marketplace = Program::current(sys);
         let init_payload = NftMarketplaceInit {
-            gas_for_creation: 1_000_000_000_000_000,
-            gas_for_mint: 100_000_000_000,
-            gas_for_transfer_token: 5_000_000_000,
-            gas_for_close_auction: 10_000_000_000,
-            gas_for_delete_collection: 5_000_000_000,
+            gas_for_creation: 5_000_000_000,
+            gas_for_mint: 7_000_000_000,
+            gas_for_transfer_token: 4_000_000_000,
+            gas_for_close_auction: 15_000_000_000,
+            gas_for_delete_collection: 3_000_000_000,
             gas_for_get_info: 5_000_000_000,
             time_between_create_collections: 3_600_000, // 1 hour in milliseconds
-            fee_per_uploaded_file: 257_142_857_100,
             royalty_to_marketplace_for_trade: 200,
             royalty_to_marketplace_for_mint: 200,
-            minimum_transfer_value: 10_300_000_000_000, // because roylty to marketplace
             ms_in_block: 3_000,
+            fee_per_uploaded_file: 257_142_857_100,
+            max_creator_royalty: 1_000,
+            max_number_of_images: 10_000,
         };
         let res = marketplace.send(ADMINS[0], init_payload);
         assert!(!res.main_failed());
@@ -289,7 +288,7 @@ impl NftMarketplace for Program<'_> {
                 collection_address,
                 token_id,
                 min_price,
-                duration,
+                duration_ms: (duration+1) * 3000,
             })
         };
         let result = &res.decoded_log::<Result<NftMarketplaceEvent, NftMarketplaceError>>();
@@ -460,10 +459,8 @@ impl NftMarketplace for Program<'_> {
         gas_for_delete_collection: Option<u64>,
         gas_for_get_info: Option<u64>,
         time_between_create_collections: Option<u64>,
-        fee_per_uploaded_file: Option<u128>,
         royalty_to_marketplace_for_trade: Option<u16>,
         royalty_to_marketplace_for_mint: Option<u16>,
-        minimum_transfer_value: Option<u128>,
         ms_in_block: Option<u32>,
         error: Option<NftMarketplaceError>,
     ) {
@@ -477,11 +474,12 @@ impl NftMarketplace for Program<'_> {
                 gas_for_delete_collection,
                 gas_for_get_info,
                 time_between_create_collections,
-                fee_per_uploaded_file,
                 royalty_to_marketplace_for_trade,
                 royalty_to_marketplace_for_mint,
-                minimum_transfer_value,
                 ms_in_block,
+                fee_per_uploaded_file: None,
+                max_creator_royalty: None,
+                max_number_of_images: None
             },
         );
         assert!(!res.main_failed());
@@ -534,7 +532,6 @@ pub fn get_init_nft_payload(
 ) -> NftInit {
     let img_data = ImageData {
         limit_copies: Some(1),
-        auto_changing_rules: None,
     };
     let img_links_and_data: Vec<(String, ImageData)> = (0..10)
         .map(|i| (format!("Img-{}", i), img_data.clone()))
@@ -557,7 +554,6 @@ pub fn get_init_nft_payload(
         },
         img_links_and_data,
         permission_to_mint,
-        fee_per_uploaded_file: 257_142_857_100,
     }
 }
 // pub fn get_state(

@@ -12,6 +12,9 @@ impl NftMarketplace {
         msg_src: ActorId,
         msg_value: u128,
     ) -> Result<NftMarketplaceEvent, NftMarketplaceError> {
+        if msg_value < self.minimum_value_for_trade {
+            return Err(NftMarketplaceError::LessThanMinimumValueForTrade);
+        }
         if !self.collection_to_owner.contains_key(&collection_address) {
             return Err(NftMarketplaceError::WrongCollectionAddress);
         }
@@ -56,7 +59,7 @@ impl NftMarketplace {
         self.offers
             .entry(offer.clone())
             .and_modify(|price| {
-                msg::send_with_gas(offer.creator, "", 0, *price).expect("Error in sending value");
+                msg::send_with_gas(offer.creator, NftMarketplaceEvent::ValueSent, 0, *price).expect("Error in sending value");
                 *price = msg_value;
             })
             .or_insert(msg_value);
@@ -81,7 +84,7 @@ impl NftMarketplace {
 
         if let Some((offer, price)) = self.offers.get_key_value(&offer) {
             // use send_with_gas to transfer the value directly to the balance, not to the mailbox.
-            msg::send_with_gas(offer.creator, "", 0, *price).expect("Error in sending value");
+            msg::send_with_gas(offer.creator, NftMarketplaceEvent::ValueSent, 0, *price).expect("Error in sending value");
         } else {
             return Err(NftMarketplaceError::WrongDataOffer);
         }
@@ -143,7 +146,6 @@ impl NftMarketplace {
             *price,
             royalty,
             self.config.royalty_to_marketplace_for_trade,
-            self.config.minimum_transfer_value,
         );
 
         self.offers.remove(&offer);

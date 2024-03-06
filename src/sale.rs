@@ -23,9 +23,9 @@ impl NftMarketplace {
         if self.auctions.contains_key(&(collection_address, token_id)) {
             return Err(NftMarketplaceError::AlreadyOnAuction);
         }
-        // check that the price is more than the minimum transfer value
-        if price < self.config.minimum_transfer_value {
-            return Err(NftMarketplaceError::LessThanExistentialDeposit);
+        // check that the price is more than the minimum value for trade
+        if price < self.minimum_value_for_trade {
+            return Err(NftMarketplaceError::LessThanMinimumValueForTrade);
         }
 
         // send a message to the nft contract to find out information about the token
@@ -123,7 +123,6 @@ impl NftMarketplace {
         msg_value: u128,
     ) -> Result<NftMarketplaceEvent, NftMarketplaceError> {
         self.check_sale(&collection_address, &token_id, msg_value)?;
-
         // transfer the token to the buyer
         transfer_token(
             collection_address,
@@ -132,13 +131,11 @@ impl NftMarketplace {
             self.config.gas_for_transfer_token,
         )
         .await?;
-
         let nft = self
             .sales
             .get(&(collection_address, token_id))
             .expect("Can't be None")
             .clone();
-
         // transfer value to owner of token and percent to collection creator
         currency_transfer(
             nft.collection_owner,
@@ -146,7 +143,6 @@ impl NftMarketplace {
             nft.price,
             nft.royalty,
             self.config.royalty_to_marketplace_for_trade,
-            self.config.minimum_transfer_value,
         );
         // remove the sale from the marketplace
         self.sales

@@ -5,9 +5,8 @@ use gstd::{prelude::*, ActorId};
 pub type NftId = u64;
 pub type TimeSec = u32;
 
-pub const BLOCK_DURATION_IN_SECS: u32 = 3;
-pub const EXISTENTIAL_DEPOSIT: u128 = 10_000_000_000_000;
-pub const GAS_AUTO_CHANGING: u64 = 5_000_000_000;
+pub const FEE_PER_UPLOADED_FILE: u128 = 282_857_142_900;
+pub const MAX_CREATOR_ROYALTY: u16 = 1_000; // 10%
 
 pub struct ContractMetadata;
 
@@ -26,19 +25,11 @@ pub struct NftInit {
     pub config: Config,
     pub img_links_and_data: Vec<(String, ImageData)>,
     pub permission_to_mint: Option<Vec<ActorId>>,
-    pub fee_per_uploaded_file: u128,
 }
 
 #[derive(Debug, Clone, Encode, Decode, TypeInfo)]
 pub struct ImageData {
     pub limit_copies: Option<u32>,
-    pub auto_changing_rules: Option<Vec<(TimeSec, Action)>>,
-}
-
-#[derive(Debug, Clone, Encode, Decode, TypeInfo)]
-pub enum Action {
-    ChangeImg(String),
-    AddMeta(String),
 }
 
 #[derive(Debug, Clone, Encode, Decode, TypeInfo)]
@@ -97,14 +88,6 @@ pub enum NftAction {
     ChangeConfig {
         config: Config,
     },
-    ChangeImg {
-        token_id: NftId,
-        img_link: String,
-    },
-    AddMetadata {
-        token_id: NftId,
-        metadata: String,
-    },
     AddUsersForMint {
         users: Vec<ActorId>,
     },
@@ -112,6 +95,12 @@ pub enum NftAction {
         user: ActorId,
     },
     LiftRestrictionMint,
+    AddAdmin {
+        admin: ActorId,
+    },
+    RemoveAdmin {
+        admin: ActorId,
+    },
 }
 
 #[derive(Debug, Clone, Encode, Decode, TypeInfo)]
@@ -156,14 +145,6 @@ pub enum NftEvent {
     ConfigChanged {
         config: Config,
     },
-    ImageChanged {
-        token_id: NftId,
-        img_link: String,
-    },
-    MetadataAdded {
-        token_id: NftId,
-        metadata: String,
-    },
     UsersForMintAdded {
         users: Vec<ActorId>,
     },
@@ -171,6 +152,12 @@ pub enum NftEvent {
         user: ActorId,
     },
     LiftRestrictionMint,
+    AdminAdded {
+        admin: ActorId,
+    },
+    AdminRemoved {
+        admin: ActorId,
+    }
 }
 #[derive(Debug, Clone, Encode, Decode, TypeInfo)]
 pub enum NftError {
@@ -191,6 +178,7 @@ pub enum NftError {
     ThereIsNoSuchUser,
     ExhaustedLimit,
     WrongValue,
+    OnlyOneAdminLeft
 }
 
 #[derive(Debug, Clone, Encode, Decode, TypeInfo)]
@@ -204,6 +192,7 @@ pub struct NftState {
     pub collection_owner: ActorId,
     pub total_number_of_tokens: Option<u64>,
     pub permission_to_mint: Option<Vec<ActorId>>,
+    pub marketplace_address: ActorId,
 }
 
 #[derive(Debug, Clone, Encode, Decode, TypeInfo)]

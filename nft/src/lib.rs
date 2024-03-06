@@ -5,10 +5,7 @@ use gstd::{
     prelude::*,
     ActorId,
 };
-use nft_io::{
-    Action, Config, ImageData, Nft, NftAction, NftError, NftEvent, NftId, NftInit, NftState,
-    StateQuery, StateReply, BLOCK_DURATION_IN_SECS, EXISTENTIAL_DEPOSIT, GAS_AUTO_CHANGING,
-};
+use nft_io::*;
 
 #[derive(Debug)]
 struct NftContract {
@@ -22,6 +19,8 @@ struct NftContract {
     pub collection_owner: ActorId,
     pub permission_to_mint: Option<Vec<ActorId>>,
     pub total_number_of_tokens: Option<u64>,
+    pub marketplace_address: ActorId,
+    pub admins: HashSet<ActorId>,
 }
 static mut NFT_CONTRACT: Option<NftContract> = None;
 
@@ -49,34 +48,11 @@ impl NftContract {
             .get_mut(rand_index as usize)
             .ok_or(NftError::ErrorGettingRandom)?;
 
-        img_info.limit_copies.as_mut().map(|limit| *limit -= 1);
+        if let Some(limit) = img_info.limit_copies.as_mut() {
+            *limit -= 1;
+        }
 
         let img_link = link.clone();
-
-        if let Some(auto_changing_rules) = &img_info.auto_changing_rules {
-            auto_changing_rules
-                .iter()
-                .for_each(|(trigger_time, auto_action)| {
-                    let action = match &auto_action {
-                        Action::ChangeImg(img_link) => NftAction::ChangeImg {
-                            token_id,
-                            img_link: img_link.to_string(),
-                        },
-                        Action::AddMeta(metadata) => NftAction::AddMetadata {
-                            token_id,
-                            metadata: metadata.to_string(),
-                        },
-                    };
-                    msg::send_with_gas_delayed(
-                        exec::program_id(),
-                        action,
-                        GAS_AUTO_CHANGING,
-                        0,
-                        *trigger_time / BLOCK_DURATION_IN_SECS,
-                    )
-                    .expect("Error in sending a delayed message `NftAction`");
-                });
-        }
 
         // if there are 0 copies of this token left, then delete this token
         if let Some(0) = img_info.limit_copies {
@@ -210,7 +186,7 @@ impl NftContract {
     }
     fn expand(&mut self, additional_links: Vec<(String, ImageData)>) -> Result<NftEvent, NftError> {
         let msg_src = msg::source();
-        self.check_collection_owner(msg_src)?;
+        self.check_admin(msg_src)?;
         if additional_links
             .iter()
             .any(|(_, img_data)| img_data.limit_copies.map_or(false, |limit| limit == 0))
@@ -221,9 +197,9 @@ impl NftContract {
         self.img_links_and_data.extend(additional_links.clone());
         let mut number_tokens = sum_limit_copies(&self.img_links_and_data);
         // The tokens that have already been minted should be added as well
-        number_tokens
-            .as_mut()
-            .map(|all_copies| *all_copies += self.tokens.len() as u64);
+        if let Some(all_copies) = number_tokens.as_mut() {
+            *all_copies += self.tokens.len() as u64;
+        }
         self.total_number_of_tokens = number_tokens;
 
         Ok(NftEvent::Expanded {
@@ -234,7 +210,7 @@ impl NftContract {
 
     fn change_config(&mut self, config: Config) -> Result<NftEvent, NftError> {
         let msg_src = msg::source();
-        self.check_collection_owner(msg_src)?;
+        self.check_admin(msg_src)?;
 
         if !self.tokens.is_empty() {
             return Err(NftError::ConfigCannotBeChanged);
@@ -257,73 +233,27 @@ impl NftContract {
         Ok(NftEvent::ConfigChanged { config })
     }
 
-    fn change_image(&mut self, token_id: NftId, img_link: String) -> Result<NftEvent, NftError> {
-        if exec::program_id() != msg::source() {
-            return Err(NftError::AccessDenied);
-        }
-
-        let nft = self
-            .tokens
-            .get_mut(&token_id)
-            .ok_or(NftError::TokenDoesNotExist)?;
-        nft.media_url = img_link.clone();
-
-        msg::send(
-            nft.owner,
-            NftEvent::ImageChanged {
-                token_id,
-                img_link: img_link.clone(),
-            },
-            0,
-        )
-        .expect("Error in sending NftEvent::ImageChanged");
-        Ok(NftEvent::ImageChanged { token_id, img_link })
-    }
-
-    fn add_metadata(&mut self, token_id: NftId, metadata: String) -> Result<NftEvent, NftError> {
-        if exec::program_id() != msg::source() {
-            return Err(NftError::AccessDenied);
-        }
-        let nft = self
-            .tokens
-            .get_mut(&token_id)
-            .ok_or(NftError::TokenDoesNotExist)?;
-        nft.metadata.push(metadata.clone());
-
-        msg::send(
-            nft.owner,
-            NftEvent::MetadataAdded {
-                token_id,
-                metadata: metadata.clone(),
-            },
-            0,
-        )
-        .expect("Error in sending NftEvent::MetadataAdded");
-        Ok(NftEvent::MetadataAdded { token_id, metadata })
-    }
-
     fn add_users_for_mint(&mut self, users: Vec<ActorId>) -> Result<NftEvent, NftError> {
         let msg_src = msg::source();
-        self.check_collection_owner(msg_src)?;
+        self.check_admin(msg_src)?;
         if let Some(allowed_users) = &mut self.permission_to_mint {
             allowed_users.extend(users.clone());
             allowed_users.sort();
             allowed_users.dedup();
+        } else if self.tokens.is_empty() {
+            let mut new_users = users.clone();
+            new_users.push(msg_src);
+            self.permission_to_mint = Some(new_users);
         } else {
-            if self.tokens.is_empty() {
-                let mut new_users = users.clone();
-                new_users.push(msg_src);
-                self.permission_to_mint = Some(new_users);
-            } else {
-                return Err(NftError::UserRestrictionCannotBeChanged);
-            }
+            return Err(NftError::UserRestrictionCannotBeChanged);
         }
+        
 
         Ok(NftEvent::UsersForMintAdded { users })
     }
     fn delete_user_for_mint(&mut self, user: ActorId) -> Result<NftEvent, NftError> {
         let msg_src = msg::source();
-        self.check_collection_owner(msg_src)?;
+        self.check_admin(msg_src)?;
         let allowed_users = self
             .permission_to_mint
             .as_mut()
@@ -342,7 +272,7 @@ impl NftContract {
 
     fn lift_restrictions_mint(&mut self) -> Result<NftEvent, NftError> {
         let msg_src = msg::source();
-        self.check_collection_owner(msg_src)?;
+        self.check_admin(msg_src)?;
 
         if !self.tokens.is_empty() {
             return Err(NftError::UserRestrictionCannotBeChanged);
@@ -351,13 +281,29 @@ impl NftContract {
 
         Ok(NftEvent::LiftRestrictionMint)
     }
+    
+    fn add_admin(&mut self, admin: ActorId) -> Result<NftEvent, NftError> {
+        let msg_src = msg::source();
+        self.check_admin(msg_src)?;
+        self.admins.insert(admin);
+        Ok(NftEvent::AdminAdded { admin})
+    }
+    fn remove_admin(&mut self, admin: ActorId) -> Result<NftEvent, NftError> {
+        let msg_src = msg::source();
+        self.check_admin(msg_src)?;
+        if self.admins.len() == 1 {
+            return Err(NftError::OnlyOneAdminLeft);
+        }
+        self.admins.remove(&admin);
+        Ok(NftEvent::AdminRemoved { admin})
+    }
 
     fn can_delete(&self) -> Result<NftEvent, NftError> {
         Ok(NftEvent::CanDelete(self.tokens.is_empty()))
     }
 
-    fn check_collection_owner(&self, msg_src: ActorId) -> Result<(), NftError> {
-        if self.collection_owner != msg_src {
+    fn check_admin(&self, msg_src: ActorId) -> Result<(), NftError> {
+        if !self.admins.contains(&msg_src) {
             return Err(NftError::AccessDenied);
         }
         Ok(())
@@ -463,14 +409,15 @@ extern "C" fn init() {
         config,
         img_links_and_data,
         mut permission_to_mint,
-        fee_per_uploaded_file,
     } = msg::load().expect("Unable to decode `NftInit`.");
 
     let msg_value = msg::value();
-    let picture_fee = fee_per_uploaded_file * img_links_and_data.len() as u128;
+    let picture_fee = FEE_PER_UPLOADED_FILE * img_links_and_data.len() as u128;
 
-    if picture_fee < EXISTENTIAL_DEPOSIT && msg_value != EXISTENTIAL_DEPOSIT
-        || picture_fee >= EXISTENTIAL_DEPOSIT && msg_value != picture_fee
+    let existential_deposit = exec::env_vars().existential_deposit;
+
+    if picture_fee < existential_deposit && msg_value != existential_deposit
+        || picture_fee >= existential_deposit && msg_value != picture_fee
     {
         panic!("Wrong value for picture fee");
     }
@@ -483,20 +430,21 @@ extern "C" fn init() {
         "The mint limit must be greater than zero"
     );
 
-    if config.payment_for_mint > 0 && config.payment_for_mint < EXISTENTIAL_DEPOSIT {
+    if config.payment_for_mint > 0 && config.payment_for_mint < existential_deposit {
         panic!(
             "{}",
             format!(
                 "The payment for mint must be greater than existential deposit ({})",
-                EXISTENTIAL_DEPOSIT
+                existential_deposit
             )
         );
     }
 
-    // made 10_000 so hundredths of a percent could be entered.
-    if config.royalty > 10_000 {
-        panic!("Royalty percent must be less than 100%");
+    // can't take more than MAX_CREATOR_ROYALTY
+    if config.royalty > MAX_CREATOR_ROYALTY {
+        panic!("Royalty percent must be less");
     }
+
     // can't be made sellable but not transferable.
     if config.transferable.is_none() && config.sellable.is_some() {
         panic!("Tokens must be transferable");
@@ -521,6 +469,8 @@ extern "C" fn init() {
         }
     }
 
+    let mut admins = HashSet::new();
+    admins.insert(collection_owner);
     unsafe {
         NFT_CONTRACT = Some(NftContract {
             tokens: HashMap::new(),
@@ -533,6 +483,8 @@ extern "C" fn init() {
             collection_owner,
             total_number_of_tokens,
             permission_to_mint: permission_to_mint.clone(),
+            marketplace_address: msg::source(),
+            admins,
         })
     };
     msg::send(
@@ -570,7 +522,12 @@ extern "C" fn handle() {
         NftAction::Mint { minter } => {
             let msg_source = msg::source();
             let msg_value = msg::value();
-            let result = nft_contract.mint(minter, msg_value);
+            let result = if msg_source != nft_contract.marketplace_address {
+                Err(NftError::AccessDenied)
+            } else {
+                nft_contract.mint(minter, msg_value)
+            };
+            
             if result.is_err() {
                 msg::send_with_gas(msg_source, "", 0, msg_value).expect("Error in sending value");
             }
@@ -589,15 +546,11 @@ extern "C" fn handle() {
         NftAction::GetTokenInfo { token_id } => nft_contract.get_token_info(token_id),
         NftAction::GetPaymentForMint => nft_contract.get_payment_for_mint(),
         NftAction::CanDelete => nft_contract.can_delete(),
-        NftAction::ChangeImg { token_id, img_link } => {
-            nft_contract.change_image(token_id, img_link)
-        }
-        NftAction::AddMetadata { token_id, metadata } => {
-            nft_contract.add_metadata(token_id, metadata)
-        }
         NftAction::AddUsersForMint { users } => nft_contract.add_users_for_mint(users),
         NftAction::DeleteUserForMint { user } => nft_contract.delete_user_for_mint(user),
         NftAction::LiftRestrictionMint => nft_contract.lift_restrictions_mint(),
+        NftAction::AddAdmin { admin } => nft_contract.add_admin(admin),
+        NftAction::RemoveAdmin { admin } => nft_contract.remove_admin(admin),
     };
 
     msg::reply(result, 0).expect("Failed to encode or reply with `Result<NftEvent, NftError>`.");
@@ -635,12 +588,12 @@ impl From<NftContract> for NftState {
             collection_owner,
             total_number_of_tokens,
             permission_to_mint,
+            marketplace_address,
             ..
         } = value;
 
         let tokens = tokens
             .into_iter()
-            .map(|(nft_id, nft)| (nft_id, nft))
             .collect();
         let owners = owners
             .into_iter()
@@ -648,7 +601,6 @@ impl From<NftContract> for NftState {
             .collect();
         let token_approvals = token_approvals
             .into_iter()
-            .map(|(nft_id, actor_id)| (nft_id, actor_id))
             .collect();
 
         Self {
@@ -661,6 +613,7 @@ impl From<NftContract> for NftState {
             collection_owner,
             total_number_of_tokens,
             permission_to_mint,
+            marketplace_address
         }
     }
 }

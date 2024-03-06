@@ -79,18 +79,19 @@ pub async fn init_marketplace(api: &GearApi) -> Result<(MessageId, ProgramId), (
     let royalty_to_marketplace = 200;
 
     let init_marketplace = NftMarketplaceInit {
-        gas_for_creation: 200_000_000_000,
-        gas_for_mint: 100_000_000_000,
-        gas_for_transfer_token: 5_000_000_000,
-        gas_for_close_auction: 10_000_000_000,
-        gas_for_delete_collection: 5_000_000_000,
-        gas_for_get_info: 5_000_000_000,
+        gas_for_creation: 110_000_000_000, 
+        gas_for_mint: 10_000_000_000, // 7_000_000_000
+        gas_for_transfer_token: 6_000_000_000, // 4_000_000_000
+        gas_for_close_auction: 13_000_000_000, // 15_000_000_000
+        gas_for_delete_collection: 5_000_000_000, // 3_000_000_000
+        gas_for_get_info: 7_000_000_000, // 5_000_000_000
         time_between_create_collections: 3_600_000, // 1 hour in milliseconds
-        fee_per_uploaded_file: 257_142_857_100,
         royalty_to_marketplace_for_trade: royalty_to_marketplace,
         royalty_to_marketplace_for_mint: royalty_to_marketplace,
-        minimum_transfer_value: 10_300_000_000_000, // because roylty to marketplace
         ms_in_block: 3_000,
+        fee_per_uploaded_file: 257_142_857_100,
+        max_creator_royalty: 1_000,
+        max_number_of_images: 10_000,
     }
     .encode();
 
@@ -165,12 +166,13 @@ pub async fn add_new_collection(
 pub async fn create_collection(
     api: &GearApi,
     marketplace_program_id: ProgramId,
-) -> Result<MessageId, ()> {
+) -> Result<(MessageId, u128), ()> {
     let img_data = ImageData {
         limit_copies: Some(1),
-        auto_changing_rules: None,
     };
-    let img_links_and_data: Vec<(String, ImageData)> = (0..10)
+    let number_of_image = 10_000;
+    let fee = number_of_image * 257_142_857_100; 
+    let img_links_and_data: Vec<(String, ImageData)> = (0..number_of_image)
         .map(|i| (format!("Img-{}", i), img_data.clone()))
         .collect();
 
@@ -183,7 +185,7 @@ pub async fn create_collection(
             collection_logo: "Collection logo".to_string(),
             collection_tags: vec!["tag1".to_string()],
             additional_links: None,
-            royalty: 0,
+            royalty: 1_000,
             user_mint_limit: Some(3),
             payment_for_mint: 10_000_000_000_000,
             transferable: Some(0),
@@ -191,7 +193,6 @@ pub async fn create_collection(
         },
         img_links_and_data,
         permission_to_mint: None,
-        fee_per_uploaded_file: 257_142_857_100,
     }
     .encode();
 
@@ -204,23 +205,23 @@ pub async fn create_collection(
             None,
             marketplace_program_id,
             create_collection_payload.encode(),
-            10_000_000_000_000,
+            fee,
             true,
         )
         .await
         .expect("Error calculate gas");
-
+    println!("GAS INFO CREATE: {:?}", gas_info);
     let (message_id, _) = api
         .send_message(
             marketplace_program_id,
             create_collection_payload,
             gas_info.min_limit,
-            10_000_000_000_000,
+            fee,
         )
         .await
         .expect("Error send message");
 
-    Ok(message_id)
+    Ok((message_id, fee))
 }
 
 pub async fn mint(
@@ -300,7 +301,7 @@ pub async fn get_new_client(api: &GearApi, name: &str) -> GearApi {
         .total_balance(api.account_id())
         .await
         .expect("Error total balance");
-    let amount = alice_balance / 10;
+    let amount = 1_000_000_000_000_000;
     api.transfer(
         api.get_specific_actor_id(name)
             .encode()
@@ -313,6 +314,12 @@ pub async fn get_new_client(api: &GearApi, name: &str) -> GearApi {
     .expect("Error transfer");
 
     api.clone()
-        .with(USERS_STR[0])
+        .with(name)
         .expect("Unable to change signer.")
+}
+
+pub fn get_program_id_from_u64(u64: u64) -> ProgramId {
+    let actor_id: gstd::ActorId = USERS[0].into();
+    let list: [u8; 32] = actor_id.into();
+    list.into()
 }

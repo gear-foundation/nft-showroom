@@ -1,4 +1,4 @@
-use gstd::{msg, prelude::*, ActorId};
+use gstd::{msg, prelude::*, ActorId, exec};
 use nft_marketplace_io::*;
 
 pub async fn mint(
