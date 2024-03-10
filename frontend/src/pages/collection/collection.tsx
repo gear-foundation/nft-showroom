@@ -43,7 +43,7 @@ function Collection() {
   const searchedTokens = nfts?.filter((nft) => nft.name.toLocaleLowerCase().includes(query));
   const tokensCount = searchedTokens?.length || 0;
 
-  const socialEntries = Object.entries(additionalLinks || {});
+  const socialEntries = Object.entries(additionalLinks || {}).filter(([key]) => !key.startsWith('__'));
 
   const renderSocials = () =>
     socialEntries.map(([key, value]) => {

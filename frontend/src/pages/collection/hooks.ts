@@ -1,12 +1,12 @@
-import { useSubscription } from 'urql';
+import { useSubscription } from '@apollo/client';
 
 import { COLLECTION_QUERY } from './consts';
 
 function useCollection(id: string, owner: string) {
-  const [result] = useSubscription({ query: COLLECTION_QUERY, variables: { id, owner } });
+  const { data, loading } = useSubscription(COLLECTION_QUERY, { variables: { id, owner } });
 
-  const collection = result.data?.collectionById;
-  const isCollectionQueryReady = !result.fetching;
+  const collection = data?.collectionById;
+  const isCollectionQueryReady = !loading;
 
   return { collection, isCollectionQueryReady };
 }

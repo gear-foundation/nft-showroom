@@ -1,21 +1,21 @@
-import { useSubscription } from 'urql';
+import { useSubscription } from '@apollo/client';
 
 import { COLLECTIONS_QUERY, NFTS_QUERY } from './consts';
 
 function useCollections(admin: string) {
-  const [result] = useSubscription({ query: COLLECTIONS_QUERY, variables: { admin } });
+  const { data, loading } = useSubscription(COLLECTIONS_QUERY, { variables: { admin } });
 
-  const collections = result.data?.collections;
-  const isCollectionsQueryReady = !result.fetching;
+  const collections = data?.collections;
+  const isCollectionsQueryReady = !loading;
 
   return { collections, isCollectionsQueryReady };
 }
 
 function useNFTs(owner: string) {
-  const [result] = useSubscription({ query: NFTS_QUERY, variables: { owner } });
+  const { data, loading } = useSubscription(NFTS_QUERY, { variables: { owner } });
 
-  const nfts = result.data?.nfts;
-  const isNFTsQueryReady = !result.fetching;
+  const nfts = data?.nfts;
+  const isNFTsQueryReady = !loading;
 
   return { nfts, isNFTsQueryReady };
 }
