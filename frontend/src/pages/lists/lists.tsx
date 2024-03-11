@@ -1,6 +1,7 @@
 import { Link, useLocation, useMatch } from 'react-router-dom';
 
 import { Container, List } from '@/components';
+import { LoadingList } from '@/components/list/loading-list';
 import { ROUTE } from '@/consts';
 import { CollectionCard, NFTCard, Skeleton } from '@/features/collections';
 import CollectionCardSkeletonSVG from '@/features/collections/assets/collection-card-skeleton.svg?react';
@@ -18,7 +19,6 @@ const TABS = [
 ];
 
 const COLLECTION_SKELETONS = new Array<null>(6).fill(null);
-const NFT_SKELETONS = new Array<null>(8).fill(null);
 
 function Lists() {
   const { pathname } = useLocation();
@@ -28,11 +28,11 @@ function Lists() {
   const { accountFilterValue, accountFilterAddress, setAccountFilterValue } = useAccountFilter();
 
   const { collections, isCollectionsQueryReady } = useCollections(accountFilterAddress);
-  const { nfts, isNFTsQueryReady } = useNFTs(accountFilterAddress);
+  const [nfts, nftsCount, hasMoreNFTs, isNFTsQueryReady, fetchNFTs] = useNFTs(accountFilterAddress);
 
   const renderTabs = () =>
     TABS.map(({ to, text }, index) => {
-      const counter = [collections?.length, nfts?.length][index];
+      const counter = [collections?.length, nftsCount][index];
 
       return (
         <li key={to}>
@@ -55,21 +55,24 @@ function Lists() {
       </header>
 
       {match ? (
-        <List
-          items={isNFTsQueryReady ? nfts : NFT_SKELETONS}
+        <LoadingList
+          items={nfts}
           itemsPerRow={gridSize === GRID_SIZE.SMALL ? 4 : 3}
           emptyText="Mint NFTs"
-          renderItem={(nft, index) =>
-            nft ? (
-              <NFTCard key={nft.id} {...nft} />
-            ) : (
+          renderItem={(nft) => <NFTCard key={nft.id} {...nft} />}
+          fetchItems={fetchNFTs}
+          isMoreItems={hasMoreNFTs}
+          skeleton={{
+            rowsCount: 2,
+            isVisible: !isNFTsQueryReady,
+            renderItem: (index) => (
               <li key={index}>
                 <Skeleton>
                   <NFTCardSkeletonSVG />
                 </Skeleton>
               </li>
-            )
-          }
+            ),
+          }}
         />
       ) : (
         <List

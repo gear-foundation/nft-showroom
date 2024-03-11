@@ -19,9 +19,17 @@ const COLLECTIONS_QUERY = graphql(`
   }
 `);
 
+const NFTS_CONNECTION_QUERY = graphql(`
+  query NFTsConnectionQuery($owner: String!) {
+    nftsConnection(orderBy: createdAt_DESC, where: { owner_contains: $owner }) {
+      totalCount
+    }
+  }
+`);
+
 const NFTS_QUERY = graphql(`
-  subscription NFTsQuery($owner: String!) {
-    nfts(where: { owner_contains: $owner }) {
+  query NFTsQuery($limit: Int!, $offset: Int!, $owner: String!) {
+    nfts(limit: $limit, offset: $offset, orderBy: createdAt_DESC, where: { owner_contains: $owner }) {
       id
       idInCollection
       name
@@ -48,4 +56,33 @@ const NFTS_QUERY = graphql(`
   }
 `);
 
-export { COLLECTIONS_QUERY, NFTS_QUERY };
+const NFTS_SUBSCRIPTION = graphql(`
+  subscription NFTsSubscription($limit: Int!, $offset: Int!, $owner: String!) {
+    nfts(limit: $limit, offset: $offset, orderBy: createdAt_DESC, where: { owner_contains: $owner }) {
+      id
+      idInCollection
+      name
+      mediaUrl
+      owner
+
+      collection {
+        id
+        name
+        transferable
+        sellable
+      }
+
+      sales(where: { status_eq: "open" }) {
+        price
+      }
+
+      auctions(where: { status_eq: "open" }) {
+        minPrice
+        lastPrice
+        endTimestamp
+      }
+    }
+  }
+`);
+
+export { COLLECTIONS_QUERY, NFTS_CONNECTION_QUERY, NFTS_QUERY, NFTS_SUBSCRIPTION };

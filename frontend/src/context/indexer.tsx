@@ -21,7 +21,23 @@ const splitLink = split(
 
 const client = new ApolloClient({
   link: splitLink,
-  cache: new InMemoryCache(),
+  cache: new InMemoryCache({
+    typePolicies: {
+      Query: {
+        fields: {
+          nfts: {
+            keyArgs: ['where', ['owner_contains']],
+            merge: (existing: unknown[] = [], incoming: unknown[]) => [...existing, ...incoming],
+          },
+        },
+      },
+    },
+  }),
+
+  defaultOptions: {
+    query: { notifyOnNetworkStatusChange: true },
+    watchQuery: { notifyOnNetworkStatusChange: true },
+  },
 });
 
 function IndexerProvider({ children }: ProviderProps) {
