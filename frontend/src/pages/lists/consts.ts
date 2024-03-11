@@ -1,19 +1,30 @@
 import { graphql } from '@/graphql';
 
-const COLLECTIONS_QUERY = graphql(`
-  subscription CollectionsQuery($admin: String!) {
-    collections(where: { admin_contains: $admin }) {
-      id
-      name
-      description
-      collectionBanner
-      collectionLogo
-      admin
-      tokensLimit
+const COLLECTIONS_CONNECTION_QUERY = graphql(`
+  query CollectionsConnectionQuery($first: Int!, $after: String, $admin: String!) {
+    collectionsConnection(orderBy: createdAt_DESC, first: $first, after: $after, where: { admin_contains: $admin }) {
+      pageInfo {
+        hasNextPage
+        endCursor
+      }
 
-      nfts {
-        id
-        mediaUrl
+      totalCount
+
+      edges {
+        node {
+          id
+          name
+          description
+          collectionBanner
+          collectionLogo
+          admin
+          tokensLimit
+
+          nfts {
+            id
+            mediaUrl
+          }
+        }
       }
     }
   }
@@ -85,4 +96,4 @@ const NFTS_SUBSCRIPTION = graphql(`
   }
 `);
 
-export { COLLECTIONS_QUERY, NFTS_CONNECTION_QUERY, NFTS_QUERY, NFTS_SUBSCRIPTION };
+export { COLLECTIONS_CONNECTION_QUERY, NFTS_CONNECTION_QUERY, NFTS_QUERY, NFTS_SUBSCRIPTION };

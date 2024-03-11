@@ -1,6 +1,6 @@
 import { Link, useLocation, useMatch } from 'react-router-dom';
 
-import { Container, List } from '@/components';
+import { Container } from '@/components';
 import { LoadingList } from '@/components/list/loading-list';
 import { ROUTE } from '@/consts';
 import { CollectionCard, NFTCard, Skeleton } from '@/features/collections';
@@ -18,8 +18,6 @@ const TABS = [
   { to: ROUTE.NFTS, text: 'NFTs' },
 ];
 
-const COLLECTION_SKELETONS = new Array<null>(6).fill(null);
-
 function Lists() {
   const { pathname } = useLocation();
   const match = useMatch(ROUTE.NFTS);
@@ -27,12 +25,13 @@ function Lists() {
   const { gridSize, setGridSize } = useGridSize();
   const { accountFilterValue, accountFilterAddress, setAccountFilterValue } = useAccountFilter();
 
-  const { collections, isCollectionsQueryReady } = useCollections(accountFilterAddress);
+  const [collections, collectionsCount, hasMoreCollections, isCollectionsQueryReady, fetchCollections] =
+    useCollections(accountFilterAddress);
   const [nfts, nftsCount, hasMoreNFTs, isNFTsQueryReady, fetchNFTs] = useNFTs(accountFilterAddress);
 
   const renderTabs = () =>
     TABS.map(({ to, text }, index) => {
-      const counter = [collections?.length, nftsCount][index];
+      const counter = [collectionsCount, nftsCount][index];
 
       return (
         <li key={to}>
@@ -75,21 +74,24 @@ function Lists() {
           }}
         />
       ) : (
-        <List
-          items={isCollectionsQueryReady ? collections : COLLECTION_SKELETONS}
+        <LoadingList
+          items={collections}
           itemsPerRow={gridSize === GRID_SIZE.SMALL ? 3 : 2}
           emptyText="Create collections"
-          renderItem={(collection, index) =>
-            collection ? (
-              <CollectionCard key={collection.id} {...collection} />
-            ) : (
+          renderItem={(collection) => <CollectionCard key={collection.id} {...collection} />}
+          fetchItems={fetchCollections}
+          isMoreItems={hasMoreCollections}
+          skeleton={{
+            rowsCount: 2,
+            isVisible: !isCollectionsQueryReady,
+            renderItem: (index) => (
               <li key={index}>
                 <Skeleton>
                   <CollectionCardSkeletonSVG />
                 </Skeleton>
               </li>
-            )
-          }
+            ),
+          }}
         />
       )}
     </Container>

@@ -6,6 +6,7 @@ import { Kind, OperationTypeNode } from 'graphql';
 import { createClient } from 'graphql-ws';
 
 import { ADDRESS } from '@/consts';
+import { CollectionsConnectionQueryQuery } from '@/graphql/graphql';
 
 const httpLink = new HttpLink({ uri: ADDRESS.INDEXER });
 const wsLink = new GraphQLWsLink(createClient({ url: ADDRESS.INDEXER_WS }));
@@ -25,9 +26,33 @@ const client = new ApolloClient({
     typePolicies: {
       Query: {
         fields: {
+          // TODO: make it less mess
           nfts: {
             keyArgs: ['where', ['owner_contains']],
             merge: (existing: unknown[] = [], incoming: unknown[]) => [...existing, ...incoming],
+          },
+
+          collectionsConnection: {
+            keyArgs: ['where', ['admin_contains']],
+            merge: (
+              existing: CollectionsConnectionQueryQuery['collectionsConnection'],
+              incoming: CollectionsConnectionQueryQuery['collectionsConnection'],
+            ) => {
+              if (!existing) return incoming;
+
+              const { edges: incomingEdges = [] } = incoming;
+              const { edges: existingEdges = [] } = existing;
+
+              const pageInfo = {
+                ...incoming.pageInfo,
+                endCursor: incoming.pageInfo?.endCursor || existing.pageInfo?.endCursor,
+                hasNextPage: incoming.pageInfo?.hasNextPage || existing.pageInfo?.hasNextPage,
+              };
+
+              const edges = [...existingEdges, ...incomingEdges];
+
+              return { ...incoming, edges, pageInfo };
+            },
           },
         },
       },
