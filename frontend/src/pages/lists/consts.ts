@@ -31,21 +31,32 @@ const COLLECTIONS_CONNECTION_QUERY = graphql(`
 `);
 
 const NFTS_CONNECTION_QUERY = graphql(`
-  query NFTsConnectionQuery($owner: String!) {
-    nftsConnection(orderBy: createdAt_DESC, where: { owner_contains: $owner }) {
+  query NFTsConnectionQuery($collectionId: String!, $owner: String!) {
+    nftsConnection(
+      orderBy: createdAt_DESC
+      where: { owner_contains: $owner, collection: { id_contains: $collectionId } }
+    ) {
       totalCount
     }
   }
 `);
 
+// mintedBy used in a collection page, collection used in a lists page
 const NFTS_QUERY = graphql(`
-  query NFTsQuery($limit: Int!, $offset: Int!, $owner: String!) {
-    nfts(limit: $limit, offset: $offset, orderBy: createdAt_DESC, where: { owner_contains: $owner }) {
+  query NFTsQuery($collectionId: String!, $limit: Int!, $offset: Int!, $owner: String!) {
+    nfts(
+      limit: $limit
+      offset: $offset
+      orderBy: createdAt_DESC
+      where: { owner_contains: $owner, collection: { id_contains: $collectionId } }
+    ) {
       id
       idInCollection
       name
       mediaUrl
       owner
+
+      mintedBy
 
       collection {
         id
@@ -68,8 +79,13 @@ const NFTS_QUERY = graphql(`
 `);
 
 const NFTS_SUBSCRIPTION = graphql(`
-  subscription NFTsSubscription($limit: Int!, $offset: Int!, $owner: String!) {
-    nfts(limit: $limit, offset: $offset, orderBy: createdAt_DESC, where: { owner_contains: $owner }) {
+  subscription NFTsSubscription($collectionId: String!, $limit: Int!, $offset: Int!, $owner: String!) {
+    nfts(
+      limit: $limit
+      offset: $offset
+      orderBy: createdAt_DESC
+      where: { owner_contains: $owner, collection: { id_contains: $collectionId } }
+    ) {
       id
       idInCollection
       name

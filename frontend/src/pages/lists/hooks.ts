@@ -1,5 +1,5 @@
 import { useQuery } from '@apollo/client';
-import { useEffect } from 'react';
+import { useCallback, useEffect } from 'react';
 
 import { COLLECTIONS_CONNECTION_QUERY, NFTS_CONNECTION_QUERY, NFTS_QUERY, NFTS_SUBSCRIPTION } from './consts';
 
@@ -22,12 +22,13 @@ function useCollections(admin: string) {
 
   const isReady = !loading;
   const hasMore = Boolean(hasNextPage);
+  console.log('hasMore: ', hasMore);
 
-  const fetchCollections = () => {
+  const fetchCollections = useCallback(() => {
     if (!endCursor) throw new Error('Cursor to end of the list is not defined');
 
     fetchMore({ variables: { after: endCursor } }).catch(console.error);
-  };
+  }, [endCursor, fetchMore]);
 
   return [collections, totalCount, hasMore, isReady, fetchCollections] as const;
 }
@@ -37,9 +38,9 @@ const DEFAULT_NFTS_VARIABLES = {
   offset: 0,
 };
 
-function useTotalNFTsCount(owner: string) {
+function useTotalNFTsCount(collectionId: string, owner: string) {
   const { data, loading, fetchMore } = useQuery(NFTS_CONNECTION_QUERY, {
-    variables: { ...DEFAULT_NFTS_VARIABLES, owner },
+    variables: { ...DEFAULT_NFTS_VARIABLES, collectionId, owner },
   });
 
   const totalCount = data?.nftsConnection?.totalCount || 0;
@@ -47,17 +48,19 @@ function useTotalNFTsCount(owner: string) {
   return [totalCount, !loading, fetchMore] as const;
 }
 
-function useNFTs(owner: string) {
-  const [totalCount, isTotalCountReady, fetchCountMore] = useTotalNFTsCount(owner);
+function useNFTs(collectionId: string, owner: string) {
+  const [totalCount, isTotalCountReady, fetchCountMore] = useTotalNFTsCount(collectionId, owner);
 
   const { data, loading, fetchMore, subscribeToMore } = useQuery(NFTS_QUERY, {
-    variables: { ...DEFAULT_NFTS_VARIABLES, owner },
+    variables: { ...DEFAULT_NFTS_VARIABLES, collectionId, owner },
   });
 
   const nfts = data?.nfts || [];
-  const hasMoreNFTs = true;
+  const nftsCount = nfts.length;
+
+  const hasMoreNFTs = totalCount && nftsCount ? nftsCount < totalCount : false;
   const isNFTsQueryReady = !loading && isTotalCountReady;
-  const offset = nfts.length;
+  const offset = nftsCount;
 
   useEffect(() => {
     // kinda tricky subscription to handle live interaction,
@@ -65,18 +68,18 @@ function useNFTs(owner: string) {
     // + would be better to use connection's cursor pagination
     const unsubscribe = subscribeToMore({
       document: NFTS_SUBSCRIPTION,
-      variables: { ...DEFAULT_NFTS_VARIABLES, offset, owner },
+      variables: { ...DEFAULT_NFTS_VARIABLES, collectionId, offset, owner },
     });
 
     return () => {
       unsubscribe();
     };
-  }, [subscribeToMore, owner, offset]);
+  }, [subscribeToMore, collectionId, owner, offset]);
 
-  const fetchNFTs = () => {
+  const fetchNFTs = useCallback(() => {
     fetchMore({ variables: { offset } }).catch(console.error);
     fetchCountMore({ variables: { offset } }).catch(console.error);
-  };
+  }, [fetchCountMore, fetchMore, offset]);
 
   return [nfts, totalCount, hasMoreNFTs, isNFTsQueryReady, fetchNFTs] as const;
 }

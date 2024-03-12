@@ -26,12 +26,12 @@ const client = new ApolloClient({
     typePolicies: {
       Query: {
         fields: {
-          // TODO: make it less mess
           nfts: {
-            keyArgs: ['where', ['owner_contains']],
+            keyArgs: ['where', ['owner_contains', 'collection', ['id_contains']]],
             merge: (existing: unknown[] = [], incoming: unknown[]) => [...existing, ...incoming],
           },
 
+          // TODO: make it less mess
           collectionsConnection: {
             keyArgs: ['where', ['admin_contains']],
             merge: (
@@ -45,8 +45,8 @@ const client = new ApolloClient({
 
               const pageInfo = {
                 ...incoming.pageInfo,
-                endCursor: incoming.pageInfo?.endCursor || existing.pageInfo?.endCursor,
-                hasNextPage: incoming.pageInfo?.hasNextPage || existing.pageInfo?.hasNextPage,
+                endCursor: incoming.pageInfo.endCursor,
+                hasNextPage: incoming.pageInfo.hasNextPage,
               };
 
               const edges = [...existingEdges, ...incomingEdges];

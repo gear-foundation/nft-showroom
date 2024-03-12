@@ -1,7 +1,6 @@
 import { Link, useLocation, useMatch } from 'react-router-dom';
 
-import { Container } from '@/components';
-import { LoadingList } from '@/components/list/loading-list';
+import { Container, List } from '@/components';
 import { ROUTE } from '@/consts';
 import { CollectionCard, NFTCard, Skeleton } from '@/features/collections';
 import CollectionCardSkeletonSVG from '@/features/collections/assets/collection-card-skeleton.svg?react';
@@ -27,7 +26,7 @@ function Lists() {
 
   const [collections, collectionsCount, hasMoreCollections, isCollectionsQueryReady, fetchCollections] =
     useCollections(accountFilterAddress);
-  const [nfts, nftsCount, hasMoreNFTs, isNFTsQueryReady, fetchNFTs] = useNFTs(accountFilterAddress);
+  const [nfts, nftsCount, hasMoreNFTs, isNFTsQueryReady, fetchNFTs] = useNFTs('', accountFilterAddress);
 
   const renderTabs = () =>
     TABS.map(({ to, text }, index) => {
@@ -54,7 +53,7 @@ function Lists() {
       </header>
 
       {match ? (
-        <LoadingList
+        <List
           items={nfts}
           itemsPerRow={gridSize === GRID_SIZE.SMALL ? 4 : 3}
           emptyText="Mint NFTs"
@@ -74,7 +73,7 @@ function Lists() {
           }}
         />
       ) : (
-        <LoadingList
+        <List
           items={collections}
           itemsPerRow={gridSize === GRID_SIZE.SMALL ? 3 : 2}
           emptyText="Create collections"
