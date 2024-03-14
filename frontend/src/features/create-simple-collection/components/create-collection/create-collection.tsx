@@ -13,15 +13,16 @@ type Props = {
   tag: string;
   text: string;
   SVG: SVGComponent;
+  isActive: boolean;
   modal: (props: Pick<ModalProps, 'close'>) => JSX.Element;
 };
 
-function CreateCollection({ heading, tag, text, SVG, modal: Modal }: Props) {
+function CreateCollection({ heading, tag, text, SVG, isActive, modal: Modal }: Props) {
   const [isOpen, open, close] = useModal();
 
   return (
     <>
-      <button className={styles.button} onClick={open}>
+      <button className={styles.button} onClick={isActive ? open : undefined} disabled={!isActive}>
         <span>
           <span className={styles.header}>
             <SVG />
