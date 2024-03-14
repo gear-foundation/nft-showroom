@@ -21,6 +21,10 @@
   &:hover {
     background-color: #eee;
   }
+
+  &:disabled {
+    pointer-events: none;
+  }
 }
 
 .header {
