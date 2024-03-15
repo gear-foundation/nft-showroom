@@ -1,3 +1,5 @@
+import { useAccount } from '@gear-js/react-hooks';
+
 import { Container, Skeleton } from '@/components';
 import { useMarketplace } from '@/context';
 import { CreateCollection as CollectionType } from '@/features/create-simple-collection';
@@ -11,16 +13,24 @@ const COLLECTION_TYPE_SKELETONS = [null];
 
 function CreateCollection() {
   const { marketplace } = useMarketplace();
-  const { collectionTypes } = marketplace || {};
+  const { collectionTypes, admins } = marketplace || {};
 
   const msTillCreateIsAvailable = useCreateCountdown();
   const isCreateAvailable = msTillCreateIsAvailable === 0;
   const isReady = Boolean(collectionTypes) && msTillCreateIsAvailable !== undefined;
 
+  const { account } = useAccount();
+  const isAdmin = account && admins ? admins.includes(account.decodedAddress) : false;
+
   const renderCollectionTypes = () =>
     collectionTypes?.map((item) => (
       <li key={item.type}>
-        <CollectionType heading={item.type} text={item.description} {...COLLECTION_TYPE[item.type]} />
+        <CollectionType
+          heading={item.type}
+          text={item.description}
+          isActive={isAdmin}
+          {...COLLECTION_TYPE[item.type]}
+        />
       </li>
     ));
 
@@ -38,8 +48,9 @@ function CreateCollection() {
 
         {isReady && isCreateAvailable && (
           <p className={styles.text}>
-            Choose your collection type: Simple NFT for pre-existing images, Composable NFT to generate layers and
-            compositions, or NFT Collections for Music Creators to craft musical NFTs.
+            {isAdmin
+              ? 'Choose your collection type: Simple NFT for pre-existing images, Composable NFT to generate layers and compositions, or NFT Collections for Music Creators to craft musical NFTs.'
+              : 'The creation of a collection is not available for the current account.'}
           </p>
         )}
 
