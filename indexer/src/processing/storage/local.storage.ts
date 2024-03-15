@@ -64,6 +64,10 @@ export class LocalStorage implements IStorage {
     this.nfts[this.getNftKey(nft.collection.id, nft.idInCollection)] = nft;
   }
 
+  async deleteNft(nft: Nft): Promise<void> {
+    delete this.nfts[this.getNftKey(nft.collection.id, nft.idInCollection)];
+  }
+
   async updateCollectionType(collectionType: CollectionType): Promise<void> {
     this.collectionTypes[collectionType.type] = collectionType;
   }

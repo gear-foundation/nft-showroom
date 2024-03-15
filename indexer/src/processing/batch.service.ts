@@ -30,11 +30,12 @@ export class BatchService {
     await (this.marketplace?.config
       ? this.store.save(this.marketplace.config)
       : Promise.resolve());
+    await this.store.save(this.collectionTypes);
+    await this.store.save(this.collections);
+    await this.store.save(this.nfts);
     await Promise.all([
       this.marketplace ? this.store.save(this.marketplace) : Promise.resolve(),
       this.store.save(this.collectionTypes),
-      this.store.save(this.collections),
-      this.store.save(this.nfts),
       this.store.save(this.offers),
       this.store.save(this.auctions),
       this.store.save(this.transfers),
@@ -101,6 +102,7 @@ export class BatchService {
   }
 
   private safelyPush(entity: string, value: any) {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     this[entity] = [...this[entity].filter((e) => e.id !== value.id), value];
   }

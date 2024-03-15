@@ -1,14 +1,14 @@
-import { TransferEvent } from '../../types/nft.events';
 import { EntitiesService } from '../entities.service';
-import { INftEventHandler } from './nft.handler';
 import { Nft, Transfer } from '../../model';
 import { EventInfo } from '../event-info.type';
 import { v4 as uuidv4 } from 'uuid';
+import { DraftTransferredEvent } from '../../types/draft-nft';
+import { IDraftNftEventHandler } from './draft-nft.handler';
 import { NullAddress } from '../../types/consts';
 
-export class TransferredHandler implements INftEventHandler {
+export class DraftTransferredHandler implements IDraftNftEventHandler {
   async handle(
-    event: TransferEvent,
+    event: DraftTransferredEvent,
     { source: collectionAddress, timestamp, blockNumber, txHash }: EventInfo,
     storage: EntitiesService,
   ): Promise<void> {
@@ -16,7 +16,7 @@ export class TransferredHandler implements INftEventHandler {
     const nft = await storage.getNft(collectionAddress, tokenId);
     if (nft === undefined) {
       console.warn(
-        `[TransferredHandler] ${collectionAddress}-${tokenId}: nft is not found`,
+        `[DraftTransferredHandler] ${collectionAddress}-${tokenId}: nft is not found`,
       );
       return;
     }

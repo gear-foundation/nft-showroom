@@ -44,6 +44,31 @@ import { LiftRestrictionMintHandler } from './nft/lift-restriction-mint.handler'
 import { UserForMintDeletedHandler } from './nft/user-for-mint-deleted.handler';
 import { UsersForMintAddedHandler } from './nft/users-for-mint-added.handler';
 import { MarketplaceInitializedHandler } from './marketplace/initialized.handler';
+import {
+  CBNftEventPlain,
+  CBNftEventType,
+  getCBNftEvent,
+} from '../types/cb-nft';
+import { ICBNftEventHandler } from './cb-nft/cb-nft.handler';
+import { CBNftMintedHandler } from './cb-nft/cb-nft-minted.handler';
+import { CBTransferredHandler } from './cb-nft/cb-transferred.handler';
+import { CBNftApprovedHandler } from './cb-nft/cb-nft-approved.handler';
+import { CBConfigChangedHandler } from './cb-nft/cb-config-changed.handler';
+import { CBNftApprovalRevokedHandler } from './cb-nft/cb-nft-approval-revoked.handler';
+import { CbBurntHandler } from './cb-nft/cb-burnt.handler';
+import { CBMeta } from './cb-nft/CBMeta';
+import {
+  DraftNftEventPlain,
+  DraftNftEventType,
+  getDraftNftEvent,
+} from '../types/draft-nft';
+import { IDraftNftEventHandler } from './draft-nft/draft-nft.handler';
+import { DraftBurntHandler } from './draft-nft/draft-burnt.handler';
+import { DraftNftMintedHandler } from './draft-nft/draft-nft-minted.handler';
+import { DraftNftApprovedHandler } from './draft-nft/draft-nft-approved.handler';
+import { DraftNftApprovalRevokedHandler } from './draft-nft/draft-nft-approval-revoked.handler';
+import { DraftTransferredHandler } from './draft-nft/draft-transferred.handler';
+import { DraftMeta } from './draft-nft/DraftMeta';
 
 const marketplaceEventsToHandler: Record<
   NftMarketplaceEventType,
@@ -87,6 +112,29 @@ const nftEventsToHandler: Record<NftEventType, INftEventHandler | undefined> = {
   [NftEventType.UserForMintDeleted]: new UserForMintDeletedHandler(),
   [NftEventType.UsersForMintAdded]: new UsersForMintAddedHandler(),
   [NftEventType.LiftRestrictionMint]: new LiftRestrictionMintHandler(),
+};
+
+const CBNftEventsToHandler: Record<
+  CBNftEventType,
+  ICBNftEventHandler | undefined
+> = {
+  [CBNftEventType.Minted]: new CBNftMintedHandler(),
+  [CBNftEventType.ConfigChanged]: new CBConfigChangedHandler(),
+  [CBNftEventType.Approved]: new CBNftApprovedHandler(),
+  [CBNftEventType.ApprovalRevoked]: new CBNftApprovalRevokedHandler(),
+  [CBNftEventType.Transferred]: new CBTransferredHandler(),
+  [CBNftEventType.Burnt]: new CbBurntHandler(),
+};
+
+const DraftNftEventsToHandler: Record<
+  DraftNftEventType,
+  IDraftNftEventHandler | undefined
+> = {
+  [DraftNftEventType.Minted]: new DraftNftMintedHandler(),
+  [DraftNftEventType.Approved]: new DraftNftApprovedHandler(),
+  [DraftNftEventType.ApprovalRevoked]: new DraftNftApprovalRevokedHandler(),
+  [DraftNftEventType.Transferred]: new DraftTransferredHandler(),
+  [DraftNftEventType.Burnt]: new DraftBurntHandler(),
 };
 
 export class EventsProcessing {
@@ -219,6 +267,103 @@ export class EventsProcessing {
     } catch (e) {
       console.error(
         `${blockNumber}-${messageId}: error handling nft event`,
+        e,
+        payload,
+      );
+      return null;
+    }
+  }
+
+  async handleCBNftEvent(payload: string, eventInfo: EventInfo) {
+    const { blockNumber, messageId } = eventInfo;
+    try {
+      console.log(`${blockNumber}-${messageId}: handling CB nft event`);
+      const data = CBMeta.createType<CBNftEventPlain>(
+        CBMeta.types.others.output!,
+        payload,
+      );
+      const parsed = data.toJSON() as CBNftEventPlain | null;
+      if (!parsed) {
+        console.warn(
+          `${blockNumber}-${messageId}: failed to parse event`,
+          parsed,
+          payload,
+        );
+        return null;
+      }
+      const event = getCBNftEvent(parsed);
+      if (!event) {
+        return null;
+      }
+      console.log(
+        `${blockNumber}-${messageId}: extracting cb nft event ${JSON.stringify(
+          parsed,
+        )}`,
+      );
+      console.log(
+        `${blockNumber}-${messageId}: detected event: ${
+          event.type
+        }\n${JSON.stringify(event)}`,
+      );
+      const eventHandler = CBNftEventsToHandler[event.type];
+      if (!eventHandler) {
+        return null;
+      }
+      await eventHandler.handle(event, eventInfo, this.entitiesService);
+      return event;
+    } catch (e: any) {
+      if (e.toString().includes('TokensForOwner')) {
+        return null;
+      }
+      console.error(
+        `${blockNumber}-${messageId}: error handling cb nft event`,
+        e,
+        payload,
+      );
+      return null;
+    }
+  }
+
+  async handleDraftNftEvent(payload: string, eventInfo: EventInfo) {
+    const { blockNumber, messageId } = eventInfo;
+    try {
+      console.log(`${blockNumber}-${messageId}: handling draft nft event`);
+      const data = DraftMeta.createType<DraftNftEventPlain>(
+        DraftMeta.types.handle.output!,
+        payload,
+      );
+      const parsed = data.toJSON() as DraftNftEventPlain | null;
+      if (!parsed) {
+        console.warn(
+          `${blockNumber}-${messageId}: failed to parse event`,
+          parsed,
+          payload,
+        );
+        return null;
+      }
+      console.log(
+        `${blockNumber}-${messageId}: extracting draft nft event ${JSON.stringify(
+          parsed,
+        )}`,
+      );
+      const event = getDraftNftEvent(parsed);
+      if (!event) {
+        return null;
+      }
+      console.log(
+        `${blockNumber}-${messageId}: detected event: ${
+          event.type
+        }\n${JSON.stringify(event)}`,
+      );
+      const eventHandler = DraftNftEventsToHandler[event.type];
+      if (!eventHandler) {
+        return null;
+      }
+      await eventHandler.handle(event, eventInfo, this.entitiesService);
+      return event;
+    } catch (e) {
+      console.error(
+        `${blockNumber}-${messageId}: error handling draft nft event`,
         e,
         payload,
       );

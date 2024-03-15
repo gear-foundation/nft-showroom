@@ -8,7 +8,14 @@ import { NftMarketplaceEventType } from './types/marketplace.events';
 import { EntitiesService } from './processing/entities.service';
 import { getLocalStorage } from './processing/storage/local.storage';
 import { BatchService } from './processing/batch.service';
+import { config } from './config';
+import { readMigratedNfts } from './migrated-nft/migrated-nft';
 
+const nftCbPrograms = [config.nfts.cb, config.nfts.vit];
+
+const nftDraftPrograms = [config.nfts.draft, ...config.nfts.old];
+
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 BigInt.prototype['toJSON'] = function () {
   return this.toString();
@@ -79,8 +86,12 @@ processor.run(new TypeormDatabase(), async (ctx) => {
             );
           }
         }
+      } else if (nftCbPrograms.includes(source)) {
+        await processing.handleCBNftEvent(payload, eventInfo);
+      } else if (nftDraftPrograms.includes(source)) {
+        await processing.handleDraftNftEvent(payload, eventInfo);
       } else {
-        let collection = await localStorage.getCollection(source);
+        const collection = await localStorage.getCollection(source);
         if (collection) {
           await processing.handleNftEvent(payload, eventInfo);
         }
