@@ -12,6 +12,7 @@ impl NftMarketplace {
         msg_src: ActorId,
         msg_value: u128,
     ) -> Result<NftMarketplaceEvent, NftMarketplaceError> {
+        self.check_allow_message(&msg_src)?;
         if msg_value < self.minimum_value_for_trade {
             return Err(NftMarketplaceError::LessThanMinimumValueForTrade);
         }
@@ -76,10 +77,12 @@ impl NftMarketplace {
         collection_address: ActorId,
         token_id: u64,
     ) -> Result<NftMarketplaceEvent, NftMarketplaceError> {
+        let msg_src = msg::source();
+        self.check_allow_message(&msg_src)?;
         let offer = Offer {
             collection_address,
             token_id,
-            creator: msg::source(),
+            creator: msg_src,
         };
 
         if let Some((offer, price)) = self.offers.get_key_value(&offer) {
@@ -100,6 +103,8 @@ impl NftMarketplace {
         &mut self,
         offer: Offer,
     ) -> Result<NftMarketplaceEvent, NftMarketplaceError> {
+        let msg_src = msg::source();
+        self.check_allow_message(&msg_src)?;
         if self
             .sales
             .contains_key(&(offer.collection_address, offer.token_id))
@@ -118,7 +123,6 @@ impl NftMarketplace {
 
         // check token info
         let address_marketplace = exec::program_id();
-        let msg_src = msg::source();
         let (collection_owner, royalty) = check_token_info(
             &offer.collection_address,
             offer.token_id,

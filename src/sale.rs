@@ -11,6 +11,8 @@ impl NftMarketplace {
         token_id: u64,
         price: u128,
     ) -> Result<NftMarketplaceEvent, NftMarketplaceError> {
+        let msg_src = msg::source();
+        self.check_allow_message(&msg_src)?;
         // check that this collection already exists in the marketplace
         if !self.collection_to_owner.contains_key(&collection_address) {
             return Err(NftMarketplaceError::WrongCollectionAddress);
@@ -30,7 +32,6 @@ impl NftMarketplace {
 
         // send a message to the nft contract to find out information about the token
         let address_marketplace = exec::program_id();
-        let msg_src = msg::source();
         let (collection_owner, royalty) = check_token_info(
             &collection_address,
             token_id,
@@ -81,9 +82,11 @@ impl NftMarketplace {
         collection_address: ActorId,
         token_id: u64,
     ) -> Result<NftMarketplaceEvent, NftMarketplaceError> {
+        let msg_src = msg::source();
+        self.check_allow_message(&msg_src)?;
         // check that such a sale exists and that the sender of the message is the owner of the sale/nft
         if let Some(nft_info) = self.sales.get(&(collection_address, token_id)) {
-            if nft_info.token_owner == msg::source() {
+            if nft_info.token_owner == msg_src {
                 // return the token to its owner
                 if let NftEvent::Transferred {
                     owner: _,
@@ -122,6 +125,7 @@ impl NftMarketplace {
         buyer: ActorId,
         msg_value: u128,
     ) -> Result<NftMarketplaceEvent, NftMarketplaceError> {
+        self.check_allow_message(&buyer)?;
         self.check_sale(&collection_address, &token_id, msg_value)?;
         // transfer the token to the buyer
         transfer_token(

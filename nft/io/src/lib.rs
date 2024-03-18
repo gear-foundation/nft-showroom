@@ -193,6 +193,7 @@ pub struct NftState {
     pub total_number_of_tokens: Option<u64>,
     pub permission_to_mint: Option<Vec<ActorId>>,
     pub marketplace_address: ActorId,
+    pub admins: Vec<ActorId>,
 }
 
 #[derive(Debug, Clone, Encode, Decode, TypeInfo)]

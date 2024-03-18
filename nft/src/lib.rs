@@ -589,6 +589,7 @@ impl From<NftContract> for NftState {
             total_number_of_tokens,
             permission_to_mint,
             marketplace_address,
+            admins,
             ..
         } = value;
 
@@ -602,6 +603,9 @@ impl From<NftContract> for NftState {
         let token_approvals = token_approvals
             .into_iter()
             .collect();
+        let admins = admins
+            .into_iter()
+            .collect();
 
         Self {
             tokens,
@@ -613,7 +617,8 @@ impl From<NftContract> for NftState {
             collection_owner,
             total_number_of_tokens,
             permission_to_mint,
-            marketplace_address
+            marketplace_address,
+            admins,
         }
     }
 }

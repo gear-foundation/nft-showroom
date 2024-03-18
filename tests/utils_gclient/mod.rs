@@ -89,7 +89,7 @@ pub async fn init_marketplace(api: &GearApi) -> Result<(MessageId, ProgramId), (
         royalty_to_marketplace_for_trade: royalty_to_marketplace,
         royalty_to_marketplace_for_mint: royalty_to_marketplace,
         ms_in_block: 3_000,
-        fee_per_uploaded_file: 257_142_857_100,
+        fee_per_uploaded_file: 282_857_142_900,
         max_creator_royalty: 1_000,
         max_number_of_images: 10_000,
     }
@@ -118,6 +118,54 @@ pub async fn init_marketplace(api: &GearApi) -> Result<(MessageId, ProgramId), (
         )
         .await
         .expect("Error upload program bytes");
+
+    let allow_message_payload = NftMarketplaceAction::AllowMessage(true);
+
+    let gas_info = api
+        .calculate_handle_gas(
+            None,
+            program_id,
+            allow_message_payload.encode(),
+            0,
+            true,
+        )
+        .await
+        .expect("Error calculate gas");
+    
+    let (message_id, _) = api
+        .send_message(
+            program_id,
+            allow_message_payload,
+            gas_info.min_limit,
+            0,
+        )
+        .await
+        .expect("Error send message");
+
+
+    let allow_create_collection_payload = NftMarketplaceAction::AllowCreateCollection(true);
+
+    let gas_info = api
+        .calculate_handle_gas(
+            None,
+            program_id,
+            allow_create_collection_payload.encode(),
+            0,
+            true,
+        )
+        .await
+        .expect("Error calculate gas");
+    
+    let (message_id, _) = api
+        .send_message(
+            program_id,
+            allow_create_collection_payload,
+            gas_info.min_limit,
+            0,
+        )
+        .await
+        .expect("Error send message");
+
     Ok((message_id, program_id))
 }
 
@@ -137,6 +185,7 @@ pub async fn add_new_collection(
         meta_link: String::from("My Meta"),
         type_name: String::from("Simple NFT"),
         type_description: String::from("My Collection"),
+        allow_create: true
     };
 
     let gas_info = api
@@ -171,7 +220,7 @@ pub async fn create_collection(
         limit_copies: Some(1),
     };
     let number_of_image = 10_000;
-    let fee = number_of_image * 257_142_857_100; 
+    let fee = number_of_image * 282_857_142_900; 
     let img_links_and_data: Vec<(String, ImageData)> = (0..number_of_image)
         .map(|i| (format!("Img-{}", i), img_data.clone()))
         .collect();

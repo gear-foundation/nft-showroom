@@ -1,17 +1,16 @@
-use gstd::{msg, prelude::*, ActorId, exec};
+use gstd::{msg, prelude::*, ActorId};
 use nft_marketplace_io::*;
 
 pub async fn mint(
     collection_address: ActorId,
     minter: ActorId,
+    msg_value: u128,
     gas_for_mint: u64,
     gas_for_get_info: u64,
     royalty_to_marketplace: u16,
 ) -> Result<NftMarketplaceEvent, NftMarketplaceError> {
-    let msg_value = msg::value();
 
     let get_payment_for_mint_payload = NftAction::GetPaymentForMint;
-
     let reply = msg::send_with_gas_for_reply_as::<NftAction, Result<NftEvent, NftError>>(
         collection_address,
         get_payment_for_mint_payload,

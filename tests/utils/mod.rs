@@ -1,9 +1,11 @@
 use gstd::{ActorId, CodeId, Encode};
 use gtest::{Program, RunResult, System};
 use nft_io::{Config, ImageData, NftError, NftEvent, NftInit};
+use music_nft_io::{MusicNftInit, MusicNftError, MusicNftEvent, Links, Config as MusicConfig, ListenCapability, ImageData as MusicImageData};
 use nft_marketplace_io::{
     NftMarketplaceAction, NftMarketplaceError, NftMarketplaceEvent, NftMarketplaceInit, Offer,
 };
+use crate::codec::Error;
 
 mod common;
 pub mod prelude;
@@ -138,6 +140,10 @@ impl NftMarketplace for Program<'_> {
         };
         let res = marketplace.send(ADMINS[0], init_payload);
         assert!(!res.main_failed());
+        let res = marketplace.send(ADMINS[0], NftMarketplaceAction::AllowMessage(true));
+        assert!(!res.main_failed());
+        let res = marketplace.send(ADMINS[0], NftMarketplaceAction::AllowCreateCollection(true));
+        assert!(!res.main_failed());
         marketplace
     }
     fn add_new_collection(
@@ -157,6 +163,7 @@ impl NftMarketplace for Program<'_> {
                 meta_link: meta_link.clone(),
                 type_name: type_name.clone(),
                 type_description: type_description.clone(),
+                allow_create: true
             },
         );
         assert!(!res.main_failed());
@@ -522,6 +529,10 @@ impl NftMarketplace for Program<'_> {
 pub fn check_nft_error(from: u64, result: &RunResult, error: NftError) {
     assert!(result.contains(&(from, Err::<NftEvent, NftError>(error).encode())));
 }
+pub fn check_music_nft_error(from: u64, result: &RunResult, error: MusicNftError) {
+    assert!(result.contains(&(from, Err::<MusicNftEvent, MusicNftError>(error).encode())));
+}
+
 
 pub fn get_init_nft_payload(
     collection_owner: ActorId,
@@ -553,6 +564,48 @@ pub fn get_init_nft_payload(
             sellable: Some(0),
         },
         img_links_and_data,
+        permission_to_mint,
+    }
+}
+
+pub fn get_init_music_nft_payload(
+    collection_owner: ActorId,
+    royalty: u16,
+    user_mint_limit: Option<u32>,
+    payment_for_mint: u128,
+    permission_to_mint: Option<Vec<ActorId>>,
+) -> MusicNftInit {
+    let img_data = MusicImageData {
+        limit_copies: Some(1),
+        description: None,
+    };
+    let links_and_data: Vec<(Links, MusicImageData)> = (0..10)
+        .map(|i| {
+            let links = Links {
+                img_link: Some(format!("Img-{}", i)),
+                music_link: format!("Music link-{}", i),
+            };
+            (links, img_data.clone())
+        })
+        .collect();
+
+    MusicNftInit {
+        collection_owner,
+        config: MusicConfig {
+            name: "User Collection".to_string(),
+            description: "User Collection".to_string(),
+            collection_banner: "Collection banner".to_string(),
+            collection_logo: "Collection logo".to_string(),
+            collection_tags: vec!["tag1".to_string()],
+            additional_links: None,
+            royalty,
+            user_mint_limit,
+            payment_for_mint,
+            transferable: Some(0),
+            sellable: Some(0),
+            listening_capabilities: ListenCapability::Demo
+        },
+        links_and_data,
         permission_to_mint,
     }
 }

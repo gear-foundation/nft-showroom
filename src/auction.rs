@@ -12,6 +12,8 @@ impl NftMarketplace {
         min_price: u128,
         duration: u32,
     ) -> Result<NftMarketplaceEvent, NftMarketplaceError> {
+        let msg_src = msg::source();
+        self.check_allow_message(&msg_src)?;
         if !self.collection_to_owner.contains_key(&collection_address) {
             return Err(NftMarketplaceError::WrongCollectionAddress);
         }
@@ -28,7 +30,6 @@ impl NftMarketplace {
 
         // check token info
         let address_marketplace = exec::program_id();
-        let msg_src = msg::source();
         let (collection_owner, royalty) = check_token_info(
             &collection_address,
             token_id,
@@ -91,10 +92,11 @@ impl NftMarketplace {
         &mut self,
         collection_address: ActorId,
         token_id: u64,
+        msg_src: ActorId,
+        msg_value: u128,
     ) -> Result<NftMarketplaceEvent, NftMarketplaceError> {
-        let msg_value = msg::value();
-        let msg_src = msg::source();
-        let auction = self.check_auction(&msg_src, &collection_address, &token_id, &msg_value)?;
+        self.check_allow_message(&msg_src)?;
+        let auction = self.check_auction(&collection_address, &token_id, &msg_value)?;
 
         if auction.current_winner != ActorId::zero() {
             // use send_with_gas with gas_limit = 0 to transfer the value directly to the balance, not to the mailbox.
@@ -184,12 +186,15 @@ impl NftMarketplace {
         collection_address: ActorId,
         token_id: u64,
     ) -> Result<NftMarketplaceEvent, NftMarketplaceError> {
+        let msg_src = msg::source();
+        self.check_allow_message(&msg_src)?;
+
         let auction = self
             .auctions
             .get(&(collection_address, token_id))
             .ok_or(NftMarketplaceError::ThereIsNoSuchAuction)?;
 
-        if auction.owner != msg::source() {
+        if auction.owner != msg_src {
             return Err(NftMarketplaceError::AccessDenied);
         }
         transfer_token(
@@ -218,7 +223,6 @@ impl NftMarketplace {
 
     fn check_auction(
         &mut self,
-        msg_src: &ActorId,
         collection_address: &ActorId,
         token_id: &u64,
         bid: &u128,
@@ -226,18 +230,15 @@ impl NftMarketplace {
         let auction =
             if let Some(auction) = self.auctions.get_mut(&(*collection_address, *token_id)) {
                 if auction.ended_at < exec::block_timestamp() {
-                    msg::send_with_gas(*msg_src, NftMarketplaceEvent::ValueSent, 0, *bid).expect("Error in sending value");
                     return Err(NftMarketplaceError::AuctionClosed);
                 }
 
                 // if the first bid, it may be equal to the `current_price` (initial bid)
                 if auction.current_winner != ActorId::zero() && *bid <= auction.current_price || auction.current_winner == ActorId::zero() && *bid < auction.current_price {
-                    msg::send_with_gas(*msg_src, NftMarketplaceEvent::ValueSent, 0, *bid).expect("Error in sending value");
                     return Err(NftMarketplaceError::LessOrEqualThanBid);
                 }
                 auction
             } else {
-                msg::send_with_gas(*msg_src, NftMarketplaceEvent::ValueSent, 0, *bid).expect("Error in sending value");
                 return Err(NftMarketplaceError::ThereIsNoSuchAuction);
             };
         Ok(auction)

@@ -47,6 +47,7 @@ pub enum NftMarketplaceAction {
         meta_link: String,
         type_name: String,
         type_description: String,
+        allow_create: bool,
     },
     CreateCollection {
         type_name: String,
@@ -120,6 +121,12 @@ pub enum NftMarketplaceAction {
         fee_per_uploaded_file: Option<u128>,
         max_creator_royalty: Option<u16>,
         max_number_of_images: Option<u64>,
+    },
+    AllowMessage(bool),
+    AllowCreateCollection(bool),
+    AddExternalCollection {
+        collection_address: ActorId,
+        type_name: String,
     },
 }
 
@@ -226,6 +233,8 @@ pub enum NftMarketplaceEvent {
         value: u128,
     },
     ValueSent,
+    AllowMessageChanged,
+    AllowCreateCollectionChanged
 }
 
 #[derive(Debug, Clone, Encode, Decode, TypeInfo)]
@@ -286,6 +295,8 @@ pub struct State {
     pub offers: Vec<(Offer, u128)>,
     pub config: Config,
     pub minimum_value_for_trade: u128,
+    pub allow_message: bool,
+    pub allow_create_collection: bool,
 }
 
 /// * code_id - code_id is used to create a collection by that CodeId,
@@ -297,6 +308,7 @@ pub struct TypeCollectionInfo {
     pub code_id: CodeId,
     pub meta_link: String,
     pub type_description: String,
+    pub allow_create: bool,
 }
 
 #[derive(Debug, Encode, Decode, TypeInfo, Clone)]
