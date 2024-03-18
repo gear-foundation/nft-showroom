@@ -20,7 +20,7 @@ const COLLECTIONS_CONNECTION_QUERY = graphql(`
           admin
           tokensLimit
 
-          nfts {
+          nfts(limit: 5) {
             id
             mediaUrl
           }
@@ -91,6 +91,8 @@ const NFTS_SUBSCRIPTION = graphql(`
       name
       mediaUrl
       owner
+
+      mintedBy
 
       collection {
         id

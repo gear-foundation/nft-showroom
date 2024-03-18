@@ -39,17 +39,15 @@ const DEFAULT_NFTS_VARIABLES = {
 };
 
 function useTotalNFTsCount(collectionId: string, owner: string) {
-  const { data, loading, fetchMore } = useQuery(NFTS_CONNECTION_QUERY, {
-    variables: { ...DEFAULT_NFTS_VARIABLES, collectionId, owner },
-  });
+  const { data, loading } = useQuery(NFTS_CONNECTION_QUERY, { variables: { collectionId, owner } });
 
   const totalCount = data?.nftsConnection?.totalCount || 0;
 
-  return [totalCount, !loading, fetchMore] as const;
+  return [totalCount, !loading] as const;
 }
 
 function useNFTs(collectionId: string, owner: string) {
-  const [totalCount, isTotalCountReady, fetchCountMore] = useTotalNFTsCount(collectionId, owner);
+  const [totalCount, isTotalCountReady] = useTotalNFTsCount(collectionId, owner);
 
   const { data, loading, fetchMore, subscribeToMore } = useQuery(NFTS_QUERY, {
     variables: { ...DEFAULT_NFTS_VARIABLES, collectionId, owner },
@@ -58,28 +56,34 @@ function useNFTs(collectionId: string, owner: string) {
   const nfts = data?.nfts || [];
   const nftsCount = nfts.length;
 
+  // TODO: if new nfts would be minted, totalCount will remain the same
   const hasMoreNFTs = totalCount && nftsCount ? nftsCount < totalCount : false;
   const isNFTsQueryReady = !loading && isTotalCountReady;
-  const offset = nftsCount;
 
   useEffect(() => {
+    const limit = nftsCount;
+    const offset = 0;
+
+    if (!limit) return;
+
     // kinda tricky subscription to handle live interaction,
     // works for now, but worth to reconsider them later.
     // + would be better to use connection's cursor pagination
     const unsubscribe = subscribeToMore({
       document: NFTS_SUBSCRIPTION,
-      variables: { ...DEFAULT_NFTS_VARIABLES, collectionId, offset, owner },
+      variables: { limit, offset, collectionId, owner },
     });
 
     return () => {
       unsubscribe();
     };
-  }, [subscribeToMore, collectionId, owner, offset]);
+  }, [subscribeToMore, collectionId, owner, nftsCount]);
 
   const fetchNFTs = useCallback(() => {
+    const offset = nftsCount;
+
     fetchMore({ variables: { offset } }).catch(console.error);
-    fetchCountMore({ variables: { offset } }).catch(console.error);
-  }, [fetchCountMore, fetchMore, offset]);
+  }, [fetchMore, nftsCount]);
 
   return [nfts, totalCount, hasMoreNFTs, isNFTsQueryReady, fetchNFTs] as const;
 }
