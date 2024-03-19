@@ -69,10 +69,21 @@ function useNFTs(owner: string, collectionId?: string) {
 
     // kinda tricky subscription to handle live interaction,
     // works for now, but worth to reconsider them later.
-    // + would be better to use connection's cursor pagination
+    // maybe would be better to use connection's cursor pagination?
     const unsubscribe = subscribeToMore({
       document: NFTS_SUBSCRIPTION,
       variables: { limit, offset, where },
+      updateQuery: (prev = { nfts: [] }, { subscriptionData }) => {
+        // extracting newly minted nfts, merge type policy should handle the rest
+        if (!subscriptionData.data) return { nfts: [] };
+
+        // important to preserve consistent sorting of nfts, otherwise results will be inaccurate
+        const mintedNfts = subscriptionData.data.nfts.filter(
+          (subNft) => !prev.nfts.some((nft) => nft.id === subNft.id),
+        );
+
+        return { nfts: [...mintedNfts, ...prev.nfts] };
+      },
     });
 
     return () => {

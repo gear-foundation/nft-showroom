@@ -2,7 +2,7 @@ import { graphql } from '@/graphql';
 
 const COLLECTIONS_CONNECTION_QUERY = graphql(`
   query CollectionsConnectionQuery($first: Int!, $after: String, $where: CollectionWhereInput!) {
-    collectionsConnection(orderBy: createdAt_DESC, first: $first, after: $after, where: $where) {
+    collectionsConnection(orderBy: [createdAt_DESC, name_DESC, id_DESC], first: $first, after: $after, where: $where) {
       pageInfo {
         hasNextPage
         endCursor
@@ -32,16 +32,17 @@ const COLLECTIONS_CONNECTION_QUERY = graphql(`
 
 const NFTS_CONNECTION_QUERY = graphql(`
   query NFTsConnectionQuery($where: NftWhereInput!) {
-    nftsConnection(orderBy: createdAt_DESC, where: $where) {
+    nftsConnection(orderBy: [createdAt_DESC, name_DESC, id_DESC], where: $where) {
       totalCount
     }
   }
 `);
 
-// mintedBy used in a collection page, collection used in a lists page
+// mintedBy used in a collection page, collection used in a lists page.
+// also, it is important to preserve consistent sorting, so we're using name_DESC and id_DESC in case if createdAt is the same
 const NFTS_QUERY = graphql(`
   query NFTsQuery($limit: Int!, $offset: Int!, $where: NftWhereInput!) {
-    nfts(limit: $limit, offset: $offset, orderBy: createdAt_DESC, where: $where) {
+    nfts(limit: $limit, offset: $offset, orderBy: [createdAt_DESC, name_DESC, id_DESC], where: $where) {
       id
       idInCollection
       name
@@ -72,7 +73,7 @@ const NFTS_QUERY = graphql(`
 
 const NFTS_SUBSCRIPTION = graphql(`
   subscription NFTsSubscription($limit: Int!, $offset: Int!, $where: NftWhereInput!) {
-    nfts(limit: $limit, offset: $offset, orderBy: createdAt_DESC, where: $where) {
+    nfts(limit: $limit, offset: $offset, orderBy: [createdAt_DESC, name_DESC, id_DESC], where: $where) {
       id
       idInCollection
       name
