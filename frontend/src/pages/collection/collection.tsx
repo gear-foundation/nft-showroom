@@ -1,8 +1,6 @@
-import { useState } from 'react';
-import { useForm } from 'react-hook-form';
 import { generatePath, useParams } from 'react-router-dom';
 
-import { Breadcrumbs, Container, InfoCard, List, SearchInput } from '@/components';
+import { Breadcrumbs, Container, InfoCard, List } from '@/components';
 import { ROUTE } from '@/consts';
 import { MintLimitInfoCard, MintNFT, NFTCard, Skeleton } from '@/features/collections';
 import CollectionHeaderSkeletonSVG from '@/features/collections/assets/collection-header-skeleton.svg?react';
@@ -15,20 +13,18 @@ import styles from './collection.module.scss';
 import { SOCIAL_ICON } from './consts';
 import { useCollection } from './hooks';
 
-function useSearchQuery() {
-  const { handleSubmit, register } = useForm({ defaultValues: { query: '' } });
-  const [query, setQuery] = useState('');
+// function useSearchQuery() {
+//   const { handleSubmit, register } = useForm({ defaultValues: { query: '' } });
+//   const [query, setQuery] = useState('');
 
-  const onSubmit = handleSubmit((values) => setQuery(values.query.trim().toLocaleLowerCase()));
+//   const onSubmit = handleSubmit((values) => setQuery(values.query.trim().toLocaleLowerCase()));
 
-  return { query, onSubmit, register };
-}
+//   return { query, onSubmit, register };
+// }
 
 type Params = {
   id: string;
 };
-
-const NFT_SKELETONS = new Array<null>(4).fill(null);
 
 function Collection() {
   const { id } = useParams() as Params;
@@ -36,14 +32,13 @@ function Collection() {
   const { gridSize, setGridSize } = useGridSize();
   const { accountFilterValue, accountFilterAddress, setAccountFilterValue } = useAccountFilter();
 
-  const { collection, isCollectionQueryReady } = useCollection(id, accountFilterAddress);
-  const { name, nfts, additionalLinks } = collection || {};
+  const [collection, nfts, totalNFTsCount, hasMoreNFTs, isCollectionQueryReady, fetchNFTs] = useCollection(
+    id,
+    accountFilterAddress,
+  );
+  const { name, additionalLinks } = collection || {};
 
-  const { query, onSubmit, register } = useSearchQuery();
-  const searchedTokens = nfts?.filter((nft) => nft.name.toLocaleLowerCase().includes(query));
-  const tokensCount = searchedTokens?.length || 0;
-
-  const socialEntries = Object.entries(additionalLinks || {});
+  const socialEntries = Object.entries(additionalLinks || {}).filter(([key]) => !key.startsWith('__'));
 
   const renderSocials = () =>
     socialEntries.map(([key, value]) => {
@@ -72,7 +67,7 @@ function Collection() {
 
             <div className={styles.cards}>
               <InfoCard heading="Creator" text={collection.admin} SVG={UserSVG} color="light" textOverflow />
-              <MintLimitInfoCard heading={collection.tokensLimit} text={tokensCount} color="light" />
+              <MintLimitInfoCard heading={collection.tokensLimit} text={totalNFTsCount} color="light" />
             </div>
           </div>
 
@@ -85,7 +80,7 @@ function Collection() {
             <div>
               <ul className={styles.socials}>{renderSocials()}</ul>
 
-              <MintNFT {...collection} />
+              <MintNFT {...{ ...collection, nfts }} />
             </div>
           </div>
         </header>
@@ -97,9 +92,10 @@ function Collection() {
 
       <div className={styles.nfts}>
         <header className={styles.nftsHeader}>
-          <form onSubmit={onSubmit}>
+          {/* TODO: search */}
+          {/* <form onSubmit={onSubmit}>
             <SearchInput label="Search by name" {...register('query')} disabled={!searchedTokens} />
-          </form>
+          </form> */}
 
           <div className={styles.options}>
             <AccountFilter value={accountFilterValue} onChange={setAccountFilterValue} />
@@ -108,20 +104,23 @@ function Collection() {
         </header>
 
         <List
-          items={isCollectionQueryReady ? searchedTokens : NFT_SKELETONS}
+          items={nfts || []}
           itemsPerRow={gridSize === GRID_SIZE.SMALL ? 4 : 3}
           emptyText="Mint NFTs"
-          renderItem={(nft, index) =>
-            nft && collection ? (
-              <NFTCard key={nft.id} {...{ ...nft, collection }} />
-            ) : (
+          renderItem={(nft) => (nft && collection ? <NFTCard key={nft.id} {...{ ...nft, collection }} /> : null)}
+          fetchItems={fetchNFTs}
+          isMoreItems={hasMoreNFTs}
+          skeleton={{
+            rowsCount: 2,
+            isVisible: !isCollectionQueryReady,
+            renderItem: (index) => (
               <li key={index}>
                 <Skeleton>
                   <NFTCardSkeletonSVG />
                 </Skeleton>
               </li>
-            )
-          }
+            ),
+          }}
         />
       </div>
     </Container>

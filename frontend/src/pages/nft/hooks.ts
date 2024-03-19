@@ -1,12 +1,12 @@
-import { useSubscription } from 'urql';
+import { useSubscription } from '@apollo/client';
 
 import { NFT_QUERY } from './consts';
 
 function useNFT(collectionId: string, idInCollection: string) {
   const id = `${collectionId}-${idInCollection}`;
-  const [result] = useSubscription({ query: NFT_QUERY, variables: { id } });
+  const { data } = useSubscription(NFT_QUERY, { variables: { id } });
 
-  return result.data?.nftById;
+  return data?.nftById;
 }
 
 export { useNFT };
