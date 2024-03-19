@@ -27,8 +27,22 @@ const client = new ApolloClient({
       Query: {
         fields: {
           nfts: {
-            keyArgs: ['where', ['owner_contains', 'collection', ['id_contains']]],
-            merge: (existing: unknown[] = [], incoming: unknown[]) => [...existing, ...incoming],
+            keyArgs: ['where', ['owner_eq', 'collection', ['id_eq']]],
+            merge: (existing: unknown[] = [], incoming: unknown[], { args }: { args: unknown }) => {
+              // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+              // @ts-ignore
+              const offset = args.offset as number;
+
+              // Slicing is necessary because the existing data is
+              // immutable, and frozen in development.
+              const merged = existing ? existing.slice(0) : [];
+
+              for (let i = 0; i < incoming.length; ++i) {
+                merged[offset + i] = incoming[i];
+              }
+
+              return merged;
+            },
           },
 
           // TODO: make it less mess

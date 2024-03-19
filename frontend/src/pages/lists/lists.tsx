@@ -26,7 +26,7 @@ function Lists() {
 
   const [collections, collectionsCount, hasMoreCollections, isCollectionsQueryReady, fetchCollections] =
     useCollections(accountFilterAddress);
-  const [nfts, nftsCount, hasMoreNFTs, isNFTsQueryReady, fetchNFTs] = useNFTs('', accountFilterAddress);
+  const [nfts, nftsCount, hasMoreNFTs, isNFTsQueryReady, fetchNFTs] = useNFTs(accountFilterAddress);
 
   const renderTabs = () =>
     TABS.map(({ to, text }, index) => {

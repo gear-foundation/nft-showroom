@@ -1,8 +1,8 @@
 import { graphql } from '@/graphql';
 
 const COLLECTIONS_CONNECTION_QUERY = graphql(`
-  query CollectionsConnectionQuery($first: Int!, $after: String, $admin: String!) {
-    collectionsConnection(orderBy: createdAt_DESC, first: $first, after: $after, where: { admin_contains: $admin }) {
+  query CollectionsConnectionQuery($first: Int!, $after: String, $where: CollectionWhereInput!) {
+    collectionsConnection(orderBy: createdAt_DESC, first: $first, after: $after, where: $where) {
       pageInfo {
         hasNextPage
         endCursor
@@ -31,11 +31,8 @@ const COLLECTIONS_CONNECTION_QUERY = graphql(`
 `);
 
 const NFTS_CONNECTION_QUERY = graphql(`
-  query NFTsConnectionQuery($collectionId: String!, $owner: String!) {
-    nftsConnection(
-      orderBy: createdAt_DESC
-      where: { owner_contains: $owner, collection: { id_contains: $collectionId } }
-    ) {
+  query NFTsConnectionQuery($where: NftWhereInput!) {
+    nftsConnection(orderBy: createdAt_DESC, where: $where) {
       totalCount
     }
   }
@@ -43,13 +40,8 @@ const NFTS_CONNECTION_QUERY = graphql(`
 
 // mintedBy used in a collection page, collection used in a lists page
 const NFTS_QUERY = graphql(`
-  query NFTsQuery($collectionId: String!, $limit: Int!, $offset: Int!, $owner: String!) {
-    nfts(
-      limit: $limit
-      offset: $offset
-      orderBy: createdAt_DESC
-      where: { owner_contains: $owner, collection: { id_contains: $collectionId } }
-    ) {
+  query NFTsQuery($limit: Int!, $offset: Int!, $where: NftWhereInput!) {
+    nfts(limit: $limit, offset: $offset, orderBy: createdAt_DESC, where: $where) {
       id
       idInCollection
       name
@@ -79,13 +71,8 @@ const NFTS_QUERY = graphql(`
 `);
 
 const NFTS_SUBSCRIPTION = graphql(`
-  subscription NFTsSubscription($collectionId: String!, $limit: Int!, $offset: Int!, $owner: String!) {
-    nfts(
-      limit: $limit
-      offset: $offset
-      orderBy: createdAt_DESC
-      where: { owner_contains: $owner, collection: { id_contains: $collectionId } }
-    ) {
+  subscription NFTsSubscription($limit: Int!, $offset: Int!, $where: NftWhereInput!) {
+    nfts(limit: $limit, offset: $offset, orderBy: createdAt_DESC, where: $where) {
       id
       idInCollection
       name
@@ -114,4 +101,16 @@ const NFTS_SUBSCRIPTION = graphql(`
   }
 `);
 
-export { COLLECTIONS_CONNECTION_QUERY, NFTS_CONNECTION_QUERY, NFTS_QUERY, NFTS_SUBSCRIPTION };
+const DEFAULT_VARIABLES = {
+  COLLECTIONS: {
+    first: 12,
+    after: null,
+  },
+
+  NFTS: {
+    limit: 16,
+    offset: 0,
+  },
+};
+
+export { COLLECTIONS_CONNECTION_QUERY, NFTS_CONNECTION_QUERY, NFTS_QUERY, NFTS_SUBSCRIPTION, DEFAULT_VARIABLES };

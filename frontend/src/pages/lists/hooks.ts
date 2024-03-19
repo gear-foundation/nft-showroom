@@ -1,17 +1,23 @@
 import { useQuery } from '@apollo/client';
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useMemo } from 'react';
 
-import { COLLECTIONS_CONNECTION_QUERY, NFTS_CONNECTION_QUERY, NFTS_QUERY, NFTS_SUBSCRIPTION } from './consts';
+import { NftWhereInput } from '@/graphql/graphql';
 
-const DEFAULT_COLLECTIONS_VARIABLES = {
-  first: 12,
-  after: null,
-};
+import {
+  COLLECTIONS_CONNECTION_QUERY,
+  DEFAULT_VARIABLES,
+  NFTS_CONNECTION_QUERY,
+  NFTS_QUERY,
+  NFTS_SUBSCRIPTION,
+} from './consts';
+import { getCollectionFilters, getNftFilters } from './utils';
 
 function useCollections(admin: string) {
+  const where = useMemo(() => getCollectionFilters(admin), [admin]);
+
   // not using subscription cuz there are no interactions with collection cards
   const { data, loading, fetchMore } = useQuery(COLLECTIONS_CONNECTION_QUERY, {
-    variables: { ...DEFAULT_COLLECTIONS_VARIABLES, admin },
+    variables: { ...DEFAULT_VARIABLES.COLLECTIONS, where },
   });
 
   const connection = data?.collectionsConnection;
@@ -22,7 +28,6 @@ function useCollections(admin: string) {
 
   const isReady = !loading;
   const hasMore = Boolean(hasNextPage);
-  console.log('hasMore: ', hasMore);
 
   const fetchCollections = useCallback(() => {
     if (!endCursor) throw new Error('Cursor to end of the list is not defined');
@@ -33,24 +38,20 @@ function useCollections(admin: string) {
   return [collections, totalCount, hasMore, isReady, fetchCollections] as const;
 }
 
-const DEFAULT_NFTS_VARIABLES = {
-  limit: 16,
-  offset: 0,
-};
-
-function useTotalNFTsCount(collectionId: string, owner: string) {
-  const { data, loading } = useQuery(NFTS_CONNECTION_QUERY, { variables: { collectionId, owner } });
+function useTotalNFTsCount(where: NftWhereInput) {
+  const { data, loading } = useQuery(NFTS_CONNECTION_QUERY, { variables: { where } });
 
   const totalCount = data?.nftsConnection?.totalCount || 0;
 
   return [totalCount, !loading] as const;
 }
 
-function useNFTs(collectionId: string, owner: string) {
-  const [totalCount, isTotalCountReady] = useTotalNFTsCount(collectionId, owner);
+function useNFTs(owner: string, collectionId?: string) {
+  const where = useMemo(() => getNftFilters(owner, collectionId), [owner, collectionId]);
+  const [totalCount, isTotalCountReady] = useTotalNFTsCount(where);
 
   const { data, loading, fetchMore, subscribeToMore } = useQuery(NFTS_QUERY, {
-    variables: { ...DEFAULT_NFTS_VARIABLES, collectionId, owner },
+    variables: { ...DEFAULT_VARIABLES.NFTS, where },
   });
 
   const nfts = data?.nfts || [];
@@ -71,13 +72,13 @@ function useNFTs(collectionId: string, owner: string) {
     // + would be better to use connection's cursor pagination
     const unsubscribe = subscribeToMore({
       document: NFTS_SUBSCRIPTION,
-      variables: { limit, offset, collectionId, owner },
+      variables: { limit, offset, where },
     });
 
     return () => {
       unsubscribe();
     };
-  }, [subscribeToMore, collectionId, owner, nftsCount]);
+  }, [subscribeToMore, nftsCount, where]);
 
   const fetchNFTs = useCallback(() => {
     const offset = nftsCount;
