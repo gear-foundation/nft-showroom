@@ -40,4 +40,31 @@ const COLLECTION_QUERY = graphql(`
   }
 `);
 
-export { SOCIAL_ICON, COLLECTION_QUERY };
+const COLLECTION_SUBSCRIPTION = graphql(`
+  subscription CollectionSub($id: String!) {
+    collectionById(id: $id) {
+      id
+      name
+      description
+      collectionBanner
+      collectionLogo
+      admin
+      tokensLimit
+      permissionToMint
+      userMintLimit
+      paymentForMint
+      transferable
+      sellable
+
+      additionalLinks {
+        discord
+        externalUrl
+        medium
+        xcom
+        telegram
+      }
+    }
+  }
+`);
+
+export { SOCIAL_ICON, COLLECTION_QUERY, COLLECTION_SUBSCRIPTION };
