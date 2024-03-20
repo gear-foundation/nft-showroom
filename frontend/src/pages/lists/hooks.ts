@@ -5,12 +5,19 @@ import { NftWhereInput } from '@/graphql/graphql';
 
 import {
   COLLECTIONS_CONNECTION_QUERY,
+  COLLECTIONS_NFTS_COUNT_QUERY,
   DEFAULT_VARIABLES,
   NFTS_CONNECTION_QUERY,
   NFTS_QUERY,
   NFTS_SUBSCRIPTION,
 } from './consts';
 import { getCollectionFilters, getNftFilters } from './utils';
+
+function useCollectionsNFTsCount(ids: string[]) {
+  const { data } = useQuery(COLLECTIONS_NFTS_COUNT_QUERY, { variables: { ids }, skip: !ids.length });
+
+  return data?.nftsInCollection || [];
+}
 
 function useCollections(admin: string) {
   const where = useMemo(() => getCollectionFilters(admin), [admin]);
@@ -24,7 +31,18 @@ function useCollections(admin: string) {
   const { pageInfo, totalCount, edges } = connection || { totalCount: 0 };
   const { hasNextPage, endCursor } = pageInfo || {};
 
-  const collections = edges?.map(({ node }) => node) || [];
+  const collectionIds = useMemo(() => edges?.map(({ node }) => node.id) || [], [edges]);
+  const nftsCounts = useCollectionsNFTsCount(collectionIds);
+
+  const collectionsWithCounts = useMemo(() => {
+    if (!edges) return [];
+
+    return edges.map(({ node }) => {
+      const nftsCount = nftsCounts.find(({ collection }) => collection === node.id)?.count;
+
+      return { ...node, nftsCount };
+    });
+  }, [edges, nftsCounts]);
 
   const isReady = !loading;
   const hasMore = Boolean(hasNextPage);
@@ -35,7 +53,7 @@ function useCollections(admin: string) {
     fetchMore({ variables: { after: endCursor } }).catch(console.error);
   }, [endCursor, fetchMore]);
 
-  return [collections, totalCount, hasMore, isReady, fetchCollections] as const;
+  return [collectionsWithCounts, totalCount, hasMore, isReady, fetchCollections] as const;
 }
 
 function useTotalNFTsCount(where: NftWhereInput) {

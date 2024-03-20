@@ -30,6 +30,15 @@ const COLLECTIONS_CONNECTION_QUERY = graphql(`
   }
 `);
 
+const COLLECTIONS_NFTS_COUNT_QUERY = graphql(`
+  query CollectionsNFTsCountQuery($ids: [String!]) {
+    nftsInCollection(collections: $ids) {
+      collection
+      count
+    }
+  }
+`);
+
 const NFTS_CONNECTION_QUERY = graphql(`
   query NFTsConnectionQuery($where: NftWhereInput!) {
     nftsConnection(orderBy: [createdAt_DESC, name_DESC, id_DESC], where: $where) {
@@ -114,4 +123,11 @@ const DEFAULT_VARIABLES = {
   },
 };
 
-export { COLLECTIONS_CONNECTION_QUERY, NFTS_CONNECTION_QUERY, NFTS_QUERY, NFTS_SUBSCRIPTION, DEFAULT_VARIABLES };
+export {
+  COLLECTIONS_CONNECTION_QUERY,
+  COLLECTIONS_NFTS_COUNT_QUERY,
+  NFTS_CONNECTION_QUERY,
+  NFTS_QUERY,
+  NFTS_SUBSCRIPTION,
+  DEFAULT_VARIABLES,
+};
