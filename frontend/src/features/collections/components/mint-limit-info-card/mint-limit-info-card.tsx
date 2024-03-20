@@ -11,7 +11,7 @@ function MintLimitInfoCard({ heading, text, ...props }: Props) {
   return (
     <InfoCard
       heading={heading ? `of ${heading} to be minted` : 'Unlimited series'}
-      text={text ? `${text} NFTs` : undefined}
+      text={text !== undefined ? `${text} NFTs` : undefined}
       SVG={LandscapeSVG}
       {...props}
     />

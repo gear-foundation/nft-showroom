@@ -13,33 +13,6 @@ const SOCIAL_ICON = {
   discord: DiscordSVG,
 };
 
-const COLLECTION_QUERY = graphql(`
-  query CollectionQuery($id: String!) {
-    collectionById(id: $id) {
-      id
-      name
-      description
-      collectionBanner
-      collectionLogo
-      admin
-      tokensLimit
-      permissionToMint
-      userMintLimit
-      paymentForMint
-      transferable
-      sellable
-
-      additionalLinks {
-        discord
-        externalUrl
-        medium
-        xcom
-        telegram
-      }
-    }
-  }
-`);
-
 const COLLECTION_SUBSCRIPTION = graphql(`
   subscription CollectionSub($id: String!) {
     collectionById(id: $id) {
@@ -67,4 +40,4 @@ const COLLECTION_SUBSCRIPTION = graphql(`
   }
 `);
 
-export { SOCIAL_ICON, COLLECTION_QUERY, COLLECTION_SUBSCRIPTION };
+export { SOCIAL_ICON, COLLECTION_SUBSCRIPTION };

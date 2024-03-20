@@ -80,10 +80,10 @@ function useNFTs(owner: string, collectionId?: string) {
   const isNFTsQueryReady = !loading && isTotalCountReady;
 
   useEffect(() => {
-    const limit = nftsCount;
-    const offset = 0;
+    if (loading) return;
 
-    if (!limit) return;
+    const limit = nftsCount || 1; // 1 fallback, cuz in case of empty list with limit 0, subscription won't work
+    const offset = 0;
 
     // kinda tricky subscription to handle live interaction,
     // works for now, but worth to reconsider them later.
@@ -107,7 +107,7 @@ function useNFTs(owner: string, collectionId?: string) {
     return () => {
       unsubscribe();
     };
-  }, [subscribeToMore, nftsCount, where]);
+  }, [subscribeToMore, nftsCount, where, loading]);
 
   const fetchNFTs = useCallback(() => {
     const offset = nftsCount;
