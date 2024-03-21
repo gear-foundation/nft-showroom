@@ -1,5 +1,6 @@
 import { Option, u128, u16, u32, u64 } from '@polkadot/types';
 import { Codec } from '@polkadot/types-codec/types/codec';
+import { Hash } from '@polkadot/types/interfaces';
 
 export function safeUnwrapToNumber(
   value: number | u16 | u32 | u64 | u128 | null,
@@ -11,6 +12,16 @@ export function safeUnwrapToNumber(
     return null;
   }
   return value.toNumber();
+}
+
+export function safeUnwrapToHex(value: Hash | string | null): string | null {
+  if (typeof value === 'string') {
+    return value;
+  }
+  if (value === null) {
+    return null;
+  }
+  return value.toHex();
 }
 
 export function safeUnwrapOptional<E extends Codec, T>(

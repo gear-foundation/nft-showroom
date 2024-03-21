@@ -17,7 +17,7 @@ export class ConfigChangedHandler implements INftEventHandler {
       );
       return;
     }
-    let {
+    const {
       name,
       description,
       additionalLinks,

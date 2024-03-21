@@ -15,6 +15,9 @@ import { v4 as uuidv4 } from 'uuid';
 import { IStorage } from './storage/storage.inteface';
 import { BatchService } from './batch.service';
 import { Store } from '@subsquid/typeorm-store';
+import { EventInfo } from './event-info.type';
+import { getCollectionDescription, getCollectionName } from './utils/helpers';
+import { ProgramMetadata } from '@gear-js/api';
 
 export class EntitiesService {
   constructor(
@@ -47,6 +50,36 @@ export class EntitiesService {
 
   async getCollection(collectionAddress: string) {
     return this.storage.getCollection(collectionAddress);
+  }
+
+  async createOldCollection(
+    collectionAddress: string,
+    meta: ProgramMetadata,
+    eventInfo: EventInfo,
+    collectionType: string,
+    namePayload: string,
+    descPayload: string,
+  ) {
+    const [collectionName, collectionDesc] = await Promise.all([
+      getCollectionName(meta, collectionAddress, namePayload),
+      getCollectionDescription(meta, collectionAddress, descPayload),
+    ]);
+    const collection = new Collection({
+      id: collectionAddress,
+      type: await this.getOldCollectionType(collectionType),
+      name: collectionName,
+      admin: '0x0',
+      description: collectionDesc,
+      paymentForMint: 0n,
+      royalty: 0,
+      collectionLogo: '',
+      collectionBanner: '',
+      createdAt: eventInfo.timestamp,
+      marketplace: this.getMarketplace(),
+      tags: [],
+    });
+    await this.setCollection(collection);
+    return collection;
   }
 
   async getNft(collectionAddress: string, tokenId: number) {
@@ -100,6 +133,22 @@ export class EntitiesService {
     await this.store.remove(collection);
   }
 
+  async getOldCollectionType(collectionType: string) {
+    const existed = await this.storage.getCollectionType(collectionType);
+    if (existed) {
+      return existed;
+    }
+    const type = new CollectionType({
+      id: collectionType,
+      type: collectionType,
+      description: collectionType,
+      metaStr: '',
+      metaUrl: '',
+    });
+    await this.setCollectionType(type);
+    return type;
+  }
+
   async getCollectionType(
     typeName: string,
   ): Promise<CollectionType | undefined> {
@@ -128,5 +177,9 @@ export class EntitiesService {
     marketplace.config = marketplaceConfig;
     await this.storage.updateMarketplace(marketplace);
     this.batchService.setMarketplace(marketplace);
+  }
+
+  async deleteNft(nft: Nft) {
+    await Promise.all([this.storage.deleteNft(nft), this.store.remove(nft)]);
   }
 }
