@@ -1,30 +1,46 @@
 import { graphql } from '@/graphql';
 
 const COLLECTIONS_CONNECTION_QUERY = graphql(`
-  query CollectionsConnectionQuery($first: Int!, $after: String, $where: CollectionWhereInput!) {
-    collectionsConnection(orderBy: [createdAt_DESC, name_DESC, id_DESC], first: $first, after: $after, where: $where) {
-      pageInfo {
-        hasNextPage
-        endCursor
-      }
-
+  query CollectionsConnectionQuery($where: CollectionWhereInput!) {
+    collectionsConnection(orderBy: [createdAt_DESC, name_DESC, id_DESC], where: $where) {
       totalCount
+    }
+  }
+`);
 
-      edges {
-        node {
-          id
-          name
-          description
-          collectionBanner
-          collectionLogo
-          admin
-          tokensLimit
+const COLLECTIONS_QUERY = graphql(`
+  query CollectionsQuery($limit: Int!, $offset: Int!, $where: CollectionWhereInput!) {
+    collections(limit: $limit, offset: $offset, orderBy: [createdAt_DESC, name_DESC, id_DESC], where: $where) {
+      id
+      name
+      description
+      collectionBanner
+      collectionLogo
+      admin
+      tokensLimit
 
-          nfts(limit: 5) {
-            id
-            mediaUrl
-          }
-        }
+      nfts(limit: 5) {
+        id
+        mediaUrl
+      }
+    }
+  }
+`);
+
+const COLLECTIONS_SUBSCRIPTION = graphql(`
+  subscription CollectionsSub($limit: Int!, $offset: Int!, $where: CollectionWhereInput!) {
+    collections(limit: $limit, offset: $offset, orderBy: [createdAt_DESC, name_DESC, id_DESC], where: $where) {
+      id
+      name
+      description
+      collectionBanner
+      collectionLogo
+      admin
+      tokensLimit
+
+      nfts(limit: 5) {
+        id
+        mediaUrl
       }
     }
   }
@@ -113,8 +129,8 @@ const NFTS_SUBSCRIPTION = graphql(`
 
 const DEFAULT_VARIABLES = {
   COLLECTIONS: {
-    first: 12,
-    after: null,
+    limit: 12,
+    offset: 0,
   },
 
   NFTS: {
@@ -125,6 +141,8 @@ const DEFAULT_VARIABLES = {
 
 export {
   COLLECTIONS_CONNECTION_QUERY,
+  COLLECTIONS_QUERY,
+  COLLECTIONS_SUBSCRIPTION,
   COLLECTIONS_NFTS_COUNT_QUERY,
   NFTS_CONNECTION_QUERY,
   NFTS_QUERY,

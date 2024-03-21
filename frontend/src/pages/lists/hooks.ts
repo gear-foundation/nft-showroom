@@ -1,11 +1,13 @@
 import { useQuery } from '@apollo/client';
 import { useCallback, useEffect, useMemo } from 'react';
 
-import { NftWhereInput } from '@/graphql/graphql';
+import { CollectionWhereInput, NftWhereInput } from '@/graphql/graphql';
 
 import {
   COLLECTIONS_CONNECTION_QUERY,
   COLLECTIONS_NFTS_COUNT_QUERY,
+  COLLECTIONS_QUERY,
+  COLLECTIONS_SUBSCRIPTION,
   DEFAULT_VARIABLES,
   NFTS_CONNECTION_QUERY,
   NFTS_QUERY,
@@ -19,39 +21,72 @@ function useCollectionsNFTsCount(ids: string[]) {
   return data?.nftsInCollection || [];
 }
 
-function useCollections(admin: string) {
-  const where = useMemo(() => getCollectionFilters(admin), [admin]);
-
-  // not using subscription cuz there are no interactions with collection cards
-  const { data, loading, fetchMore } = useQuery(COLLECTIONS_CONNECTION_QUERY, {
+function useTotalCollectionsCount(where: CollectionWhereInput) {
+  const { data, loading } = useQuery(COLLECTIONS_CONNECTION_QUERY, {
     variables: { ...DEFAULT_VARIABLES.COLLECTIONS, where },
   });
 
-  const connection = data?.collectionsConnection;
-  const { pageInfo, totalCount, edges } = connection || { totalCount: 0 };
-  const { hasNextPage, endCursor } = pageInfo || {};
+  const totalCount = data?.collectionsConnection.totalCount || 0;
 
-  const collectionIds = useMemo(() => edges?.map(({ node }) => node.id) || [], [edges]);
+  return [totalCount, !loading] as const;
+}
+
+function useCollections(admin: string) {
+  const where = useMemo(() => getCollectionFilters(admin), [admin]);
+  const [totalCount, isTotalCountReady] = useTotalCollectionsCount(where);
+
+  const { data, loading, fetchMore, subscribeToMore } = useQuery(COLLECTIONS_QUERY, {
+    variables: { ...DEFAULT_VARIABLES.COLLECTIONS, where },
+  });
+
+  const collections = useMemo(() => data?.collections || [], [data]);
+  const collectionsCount = collections.length;
+
+  const collectionIds = useMemo(() => collections.map(({ id }) => id), [collections]);
   const nftsCounts = useCollectionsNFTsCount(collectionIds);
 
   const collectionsWithCounts = useMemo(() => {
-    if (!edges) return [];
+    return collections.map((collection) => {
+      const nftsCount = nftsCounts.find(({ collection: id }) => collection.id === id)?.count;
 
-    return edges.map(({ node }) => {
-      const nftsCount = nftsCounts.find(({ collection }) => collection === node.id)?.count;
-
-      return { ...node, nftsCount };
+      return { ...collection, nftsCount };
     });
-  }, [edges, nftsCounts]);
+  }, [collections, nftsCounts]);
 
-  const isReady = !loading;
-  const hasMore = Boolean(hasNextPage);
+  const isReady = !loading && isTotalCountReady;
+  const hasMore = totalCount && collectionsCount ? collectionsCount < totalCount : false;
+
+  useEffect(() => {
+    if (loading) return;
+
+    const limit = collectionsCount || 1; // 1 fallback, cuz in case of empty list with limit 0, subscription won't work
+    const offset = 0;
+
+    // same solution as for nfts, but for newly created collections
+    const unsubscribe = subscribeToMore({
+      document: COLLECTIONS_SUBSCRIPTION,
+      variables: { limit, offset, where },
+      updateQuery: (prev = { collections: [] }, { subscriptionData }) => {
+        if (!subscriptionData.data) return { collections: [] };
+
+        const newCollections = subscriptionData.data.collections.filter(
+          (subCollection) => !prev.collections.some((collection) => collection.id === subCollection.id),
+        );
+
+        return { collections: [...newCollections, ...prev.collections] };
+      },
+    });
+
+    return () => {
+      unsubscribe();
+    };
+  }, [subscribeToMore, collectionsCount, where, loading]);
 
   const fetchCollections = useCallback(() => {
-    if (!endCursor) throw new Error('Cursor to end of the list is not defined');
+    const offset = collectionsCount;
 
-    fetchMore({ variables: { after: endCursor } }).catch(console.error);
-  }, [endCursor, fetchMore]);
+    fetchMore({ variables: { offset } }).catch(console.error);
+  }, [collectionsCount, fetchMore]);
 
   return [collectionsWithCounts, totalCount, hasMore, isReady, fetchCollections] as const;
 }
