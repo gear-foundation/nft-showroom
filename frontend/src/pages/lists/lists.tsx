@@ -17,9 +17,6 @@ const TABS = [
   { to: ROUTE.NFTS, text: 'NFTs' },
 ];
 
-const COLLECTION_SKELETONS = new Array<null>(6).fill(null);
-const NFT_SKELETONS = new Array<null>(8).fill(null);
-
 function Lists() {
   const { pathname } = useLocation();
   const match = useMatch(ROUTE.NFTS);
@@ -27,12 +24,13 @@ function Lists() {
   const { gridSize, setGridSize } = useGridSize();
   const { accountFilterValue, accountFilterAddress, setAccountFilterValue } = useAccountFilter();
 
-  const { collections, isCollectionsQueryReady } = useCollections(accountFilterAddress);
-  const { nfts, isNFTsQueryReady } = useNFTs(accountFilterAddress);
+  const [collections, collectionsCount, hasMoreCollections, isCollectionsQueryReady, fetchCollections] =
+    useCollections(accountFilterAddress);
+  const [nfts, nftsCount, hasMoreNFTs, isNFTsQueryReady, fetchNFTs] = useNFTs(accountFilterAddress);
 
   const renderTabs = () =>
     TABS.map(({ to, text }, index) => {
-      const counter = [collections?.length, nfts?.length][index];
+      const counter = [collectionsCount, nftsCount][index];
 
       return (
         <li key={to}>
@@ -56,37 +54,43 @@ function Lists() {
 
       {match ? (
         <List
-          items={isNFTsQueryReady ? nfts : NFT_SKELETONS}
+          items={nfts}
           itemsPerRow={gridSize === GRID_SIZE.SMALL ? 4 : 3}
           emptyText="Mint NFTs"
-          renderItem={(nft, index) =>
-            nft ? (
-              <NFTCard key={nft.id} {...nft} />
-            ) : (
+          renderItem={(nft) => <NFTCard key={nft.id} {...nft} />}
+          fetchItems={fetchNFTs}
+          isMoreItems={hasMoreNFTs}
+          skeleton={{
+            rowsCount: 2,
+            isVisible: !isNFTsQueryReady,
+            renderItem: (index) => (
               <li key={index}>
                 <Skeleton>
                   <NFTCardSkeletonSVG />
                 </Skeleton>
               </li>
-            )
-          }
+            ),
+          }}
         />
       ) : (
         <List
-          items={isCollectionsQueryReady ? collections : COLLECTION_SKELETONS}
+          items={collections}
           itemsPerRow={gridSize === GRID_SIZE.SMALL ? 3 : 2}
           emptyText="Create collections"
-          renderItem={(collection, index) =>
-            collection ? (
-              <CollectionCard key={collection.id} {...collection} />
-            ) : (
+          renderItem={(collection) => <CollectionCard key={collection.id} {...collection} />}
+          fetchItems={fetchCollections}
+          isMoreItems={hasMoreCollections}
+          skeleton={{
+            rowsCount: 2,
+            isVisible: !isCollectionsQueryReady,
+            renderItem: (index) => (
               <li key={index}>
                 <Skeleton>
                   <CollectionCardSkeletonSVG />
                 </Skeleton>
               </li>
-            )
-          }
+            ),
+          }}
         />
       )}
     </Container>

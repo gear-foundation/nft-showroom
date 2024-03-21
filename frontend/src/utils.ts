@@ -1,6 +1,4 @@
 import { decodeAddress } from '@gear-js/api';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { ZodType, z } from 'zod';
 
 import { ADDRESS } from './consts';
 import { Entries } from './types';
@@ -14,9 +12,9 @@ const cx = (...args: unknown[]) =>
 const getTypedEntries = <T extends object>(value: T) => Object.entries(value) as Entries<T>;
 
 const getIpfsLink = (value: string) => {
-  const [, cid = ''] = value.split('ipfs://');
+  if (!value.includes('ipfs://')) return `${ADDRESS.IPFS_GATEWAY}/${value}`; // handle legacy links (coinbase collection)
 
-  // if (!cid) throw new Error(`Can't find CID in a link: ${value}`);
+  const [, cid = ''] = value.split('ipfs://');
 
   return `${ADDRESS.IPFS_GATEWAY}/${cid}`;
 };

@@ -1,7 +1,7 @@
+import { useQuery } from '@apollo/client';
 import { ProgramMetadata } from '@gear-js/api';
 import { ProviderProps, useAlert } from '@gear-js/react-hooks';
 import { createContext, useContext, useEffect, useState } from 'react';
-import { useQuery } from 'urql';
 
 import { getIpfsLink } from '@/utils';
 
@@ -15,8 +15,8 @@ const useMarketplace = () => useContext(MarketplaceContext);
 function MarketplaceProvider({ children }: ProviderProps) {
   const alert = useAlert();
 
-  const [result] = useQuery({ query: MARKETPLACE_QUERY });
-  const marketplace = result.data?.marketplaceById;
+  const { data } = useQuery(MARKETPLACE_QUERY);
+  const marketplace = data?.marketplaceById;
 
   const [marketplaceMetadata, setMarketplaceMetadata] = useState<ProgramMetadata>();
   const [collectionsMetadata, setCollectionsMetadata] = useState<MetadataRecord>();

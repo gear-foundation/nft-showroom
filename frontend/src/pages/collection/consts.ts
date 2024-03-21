@@ -13,8 +13,8 @@ const SOCIAL_ICON = {
   discord: DiscordSVG,
 };
 
-const COLLECTION_QUERY = graphql(`
-  subscription CollectionQuery($id: String!, $owner: String!) {
+const COLLECTION_SUBSCRIPTION = graphql(`
+  subscription CollectionSub($id: String!) {
     collectionById(id: $id) {
       id
       name
@@ -29,25 +29,6 @@ const COLLECTION_QUERY = graphql(`
       transferable
       sellable
 
-      nfts(where: { owner_contains: $owner }) {
-        id
-        idInCollection
-        name
-        mediaUrl
-        owner
-        mintedBy
-
-        sales(where: { status_eq: "open" }) {
-          price
-        }
-
-        auctions(where: { status_eq: "open" }) {
-          minPrice
-          lastPrice
-          endTimestamp
-        }
-      }
-
       additionalLinks {
         discord
         externalUrl
@@ -59,4 +40,4 @@ const COLLECTION_QUERY = graphql(`
   }
 `);
 
-export { SOCIAL_ICON, COLLECTION_QUERY };
+export { SOCIAL_ICON, COLLECTION_SUBSCRIPTION };

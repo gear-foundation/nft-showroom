@@ -13,12 +13,14 @@ import styles from './collection-card.module.scss';
 
 type Props = Pick<Collection, 'id' | 'name' | 'collectionBanner' | 'collectionLogo' | 'admin' | 'tokensLimit'> & {
   nfts: Pick<Nft, 'id' | 'mediaUrl'>[];
+} & {
+  nftsCount: string | undefined;
 };
 
 const PREVIEW_NFTS_COUNT = 5;
 const DEFAULT_NFTS = new Array<null>(PREVIEW_NFTS_COUNT).fill(null);
 
-function CollectionCard({ id, name, collectionBanner, collectionLogo, admin, tokensLimit, nfts }: Props) {
+function CollectionCard({ id, name, collectionBanner, collectionLogo, admin, tokensLimit, nfts, nftsCount }: Props) {
   const renderNFTs = () =>
     (nfts.length < PREVIEW_NFTS_COUNT ? [...nfts, ...DEFAULT_NFTS] : nfts)
       .slice(0, PREVIEW_NFTS_COUNT)
@@ -51,7 +53,7 @@ function CollectionCard({ id, name, collectionBanner, collectionLogo, admin, tok
         </div>
 
         <div className={styles.cards}>
-          <MintLimitInfoCard heading={tokensLimit} text={nfts.length} color="dark" />
+          <MintLimitInfoCard heading={tokensLimit} text={nftsCount} color="dark" />
         </div>
 
         <ul className={styles.nfts}>{renderNFTs()}</ul>

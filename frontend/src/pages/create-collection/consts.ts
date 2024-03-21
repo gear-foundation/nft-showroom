@@ -13,7 +13,7 @@ const COLLECTION_TYPE = {
 
 const LAST_CREATED_COLLECTION_QUERY = graphql(`
   query LastCreatedCollectionQuery($admin: String!) {
-    collections(where: { admin_eq: $admin }, orderBy: createdAt_DESC, limit: 1) {
+    collections(where: { admin_eq: $admin }, orderBy: [createdAt_DESC, name_DESC, id_DESC], limit: 1) {
       createdAt
     }
   }
