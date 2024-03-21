@@ -9,6 +9,6 @@ export class NftsInCollection {
   @Field(() => String)
   collection!: string;
 
-  @Field(() => String)
-  count!: string;
+  @Field(() => Number)
+  count!: number;
 }

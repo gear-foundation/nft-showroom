@@ -23,6 +23,17 @@ export class NftsInCollectionResolver {
       .select('count(nft.id) as count, collection_id as collection')
       .where('collection_id in (:...collections)', { collections })
       .groupBy('collection_id');
-    return query.getRawMany();
+    const result = await query.getRawMany<{
+      count: number;
+      collection: string;
+    }>();
+    const collectionMap = result.reduce((acc, { collection, count }) => {
+      acc[collection] = count;
+      return acc;
+    }, {} as Record<string, number>);
+    return collections.map((collection) => ({
+      collection,
+      count: collectionMap[collection] || 0,
+    }));
   }
 }
