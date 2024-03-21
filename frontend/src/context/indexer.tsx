@@ -6,7 +6,7 @@ import { Kind, OperationTypeNode } from 'graphql';
 import { createClient } from 'graphql-ws';
 
 import { ADDRESS } from '@/consts';
-import { CollectionsConnectionQueryQuery } from '@/graphql/graphql';
+import { CollectionsQueryQuery } from '@/graphql/graphql';
 
 const httpLink = new HttpLink({ uri: ADDRESS.INDEXER });
 const wsLink = new GraphQLWsLink(createClient({ url: ADDRESS.INDEXER_WS }));
@@ -46,26 +46,26 @@ const client = new ApolloClient({
           },
 
           // TODO: make it less mess
-          collectionsConnection: {
-            keyArgs: ['where', ['admin_contains']],
+          collections: {
+            keyArgs: ['where', ['admin_contains', 'admin_eq']], // admin_eq is for create collection page
             merge: (
-              existing: CollectionsConnectionQueryQuery['collectionsConnection'],
-              incoming: CollectionsConnectionQueryQuery['collectionsConnection'],
+              existing: CollectionsQueryQuery['collections'] = [],
+              incoming: CollectionsQueryQuery['collections'],
+              { args }: { args: unknown },
             ) => {
-              if (!existing) return incoming;
+              // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+              // @ts-ignore
+              const offset = args.offset as number;
 
-              const { edges: incomingEdges = [] } = incoming;
-              const { edges: existingEdges = [] } = existing;
+              // Slicing is necessary because the existing data is
+              // immutable, and frozen in development.
+              const merged = existing ? existing.slice(0) : [];
 
-              const pageInfo = {
-                ...incoming.pageInfo,
-                endCursor: incoming.pageInfo.endCursor,
-                hasNextPage: incoming.pageInfo.hasNextPage,
-              };
+              for (let i = 0; i < incoming.length; ++i) {
+                merged[offset + i] = incoming[i];
+              }
 
-              const edges = [...existingEdges, ...incomingEdges];
-
-              return { ...incoming, edges, pageInfo };
+              return merged;
             },
           },
         },

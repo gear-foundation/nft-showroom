@@ -10,7 +10,10 @@ const cx = (...args: unknown[]) =>
     .trim();
 
 const getTypedEntries = <T extends object>(value: T) => Object.entries(value) as Entries<T>;
+
 const getIpfsLink = (value: string) => {
+  if (!value.includes('ipfs://')) return `${ADDRESS.IPFS_GATEWAY}/${value}`; // handle legacy links (coinbase collection)
+
   const [, cid = ''] = value.split('ipfs://');
 
   return `${ADDRESS.IPFS_GATEWAY}/${cid}`;
