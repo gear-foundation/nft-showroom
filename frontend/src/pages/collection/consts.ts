@@ -13,8 +13,8 @@ const SOCIAL_ICON = {
   discord: DiscordSVG,
 };
 
-const COLLECTION_SUBSCRIPTION = graphql(`
-  subscription CollectionSub($id: String!) {
+const COLLECTION_QUERY = graphql(`
+  query CollectionQuery($id: String!) {
     collectionById(id: $id) {
       id
       name
@@ -40,4 +40,4 @@ const COLLECTION_SUBSCRIPTION = graphql(`
   }
 `);
 
-export { SOCIAL_ICON, COLLECTION_SUBSCRIPTION };
+export { SOCIAL_ICON, COLLECTION_QUERY };

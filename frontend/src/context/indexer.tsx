@@ -6,7 +6,6 @@ import { Kind, OperationTypeNode } from 'graphql';
 import { createClient } from 'graphql-ws';
 
 import { ADDRESS } from '@/consts';
-import { CollectionsQueryQuery } from '@/graphql/graphql';
 
 const httpLink = new HttpLink({ uri: ADDRESS.INDEXER });
 const wsLink = new GraphQLWsLink(createClient({ url: ADDRESS.INDEXER_WS }));
@@ -48,11 +47,7 @@ const client = new ApolloClient({
           // TODO: make it less mess
           collections: {
             keyArgs: ['where', ['admin_contains', 'admin_eq']], // admin_eq is for create collection page
-            merge: (
-              existing: CollectionsQueryQuery['collections'] = [],
-              incoming: CollectionsQueryQuery['collections'],
-              { args }: { args: unknown },
-            ) => {
+            merge: (existing: unknown[] = [], incoming: unknown[], { args }: { args: unknown }) => {
               // eslint-disable-next-line @typescript-eslint/ban-ts-comment
               // @ts-ignore
               const offset = args.offset as number;
@@ -74,8 +69,8 @@ const client = new ApolloClient({
   }),
 
   defaultOptions: {
-    query: { notifyOnNetworkStatusChange: true },
-    watchQuery: { notifyOnNetworkStatusChange: true },
+    query: { notifyOnNetworkStatusChange: true, fetchPolicy: 'network-only' },
+    watchQuery: { notifyOnNetworkStatusChange: true, fetchPolicy: 'network-only' },
   },
 });
 
