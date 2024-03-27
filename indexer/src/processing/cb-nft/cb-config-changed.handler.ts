@@ -21,7 +21,10 @@ export class CBConfigChangedHandler implements ICBNftEventHandler {
       );
       return;
     }
-    const fullLink = `${link.toString()}/${media.toString()}.png`;
+    const fullLink =
+      link && media
+        ? `${link.toString()}/${media.toString()}.png`
+        : nft.mediaUrl;
     await storage.setNft(
       new Nft({
         ...nft,

@@ -21,7 +21,7 @@ export class ImageChangedHandler implements INftEventHandler {
     await storage.setNft(
       new Nft({
         ...nft,
-        mediaUrl: imgLink,
+        mediaUrl: imgLink ?? nft.mediaUrl,
         updatedAt: timestamp,
       }),
     );
