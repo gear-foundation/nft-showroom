@@ -5,11 +5,9 @@ import { RouterProvider, createBrowserRouter } from 'react-router-dom';
 
 import { App } from './App';
 import { PrivateRoute } from './components';
-import { ADDRESS, ROUTE } from './consts';
+import { ROUTE } from './consts';
 import { Collection, CreateCollection, NFT, Lists, NotFound } from './pages';
 import './index.scss';
-
-console.log('public envs: ', ADDRESS);
 
 const PRIVATE_ROUTES = [
   {
