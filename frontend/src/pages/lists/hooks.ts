@@ -75,7 +75,7 @@ function useNFTs(owner: string, collectionId?: string) {
   const where = useMemo(() => getNftFilters(owner, collectionId), [owner, collectionId]);
   const [totalCount, isTotalCountReady] = useTotalNFTsCount(where);
 
-  const { data, loading, fetchMore } = useQuery(NFTS_QUERY, {
+  const { data, loading, fetchMore, refetch } = useQuery(NFTS_QUERY, {
     variables: { ...DEFAULT_VARIABLES.NFTS, where },
   });
 
@@ -92,7 +92,7 @@ function useNFTs(owner: string, collectionId?: string) {
     fetchMore({ variables: { offset } }).catch(console.error);
   }, [fetchMore, nftsCount]);
 
-  return [nfts, totalCount, hasMoreNFTs, isNFTsQueryReady, fetchNFTs] as const;
+  return [nfts, totalCount, hasMoreNFTs, isNFTsQueryReady, fetchNFTs, refetch] as const;
 }
 
 export { useNFTs, useCollections };

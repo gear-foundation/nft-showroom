@@ -1,19 +1,14 @@
 import { useQuery } from '@apollo/client';
 
-// TODO: reusing temporary solution for nfts subscriptiption
-import { useNFTs } from '../lists/hooks';
-
 import { COLLECTION_QUERY } from './consts';
 
-function useCollection(id: string, owner: string) {
-  const [nfts, nftsCount, hasMoreNFTs, isNFTsQueryReady, fetchNFTs] = useNFTs(owner, id);
-
+function useCollection(id: string) {
   // subscription to handle update in case of newly created collection
   const { data, loading } = useQuery(COLLECTION_QUERY, { variables: { id } });
   const collection = data?.collectionById;
-  const isCollectionQueryReady = !loading && isNFTsQueryReady;
+  const isCollectionQueryReady = !loading;
 
-  return [collection, nfts, nftsCount, hasMoreNFTs, isCollectionQueryReady, fetchNFTs] as const;
+  return [collection, isCollectionQueryReady] as const;
 }
 
 export { useCollection };

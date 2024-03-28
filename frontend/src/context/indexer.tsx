@@ -1,6 +1,6 @@
 import { HttpLink, split, ApolloClient, InMemoryCache, ApolloProvider } from '@apollo/client';
 import { GraphQLWsLink } from '@apollo/client/link/subscriptions';
-import { getMainDefinition } from '@apollo/client/utilities';
+import { getMainDefinition, offsetLimitPagination } from '@apollo/client/utilities';
 import { ProviderProps } from '@gear-js/react-hooks';
 import { Kind, OperationTypeNode } from 'graphql';
 import { createClient } from 'graphql-ws';
@@ -25,52 +25,15 @@ const client = new ApolloClient({
     typePolicies: {
       Query: {
         fields: {
-          nfts: {
-            keyArgs: ['where', ['owner_eq', 'collection', ['id_eq']]],
-            merge: (existing: unknown[] = [], incoming: unknown[], { args }: { args: unknown }) => {
-              // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-              // @ts-ignore
-              const offset = args.offset as number;
-
-              // Slicing is necessary because the existing data is
-              // immutable, and frozen in development.
-              const merged = existing ? existing.slice(0) : [];
-
-              for (let i = 0; i < incoming.length; ++i) {
-                merged[offset + i] = incoming[i];
-              }
-
-              return merged;
-            },
-          },
-
-          // TODO: make it less mess
-          collections: {
-            keyArgs: ['where', ['admin_contains', 'admin_eq']], // admin_eq is for create collection page
-            merge: (existing: unknown[] = [], incoming: unknown[], { args }: { args: unknown }) => {
-              // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-              // @ts-ignore
-              const offset = args.offset as number;
-
-              // Slicing is necessary because the existing data is
-              // immutable, and frozen in development.
-              const merged = existing ? existing.slice(0) : [];
-
-              for (let i = 0; i < incoming.length; ++i) {
-                merged[offset + i] = incoming[i];
-              }
-
-              return merged;
-            },
-          },
+          nfts: offsetLimitPagination(['where', ['owner_eq', 'collection', ['id_eq']]]),
+          collections: offsetLimitPagination(['where', ['admin_contains', 'admin_eq']]),
         },
       },
     },
   }),
 
   defaultOptions: {
-    query: { notifyOnNetworkStatusChange: true, fetchPolicy: 'network-only' },
-    watchQuery: { notifyOnNetworkStatusChange: true, fetchPolicy: 'network-only' },
+    watchQuery: { notifyOnNetworkStatusChange: true, fetchPolicy: 'cache-and-network' },
   },
 });
 
