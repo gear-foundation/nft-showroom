@@ -1,6 +1,8 @@
-import { useQuery } from '@apollo/client';
-import { useCallback, useMemo } from 'react';
+import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
+import request from 'graphql-request';
+import { useMemo } from 'react';
 
+import { ADDRESS } from '@/consts';
 import { CollectionWhereInput, NftWhereInput } from '@/graphql/graphql';
 
 import {
@@ -14,30 +16,41 @@ import {
 import { getCollectionFilters, getNftFilters } from './utils';
 
 function useCollectionsNFTsCount(ids: string[]) {
-  const { data } = useQuery(COLLECTIONS_NFTS_COUNT_QUERY, { variables: { ids }, skip: !ids.length });
+  const { data } = useQuery({
+    queryKey: ['collectionsNFTsCount', ids],
+    queryFn: () => request(ADDRESS.INDEXER, COLLECTIONS_NFTS_COUNT_QUERY, { ids }),
+    enabled: Boolean(ids.length),
+  });
 
   return data?.nftsInCollection || [];
 }
 
 function useTotalCollectionsCount(where: CollectionWhereInput) {
-  const { data, loading } = useQuery(COLLECTIONS_CONNECTION_QUERY, {
-    variables: { ...DEFAULT_VARIABLES.COLLECTIONS, where },
+  const { data, isFetching } = useQuery({
+    queryKey: ['collectionsCount', where],
+    queryFn: () => request(ADDRESS.INDEXER, COLLECTIONS_CONNECTION_QUERY, { ...DEFAULT_VARIABLES.COLLECTIONS, where }),
   });
 
+  const isReady = !isFetching;
   const totalCount = data?.collectionsConnection.totalCount || 0;
 
-  return [totalCount, !loading] as const;
+  return [totalCount, isReady] as const;
 }
 
 function useCollections(admin: string) {
   const where = useMemo(() => getCollectionFilters(admin), [admin]);
   const [totalCount, isTotalCountReady] = useTotalCollectionsCount(where);
 
-  const { data, loading, fetchMore } = useQuery(COLLECTIONS_QUERY, {
-    variables: { ...DEFAULT_VARIABLES.COLLECTIONS, where },
+  const { data, isFetching, fetchNextPage } = useInfiniteQuery({
+    queryKey: ['collections', admin],
+    queryFn: ({ pageParam: offset }) =>
+      request(ADDRESS.INDEXER, COLLECTIONS_QUERY, { ...DEFAULT_VARIABLES.COLLECTIONS, offset, where }),
+    initialPageParam: 0,
+    // TODO: take a look, works for now cuz counter and hasMore are calculated below
+    getNextPageParam: (_lastPage, pages) => DEFAULT_VARIABLES.COLLECTIONS.limit * pages.length,
   });
 
-  const collections = useMemo(() => data?.collections || [], [data]);
+  const collections = useMemo(() => data?.pages.flatMap((result) => result.collections) || [], [data]);
   const collectionsCount = collections.length;
 
   const collectionIds = useMemo(() => collections.map(({ id }) => id), [collections]);
@@ -51,48 +64,45 @@ function useCollections(admin: string) {
     });
   }, [collections, nftsCounts]);
 
-  const isReady = !loading && isTotalCountReady;
+  const isReady = !isFetching && isTotalCountReady;
   const hasMore = totalCount && collectionsCount ? collectionsCount < totalCount : false;
 
-  const fetchCollections = useCallback(() => {
-    const offset = collectionsCount;
-
-    fetchMore({ variables: { offset } }).catch(console.error);
-  }, [collectionsCount, fetchMore]);
-
-  return [collectionsWithCounts, totalCount, hasMore, isReady, fetchCollections] as const;
+  return [collectionsWithCounts, totalCount, hasMore, isReady, fetchNextPage] as const;
 }
 
 function useTotalNFTsCount(where: NftWhereInput) {
-  const { data, loading } = useQuery(NFTS_CONNECTION_QUERY, { variables: { where } });
+  const { data, isFetching } = useQuery({
+    queryKey: ['nftsCount', where],
+    queryFn: () => request(ADDRESS.INDEXER, NFTS_CONNECTION_QUERY, { where }),
+  });
 
+  const isReady = !isFetching;
   const totalCount = data?.nftsConnection?.totalCount || 0;
 
-  return [totalCount, !loading] as const;
+  return [totalCount, isReady] as const;
 }
 
 function useNFTs(owner: string, collectionId?: string) {
   const where = useMemo(() => getNftFilters(owner, collectionId), [owner, collectionId]);
   const [totalCount, isTotalCountReady] = useTotalNFTsCount(where);
 
-  const { data, loading, fetchMore, refetch } = useQuery(NFTS_QUERY, {
-    variables: { ...DEFAULT_VARIABLES.NFTS, where },
+  const { data, isFetching, fetchNextPage, refetch } = useInfiniteQuery({
+    queryKey: ['nfts', where],
+    queryFn: ({ pageParam: offset }) =>
+      request(ADDRESS.INDEXER, NFTS_QUERY, { ...DEFAULT_VARIABLES.NFTS, offset, where }),
+    initialPageParam: 0,
+    // TODO: take a look, works for now cuz counter and hasMore are calculated below
+    getNextPageParam: (_lastPage, pages) => DEFAULT_VARIABLES.NFTS.limit * pages.length,
   });
 
-  const nfts = data?.nfts || [];
+  const nfts = useMemo(() => data?.pages.flatMap((result) => result.nfts) || [], [data]);
   const nftsCount = nfts.length;
 
   // TODO: if new nfts would be minted, totalCount will remain the same
   const hasMoreNFTs = totalCount && nftsCount ? nftsCount < totalCount : false;
-  const isNFTsQueryReady = !loading && isTotalCountReady;
+  const isNFTsQueryReady = !isFetching && isTotalCountReady;
 
-  const fetchNFTs = useCallback(() => {
-    const offset = nftsCount;
-
-    fetchMore({ variables: { offset } }).catch(console.error);
-  }, [fetchMore, nftsCount]);
-
-  return [nfts, totalCount, hasMoreNFTs, isNFTsQueryReady, fetchNFTs, refetch] as const;
+  return [nfts, totalCount, hasMoreNFTs, isNFTsQueryReady, fetchNextPage, refetch] as const;
 }
 
 export { useNFTs, useCollections };

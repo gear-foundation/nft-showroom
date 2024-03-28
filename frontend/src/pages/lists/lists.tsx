@@ -77,6 +77,9 @@ function Lists() {
           items={collections}
           itemsPerRow={gridSize === GRID_SIZE.SMALL ? 3 : 2}
           emptyText="Create collections"
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
           renderItem={(collection) => <CollectionCard key={collection.id} {...collection} />}
           fetchItems={fetchCollections}
           isMoreItems={hasMoreCollections}

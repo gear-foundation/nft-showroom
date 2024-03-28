@@ -1,6 +1,7 @@
-import { useQuery } from '@apollo/client';
 import { ProgramMetadata } from '@gear-js/api';
 import { ProviderProps, useAlert } from '@gear-js/react-hooks';
+import { useQuery } from '@tanstack/react-query';
+import request from 'graphql-request';
 import { createContext, useContext, useEffect, useState } from 'react';
 
 import { ADDRESS } from '@/consts';
@@ -16,7 +17,7 @@ const useMarketplace = () => useContext(MarketplaceContext);
 function MarketplaceProvider({ children }: ProviderProps) {
   const alert = useAlert();
 
-  const { data } = useQuery(MARKETPLACE_QUERY);
+  const { data } = useQuery({ queryKey: ['marketplace'], queryFn: () => request(ADDRESS.INDEXER, MARKETPLACE_QUERY) });
   const marketplace = data?.marketplaceById;
 
   const [marketplaceMetadata, setMarketplaceMetadata] = useState<ProgramMetadata>();

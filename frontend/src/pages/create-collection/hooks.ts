@@ -1,6 +1,8 @@
-import { useQuery } from '@apollo/client';
 import { useAccount } from '@gear-js/react-hooks';
+import { useQuery } from '@tanstack/react-query';
+import request from 'graphql-request';
 
+import { ADDRESS } from '@/consts';
 import { useMarketplace } from '@/context';
 import { useCountdown } from '@/hooks';
 
@@ -10,16 +12,13 @@ function useLastCollection() {
   const { account } = useAccount();
   const admin = account?.decodedAddress || '';
 
-  const { data, loading } = useQuery(LAST_CREATED_COLLECTION_QUERY, {
-    variables: { admin },
-    // TODO: better to use cache-and-network, but result.fetching is not getting updated immediately
-    // maybe should be easy to fix via result.stale
-    // ref: https://github.com/urql-graphql/urql/issues/2002
-    fetchPolicy: 'network-only',
+  const { data, isFetching } = useQuery({
+    queryKey: ['lastCreatedCollection', admin],
+    queryFn: () => request(ADDRESS.INDEXER, LAST_CREATED_COLLECTION_QUERY, { admin }),
   });
 
   const lastCollection = data?.collections[0];
-  const isLastCollectionReady = !loading;
+  const isLastCollectionReady = !isFetching;
 
   return { lastCollection, isLastCollectionReady };
 }
