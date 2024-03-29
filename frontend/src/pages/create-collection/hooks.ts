@@ -10,13 +10,7 @@ function useLastCollection() {
   const { account } = useAccount();
   const admin = account?.decodedAddress || '';
 
-  const { data, loading } = useQuery(LAST_CREATED_COLLECTION_QUERY, {
-    variables: { admin },
-    // TODO: better to use cache-and-network, but result.fetching is not getting updated immediately
-    // maybe should be easy to fix via result.stale
-    // ref: https://github.com/urql-graphql/urql/issues/2002
-    fetchPolicy: 'network-only',
-  });
+  const { data, loading } = useQuery(LAST_CREATED_COLLECTION_QUERY, { variables: { admin } });
 
   const lastCollection = data?.collections[0];
   const isLastCollectionReady = !loading;

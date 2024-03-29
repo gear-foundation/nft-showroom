@@ -6,7 +6,6 @@ import { Kind, OperationTypeNode } from 'graphql';
 import { createClient } from 'graphql-ws';
 
 import { ADDRESS } from '@/consts';
-import { CollectionsQueryQuery } from '@/graphql/graphql';
 
 const httpLink = new HttpLink({ uri: ADDRESS.INDEXER });
 const wsLink = new GraphQLWsLink(createClient({ url: ADDRESS.INDEXER_WS }));
@@ -22,60 +21,10 @@ const splitLink = split(
 
 const client = new ApolloClient({
   link: splitLink,
-  cache: new InMemoryCache({
-    typePolicies: {
-      Query: {
-        fields: {
-          nfts: {
-            keyArgs: ['where', ['owner_eq', 'collection', ['id_eq']]],
-            merge: (existing: unknown[] = [], incoming: unknown[], { args }: { args: unknown }) => {
-              // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-              // @ts-ignore
-              const offset = args.offset as number;
-
-              // Slicing is necessary because the existing data is
-              // immutable, and frozen in development.
-              const merged = existing ? existing.slice(0) : [];
-
-              for (let i = 0; i < incoming.length; ++i) {
-                merged[offset + i] = incoming[i];
-              }
-
-              return merged;
-            },
-          },
-
-          // TODO: make it less mess
-          collections: {
-            keyArgs: ['where', ['admin_contains', 'admin_eq']], // admin_eq is for create collection page
-            merge: (
-              existing: CollectionsQueryQuery['collections'] = [],
-              incoming: CollectionsQueryQuery['collections'],
-              { args }: { args: unknown },
-            ) => {
-              // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-              // @ts-ignore
-              const offset = args.offset as number;
-
-              // Slicing is necessary because the existing data is
-              // immutable, and frozen in development.
-              const merged = existing ? existing.slice(0) : [];
-
-              for (let i = 0; i < incoming.length; ++i) {
-                merged[offset + i] = incoming[i];
-              }
-
-              return merged;
-            },
-          },
-        },
-      },
-    },
-  }),
+  cache: new InMemoryCache(),
 
   defaultOptions: {
-    query: { notifyOnNetworkStatusChange: true },
-    watchQuery: { notifyOnNetworkStatusChange: true },
+    watchQuery: { notifyOnNetworkStatusChange: true, fetchPolicy: 'network-only' },
   },
 });
 

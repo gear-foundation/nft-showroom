@@ -3,6 +3,7 @@ import { ProgramMetadata } from '@gear-js/api';
 import { ProviderProps, useAlert } from '@gear-js/react-hooks';
 import { createContext, useContext, useEffect, useState } from 'react';
 
+import { ADDRESS } from '@/consts';
 import { getIpfsLink } from '@/utils';
 
 import { DEFAULT_VALUE, MARKETPLACE_QUERY } from './consts';
@@ -21,8 +22,11 @@ function MarketplaceProvider({ children }: ProviderProps) {
   const [marketplaceMetadata, setMarketplaceMetadata] = useState<ProgramMetadata>();
   const [collectionsMetadata, setCollectionsMetadata] = useState<MetadataRecord>();
 
+  const logPublicEnvs = () => console.log('public envs: ', { ...ADDRESS, CONTRACT: marketplace?.address });
+
   useEffect(() => {
     if (!marketplace) return;
+    logPublicEnvs();
 
     const { metadata, collectionTypes } = marketplace;
     const collectionURLs = collectionTypes.map(({ metaUrl }) => fetch(getIpfsLink(metaUrl)));

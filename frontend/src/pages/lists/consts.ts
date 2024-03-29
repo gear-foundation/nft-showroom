@@ -27,25 +27,6 @@ const COLLECTIONS_QUERY = graphql(`
   }
 `);
 
-const COLLECTIONS_SUBSCRIPTION = graphql(`
-  subscription CollectionsSub($limit: Int!, $offset: Int!, $where: CollectionWhereInput!) {
-    collections(limit: $limit, offset: $offset, orderBy: [createdAt_DESC, name_DESC, id_DESC], where: $where) {
-      id
-      name
-      description
-      collectionBanner
-      collectionLogo
-      admin
-      tokensLimit
-
-      nfts(limit: 5) {
-        id
-        mediaUrl
-      }
-    }
-  }
-`);
-
 const COLLECTIONS_NFTS_COUNT_QUERY = graphql(`
   query CollectionsNFTsCountQuery($ids: [String!]) {
     nftsInCollection(collections: $ids) {
@@ -96,37 +77,6 @@ const NFTS_QUERY = graphql(`
   }
 `);
 
-const NFTS_SUBSCRIPTION = graphql(`
-  subscription NFTsSubscription($limit: Int!, $offset: Int!, $where: NftWhereInput!) {
-    nfts(limit: $limit, offset: $offset, orderBy: [createdAt_DESC, name_DESC, id_DESC], where: $where) {
-      id
-      idInCollection
-      name
-      mediaUrl
-      owner
-
-      mintedBy
-
-      collection {
-        id
-        name
-        transferable
-        sellable
-      }
-
-      sales(where: { status_eq: "open" }) {
-        price
-      }
-
-      auctions(where: { status_eq: "open" }) {
-        minPrice
-        lastPrice
-        endTimestamp
-      }
-    }
-  }
-`);
-
 const DEFAULT_VARIABLES = {
   COLLECTIONS: {
     limit: 12,
@@ -142,10 +92,8 @@ const DEFAULT_VARIABLES = {
 export {
   COLLECTIONS_CONNECTION_QUERY,
   COLLECTIONS_QUERY,
-  COLLECTIONS_SUBSCRIPTION,
   COLLECTIONS_NFTS_COUNT_QUERY,
   NFTS_CONNECTION_QUERY,
   NFTS_QUERY,
-  NFTS_SUBSCRIPTION,
   DEFAULT_VARIABLES,
 };
