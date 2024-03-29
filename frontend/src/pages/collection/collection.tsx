@@ -26,10 +26,9 @@ function Collection() {
   const { accountFilterValue, accountFilterAddress, setAccountFilterValue } = useAccountFilter();
 
   const [nfts, nftsCount, hasMoreNFTs, isNFTsQueryReady, fetchNFTs, refetchNFTs] = useNFTs(accountFilterAddress, id);
+  const [collection, isCollectionQueryReady] = useCollection(id);
 
-  const collection = useCollection(id);
   const { name, additionalLinks } = collection || {};
-
   const socialEntries = Object.entries(additionalLinks || {}).filter(([key]) => !key.startsWith('__'));
 
   const renderSocials = () =>
@@ -51,7 +50,7 @@ function Collection() {
     <Container>
       <Breadcrumbs list={[{ to: generatePath(ROUTE.COLLECTION, { id }), text: name || '' }]} />
 
-      {collection ? (
+      {isCollectionQueryReady && collection ? (
         <header className={styles.headerContainer}>
           <div className={styles.header}>
             <img src={getIpfsLink(collection.collectionBanner)} alt="" className={styles.banner} />
