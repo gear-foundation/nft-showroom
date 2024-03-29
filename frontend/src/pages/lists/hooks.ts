@@ -57,7 +57,12 @@ function useCollections(admin: string) {
   const fetchCollections = useCallback(() => {
     const offset = collectionsCount;
 
-    fetchMore({ variables: { offset } }).catch(console.error);
+    fetchMore({
+      variables: { offset },
+      updateQuery: (prevResult, { fetchMoreResult }) => ({
+        collections: [...prevResult.collections, ...fetchMoreResult.collections],
+      }),
+    }).catch(console.error);
   }, [collectionsCount, fetchMore]);
 
   return [collectionsWithCounts, totalCount, hasMore, isReady, fetchCollections] as const;
@@ -75,7 +80,7 @@ function useNFTs(owner: string, collectionId?: string) {
   const where = useMemo(() => getNftFilters(owner, collectionId), [owner, collectionId]);
   const [totalCount, isTotalCountReady] = useTotalNFTsCount(where);
 
-  const { data, loading, fetchMore } = useQuery(NFTS_QUERY, {
+  const { data, loading, fetchMore, refetch } = useQuery(NFTS_QUERY, {
     variables: { ...DEFAULT_VARIABLES.NFTS, where },
   });
 
@@ -89,10 +94,13 @@ function useNFTs(owner: string, collectionId?: string) {
   const fetchNFTs = useCallback(() => {
     const offset = nftsCount;
 
-    fetchMore({ variables: { offset } }).catch(console.error);
+    fetchMore({
+      variables: { offset },
+      updateQuery: (prevResult, { fetchMoreResult }) => ({ nfts: [...prevResult.nfts, ...fetchMoreResult.nfts] }),
+    }).catch(console.error);
   }, [fetchMore, nftsCount]);
 
-  return [nfts, totalCount, hasMoreNFTs, isNFTsQueryReady, fetchNFTs] as const;
+  return [nfts, totalCount, hasMoreNFTs, isNFTsQueryReady, fetchNFTs, refetch] as const;
 }
 
 export { useNFTs, useCollections };

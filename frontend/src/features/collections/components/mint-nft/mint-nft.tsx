@@ -11,9 +11,10 @@ type Props = Pick<
   'id' | 'tokensLimit' | 'paymentForMint' | 'userMintLimit' | 'permissionToMint' | 'admin'
 > & {
   nfts: Pick<Nft, 'id' | 'mintedBy'>[];
+  refetch: () => void;
 };
 
-function Component({ id, tokensLimit, paymentForMint, userMintLimit, permissionToMint, admin, nfts }: Props) {
+function Component({ id, tokensLimit, paymentForMint, userMintLimit, permissionToMint, admin, nfts, refetch }: Props) {
   const sendMessage = useMarketplaceMessage();
   const alert = useAlert();
   const [isLoading, enableLoading, disableLoading] = useLoading();
@@ -42,7 +43,11 @@ function Component({ id, tokensLimit, paymentForMint, userMintLimit, permissionT
     const percentage = (BigInt(paymentForMint) * BigInt(200)) / BigInt(FEE_MULTIPLIER);
     const value = (BigInt(paymentForMint) + percentage).toString();
 
-    const onSuccess = () => alert.success('NFT minted');
+    const onSuccess = () => {
+      refetch();
+      alert.success('NFT minted');
+    };
+
     const onFinally = disableLoading;
 
     sendMessage({ payload, value, onSuccess, onFinally });

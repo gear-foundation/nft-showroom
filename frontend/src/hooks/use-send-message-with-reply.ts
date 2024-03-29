@@ -58,6 +58,7 @@ const useSendMessageWithReply = (programId: HexString, metadata: ProgramMetadata
     if (!account) throw new Error('Account is not found');
 
     let unsub: UnsubscribePromise | undefined = undefined;
+    let replyPayload: Reply<T> | undefined = undefined;
 
     const _onFinally = () => {
       onFinally();
@@ -66,6 +67,13 @@ const useSendMessageWithReply = (programId: HexString, metadata: ProgramMetadata
       if (!unsub) throw new Error('Failed to unsubscribe from reply');
 
       unsub.then((unsubCallback) => unsubCallback()).catch((error: Error) => alert.error(error.message));
+    };
+
+    const _onSuccess = () => {
+      _onFinally();
+
+      if (!replyPayload) return;
+      onSuccess(replyPayload);
     };
 
     const handleUserMessageSent = ({ data }: UserMessageSent) => {
@@ -87,25 +95,20 @@ const useSendMessageWithReply = (programId: HexString, metadata: ProgramMetadata
         const decodedPayload = metadata.createType(typeIndex, payload).toJSON();
 
         if (!isObject(decodedPayload)) throw new Error('Failed to get transaction result: payload is not an object');
+        if ('err' in decodedPayload) throw new Error(decodedPayload.err?.toString());
+        if (!('ok' in decodedPayload)) throw new Error('Failed to get transaction result: ok property is not found');
 
-        const isErrorPayload = Object.prototype.hasOwnProperty.call(decodedPayload, 'err');
-        if (isErrorPayload) throw new Error(decodedPayload.err?.toString());
-
-        const isSuccessPayload = Object.prototype.hasOwnProperty.call(decodedPayload, 'ok');
-        if (!isSuccessPayload) throw new Error('Failed to get transaction result: ok property is not found');
-
-        onSuccess(decodedPayload.ok as Reply<T>);
+        replyPayload = decodedPayload.ok as Reply<T>;
       } catch (error) {
         const errorMessage = error instanceof Error ? error.message : String(error);
         alert.error(errorMessage);
+        _onFinally();
       }
-
-      _onFinally();
     };
 
     unsub = api.gearEvents.subscribeToGearEvent('UserMessageSent', handleUserMessageSent);
 
-    sendMessage({ ...sendMessageArgs, onError: _onFinally });
+    sendMessage({ ...sendMessageArgs, onError: _onFinally, onSuccess: _onSuccess });
   };
 };
 
