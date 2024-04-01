@@ -6,7 +6,7 @@ import { ADDRESS } from '@/consts';
 import { COLLECTION_QUERY } from './consts';
 
 function useCollection(id: string) {
-  const { data, isFetching, refetch } = useQuery({
+  const { data, isFetching } = useQuery({
     queryKey: ['collection', id],
     queryFn: () => request(ADDRESS.INDEXER, COLLECTION_QUERY, { id }),
   });
@@ -14,7 +14,7 @@ function useCollection(id: string) {
   const collection = data?.collectionById;
   const isCollectionQueryReady = !isFetching;
 
-  return [collection, isCollectionQueryReady, refetch] as const;
+  return [collection, isCollectionQueryReady] as const;
 }
 
 export { useCollection };

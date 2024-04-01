@@ -71,7 +71,7 @@ function useCollections(admin: string) {
 }
 
 function useTotalNFTsCount(where: NftWhereInput) {
-  const { data, isFetching } = useQuery({
+  const { data, isFetching, refetch } = useQuery({
     queryKey: ['nftsCount', where],
     queryFn: () => request(ADDRESS.INDEXER, NFTS_CONNECTION_QUERY, { where }),
   });
@@ -79,12 +79,12 @@ function useTotalNFTsCount(where: NftWhereInput) {
   const isReady = !isFetching;
   const totalCount = data?.nftsConnection?.totalCount || 0;
 
-  return [totalCount, isReady] as const;
+  return [totalCount, isReady, refetch] as const;
 }
 
 function useNFTs(owner: string, collectionId?: string) {
   const where = useMemo(() => getNftFilters(owner, collectionId), [owner, collectionId]);
-  const [totalCount, isTotalCountReady] = useTotalNFTsCount(where);
+  const [totalCount, isTotalCountReady, refetchTotalNFTsCount] = useTotalNFTsCount(where);
 
   const { data, isFetching, fetchNextPage, refetch } = useInfiniteQuery({
     queryKey: ['nfts', where],
@@ -102,7 +102,9 @@ function useNFTs(owner: string, collectionId?: string) {
   const hasMoreNFTs = totalCount && nftsCount ? nftsCount < totalCount : false;
   const isNFTsQueryReady = !isFetching && isTotalCountReady;
 
-  return [nfts, totalCount, hasMoreNFTs, isNFTsQueryReady, fetchNextPage, refetch] as const;
+  const refetchNFTs = () => Promise.all([refetch(), refetchTotalNFTsCount()]);
+
+  return [nfts, totalCount, hasMoreNFTs, isNFTsQueryReady, fetchNextPage, refetchNFTs] as const;
 }
 
 export { useNFTs, useCollections };
