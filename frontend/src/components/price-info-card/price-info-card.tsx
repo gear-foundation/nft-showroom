@@ -5,10 +5,10 @@ import VaraSVG from '@/assets/vara.svg?react';
 import { InfoCard, InfoCardProps } from '../info-card';
 
 function PriceInfoCard({ text, ...props }: Omit<InfoCardProps, 'SVG'>) {
-  const { api } = useApi();
+  const { isApiReady, api } = useApi();
   const [unit] = api?.registry.chainTokens || ['Unit'];
 
-  return <InfoCard SVG={VaraSVG} text={`${text} ${unit}`} {...props} />;
+  return <InfoCard SVG={VaraSVG} text={isApiReady ? `${text} ${unit}` : undefined} {...props} />;
 }
 
 export { PriceInfoCard };
