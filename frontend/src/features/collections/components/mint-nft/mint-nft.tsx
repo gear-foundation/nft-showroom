@@ -1,7 +1,7 @@
 import { useAccount, useAlert } from '@gear-js/react-hooks';
 import { Button } from '@gear-js/vara-ui';
 
-import { withAccount } from '@/components';
+import { withAccount, withApi } from '@/components';
 import { useMarketplace } from '@/context';
 import { Collection, Nft } from '@/graphql/graphql';
 import { useIsOwner, useLoading, useMarketplaceMessage } from '@/hooks';
@@ -10,29 +10,32 @@ type Props = Pick<
   Collection,
   'id' | 'tokensLimit' | 'paymentForMint' | 'userMintLimit' | 'permissionToMint' | 'admin'
 > & {
-  nfts: Pick<Nft, 'id' | 'mintedBy'>[];
+  nfts?: Pick<Nft, 'id'>[];
+  nftsCount: number;
   refetch: () => void;
 };
 
-function Component({ id, tokensLimit, paymentForMint, userMintLimit, permissionToMint, admin, nfts, refetch }: Props) {
+function Component(props: Props) {
+  const { id, tokensLimit, paymentForMint, userMintLimit, permissionToMint, admin, nfts, nftsCount, refetch } = props;
+
   const sendMessage = useMarketplaceMessage();
   const alert = useAlert();
   const [isLoading, enableLoading, disableLoading] = useLoading();
   const isAdmin = useIsOwner(admin);
 
   const { account } = useAccount();
-  // TODO: fetch filtered result from indexer?
-  const mintedTokensCount = nfts.filter(({ mintedBy }) => account?.decodedAddress === mintedBy).length;
 
-  const tokensToMint = tokensLimit ? Number(tokensLimit) - nfts.length : 1;
+  const tokensToMint = tokensLimit ? Number(tokensLimit) - nftsCount : 1;
   const isAllowedToMint = permissionToMint ? permissionToMint.includes(account!.decodedAddress) : true;
-  const isUserMintLimitUnmet = userMintLimit ? mintedTokensCount < Number(userMintLimit) : true;
+
+  const mintedNFTsCount = nfts?.length || 0;
+  const isUserMintLimitUnmet = userMintLimit ? mintedNFTsCount < Number(userMintLimit) : true;
 
   const { marketplace } = useMarketplace();
   const { royaltyToMarketplaceForMint } = marketplace?.config || {};
 
   const handleClick = () => {
-    if (!paymentForMint) throw new Error('paymentForMint is not exists');
+    if (!paymentForMint) throw new Error('paymentForMint is not found');
     if (royaltyToMarketplaceForMint === undefined) throw new Error('royaltyToMarketplaceForMint is not initialized');
 
     enableLoading();
@@ -58,6 +61,6 @@ function Component({ id, tokensLimit, paymentForMint, userMintLimit, permissionT
   ) : null;
 }
 
-const MintNFT = withAccount(Component);
+const MintNFT = withAccount(withApi(Component));
 
 export { MintNFT };

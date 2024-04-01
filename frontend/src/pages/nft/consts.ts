@@ -11,6 +11,8 @@ const NFT_QUERY = graphql(`
       owner
       createdAt
 
+      approvedAccount
+
       collection {
         id
         name
