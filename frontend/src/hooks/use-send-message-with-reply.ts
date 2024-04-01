@@ -46,12 +46,14 @@ const useSendMessageWithReply = (programId: HexString, metadata: ProgramMetadata
   // TODO: different payload types for marketplace and collection hooks
   return <T extends Payload>({
     onSuccess = () => {},
+    onError = () => {},
     onFinally = () => {},
     ...sendMessageArgs
   }: {
     payload: T;
     value?: string | number;
     onSuccess?: (value: Reply<T>) => void;
+    onError?: () => void;
     onFinally?: () => void;
   }) => {
     if (!isApiReady) throw new Error('API is not initialized');
@@ -60,13 +62,21 @@ const useSendMessageWithReply = (programId: HexString, metadata: ProgramMetadata
     let unsub: UnsubscribePromise | undefined = undefined;
     let replyPayload: Reply<T> | undefined = undefined;
 
-    const _onFinally = () => {
-      onFinally();
-
+    const unsubscribe = () => {
       // for dev purposes only, since unsub is tricky
       if (!unsub) throw new Error('Failed to unsubscribe from reply');
 
       unsub.then((unsubCallback) => unsubCallback()).catch((error: Error) => alert.error(error.message));
+    };
+
+    const _onFinally = () => {
+      unsubscribe();
+      onFinally();
+    };
+
+    const _onError = () => {
+      _onFinally();
+      onError();
     };
 
     const _onSuccess = () => {
@@ -103,13 +113,14 @@ const useSendMessageWithReply = (programId: HexString, metadata: ProgramMetadata
       } catch (error) {
         const errorMessage = error instanceof Error ? error.message : String(error);
         alert.error(errorMessage);
-        _onFinally();
+
+        _onError();
       }
     };
 
     unsub = api.gearEvents.subscribeToGearEvent('UserMessageSent', handleUserMessageSent);
 
-    sendMessage({ ...sendMessageArgs, onError: _onFinally, onSuccess: _onSuccess });
+    sendMessage({ ...sendMessageArgs, onError: _onError, onSuccess: _onSuccess });
   };
 };
 

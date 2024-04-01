@@ -3,13 +3,14 @@ import { Button } from '@gear-js/vara-ui';
 import { z } from 'zod';
 
 import { NFTActionFormModal, PriceInput, withAccount, withApi, withMarketplaceConfig } from '@/components';
+import { useMarketplace } from '@/context';
 import { Nft, Collection, CollectionType } from '@/graphql/graphql';
-import { useApprovedMessage, useIsOwner, useLoading, useModal } from '@/hooks';
+import { useApproveMessage, useIsOwner, useLoading, useMarketplaceMessage, useModal } from '@/hooks';
 
 import TagSVG from '../../assets/tag.svg?react';
 import { usePriceSchema } from '../../hooks';
 
-type Props = Pick<Nft, 'idInCollection' | 'name' | 'mediaUrl' | 'owner'> & {
+type Props = Pick<Nft, 'idInCollection' | 'name' | 'mediaUrl' | 'owner' | 'approvedAccount'> & {
   collection: Pick<Collection, 'id' | 'name' | 'sellable'> & {
     type: Pick<CollectionType, 'type'>;
   };
@@ -19,23 +20,26 @@ const defaultValues = {
   price: '',
 };
 
-function Component({ collection, owner, ...nft }: Props) {
+function Component({ collection, owner, approvedAccount, ...nft }: Props) {
   const [isOpen, open, close] = useModal();
   const isOwner = useIsOwner(owner);
   const alert = useAlert();
   const [isLoading, enableLoading, disableLoading] = useLoading();
 
+  const { marketplace } = useMarketplace();
+  const isApprovedToMarketplace = approvedAccount === marketplace?.address;
+
   const { getPriceSchema } = usePriceSchema();
   const schema = z.object({ price: getPriceSchema() });
 
-  const sendMessage = useApprovedMessage(collection.id, collection.type.type);
+  const sendMarketplaceMessage = useMarketplaceMessage();
+  const sendApprovedMessage = useApproveMessage(collection.id, collection.type.type);
 
   const onSubmit = ({ price }: typeof defaultValues) => {
     enableLoading();
 
     const tokenId = nft.idInCollection;
     const collectionAddress = collection.id;
-
     const payload = { SaleNft: { price, collectionAddress, tokenId } };
 
     const onSuccess = () => {
@@ -44,8 +48,11 @@ function Component({ collection, owner, ...nft }: Props) {
     };
 
     const onFinally = disableLoading;
+    const startSale = () => sendMarketplaceMessage({ payload, onSuccess, onFinally });
 
-    sendMessage({ payload, onSuccess, onFinally });
+    if (isApprovedToMarketplace) return startSale();
+
+    sendApprovedMessage(tokenId, startSale, onFinally);
   };
 
   const modalProps = { heading: 'Start Sale', close };
