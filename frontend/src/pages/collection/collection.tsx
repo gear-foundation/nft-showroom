@@ -26,7 +26,7 @@ function Collection() {
   const { accountFilterValue, accountFilterAddress, setAccountFilterValue } = useAccountFilter();
 
   const [nfts, nftsCount, hasMoreNFTs, isNFTsQueryReady, fetchNFTs, refetchNFTs] = useNFTs(accountFilterAddress, id);
-  const [collection, isCollectionQueryReady] = useCollection(id);
+  const [collection, isCollectionQueryReady, refetchCollection] = useCollection(id);
 
   const { name, additionalLinks } = collection || {};
   const socialEntries = Object.entries(additionalLinks || {}).filter(([key]) => !key.startsWith('__'));
@@ -71,7 +71,11 @@ function Collection() {
             <div>
               <ul className={styles.socials}>{renderSocials()}</ul>
 
-              <MintNFT {...{ ...collection, nfts }} refetch={refetchNFTs} />
+              <MintNFT
+                {...{ ...collection }}
+                nftsCount={nftsCount}
+                refetch={() => Promise.all([refetchCollection(), refetchNFTs()])}
+              />
             </div>
           </div>
         </header>
