@@ -85,9 +85,10 @@ const useSendMessageWithReply = (programId: HexString, metadata: ProgramMetadata
           throw new Error('Failed to get transaction result: handle.output type index is not found');
 
         const { message } = data;
-        const { source, destination, payload, details } = message;
+        const { source, destination, payload, details, value } = message;
 
-        if (source.toHex() !== programId || destination.toHex() !== account.decodedAddress) return;
+        const isUtilMessage = !value.isEmpty; // treat carefully, currently all user messages are the ones without value
+        if (source.toHex() !== programId || destination.toHex() !== account.decodedAddress || isUtilMessage) return;
 
         const isSuccess = details.isSome ? details.unwrap().code.isSuccess : true;
         if (!isSuccess) throw new Error(payload.toHuman()?.toString());
