@@ -2,7 +2,7 @@ import { useAlert } from '@gear-js/react-hooks';
 import { Button } from '@gear-js/vara-ui';
 import { z } from 'zod';
 
-import { NFTActionFormModal, PriceInput, withAccount, withApi } from '@/components';
+import { NFTActionFormModal, PriceInput, withAccount, withApi, withMarketplaceConfig } from '@/components';
 import { Nft, Collection, CollectionType } from '@/graphql/graphql';
 import { useApprovedMessage, useIsOwner, useLoading, useModal } from '@/hooks';
 
@@ -64,6 +64,6 @@ function Component({ collection, owner, ...nft }: Props) {
   ) : null;
 }
 
-const StartSale = withAccount(withApi(Component));
+const StartSale = withAccount(withApi(withMarketplaceConfig(Component)));
 
 export { StartSale };
