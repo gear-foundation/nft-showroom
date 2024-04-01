@@ -14,7 +14,7 @@ const SOCIAL_ICON = {
 };
 
 const COLLECTION_QUERY = graphql(`
-  query CollectionQuery($id: String!, $accountAddress: String!) {
+  query CollectionQuery($id: String!) {
     collectionById(id: $id) {
       id
       name
@@ -36,10 +36,6 @@ const COLLECTION_QUERY = graphql(`
 
         xcom
         telegram
-      }
-
-      nfts(where: { mintedBy_eq: $accountAddress }) {
-        id
       }
     }
   }

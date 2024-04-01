@@ -3,20 +3,21 @@ import { Button } from '@gear-js/vara-ui';
 
 import { withAccount, withApi } from '@/components';
 import { useMarketplace } from '@/context';
-import { Collection, Nft } from '@/graphql/graphql';
+import { Collection } from '@/graphql/graphql';
 import { useIsOwner, useLoading, useMarketplaceMessage } from '@/hooks';
+
+import { useMintedNFTsCount } from '../../hooks';
 
 type Props = Pick<
   Collection,
   'id' | 'tokensLimit' | 'paymentForMint' | 'userMintLimit' | 'permissionToMint' | 'admin'
 > & {
-  nfts?: Pick<Nft, 'id'>[];
   nftsCount: number;
   refetch: () => void;
 };
 
 function Component(props: Props) {
-  const { id, tokensLimit, paymentForMint, userMintLimit, permissionToMint, admin, nfts, nftsCount, refetch } = props;
+  const { id, tokensLimit, paymentForMint, userMintLimit, permissionToMint, admin, nftsCount, refetch } = props;
 
   const sendMessage = useMarketplaceMessage();
   const alert = useAlert();
@@ -28,8 +29,8 @@ function Component(props: Props) {
   const tokensToMint = tokensLimit ? Number(tokensLimit) - nftsCount : 1;
   const isAllowedToMint = permissionToMint ? permissionToMint.includes(account!.decodedAddress) : true;
 
-  const mintedNFTsCount = nfts?.length || 0;
-  const isUserMintLimitUnmet = userMintLimit ? mintedNFTsCount < Number(userMintLimit) : true;
+  const [mintedNFTsCount, isMintedNFTCountReady, refetchMintedNFTsCount] = useMintedNFTsCount(id);
+  const isUserMintLimitUnmet = userMintLimit ? isMintedNFTCountReady && mintedNFTsCount < Number(userMintLimit) : true;
 
   const { marketplace } = useMarketplace();
   const { royaltyToMarketplaceForMint } = marketplace?.config || {};
@@ -48,6 +49,8 @@ function Component(props: Props) {
 
     const onSuccess = () => {
       refetch();
+      refetchMintedNFTsCount().catch(({ message }: Error) => alert.error(message));
+
       alert.success('NFT minted');
     };
 
