@@ -93,7 +93,12 @@ function Collection() {
           items={nfts || []}
           itemsPerRow={gridSize === GRID_SIZE.SMALL ? 4 : 3}
           emptyText="Mint NFTs"
-          renderItem={(nft) => (nft && collection ? <NFTCard key={nft.id} {...{ ...nft, collection }} /> : null)}
+          renderItem={(nft, index) =>
+            // TODO: should be fixed with cursor pagination,
+            // however cuz of indexer's limitations we have to deal with duplicates,
+            // and therefore adding index to the key
+            nft && collection ? <NFTCard key={`${nft.id}-${index}`} {...{ ...nft, collection }} /> : null
+          }
           fetchItems={fetchNFTs}
           isMoreItems={hasMoreNFTs}
           skeleton={{
