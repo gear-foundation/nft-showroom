@@ -57,7 +57,10 @@ function Lists() {
           items={nfts}
           itemsPerRow={gridSize === GRID_SIZE.SMALL ? 4 : 3}
           emptyText="Mint NFTs"
-          renderItem={(nft) => <NFTCard key={nft.id} {...nft} />}
+          // TODO: should be fixed with cursor pagination,
+          // however cuz of indexer's limitations we have to deal with duplicates,
+          // and therefore adding index to the key
+          renderItem={(nft, index) => <NFTCard key={`${nft.id}-${index}`} {...nft} />}
           fetchItems={fetchNFTs}
           isMoreItems={hasMoreNFTs}
           skeleton={{
@@ -77,7 +80,8 @@ function Lists() {
           items={collections}
           itemsPerRow={gridSize === GRID_SIZE.SMALL ? 3 : 2}
           emptyText="Create collections"
-          renderItem={(collection) => <CollectionCard key={collection.id} {...collection} />}
+          // adding index in the key, same as above
+          renderItem={(collection, index) => <CollectionCard key={`${collection.id}-${index}`} {...collection} />}
           fetchItems={fetchCollections}
           isMoreItems={hasMoreCollections}
           skeleton={{

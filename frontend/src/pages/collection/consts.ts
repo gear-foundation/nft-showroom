@@ -33,6 +33,7 @@ const COLLECTION_QUERY = graphql(`
         discord
         externalUrl
         medium
+
         xcom
         telegram
       }

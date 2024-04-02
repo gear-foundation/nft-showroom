@@ -26,10 +26,9 @@ function Collection() {
   const { accountFilterValue, accountFilterAddress, setAccountFilterValue } = useAccountFilter();
 
   const [nfts, nftsCount, hasMoreNFTs, isNFTsQueryReady, fetchNFTs, refetchNFTs] = useNFTs(accountFilterAddress, id);
+  const [collection, isCollectionQueryReady] = useCollection(id);
 
-  const collection = useCollection(id);
   const { name, additionalLinks } = collection || {};
-
   const socialEntries = Object.entries(additionalLinks || {}).filter(([key]) => !key.startsWith('__'));
 
   const renderSocials = () =>
@@ -51,7 +50,7 @@ function Collection() {
     <Container>
       <Breadcrumbs list={[{ to: generatePath(ROUTE.COLLECTION, { id }), text: name || '' }]} />
 
-      {collection ? (
+      {isCollectionQueryReady && collection ? (
         <header className={styles.headerContainer}>
           <div className={styles.header}>
             <img src={getIpfsLink(collection.collectionBanner)} alt="" className={styles.banner} />
@@ -72,7 +71,7 @@ function Collection() {
             <div>
               <ul className={styles.socials}>{renderSocials()}</ul>
 
-              <MintNFT {...{ ...collection, nfts }} refetch={refetchNFTs} />
+              <MintNFT {...{ ...collection }} nftsCount={nftsCount} refetch={refetchNFTs} />
             </div>
           </div>
         </header>
@@ -94,7 +93,12 @@ function Collection() {
           items={nfts || []}
           itemsPerRow={gridSize === GRID_SIZE.SMALL ? 4 : 3}
           emptyText="Mint NFTs"
-          renderItem={(nft) => (nft && collection ? <NFTCard key={nft.id} {...{ ...nft, collection }} /> : null)}
+          renderItem={(nft, index) =>
+            // TODO: should be fixed with cursor pagination,
+            // however cuz of indexer's limitations we have to deal with duplicates,
+            // and therefore adding index to the key
+            nft && collection ? <NFTCard key={`${nft.id}-${index}`} {...{ ...nft, collection }} /> : null
+          }
           fetchItems={fetchNFTs}
           isMoreItems={hasMoreNFTs}
           skeleton={{

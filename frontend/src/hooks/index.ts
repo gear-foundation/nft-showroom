@@ -1,4 +1,4 @@
-import { useMarketplaceMessage, useCollectionMessage, useApprovedMessage } from './api';
+import { useMarketplaceMessage, useCollectionMessage, useApproveMessage } from './api';
 import { useChangeEffect } from './use-change-effect';
 import { useCountdown } from './use-countdown';
 import { useIsOwner } from './use-is-owner';
@@ -8,7 +8,7 @@ import { useModal } from './use-modal';
 export {
   useMarketplaceMessage,
   useCollectionMessage,
-  useApprovedMessage,
+  useApproveMessage,
   useModal,
   useIsOwner,
   useLoading,

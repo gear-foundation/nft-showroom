@@ -2,7 +2,6 @@ import { HexString } from '@gear-js/api';
 import { useAlert } from '@gear-js/react-hooks';
 
 import { useMarketplace } from '@/context';
-import { StartAuctionPayload, StartSalePayload } from '@/features/marketplace';
 
 import { useSendMessageWithReply } from './use-send-message-with-reply';
 
@@ -20,38 +19,25 @@ function useCollectionMessage(id: string, typeName: string) {
   return useSendMessageWithReply(id as HexString, collectionsMetadata?.[typeName]);
 }
 
-function useApprovedMessage(collectionId: string, collectionTypeName: string) {
+function useApproveMessage(collectionId: string, collectionTypeName: string) {
   const alert = useAlert();
 
   const { marketplace } = useMarketplace();
-  // TODO: drop after @gear-js/react-hooks update
-  const address = (marketplace?.address || '0x00') as HexString;
+  const sendMessage = useCollectionMessage(collectionId, collectionTypeName);
 
-  const sendMarketplaceMessage = useMarketplaceMessage();
-  const sendCollectionMessage = useCollectionMessage(collectionId, collectionTypeName);
+  return (tokenId: number, _onSuccess: () => void, onError: () => void) => {
+    if (!marketplace) throw new Error('Marketplace config is not initialized');
 
-  return <T extends StartAuctionPayload | StartSalePayload>(args: {
-    payload: T;
-    onSuccess: () => void;
-    onFinally: () => void;
-  }) => {
-    const to = address;
-
-    const [{ tokenId }] = Object.values(args.payload) as unknown as
-      | StartAuctionPayload[keyof StartAuctionPayload][]
-      | StartSalePayload[keyof StartSalePayload][];
-
+    const to = marketplace.address;
     const payload = { Approve: { to, tokenId } };
 
     const onSuccess = () => {
       alert.success('NFT is approved to Marketplace contract');
-      sendMarketplaceMessage(args);
+      _onSuccess();
     };
 
-    const onFinally = args.onFinally;
-
-    sendCollectionMessage({ payload, onSuccess, onFinally });
+    sendMessage({ payload, onSuccess, onError });
   };
 }
 
-export { useMarketplaceMessage, useCollectionMessage, useApprovedMessage };
+export { useMarketplaceMessage, useCollectionMessage, useApproveMessage };

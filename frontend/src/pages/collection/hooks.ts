@@ -1,12 +1,20 @@
-import { useQuery } from '@apollo/client';
+import { useQuery } from '@tanstack/react-query';
+import request from 'graphql-request';
+
+import { ADDRESS } from '@/consts';
 
 import { COLLECTION_QUERY } from './consts';
 
 function useCollection(id: string) {
-  const { data } = useQuery(COLLECTION_QUERY, { variables: { id } });
-  const collection = data?.collectionById;
+  const { data, isFetching } = useQuery({
+    queryKey: ['collection', id],
+    queryFn: () => request(ADDRESS.INDEXER, COLLECTION_QUERY, { id }),
+  });
 
-  return collection;
+  const collection = data?.collectionById;
+  const isCollectionQueryReady = !isFetching;
+
+  return [collection, isCollectionQueryReady] as const;
 }
 
 export { useCollection };
