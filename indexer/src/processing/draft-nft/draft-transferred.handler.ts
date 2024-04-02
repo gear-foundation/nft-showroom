@@ -35,6 +35,7 @@ export class DraftTransferredHandler implements IDraftNftEventHandler {
       await storage.setNft(
         new Nft({
           ...nft,
+          approvedAccount: null,
           owner: recipient,
         }),
       );

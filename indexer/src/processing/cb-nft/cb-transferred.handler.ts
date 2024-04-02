@@ -35,6 +35,7 @@ export class CBTransferredHandler implements ICBNftEventHandler {
       await storage.setNft(
         new Nft({
           ...nft,
+          approvedAccount: null,
           owner: recipient,
         }),
       );
