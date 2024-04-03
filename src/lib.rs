@@ -1,9 +1,7 @@
 #![no_std]
 
 use crate::nft_messages::*;
-use gstd::{
-    collections::HashMap, exec, msg, prelude::*, prog::ProgramGenerator, ActorId, CodeId
-};
+use gstd::{collections::HashMap, exec, msg, prelude::*, prog::ProgramGenerator, ActorId, CodeId};
 use nft_marketplace_io::*;
 
 mod auction;
@@ -52,7 +50,8 @@ extern "C" fn init() {
         max_number_of_images,
     } = msg::load().expect("Unable to decode `NftMarketplaceInit`");
     let existential_deposit = exec::env_vars().existential_deposit;
-    let minimum_value_for_trade =  existential_deposit * 10_000 / (10_000 - royalty_to_marketplace_for_trade) as u128;
+    let minimum_value_for_trade =
+        existential_deposit * 10_000 / (10_000 - royalty_to_marketplace_for_trade) as u128;
     let nft_marketplace = NftMarketplace {
         admins: vec![msg::source()],
         config: Config {
@@ -68,7 +67,7 @@ extern "C" fn init() {
             ms_in_block,
             fee_per_uploaded_file,
             max_creator_royalty,
-            max_number_of_images
+            max_number_of_images,
         },
         minimum_value_for_trade,
         ..Default::default()
@@ -82,7 +81,7 @@ extern "C" fn init() {
             minimum_value_for_trade,
             fee_per_uploaded_file,
             max_creator_royalty,
-            max_number_of_images
+            max_number_of_images,
         }),
         0,
     )
@@ -106,22 +105,34 @@ async fn main() {
             type_name,
             type_description,
             allow_create,
-        } => nft_marketplace.add_new_collection(code_id, meta_link, type_name, type_description, allow_create),
+        } => nft_marketplace.add_new_collection(
+            code_id,
+            meta_link,
+            type_name,
+            type_description,
+            allow_create,
+        ),
         NftMarketplaceAction::CreateCollection { type_name, payload } => {
             let msg_source = msg::source();
             let msg_value = msg::value();
-            let reply = nft_marketplace.create_collection(type_name, payload, msg_source, msg_value).await;
+            let reply = nft_marketplace
+                .create_collection(type_name, payload, msg_source, msg_value)
+                .await;
             if reply.is_err() {
-                msg::send_with_gas(msg_source, NftMarketplaceEvent::ValueSent, 0, msg_value).expect("Error in sending value");
+                msg::send_with_gas(msg_source, Ok::<NftMarketplaceEvent, NftMarketplaceError>(NftMarketplaceEvent::ValueSent), 0, msg_value)
+                    .expect("Error in sending value");
             }
             reply
         }
         NftMarketplaceAction::Mint { collection_address } => {
             let msg_source = msg::source();
             let msg_value = msg::value();
-            let reply = nft_marketplace.mint(collection_address, msg_source, msg_value).await;
+            let reply = nft_marketplace
+                .mint(collection_address, msg_source, msg_value)
+                .await;
             if reply.is_err() {
-                msg::send_with_gas(msg_source, NftMarketplaceEvent::ValueSent, 0, msg_value).expect("Error in sending value");
+                msg::send_with_gas(msg_source, Ok::<NftMarketplaceEvent, NftMarketplaceError>(NftMarketplaceEvent::ValueSent), 0, msg_value)
+                    .expect("Error in sending value");
             }
             reply
         }
@@ -152,7 +163,8 @@ async fn main() {
                 .buy(collection_address, token_id, msg_source, msg_value)
                 .await;
             if reply.is_err() {
-                msg::send_with_gas(msg_source, NftMarketplaceEvent::ValueSent, 0, msg_value).expect("Error in sending value");
+                msg::send_with_gas(msg_source, Ok::<NftMarketplaceEvent, NftMarketplaceError>(NftMarketplaceEvent::ValueSent), 0, msg_value)
+                    .expect("Error in sending value");
             }
             reply
         }
@@ -172,12 +184,13 @@ async fn main() {
         } => {
             let msg_source = msg::source();
             let msg_value = msg::value();
-            let reply = nft_marketplace.add_bid(collection_address, token_id, msg_source, msg_value);
+            let reply =
+                nft_marketplace.add_bid(collection_address, token_id, msg_source, msg_value);
             if reply.is_err() {
-                msg::send_with_gas(msg_source, NftMarketplaceEvent::ValueSent, 0, msg_value).expect("Error in sending value");
+                msg::send_with_gas(msg_source, Ok::<NftMarketplaceEvent, NftMarketplaceError>(NftMarketplaceEvent::ValueSent), 0, msg_value)
+                    .expect("Error in sending value");
             }
             reply
-            
         }
         NftMarketplaceAction::CloseAuction {
             collection_address,
@@ -206,7 +219,8 @@ async fn main() {
                 .create_offer(collection_address, token_id, msg_source, msg_value)
                 .await;
             if reply.is_err() {
-                msg::send_with_gas(msg_source, NftMarketplaceEvent::ValueSent, 0, msg_value).expect("Error in sending value");
+                msg::send_with_gas(msg_source, Ok::<NftMarketplaceEvent, NftMarketplaceError>(NftMarketplaceEvent::ValueSent), 0, msg_value)
+                    .expect("Error in sending value");
             }
             reply
         }
@@ -233,7 +247,7 @@ async fn main() {
             ms_in_block,
             fee_per_uploaded_file,
             max_creator_royalty,
-            max_number_of_images
+            max_number_of_images,
         } => nft_marketplace.update_config(
             gas_for_creation,
             gas_for_mint,
@@ -247,11 +261,16 @@ async fn main() {
             ms_in_block,
             fee_per_uploaded_file,
             max_creator_royalty,
-            max_number_of_images
+            max_number_of_images,
         ),
         NftMarketplaceAction::AllowMessage(allow) => nft_marketplace.allow_message(allow),
-        NftMarketplaceAction::AllowCreateCollection(allow) => nft_marketplace.allow_create_collection(allow),
-        NftMarketplaceAction::AddExternalCollection { collection_address, type_name } => nft_marketplace.add_external_collection(collection_address, type_name),
+        NftMarketplaceAction::AllowCreateCollection(allow) => {
+            nft_marketplace.allow_create_collection(allow)
+        }
+        NftMarketplaceAction::AddExternalCollection {
+            collection_address,
+            type_name,
+        } => nft_marketplace.add_external_collection(collection_address, type_name),
     };
 
     msg::reply(result, 0).expect(
@@ -295,7 +314,6 @@ impl NftMarketplace {
         msg_src: ActorId,
         msg_value: u128,
     ) -> Result<NftMarketplaceEvent, NftMarketplaceError> {
-
         self.check_time_creation(&msg_src)?;
         self.check_allow_create_collection(&msg_src)?;
         self.check_allow_message(&msg_src)?;
@@ -340,7 +358,7 @@ impl NftMarketplace {
         &mut self,
         collection_address: ActorId,
         msg_src: ActorId,
-        msg_value: u128
+        msg_value: u128,
     ) -> Result<NftMarketplaceEvent, NftMarketplaceError> {
         self.check_allow_message(&msg_src)?;
         mint(
@@ -455,7 +473,8 @@ impl NftMarketplace {
         let minimum_value_for_trade = if let Some(royalty) = royalty_to_marketplace_for_trade {
             self.config.royalty_to_marketplace_for_trade = royalty;
             let existential_deposit = exec::env_vars().existential_deposit;
-            self.minimum_value_for_trade =  existential_deposit * 10_000 / (10_000 - royalty) as u128;
+            self.minimum_value_for_trade =
+                existential_deposit * 10_000 / (10_000 - royalty) as u128;
             Some(self.minimum_value_for_trade)
         } else {
             None
@@ -490,7 +509,7 @@ impl NftMarketplace {
             minimum_value_for_trade,
             fee_per_uploaded_file,
             max_creator_royalty,
-            max_number_of_images
+            max_number_of_images,
         })
     }
     pub fn allow_message(
@@ -501,7 +520,6 @@ impl NftMarketplace {
         self.check_admin(&msg_src)?;
         self.allow_message = allow;
         Ok(NftMarketplaceEvent::AllowMessageChanged)
-
     }
     pub fn allow_create_collection(
         &mut self,
@@ -511,7 +529,6 @@ impl NftMarketplace {
         self.check_admin(&msg_src)?;
         self.allow_create_collection = allow;
         Ok(NftMarketplaceEvent::AllowCreateCollectionChanged)
-
     }
 
     pub fn add_external_collection(
@@ -521,10 +538,11 @@ impl NftMarketplace {
     ) -> Result<NftMarketplaceEvent, NftMarketplaceError> {
         let msg_src = msg::source();
         self.check_admin(&msg_src)?;
-        if !self.type_collections.contains_key(&type_name){
+        if !self.type_collections.contains_key(&type_name) {
             return Err(NftMarketplaceError::WrongCollectionName);
         }
-        self.collection_to_owner.insert(collection_address, (type_name.clone(), msg_src));
+        self.collection_to_owner
+            .insert(collection_address, (type_name.clone(), msg_src));
         Ok(NftMarketplaceEvent::CollectionCreated {
             type_name,
             collection_address,
@@ -536,11 +554,12 @@ impl NftMarketplace {
         self.check_admin(&msg_src)?;
         let balance = exec::value_available();
         let existential_deposit = exec::env_vars().existential_deposit;
-        if balance < 2*existential_deposit {
+        if balance < 2 * existential_deposit {
             return Err(NftMarketplaceError::InsufficientBalance);
         }
         let value = balance - existential_deposit;
-        msg::send_with_gas(msg_src, NftMarketplaceEvent::ValueSent, 0, value).expect("Error in sending value");
+        msg::send_with_gas(msg_src, Ok::<NftMarketplaceEvent, NftMarketplaceError>(NftMarketplaceEvent::ValueSent), 0, value)
+            .expect("Error in sending value");
         Ok(NftMarketplaceEvent::BalanceHasBeenWithdrawn { value })
     }
 
@@ -607,18 +626,12 @@ extern "C" fn state() {
         StateQuery::All => StateReply::All(nft_marketplace.into()),
         StateQuery::Admins => StateReply::Admins(nft_marketplace.admins),
         StateQuery::CollectionsInfo => {
-            let type_collections = nft_marketplace
-                .type_collections
-                .into_iter()
-                .collect();
+            let type_collections = nft_marketplace.type_collections.into_iter().collect();
             StateReply::CollectionsInfo(type_collections)
         }
         StateQuery::Config => StateReply::Config(nft_marketplace.config),
         StateQuery::AllCollections => {
-            let collection_to_owner = nft_marketplace
-                .collection_to_owner
-                .into_iter()
-                .collect();
+            let collection_to_owner = nft_marketplace.collection_to_owner.into_iter().collect();
             StateReply::AllCollections(collection_to_owner)
         }
         StateQuery::GetCollectionInfo(collection_address) => {
@@ -656,29 +669,19 @@ impl From<NftMarketplace> for State {
             config,
             minimum_value_for_trade,
             allow_message,
-            allow_create_collection
+            allow_create_collection,
         } = value;
 
-        let collection_to_owner = collection_to_owner
-            .into_iter()
-            .collect();
+        let collection_to_owner = collection_to_owner.into_iter().collect();
 
-        let time_creation = time_creation
-            .into_iter()
-            .collect();
+        let time_creation = time_creation.into_iter().collect();
 
-        let type_collections = type_collections
-            .into_iter()
-            .collect();
+        let type_collections = type_collections.into_iter().collect();
 
         let sales = sales.into_iter().collect();
-        let auctions = auctions
-            .into_iter()
-            .collect();
+        let auctions = auctions.into_iter().collect();
 
-        let offers = offers
-            .into_iter()
-            .collect();
+        let offers = offers.into_iter().collect();
 
         Self {
             admins,
@@ -691,7 +694,7 @@ impl From<NftMarketplace> for State {
             config,
             minimum_value_for_trade,
             allow_message,
-            allow_create_collection
+            allow_create_collection,
         }
     }
 }

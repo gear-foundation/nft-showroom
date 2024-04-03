@@ -1,8 +1,8 @@
 use gclient::{EventProcessor, GearApi, Result};
 use gear_core::ids::ProgramId;
 use gstd::{prelude::*, ActorId};
-use nft_marketplace_io::*;
 use nft_io::{Config as NftConfig, ImageData, NftInit};
+use nft_marketplace_io::*;
 mod utils_gclient;
 use utils_gclient::*;
 
@@ -52,27 +52,23 @@ async fn create_test() -> Result<()> {
     assert_eq!(state.collection_owner, USERS[0].into(), "Wrong Admin");
 
     let percent_to_marketplace = 10_000_000_000_000 * 200 as u128 / 10_000;
-    let payment_for_mint = 10_000_000_000_000 + percent_to_marketplace ;
+    let payment_for_mint = 10_000_000_000_000 + percent_to_marketplace;
 
     let message_id = mint(&api, program_id, address_nft, payment_for_mint)
         .await
         .expect("Error mint");
     assert!(listener.message_processed(message_id).await?.succeed());
 
-    // Check marketplace and collection owner balance 
+    // Check marketplace and collection owner balance
     let marketplace_balance_after_mint = api.total_balance(program_id).await?;
     assert_eq!(
         marketplace_balance_after_mint,
         marketplace_balance + percent_to_marketplace,
         "Wrong value"
     );
-    
+
     let collection_owner_balance = api.total_balance(get_program_id_from_u64(USERS[0])).await?;
-    assert_eq!(
-        collection_owner_balance,
-        10_000_000_000_000,
-        "Wrong value"
-    );
+    assert_eq!(collection_owner_balance, 10_000_000_000_000, "Wrong value");
 
     // Check success of mint
     let state = get_all_state_nft(&api, &nft_pid)
@@ -81,7 +77,7 @@ async fn create_test() -> Result<()> {
 
     assert!(!state.tokens.is_empty());
     // assert_eq!(state.img_links_and_data.len(), 9);
-    
+
     assert_eq!(state.img_links_and_data.len(), 9999);
     Ok(())
 }
@@ -133,13 +129,13 @@ async fn sale_test() -> Result<()> {
     assert_eq!(state.collection_owner, USERS[0].into(), "Wrong Admin");
 
     let percent_to_marketplace = 10_000_000_000_000 * 200 as u128 / 10_000;
-    let payment_for_mint = 10_000_000_000_000 + percent_to_marketplace ;
+    let payment_for_mint = 10_000_000_000_000 + percent_to_marketplace;
     let message_id = mint(&api, program_id, address_nft, payment_for_mint)
         .await
         .expect("Error mint");
     assert!(listener.message_processed(message_id).await?.succeed());
 
-    // Check marketplace and collection owner balance 
+    // Check marketplace and collection owner balance
     let marketplace_balance_after_mint = api.total_balance(program_id).await?;
     assert_eq!(
         marketplace_balance_after_mint,
@@ -147,11 +143,7 @@ async fn sale_test() -> Result<()> {
         "Wrong value"
     );
     let collection_owner_balance = api.total_balance(get_program_id_from_u64(USERS[0])).await?;
-    assert_eq!(
-        collection_owner_balance,
-        10_000_000_000_000,
-        "Wrong value"
-    );
+    assert_eq!(collection_owner_balance, 10_000_000_000_000, "Wrong value");
 
     // Check success of mint
     let state = get_all_state_nft(&api, &nft_pid)
@@ -232,7 +224,7 @@ async fn sale_test() -> Result<()> {
     let collection_owner_balance = api.total_balance(get_program_id_from_u64(USERS[0])).await?;
     assert_eq!(
         collection_owner_balance,
-        10_000_000_000_000+percent_to_collection_owner,
+        10_000_000_000_000 + percent_to_collection_owner,
         "Wrong value"
     );
 
@@ -286,13 +278,13 @@ async fn auction_test() -> Result<()> {
     assert_eq!(state.collection_owner, USERS[0].into(), "Wrong Admin");
 
     let percent_to_marketplace = 10_000_000_000_000 * 200 as u128 / 10_000;
-    let payment_for_mint = 10_000_000_000_000 + percent_to_marketplace ;
+    let payment_for_mint = 10_000_000_000_000 + percent_to_marketplace;
     let message_id = mint(&api, program_id, address_nft, payment_for_mint)
         .await
         .expect("Error mint");
     assert!(listener.message_processed(message_id).await?.succeed());
 
-    // Check marketplace and collection owner balance 
+    // Check marketplace and collection owner balance
     let marketplace_balance_after_mint = api.total_balance(program_id).await?;
     assert_eq!(
         marketplace_balance_after_mint,
@@ -300,11 +292,7 @@ async fn auction_test() -> Result<()> {
         "Wrong value"
     );
     let collection_owner_balance = api.total_balance(get_program_id_from_u64(USERS[0])).await?;
-    assert_eq!(
-        collection_owner_balance,
-        10_000_000_000_000,
-        "Wrong value"
-    );
+    assert_eq!(collection_owner_balance, 10_000_000_000_000, "Wrong value");
 
     // Check success of mint
     let state = get_all_state_nft(&api, &nft_pid)
@@ -404,7 +392,10 @@ async fn auction_test() -> Result<()> {
     let state = get_marketplace_state(&api, &program_id)
         .await
         .expect("Unexpected invalid state.");
-    assert_eq!(state.auctions[0].1.current_winner, client_2.get_specific_actor_id(USERS_STR[1]));
+    assert_eq!(
+        state.auctions[0].1.current_winner,
+        client_2.get_specific_actor_id(USERS_STR[1])
+    );
 
     let balance_user_0_new = api.total_balance(user_0).await?;
     assert_eq!(
@@ -433,7 +424,7 @@ async fn auction_test() -> Result<()> {
     assert_eq!(token.0, 0);
     assert_eq!(token.1.owner, api.get_specific_actor_id(USERS_STR[1]));
 
-    // Check marketplace and collection owner balance 
+    // Check marketplace and collection owner balance
     let marketplace_balance_after_auction = api.total_balance(program_id).await?;
     assert_eq!(
         marketplace_balance_after_auction,
@@ -443,7 +434,7 @@ async fn auction_test() -> Result<()> {
     let collection_owner_balance = api.total_balance(get_program_id_from_u64(USERS[1])).await?;
     assert_eq!(
         collection_owner_balance,
-        10_000_000_000_000+percent_to_collection_owner,
+        10_000_000_000_000 + percent_to_collection_owner,
         "Wrong value"
     );
     Ok(())
@@ -496,7 +487,7 @@ async fn offer_test() -> Result<()> {
     assert_eq!(state.collection_owner, USERS[0].into(), "Wrong Admin");
 
     let percent_to_marketplace = 10_000_000_000_000 * 200 as u128 / 10_000;
-    let payment_for_mint = 10_000_000_000_000 + percent_to_marketplace ;
+    let payment_for_mint = 10_000_000_000_000 + percent_to_marketplace;
     let message_id = mint(&api, program_id, address_nft, payment_for_mint)
         .await
         .expect("Error mint");
@@ -510,11 +501,7 @@ async fn offer_test() -> Result<()> {
         "Wrong value"
     );
     let collection_owner_balance = api.total_balance(get_program_id_from_u64(USERS[0])).await?;
-    assert_eq!(
-        collection_owner_balance,
-        10_000_000_000_000,
-        "Wrong value"
-    );
+    assert_eq!(collection_owner_balance, 10_000_000_000_000, "Wrong value");
 
     // Check success of mint
     let state = get_all_state_nft(&api, &nft_pid)
@@ -535,7 +522,6 @@ async fn offer_test() -> Result<()> {
     let offer_price = 150_000_000_000_000;
     let percent_to_marketplace = offer_price * royalty_to_marketplace as u128 / 10_000;
     let percent_to_collection_owner = offer_price * royalty_to_collection_owner as u128 / 10_000;
-
 
     let gas_info = client
         .calculate_handle_gas(
@@ -601,7 +587,7 @@ async fn offer_test() -> Result<()> {
     assert_eq!(token.0, 0);
     assert_eq!(token.1.owner, api.get_specific_actor_id(USERS_STR[0]));
 
-    // Check marketplace and collection owner balance 
+    // Check marketplace and collection owner balance
     let marketplace_balance_after_offer = api.total_balance(program_id).await?;
     assert_eq!(
         marketplace_balance_after_offer,
@@ -611,13 +597,12 @@ async fn offer_test() -> Result<()> {
     let collection_owner_balance = api.total_balance(get_program_id_from_u64(USERS[0])).await?;
     assert_eq!(
         collection_owner_balance,
-        10_000_000_000_000+percent_to_collection_owner,
+        10_000_000_000_000 + percent_to_collection_owner,
         "Wrong value"
     );
 
     Ok(())
 }
-
 
 // #[tokio::test]
 // #[ignore]

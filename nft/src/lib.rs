@@ -25,20 +25,22 @@ struct NftContract {
 static mut NFT_CONTRACT: Option<NftContract> = None;
 
 impl NftContract {
-    fn mint(&mut self, minter: ActorId, msg_value: u128) -> Result<NftEvent, NftError> {
+    fn mint(&mut self, minter: ActorId, msg_value: u128, source_maketplace: bool) -> Result<NftEvent, NftError> {
         // check if there are tokens for mint
         self.check_available_amount_of_tokens()?;
 
-        // check if a user can make a mint:
-        // - quantity limit
-        // - user-specific limit
-        self.check_mint(&minter)?;
+        if source_maketplace {
+            // check if a user can make a mint:
+            // - quantity limit
+            // - user-specific limit
+            self.check_mint(&minter)?;
+            // value check on mint
+            self.payment_for_mint(msg_value)?;
+        }
 
         let Some(next_nft_nonce) = self.nonce.checked_add(1) else {
             return Err(NftError::MathOverflow);
         };
-        // value check on mint
-        self.payment_for_mint(msg_value)?;
 
         let rand_index = get_random_value(self.img_links_and_data.len() as u64);
         let token_id = self.nonce;
@@ -340,7 +342,7 @@ impl NftContract {
                 return Err(NftError::WrongValue);
             }
             // use send_with_gas to transfer the value directly to the balance, not to the mailbox.
-            msg::send_with_gas(self.collection_owner, "", 0, self.config.payment_for_mint)
+            msg::send_with_gas(self.collection_owner, Ok::<NftEvent, NftError>(NftEvent::ValueSent), 0, self.config.payment_for_mint)
                 .expect("Error in sending value");
         }
 
@@ -522,14 +524,16 @@ extern "C" fn handle() {
         NftAction::Mint { minter } => {
             let msg_source = msg::source();
             let msg_value = msg::value();
-            let result = if msg_source != nft_contract.marketplace_address {
-                Err(NftError::AccessDenied)
+            let result = if msg_source == nft_contract.marketplace_address {
+                nft_contract.mint(minter, msg_value, true)
+            } else if nft_contract.admins.contains(&msg_source){
+                nft_contract.mint(minter, msg_value, false)
             } else {
-                nft_contract.mint(minter, msg_value)
+                Err(NftError::AccessDenied)
             };
             
             if result.is_err() {
-                msg::send_with_gas(msg_source, "", 0, msg_value).expect("Error in sending value");
+                msg::send_with_gas(msg_source, Ok::<NftEvent, NftError>(NftEvent::ValueSent), 0, msg_value).expect("Error in sending value");
             }
             result
         }

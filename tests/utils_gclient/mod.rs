@@ -372,3 +372,4 @@ pub fn get_program_id_from_u64(u64: u64) -> ProgramId {
     let list: [u8; 32] = actor_id.into();
     list.into()
 }
+

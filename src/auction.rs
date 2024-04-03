@@ -76,7 +76,7 @@ impl NftMarketplace {
             },
             self.config.gas_for_close_auction,
             0,
-            duration+1,
+            duration + 1,
         )
         .expect("Error in sending delayed message");
 
@@ -84,7 +84,7 @@ impl NftMarketplace {
             collection_address,
             token_id,
             min_price,
-            duration_ms: (duration+1) * self.config.ms_in_block,
+            duration_ms: (duration + 1) * self.config.ms_in_block,
         })
     }
 
@@ -100,8 +100,13 @@ impl NftMarketplace {
 
         if auction.current_winner != ActorId::zero() {
             // use send_with_gas with gas_limit = 0 to transfer the value directly to the balance, not to the mailbox.
-            msg::send_with_gas(auction.current_winner, NftMarketplaceEvent::ValueSent, 0, auction.current_price)
-                .expect("Error in sending value");
+            msg::send_with_gas(
+                auction.current_winner,
+                Ok::<NftMarketplaceEvent, NftMarketplaceError>(NftMarketplaceEvent::ValueSent),
+                0,
+                auction.current_price,
+            )
+            .expect("Error in sending value");
         }
         auction.current_winner = msg_src;
         auction.current_price = msg_value;
@@ -207,8 +212,13 @@ impl NftMarketplace {
 
         if auction.current_winner != ActorId::zero() {
             // use send_with_gas to transfer the value directly to the balance, not to the mailbox.
-            msg::send_with_gas(auction.current_winner, NftMarketplaceEvent::ValueSent, 0, auction.current_price)
-                .expect("Error in sending value");
+            msg::send_with_gas(
+                auction.current_winner,
+                Ok::<NftMarketplaceEvent, NftMarketplaceError>(NftMarketplaceEvent::ValueSent),
+                0,
+                auction.current_price,
+            )
+            .expect("Error in sending value");
         }
 
         self.auctions
@@ -234,7 +244,9 @@ impl NftMarketplace {
                 }
 
                 // if the first bid, it may be equal to the `current_price` (initial bid)
-                if auction.current_winner != ActorId::zero() && *bid <= auction.current_price || auction.current_winner == ActorId::zero() && *bid < auction.current_price {
+                if auction.current_winner != ActorId::zero() && *bid <= auction.current_price
+                    || auction.current_winner == ActorId::zero() && *bid < auction.current_price
+                {
                     return Err(NftMarketplaceError::LessOrEqualThanBid);
                 }
                 auction

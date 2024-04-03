@@ -157,7 +157,8 @@ pub enum NftEvent {
     },
     AdminRemoved {
         admin: ActorId,
-    }
+    },
+    ValueSent
 }
 #[derive(Debug, Clone, Encode, Decode, TypeInfo)]
 pub enum NftError {

@@ -234,7 +234,7 @@ pub enum NftMarketplaceEvent {
     },
     ValueSent,
     AllowMessageChanged,
-    AllowCreateCollectionChanged
+    AllowCreateCollectionChanged,
 }
 
 #[derive(Debug, Clone, Encode, Decode, TypeInfo)]
@@ -261,7 +261,7 @@ pub enum NftMarketplaceError {
     WrongValue,
     MintError,
     InsufficientBalance,
-    LessThanMinimumValueForTrade
+    LessThanMinimumValueForTrade,
 }
 
 #[derive(Encode, Decode, TypeInfo)]

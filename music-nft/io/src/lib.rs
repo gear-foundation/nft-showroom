@@ -110,7 +110,6 @@ pub enum MusicNftAction {
     RemoveAdmin {
         admin: ActorId,
     },
-
 }
 
 #[derive(Debug, Clone, Encode, Decode, TypeInfo)]
@@ -167,7 +166,7 @@ pub enum MusicNftEvent {
     },
     AdminRemoved {
         admin: ActorId,
-    }
+    },
 }
 
 #[derive(Debug, Clone, Encode, Decode, TypeInfo)]
@@ -189,7 +188,7 @@ pub enum MusicNftError {
     ThereIsNoSuchUser,
     ExhaustedLimit,
     WrongValue,
-    OnlyOneAdminLeft
+    OnlyOneAdminLeft,
 }
 
 #[derive(Debug, Clone, Encode, Decode, TypeInfo)]

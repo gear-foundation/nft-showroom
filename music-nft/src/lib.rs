@@ -98,7 +98,10 @@ impl NftContract {
 
         msg::send_with_gas(
             minter,
-            Ok::<MusicNftEvent, MusicNftError>(MusicNftEvent::Minted { token_id, links_and_data }),
+            Ok::<MusicNftEvent, MusicNftError>(MusicNftEvent::Minted {
+                token_id,
+                links_and_data,
+            }),
             0,
             0,
         )
@@ -195,7 +198,10 @@ impl NftContract {
             payment_for_mint: self.config.payment_for_mint,
         })
     }
-    fn expand(&mut self, additional_links: Vec<(Links, ImageData)>) -> Result<MusicNftEvent, MusicNftError> {
+    fn expand(
+        &mut self,
+        additional_links: Vec<(Links, ImageData)>,
+    ) -> Result<MusicNftEvent, MusicNftError> {
         let msg_src = msg::source();
         self.check_admin(msg_src)?;
         if additional_links
@@ -258,7 +264,7 @@ impl NftContract {
         } else {
             return Err(MusicNftError::UserRestrictionCannotBeChanged);
         }
-        
+
         Ok(MusicNftEvent::UsersForMintAdded { users })
     }
     fn delete_user_for_mint(&mut self, user: ActorId) -> Result<MusicNftEvent, MusicNftError> {
@@ -296,7 +302,7 @@ impl NftContract {
         let msg_src = msg::source();
         self.check_admin(msg_src)?;
         self.admins.insert(admin);
-        Ok(MusicNftEvent::AdminAdded { admin})
+        Ok(MusicNftEvent::AdminAdded { admin })
     }
 
     fn remove_admin(&mut self, admin: ActorId) -> Result<MusicNftEvent, MusicNftError> {
@@ -306,7 +312,7 @@ impl NftContract {
             return Err(MusicNftError::OnlyOneAdminLeft);
         }
         self.admins.remove(&admin);
-        Ok(MusicNftEvent::AdminRemoved { admin})
+        Ok(MusicNftEvent::AdminRemoved { admin })
     }
 
     fn can_delete(&self) -> Result<MusicNftEvent, MusicNftError> {
@@ -342,7 +348,7 @@ impl NftContract {
         }
         Ok(())
     }
-    
+
     // Checking for sufficient mint value and sending the value to the creator
     fn payment_for_mint(&self, msg_value: u128) -> Result<(), MusicNftError> {
         if self.config.payment_for_mint != 0 {
@@ -385,7 +391,12 @@ impl NftContract {
     }
 
     // doing all the checks to verify that the transfer can be made
-    fn can_transfer(&self, from: &ActorId, to: &ActorId, token_id: &NftId) -> Result<(), MusicNftError> {
+    fn can_transfer(
+        &self,
+        from: &ActorId,
+        to: &ActorId,
+        token_id: &NftId,
+    ) -> Result<(), MusicNftError> {
         let nft = self
             .tokens
             .get(token_id)
@@ -400,7 +411,10 @@ impl NftContract {
         if owner != msg_src {
             self.check_approve(&msg_src, token_id)?;
         }
-        let time = self.config.transferable.ok_or(MusicNftError::NotTransferable)?;
+        let time = self
+            .config
+            .transferable
+            .ok_or(MusicNftError::NotTransferable)?;
         if exec::block_timestamp() < nft.mint_time + time {
             return Err(MusicNftError::NotTransferable);
         }
@@ -418,7 +432,7 @@ extern "C" fn init() {
         collection_owner,
         config,
         links_and_data,
-        mut permission_to_mint
+        mut permission_to_mint,
     } = msg::load().expect("Unable to decode `MusicNftInit`.");
 
     let msg_value = msg::value();
@@ -533,7 +547,7 @@ extern "C" fn handle() {
             } else {
                 nft_contract.mint(minter, msg_value)
             };
-            
+
             if result.is_err() {
                 msg::send_with_gas(msg_source, "", 0, msg_value).expect("Error in sending value");
             }
@@ -613,9 +627,7 @@ impl From<NftContract> for NftState {
             .map(|(nft_id, actor_id)| (nft_id, actor_id))
             .collect();
 
-        let admins = admins
-            .into_iter()
-            .collect();
+        let admins = admins.into_iter().collect();
 
         Self {
             tokens,
@@ -628,7 +640,7 @@ impl From<NftContract> for NftState {
             total_number_of_tokens,
             permission_to_mint,
             marketplace_address,
-            admins
+            admins,
         }
     }
 }

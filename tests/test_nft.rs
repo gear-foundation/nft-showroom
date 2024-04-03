@@ -712,11 +712,11 @@ fn get_state(nft_collection: &Program) -> Option<NftState> {
 
 // }
 
-// #[test]
-// fn check() {
-//     let input = "000080ee3600000000008c9de8de3b0000000000000000000000c800c800";
-//     let decoded = hex::decode(input).expect("Decoding failed");
-//     let mut res: &[u8] = &decoded;
-//     let result = Result::<NftMarketplaceEvent, NftMarketplaceError>::decode(&mut res).ok();
-//     println!("RES: {:?}", result);
-// }
+#[test]
+fn check() {
+    let input = "13";
+    let decoded = hex::decode(input).expect("Decoding failed");
+    let mut res: &[u8] = &decoded;
+    let result = Result::<NftMarketplaceEvent, NftMarketplaceError>::decode(&mut res).ok();
+    println!("RES: {:?}", result);
+}

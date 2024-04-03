@@ -2,8 +2,11 @@ use crate::utils::*;
 use utils::prelude::*;
 mod utils;
 use gtest::Program;
+use music_nft_io::{
+    Config, ImageData, Links, ListenCapability, MusicNftAction, MusicNftError, NftState,
+    StateQuery as StateQueryNft, StateReply as StateReplyNft,
+};
 use nft_marketplace_io::*;
-use music_nft_io::{Config, ImageData, Links, ListenCapability, MusicNftAction, MusicNftError, StateQuery as StateQueryNft, StateReply as StateReplyNft, NftState};
 const USERS: &[u64] = &[5, 6, 7, 8];
 
 #[test]
@@ -82,7 +85,7 @@ fn successful_basics() {
         payment_for_mint: 0,
         transferable: Some(0),
         sellable: Some(0),
-        listening_capabilities: ListenCapability::Demo
+        listening_capabilities: ListenCapability::Demo,
     };
     let res = nft_collection.send(USERS[0], MusicNftAction::ChangeConfig { config });
     assert!(!res.main_failed());
@@ -180,23 +183,25 @@ fn successful_basics() {
     // Successful Expand NFT in the collection
     let img_data = ImageData {
         limit_copies: Some(1),
-        description: None
+        description: None,
     };
-    let additional_links = vec![(Links{
-        img_link: None,
-        music_link: "add_link_1".to_string()
-    }, img_data.clone()),
-    (Links{
-        img_link: None,
-        music_link: "add_link_2".to_string()
-    }, img_data.clone()),
+    let additional_links = vec![
+        (
+            Links {
+                img_link: None,
+                music_link: "add_link_1".to_string(),
+            },
+            img_data.clone(),
+        ),
+        (
+            Links {
+                img_link: None,
+                music_link: "add_link_2".to_string(),
+            },
+            img_data.clone(),
+        ),
     ];
-    let res = nft_collection.send(
-        USERS[0],
-        MusicNftAction::Expand {
-            additional_links,
-        },
-    );
+    let res = nft_collection.send(USERS[0], MusicNftAction::Expand { additional_links });
     assert!(!res.main_failed());
     let state_reply = nft_collection
         .read_state(StateQueryNft::All)
@@ -227,7 +232,8 @@ fn failures() {
     );
 
     // The mint limit must be greater than zero
-    let mut init_music_nft_payload = get_init_music_nft_payload(USERS[0].into(), 0, Some(0), 0, None);
+    let mut init_music_nft_payload =
+        get_init_music_nft_payload(USERS[0].into(), 0, Some(0), 0, None);
     sys.mint_to(USERS[0], 100_000_000_000_000);
     marketplace.create_collection(
         USERS[0],
@@ -258,11 +264,11 @@ fn failures() {
     // Limit of copies value is equal to 0
     let img_data = ImageData {
         limit_copies: Some(0),
-        description: None
+        description: None,
     };
-    let links = Links{
+    let links = Links {
         img_link: None,
-        music_link: "Music link-0".to_owned()
+        music_link: "Music link-0".to_owned(),
     };
     init_music_nft_payload.links_and_data = vec![(links, img_data.clone())];
     marketplace.create_collection(
@@ -341,7 +347,7 @@ fn failures() {
         payment_for_mint: 0,
         transferable: Some(0),
         sellable: Some(0),
-        listening_capabilities: ListenCapability::Demo
+        listening_capabilities: ListenCapability::Demo,
     };
     let res = nft_collection.send(USERS[0], MusicNftAction::ChangeConfig { config });
     check_music_nft_error(USERS[0], &res, MusicNftError::ConfigCannotBeChanged);
@@ -356,18 +362,16 @@ fn failures() {
 
     let img_data = ImageData {
         limit_copies: Some(4),
-        description: None
+        description: None,
     };
-    let additional_links = vec![(Links{
-        img_link: None,
-        music_link: "New_img".to_owned()
-    }, img_data.clone())];
-    let res = nft_collection.send(
-        USERS[0],
-        MusicNftAction::Expand {
-            additional_links,
+    let additional_links = vec![(
+        Links {
+            img_link: None,
+            music_link: "New_img".to_owned(),
         },
-    );
+        img_data.clone(),
+    )];
+    let res = nft_collection.send(USERS[0], MusicNftAction::Expand { additional_links });
     assert!(!res.main_failed());
     marketplace.mint(USERS[2], address_nft, None);
 
@@ -427,7 +431,8 @@ fn check_transferable() {
         None,
     );
 
-    let mut init_music_nft_payload = get_init_music_nft_payload(USERS[0].into(), 0, Some(3), 0, None);
+    let mut init_music_nft_payload =
+        get_init_music_nft_payload(USERS[0].into(), 0, Some(3), 0, None);
     let transferable_time = 9_000;
     init_music_nft_payload.config.transferable = Some(transferable_time);
     sys.mint_to(USERS[0], 100_000_000_000_000);
@@ -527,7 +532,8 @@ fn check_payment_for_mint() {
     }
 
     // The payment for mint must be greater than existential deposit (10000000000000)
-    let mut init_music_nft_payload = get_init_music_nft_payload(USERS[0].into(), 0, Some(3), 0, None);
+    let mut init_music_nft_payload =
+        get_init_music_nft_payload(USERS[0].into(), 0, Some(3), 0, None);
     let payment_for_mint = 9_000_000_000_000;
     init_music_nft_payload.config.payment_for_mint = payment_for_mint;
     sys.mint_to(USERS[0], 100_000_000_000_000);
@@ -641,7 +647,8 @@ fn permission_to_mint() {
         println!("Collection info: {:?}", state);
     }
     // Successful creation of a new collection
-    let init_music_nft_payload = get_init_music_nft_payload(USERS[0].into(), 0, Some(3), 0, Some(vec![]));
+    let init_music_nft_payload =
+        get_init_music_nft_payload(USERS[0].into(), 0, Some(3), 0, Some(vec![]));
     sys.mint_to(USERS[0], 100_000_000_000_000);
     marketplace.create_collection(
         USERS[0],
