@@ -49,6 +49,7 @@ export class SaleNftHandler implements INftMarketplaceEventHandler {
     await storage.setNft(
       new Nft({
         ...nft,
+        approvedAccount: null,
         onSale: true,
       }),
     );

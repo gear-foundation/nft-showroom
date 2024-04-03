@@ -36,6 +36,7 @@ export class BidAddedHandler implements INftMarketplaceEventHandler {
     await storage.setAuction(
       new Auction({
         ...auction,
+        nft,
         lastPrice: price,
       }),
     );
