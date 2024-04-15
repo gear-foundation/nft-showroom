@@ -269,6 +269,7 @@ export class EventsProcessing {
         `${blockNumber}-${messageId}: error handling nft event`,
         e,
         payload,
+        eventInfo,
       );
       return null;
     }
