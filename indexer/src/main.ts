@@ -9,7 +9,6 @@ import { EntitiesService } from './processing/entities.service';
 import { getLocalStorage } from './processing/storage/local.storage';
 import { BatchService } from './processing/batch.service';
 import { config } from './config';
-import { readMigratedNfts } from './migrated-nft/migrated-nft';
 
 const nftCbPrograms = [config.nfts.cb, config.nfts.vit];
 
