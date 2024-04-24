@@ -1,7 +1,7 @@
 import { MintedEvent } from '../../types/nft.events';
 import { EntitiesService } from '../entities.service';
 import { INftEventHandler } from './nft.handler';
-import { Nft, Offer } from '../../model';
+import { Nft } from '../../model';
 import { EventInfo } from '../event-info.type';
 
 export class NftMintedHandler implements INftEventHandler {
@@ -18,7 +18,7 @@ export class NftMintedHandler implements INftEventHandler {
       return;
     }
     const { tokenId } = event;
-    let { description, mediaUrl, metadata, name, owner } = event.nftData;
+    const { description, mediaUrl, metadata, name, owner } = event.nftData;
     await storage.setNft(
       new Nft({
         id: `${collection.id}-${tokenId}`,
