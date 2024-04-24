@@ -2,8 +2,13 @@ import { cx } from '@/utils';
 
 import styles from './tabs.module.scss';
 
-type Props = {
-  list: string[];
+type Tab = {
+  title: string;
+  disabled?: boolean;
+};
+
+export type TabsProps = {
+  list: Tab[];
   value: number;
   size?: 'small' | 'large';
   outlined?: boolean;
@@ -11,18 +16,19 @@ type Props = {
   onChange: (index: number) => void;
 };
 
-function Tabs({ list, value, size = 'large', outlined, className, onChange }: Props) {
+function Tabs({ list, value, size = 'large', outlined, className, onChange }: TabsProps) {
   const renderButtons = () =>
-    list.map((button, index) => {
+    list.map(({ title, disabled }, index) => {
       const isActive = index === value;
 
       return (
-        <li key={button}>
+        <li key={title}>
           <button
             type="button"
             className={cx(styles.button, isActive && styles.active)}
-            onClick={() => onChange(index)}>
-            {button}
+            onClick={() => onChange(index)}
+            disabled={disabled}>
+            {title}
           </button>
         </li>
       );

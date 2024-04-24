@@ -29,6 +29,7 @@ const DEFAULT_PARAMETERS_VALUES: ParametersValues = {
   tags: [],
   isSellable: false,
   isTransferable: false,
+  isVariableMeta: false,
 };
 
 const DEFAULT_NFTS_VALUES: NFTsValues = {

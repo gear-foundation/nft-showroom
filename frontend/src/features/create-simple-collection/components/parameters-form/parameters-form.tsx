@@ -55,6 +55,7 @@ function ParametersForm({ defaultValues, onSubmit, onBack }: Props) {
         .transform((value) => value.toString()),
       isSellable: z.boolean(),
       isTransferable: z.boolean(),
+      isVariableMeta: z.boolean(),
     })
     .refine(({ mintPermission }) => mintPermission.value !== 'custom' || mintPermission.addresses.length, {
       message: 'No specifed address',
@@ -125,6 +126,7 @@ function ParametersForm({ defaultValues, onSubmit, onBack }: Props) {
             {Boolean(fields.length) && <ul className={styles.tags}>{renderTags()}</ul>}
           </div>
 
+          <Checkbox label="Allow modify meta" type="switch" {...register('isVariableMeta')} />
           <Checkbox label="Allow transferring" type="switch" {...register('isTransferable')} disabled={isSellable} />
           <Checkbox label="Allow selling" type="switch" {...register('isSellable')} />
 

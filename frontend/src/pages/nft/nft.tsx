@@ -2,7 +2,7 @@ import { useAccount } from '@gear-js/react-hooks';
 import { Identicon } from '@polkadot/react-identicon';
 import { generatePath, useParams } from 'react-router-dom';
 
-import { Breadcrumbs, Container, CopyButton, ResponsiveSquareImage, Skeleton, Tabs } from '@/components';
+import { Breadcrumbs, Container, CopyButton, ResponsiveSquareImage, Skeleton, Tabs, TabsProps } from '@/components';
 import { ROUTE } from '@/consts';
 import { TransferNFT } from '@/features/collections';
 import { BuyNFT, MakeBid, StartSale, StartAuction } from '@/features/marketplace';
@@ -13,9 +13,16 @@ import { getIpfsLink } from '@/utils';
 import { ListingCard } from './components';
 import { useNFT } from './hooks';
 import InfoSVG from './info.svg?react';
+import FeaturedPlayListSVG from './featured-play-list.svg?react';
+import MarkerSVG from './marker.svg?react';
 import styles from './nft.module.scss';
+import { useState } from 'react';
 
-const TABS = ['Overview', 'Properties', 'Activities'];
+const TABS: TabsProps['list'] = [
+  { title: 'Overview' },
+  { title: 'Properties' },
+  { title: 'History', disabled: true },
+];
 
 type Params = {
   collectionId: string;
@@ -28,13 +35,28 @@ function NFT() {
   const { collectionId, id } = useParams() as Params;
   const nft = useNFT(collectionId, id);
 
-  const { owner, name, collection, mediaUrl, description, createdAt, sales, auctions } = nft || {};
+  const { owner, name, collection, mediaUrl, description, createdAt, sales, auctions, metadata } = nft || {};
   const { name: collectionName, royalty } = collection || {};
 
   const [sale] = sales || [];
   const [auction] = auctions || [];
 
+  const parseNFTMetadata = (NFTMetadata?: string | null) => {
+    const parsedMetadata: unknown = NFTMetadata ? JSON.parse(NFTMetadata) : null;
+    if (Array.isArray(parsedMetadata) && parsedMetadata.every((value) => typeof value === 'string')) {
+      return parsedMetadata as string[];
+    }
+    return null;
+  };
+
+  const parsedNFTMetadata = parseNFTMetadata(metadata);
+
   const isOwner = account?.decodedAddress === owner;
+
+  const [selectedTab, setSelectedTab] = useState(0);
+  const onSelectedTabChange = (index: number) => {
+    setSelectedTab(index);
+  };
 
   return (
     <Container>
@@ -104,47 +126,79 @@ function NFT() {
           )}
 
           <div>
-            <Tabs list={TABS} size="small" outlined className={styles.tabs} value={0} onChange={() => {}} />
+            <Tabs
+              list={TABS}
+              size="small"
+              outlined
+              className={styles.tabs}
+              value={selectedTab}
+              onChange={onSelectedTabChange}
+            />
 
-            <div className={styles.card}>
-              <h3 className={styles.heading}>
-                <InfoSVG /> Details
-              </h3>
+            {selectedTab === 0 && (
+              <div className={styles.card}>
+                <h3 className={styles.heading}>
+                  <InfoSVG />
+                  Details
+                </h3>
 
-              <ul className={styles.table}>
-                <li className={styles.row}>
-                  <span>Contract Address:</span>
-                  <span className={styles.value}>
-                    <span className={styles.address}>{collectionId}</span>
-                    <CopyButton value={collectionId} />
-                  </span>
-                </li>
+                <ul className={styles.table}>
+                  <li className={styles.row}>
+                    <span>Contract Address:</span>
+                    <span className={styles.value}>
+                      <span className={styles.address}>{collectionId}</span>
+                      <CopyButton value={collectionId} />
+                    </span>
+                  </li>
 
-                <li className={styles.row}>
-                  <span>Token ID:</span>
-                  <span className={styles.value}>{id}</span>
-                </li>
+                  <li className={styles.row}>
+                    <span>Token ID:</span>
+                    <span className={styles.value}>{id}</span>
+                  </li>
 
-                <li className={styles.row}>
-                  <span>Token Standart:</span>
-                  <span className={styles.value}>gNFT</span>
-                </li>
+                  <li className={styles.row}>
+                    <span>Token Standart:</span>
+                    <span className={styles.value}>gNFT</span>
+                  </li>
 
-                <li className={styles.row}>
-                  <span>Mint Date:</span>
-                  <span className={styles.value}>
-                    {createdAt ? new Date(createdAt).toLocaleString() : <Skeleton width="25%" borderRadius="4px" />}
-                  </span>
-                </li>
+                  <li className={styles.row}>
+                    <span>Mint Date:</span>
+                    <span className={styles.value}>
+                      {createdAt ? new Date(createdAt).toLocaleString() : <Skeleton width="25%" borderRadius="4px" />}
+                    </span>
+                  </li>
 
-                <li className={styles.row}>
-                  <span>Creator Earnings:</span>
-                  <span className={styles.value}>
-                    {royalty !== undefined ? `${royalty}%` : <Skeleton width="25%" borderRadius="4px" />}
-                  </span>
-                </li>
-              </ul>
-            </div>
+                  <li className={styles.row}>
+                    <span>Creator Earnings:</span>
+                    <span className={styles.value}>
+                      {royalty !== undefined ? `${royalty}%` : <Skeleton width="25%" borderRadius="4px" />}
+                    </span>
+                  </li>
+                </ul>
+              </div>
+            )}
+
+            {selectedTab === 1 && (
+              <div className={styles.card}>
+                <h3 className={styles.heading}>
+                  <FeaturedPlayListSVG />
+                  NFT Details
+                </h3>
+
+                {!!parsedNFTMetadata?.length && (
+                  <ul className={styles.metadata}>
+                    {parsedNFTMetadata.map((value, index) => (
+                      <li className={styles.metadataItem} key={index}>
+                        <span className={styles.metadataContainer}>
+                          <MarkerSVG />
+                          <span className={styles.metadataText}>{value}</span>
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            )}
           </div>
         </div>
       </div>

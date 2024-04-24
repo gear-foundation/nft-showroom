@@ -10,6 +10,7 @@ const NFT_QUERY = graphql(`
       mediaUrl
       owner
       createdAt
+      metadata
 
       approvedAccount
 
