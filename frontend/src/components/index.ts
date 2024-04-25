@@ -19,7 +19,7 @@ import { List } from './list';
 import { NFTActionFormModal } from './nft-action-form-modal';
 import { PriceInfoCard } from './price-info-card';
 import { ResponsiveSquareImage } from './responsive-square-image';
-import { Tabs, TabsProps } from './tabs';
+import { Tabs } from './tabs';
 
 export {
   Header,
@@ -54,4 +54,4 @@ export {
   withMarketplaceConfig,
 };
 
-export type { InfoCardProps, TabsProps };
+export type { InfoCardProps };

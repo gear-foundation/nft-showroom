@@ -73,7 +73,9 @@
     letter-spacing: 0.02em;
 
     svg {
-      margin-right: 8px;
+      margin: 2px 10px 2px 2px;
+      height: 24px;
+      width: 24px;
     }
   }
 
@@ -109,27 +111,32 @@
   }
 
   .metadata {
-    padding: 12.5px 0 11.5px 0;
+    padding: 2.5px 12px 1.5px 0;
+    margin-right: -12px;
+    max-height: 292px;
+    overflow-y: auto;
     &Item {
+      position: relative;
+      display: flex;
+      gap: 10px;
+      padding: 10px 0;
+
       svg {
         min-width: 24px;
         height: 24px;
       }
       &:not(:last-child)::after {
+        position: absolute;
+        bottom: 0px;
         display: block;
         content: '';
-        width: 296px;
+        width: 55%;
+        max-width: 296px;
         height: 0px;
-        margin-top: 10px;
-        margin-bottom: 10px;
+
         opacity: 0.2;
         border-bottom: 1px solid #c4c4c4;
       }
-    }
-
-    &Container {
-      display: flex;
-      gap: 10px;
     }
 
     &Text {

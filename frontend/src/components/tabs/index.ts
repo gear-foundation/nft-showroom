@@ -1,4 +1,3 @@
-import { Tabs, TabsProps } from './tabs';
+import { Tabs } from './tabs';
 
 export { Tabs };
-export type { TabsProps };

@@ -7,7 +7,7 @@ type Tab = {
   disabled?: boolean;
 };
 
-export type TabsProps = {
+type Props = {
   list: Tab[];
   value: number;
   size?: 'small' | 'large';
@@ -16,7 +16,7 @@ export type TabsProps = {
   onChange: (index: number) => void;
 };
 
-function Tabs({ list, value, size = 'large', outlined, className, onChange }: TabsProps) {
+function Tabs({ list, value, size = 'large', outlined, className, onChange }: Props) {
   const renderButtons = () =>
     list.map(({ title, disabled }, index) => {
       const isActive = index === value;

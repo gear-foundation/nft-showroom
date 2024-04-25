@@ -21,7 +21,7 @@ type ParametersValues = {
   royalty: string;
   isSellable: boolean;
   isTransferable: boolean;
-  isVariableMeta: boolean;
+  isMetadataChangesAllowed: boolean;
 };
 
 type NFT = {

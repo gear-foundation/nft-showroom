@@ -1,8 +1,9 @@
 import { useAccount } from '@gear-js/react-hooks';
 import { Identicon } from '@polkadot/react-identicon';
+import { useState } from 'react';
 import { generatePath, useParams } from 'react-router-dom';
 
-import { Breadcrumbs, Container, CopyButton, ResponsiveSquareImage, Skeleton, Tabs, TabsProps } from '@/components';
+import { Breadcrumbs, Container, CopyButton, ResponsiveSquareImage, Skeleton, Tabs } from '@/components';
 import { ROUTE } from '@/consts';
 import { TransferNFT } from '@/features/collections';
 import { BuyNFT, MakeBid, StartSale, StartAuction } from '@/features/marketplace';
@@ -11,18 +12,12 @@ import TagSVG from '@/features/marketplace/assets/tag.svg?react';
 import { getIpfsLink } from '@/utils';
 
 import { ListingCard } from './components';
+import FeaturedPlayListSVG from './featured-play-list.svg?react';
 import { useNFT } from './hooks';
 import InfoSVG from './info.svg?react';
-import FeaturedPlayListSVG from './featured-play-list.svg?react';
 import MarkerSVG from './marker.svg?react';
 import styles from './nft.module.scss';
-import { useState } from 'react';
-
-const TABS: TabsProps['list'] = [
-  { title: 'Overview' },
-  { title: 'Properties' },
-  { title: 'History', disabled: true },
-];
+import { parseNFTMetadata } from './utils';
 
 type Params = {
   collectionId: string;
@@ -41,22 +36,24 @@ function NFT() {
   const [sale] = sales || [];
   const [auction] = auctions || [];
 
-  const parseNFTMetadata = (NFTMetadata?: string | null) => {
-    const parsedMetadata: unknown = NFTMetadata ? JSON.parse(NFTMetadata) : null;
-    if (Array.isArray(parsedMetadata) && parsedMetadata.every((value) => typeof value === 'string')) {
-      return parsedMetadata as string[];
-    }
-    return null;
-  };
-
   const parsedNFTMetadata = parseNFTMetadata(metadata);
 
   const isOwner = account?.decodedAddress === owner;
 
-  const [selectedTab, setSelectedTab] = useState(0);
-  const onSelectedTabChange = (index: number) => {
-    setSelectedTab(index);
-  };
+  const tabs = [
+    { title: 'Overview' },
+    { title: 'Properties', disabled: !parsedNFTMetadata?.length },
+    { title: 'History', disabled: true },
+  ];
+  const [tabIndex, setTabIndex] = useState(0);
+
+  const renderMetadata = () =>
+    parsedNFTMetadata?.map((value, index) => (
+      <li className={styles.metadataItem} key={index}>
+        <MarkerSVG />
+        <span className={styles.metadataText}>{value}</span>
+      </li>
+    ));
 
   return (
     <Container>
@@ -127,15 +124,15 @@ function NFT() {
 
           <div>
             <Tabs
-              list={TABS}
+              list={tabs}
               size="small"
               outlined
               className={styles.tabs}
-              value={selectedTab}
-              onChange={onSelectedTabChange}
+              value={tabIndex}
+              onChange={(index) => setTabIndex(index)}
             />
 
-            {selectedTab === 0 && (
+            {tabIndex === 0 && (
               <div className={styles.card}>
                 <h3 className={styles.heading}>
                   <InfoSVG />
@@ -178,25 +175,14 @@ function NFT() {
               </div>
             )}
 
-            {selectedTab === 1 && (
+            {tabIndex === 1 && Boolean(parsedNFTMetadata?.length) && (
               <div className={styles.card}>
                 <h3 className={styles.heading}>
                   <FeaturedPlayListSVG />
                   NFT Details
                 </h3>
 
-                {!!parsedNFTMetadata?.length && (
-                  <ul className={styles.metadata}>
-                    {parsedNFTMetadata.map((value, index) => (
-                      <li className={styles.metadataItem} key={index}>
-                        <span className={styles.metadataContainer}>
-                          <MarkerSVG />
-                          <span className={styles.metadataText}>{value}</span>
-                        </span>
-                      </li>
-                    ))}
-                  </ul>
-                )}
+                <ul className={styles.metadata}>{renderMetadata()}</ul>
               </div>
             )}
           </div>
