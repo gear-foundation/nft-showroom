@@ -18,7 +18,7 @@ export class MetadataAddedHandler implements INftEventHandler {
       );
       return;
     }
-    const oldMeta = JSON.parse(metadata || '[]');
+    const oldMeta = JSON.parse(nft.metadata || '[]');
     const newMeta = [...oldMeta, metadata];
     await storage.setNft(
       new Nft({

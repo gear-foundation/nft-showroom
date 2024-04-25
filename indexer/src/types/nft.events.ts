@@ -219,7 +219,7 @@ export interface NftEventPlain extends Enum {
     imgLink: Text;
   };
   metadataAdded: {
-    tokenId: u64;
+    nftId: u64;
     metadata: Text;
   };
   usersForMintAdded: {
@@ -401,7 +401,7 @@ export function getNftEvent(event: NftEventPlain): NftEvent | undefined {
   if (event.metadataAdded) {
     return {
       type: NftEventType.MetadataAdded,
-      tokenId: safeUnwrapToNumber(event.metadataAdded.tokenId)!,
+      tokenId: safeUnwrapToNumber(event.metadataAdded.nftId)!,
       metadata: event.metadataAdded.metadata.toString(),
     };
   }
