@@ -77,13 +77,15 @@ function CreateSimpleCollectionModal({ close }: Pick<ModalProps, 'close'>) {
     const { feePerUploadedFile } = marketplace?.config || {};
 
     const { cover, logo, name, description, telegram, medium, discord, url: externalUrl, x: xcom } = summaryValues;
-    const { mintPermission, isTransferable, isSellable, tags, royalty, mintLimit, mintPrice } = parametersValues;
+    const { mintPermission, isTransferable, isSellable, isMetadataChangesAllowed, tags, royalty, mintLimit, mintPrice } =
+      parametersValues;
 
     if (!cover || !logo) throw new Error('Cover and logo are required');
     const [collectionBanner, collectionLogo] = await uploadToIpfs([cover, logo]);
     const additionalLinks = { telegram, medium, discord, externalUrl, xcom };
 
     const userMintLimit = mintLimit || null;
+    const variableMeta = isMetadataChangesAllowed;
     const transferable = isTransferable ? '0' : null;
     const sellable = isSellable ? '0' : null;
     const paymentForMint = getChainBalanceValue(mintPrice).toFixed();
@@ -105,6 +107,7 @@ function CreateSimpleCollectionModal({ close }: Pick<ModalProps, 'close'>) {
       userMintLimit,
       royalty,
       paymentForMint,
+      variableMeta,
       transferable,
       sellable,
       collectionTags,
