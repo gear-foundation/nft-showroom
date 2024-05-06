@@ -69,6 +69,9 @@ import { DraftNftApprovedHandler } from './draft-nft/draft-nft-approved.handler'
 import { DraftNftApprovalRevokedHandler } from './draft-nft/draft-nft-approval-revoked.handler';
 import { DraftTransferredHandler } from './draft-nft/draft-transferred.handler';
 import { DraftMeta } from './draft-nft/DraftMeta';
+import { MetadataDeletedHandler } from './nft/metadata-deleted.handler';
+import { MetadataChangedHandler } from './nft/metadata-changed.handler';
+import { ImageLinkChangedHandler } from './nft/img-link-changed.handler';
 
 const marketplaceEventsToHandler: Record<
   NftMarketplaceEventType,
@@ -107,6 +110,9 @@ const nftEventsToHandler: Record<NftEventType, INftEventHandler | undefined> = {
   [NftEventType.ConfigChanged]: new ConfigChangedHandler(),
   [NftEventType.ImageChanged]: new ImageChangedHandler(),
   [NftEventType.MetadataAdded]: new MetadataAddedHandler(),
+  [NftEventType.MetadataDeleted]: new MetadataDeletedHandler(),
+  [NftEventType.MetadataChanged]: new MetadataChangedHandler(),
+  [NftEventType.ImageLinkChanged]: new ImageLinkChangedHandler(),
   [NftEventType.TokenInfoReceived]: undefined,
   [NftEventType.Transferred]: new TransferredHandler(),
   [NftEventType.UserForMintDeleted]: new UserForMintDeletedHandler(),
