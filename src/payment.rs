@@ -1,6 +1,6 @@
 use gcore::exec;
 use gstd::{msg, ActorId};
-use nft_marketplace_io::{NftMarketplaceEvent, NftMarketplaceError};
+use nft_marketplace_io::{NftMarketplaceError, NftMarketplaceEvent};
 
 pub fn currency_transfer(
     collection_owner: ActorId,

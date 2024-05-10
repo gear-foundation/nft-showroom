@@ -119,8 +119,13 @@ async fn main() {
                 .create_collection(type_name, payload, msg_source, msg_value)
                 .await;
             if reply.is_err() {
-                msg::send_with_gas(msg_source, Ok::<NftMarketplaceEvent, NftMarketplaceError>(NftMarketplaceEvent::ValueSent), 0, msg_value)
-                    .expect("Error in sending value");
+                msg::send_with_gas(
+                    msg_source,
+                    Ok::<NftMarketplaceEvent, NftMarketplaceError>(NftMarketplaceEvent::ValueSent),
+                    0,
+                    msg_value,
+                )
+                .expect("Error in sending value");
             }
             reply
         }
@@ -131,8 +136,13 @@ async fn main() {
                 .mint(collection_address, msg_source, msg_value)
                 .await;
             if reply.is_err() {
-                msg::send_with_gas(msg_source, Ok::<NftMarketplaceEvent, NftMarketplaceError>(NftMarketplaceEvent::ValueSent), 0, msg_value)
-                    .expect("Error in sending value");
+                msg::send_with_gas(
+                    msg_source,
+                    Ok::<NftMarketplaceEvent, NftMarketplaceError>(NftMarketplaceEvent::ValueSent),
+                    0,
+                    msg_value,
+                )
+                .expect("Error in sending value");
             }
             reply
         }
@@ -163,8 +173,13 @@ async fn main() {
                 .buy(collection_address, token_id, msg_source, msg_value)
                 .await;
             if reply.is_err() {
-                msg::send_with_gas(msg_source, Ok::<NftMarketplaceEvent, NftMarketplaceError>(NftMarketplaceEvent::ValueSent), 0, msg_value)
-                    .expect("Error in sending value");
+                msg::send_with_gas(
+                    msg_source,
+                    Ok::<NftMarketplaceEvent, NftMarketplaceError>(NftMarketplaceEvent::ValueSent),
+                    0,
+                    msg_value,
+                )
+                .expect("Error in sending value");
             }
             reply
         }
@@ -187,8 +202,13 @@ async fn main() {
             let reply =
                 nft_marketplace.add_bid(collection_address, token_id, msg_source, msg_value);
             if reply.is_err() {
-                msg::send_with_gas(msg_source, Ok::<NftMarketplaceEvent, NftMarketplaceError>(NftMarketplaceEvent::ValueSent), 0, msg_value)
-                    .expect("Error in sending value");
+                msg::send_with_gas(
+                    msg_source,
+                    Ok::<NftMarketplaceEvent, NftMarketplaceError>(NftMarketplaceEvent::ValueSent),
+                    0,
+                    msg_value,
+                )
+                .expect("Error in sending value");
             }
             reply
         }
@@ -219,8 +239,13 @@ async fn main() {
                 .create_offer(collection_address, token_id, msg_source, msg_value)
                 .await;
             if reply.is_err() {
-                msg::send_with_gas(msg_source, Ok::<NftMarketplaceEvent, NftMarketplaceError>(NftMarketplaceEvent::ValueSent), 0, msg_value)
-                    .expect("Error in sending value");
+                msg::send_with_gas(
+                    msg_source,
+                    Ok::<NftMarketplaceEvent, NftMarketplaceError>(NftMarketplaceEvent::ValueSent),
+                    0,
+                    msg_value,
+                )
+                .expect("Error in sending value");
             }
             reply
         }
@@ -558,8 +583,13 @@ impl NftMarketplace {
             return Err(NftMarketplaceError::InsufficientBalance);
         }
         let value = balance - existential_deposit;
-        msg::send_with_gas(msg_src, Ok::<NftMarketplaceEvent, NftMarketplaceError>(NftMarketplaceEvent::ValueSent), 0, value)
-            .expect("Error in sending value");
+        msg::send_with_gas(
+            msg_src,
+            Ok::<NftMarketplaceEvent, NftMarketplaceError>(NftMarketplaceEvent::ValueSent),
+            0,
+            value,
+        )
+        .expect("Error in sending value");
         Ok(NftMarketplaceEvent::BalanceHasBeenWithdrawn { value })
     }
 

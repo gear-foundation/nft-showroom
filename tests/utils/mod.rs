@@ -1,11 +1,14 @@
+use crate::codec::Error;
 use gstd::{ActorId, CodeId, Encode};
 use gtest::{Program, RunResult, System};
+use music_nft_io::{
+    Config as MusicConfig, ImageData as MusicImageData, Links, ListenCapability, MusicNftError,
+    MusicNftEvent, MusicNftInit,
+};
 use nft_io::{Config, ImageData, NftError, NftEvent, NftInit};
-use music_nft_io::{MusicNftInit, MusicNftError, MusicNftEvent, Links, Config as MusicConfig, ListenCapability, ImageData as MusicImageData};
 use nft_marketplace_io::{
     NftMarketplaceAction, NftMarketplaceError, NftMarketplaceEvent, NftMarketplaceInit, Offer,
 };
-use crate::codec::Error;
 
 mod common;
 pub mod prelude;
@@ -163,7 +166,7 @@ impl NftMarketplace for Program<'_> {
                 meta_link: meta_link.clone(),
                 type_name: type_name.clone(),
                 type_description: type_description.clone(),
-                allow_create: true
+                allow_create: true,
             },
         );
         assert!(!res.main_failed());
@@ -295,7 +298,7 @@ impl NftMarketplace for Program<'_> {
                 collection_address,
                 token_id,
                 min_price,
-                duration_ms: (duration+1) * 3000,
+                duration_ms: (duration + 1) * 3000,
             })
         };
         let result = &res.decoded_log::<Result<NftMarketplaceEvent, NftMarketplaceError>>();
@@ -486,7 +489,7 @@ impl NftMarketplace for Program<'_> {
                 ms_in_block,
                 fee_per_uploaded_file: None,
                 max_creator_royalty: None,
-                max_number_of_images: None
+                max_number_of_images: None,
             },
         );
         assert!(!res.main_failed());
@@ -533,7 +536,6 @@ pub fn check_music_nft_error(from: u64, result: &RunResult, error: MusicNftError
     assert!(result.contains(&(from, Err::<MusicNftEvent, MusicNftError>(error).encode())));
 }
 
-
 pub fn get_init_nft_payload(
     collection_owner: ActorId,
     royalty: u16,
@@ -562,6 +564,7 @@ pub fn get_init_nft_payload(
             payment_for_mint,
             transferable: Some(0),
             sellable: Some(0),
+            variable_meta: false,
         },
         img_links_and_data,
         permission_to_mint,
@@ -603,7 +606,7 @@ pub fn get_init_music_nft_payload(
             payment_for_mint,
             transferable: Some(0),
             sellable: Some(0),
-            listening_capabilities: ListenCapability::Demo
+            listening_capabilities: ListenCapability::Demo,
         },
         links_and_data,
         permission_to_mint,

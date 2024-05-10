@@ -45,6 +45,7 @@ pub struct Config {
     pub payment_for_mint: u128,
     pub transferable: Option<u64>,
     pub sellable: Option<u64>,
+    pub variable_meta: bool,
 }
 
 #[derive(Debug, Clone, Encode, Decode, TypeInfo)]
@@ -100,6 +101,21 @@ pub enum NftAction {
     },
     RemoveAdmin {
         admin: ActorId,
+    },
+    AddMetadata {
+        nft_id: u64,
+        metadata: String,
+    },
+    ChangeImageLink {
+        nft_id: u64,
+        img_link: String,
+    },
+    ChangeMetadata {
+        nft_id: u64,
+        metadata: Vec<String>,
+    },
+    DeleteMetadata {
+        nft_id: u64,
     },
 }
 
@@ -158,7 +174,22 @@ pub enum NftEvent {
     AdminRemoved {
         admin: ActorId,
     },
-    ValueSent
+    ValueSent,
+    MetadataAdded {
+        nft_id: u64,
+        metadata: String,
+    },
+    ImageLinkChanged {
+        nft_id: u64,
+        img_link: String,
+    },
+    MetadataChanged {
+        nft_id: u64,
+        metadata: Vec<String>,
+    },
+    MetadataDeleted {
+        nft_id: u64,
+    },
 }
 #[derive(Debug, Clone, Encode, Decode, TypeInfo)]
 pub enum NftError {
@@ -179,7 +210,7 @@ pub enum NftError {
     ThereIsNoSuchUser,
     ExhaustedLimit,
     WrongValue,
-    OnlyOneAdminLeft
+    OnlyOneAdminLeft,
 }
 
 #[derive(Debug, Clone, Encode, Decode, TypeInfo)]

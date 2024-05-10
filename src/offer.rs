@@ -60,8 +60,13 @@ impl NftMarketplace {
         self.offers
             .entry(offer.clone())
             .and_modify(|price| {
-                msg::send_with_gas(offer.creator, Ok::<NftMarketplaceEvent, NftMarketplaceError>(NftMarketplaceEvent::ValueSent), 0, *price)
-                    .expect("Error in sending value");
+                msg::send_with_gas(
+                    offer.creator,
+                    Ok::<NftMarketplaceEvent, NftMarketplaceError>(NftMarketplaceEvent::ValueSent),
+                    0,
+                    *price,
+                )
+                .expect("Error in sending value");
                 *price = msg_value;
             })
             .or_insert(msg_value);
@@ -88,8 +93,13 @@ impl NftMarketplace {
 
         if let Some((offer, price)) = self.offers.get_key_value(&offer) {
             // use send_with_gas to transfer the value directly to the balance, not to the mailbox.
-            msg::send_with_gas(offer.creator, Ok::<NftMarketplaceEvent, NftMarketplaceError>(NftMarketplaceEvent::ValueSent), 0, *price)
-                .expect("Error in sending value");
+            msg::send_with_gas(
+                offer.creator,
+                Ok::<NftMarketplaceEvent, NftMarketplaceError>(NftMarketplaceEvent::ValueSent),
+                0,
+                *price,
+            )
+            .expect("Error in sending value");
         } else {
             return Err(NftMarketplaceError::WrongDataOffer);
         }

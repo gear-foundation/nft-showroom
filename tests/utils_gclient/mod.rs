@@ -79,12 +79,12 @@ pub async fn init_marketplace(api: &GearApi) -> Result<(MessageId, ProgramId), (
     let royalty_to_marketplace = 200;
 
     let init_marketplace = NftMarketplaceInit {
-        gas_for_creation: 110_000_000_000, 
-        gas_for_mint: 10_000_000_000, // 7_000_000_000
-        gas_for_transfer_token: 6_000_000_000, // 4_000_000_000
-        gas_for_close_auction: 13_000_000_000, // 15_000_000_000
-        gas_for_delete_collection: 5_000_000_000, // 3_000_000_000
-        gas_for_get_info: 7_000_000_000, // 5_000_000_000
+        gas_for_creation: 110_000_000_000,
+        gas_for_mint: 10_000_000_000,               // 7_000_000_000
+        gas_for_transfer_token: 6_000_000_000,      // 4_000_000_000
+        gas_for_close_auction: 13_000_000_000,      // 15_000_000_000
+        gas_for_delete_collection: 5_000_000_000,   // 3_000_000_000
+        gas_for_get_info: 7_000_000_000,            // 5_000_000_000
         time_between_create_collections: 3_600_000, // 1 hour in milliseconds
         royalty_to_marketplace_for_trade: royalty_to_marketplace,
         royalty_to_marketplace_for_mint: royalty_to_marketplace,
@@ -122,26 +122,14 @@ pub async fn init_marketplace(api: &GearApi) -> Result<(MessageId, ProgramId), (
     let allow_message_payload = NftMarketplaceAction::AllowMessage(true);
 
     let gas_info = api
-        .calculate_handle_gas(
-            None,
-            program_id,
-            allow_message_payload.encode(),
-            0,
-            true,
-        )
+        .calculate_handle_gas(None, program_id, allow_message_payload.encode(), 0, true)
         .await
         .expect("Error calculate gas");
-    
+
     let (message_id, _) = api
-        .send_message(
-            program_id,
-            allow_message_payload,
-            gas_info.min_limit,
-            0,
-        )
+        .send_message(program_id, allow_message_payload, gas_info.min_limit, 0)
         .await
         .expect("Error send message");
-
 
     let allow_create_collection_payload = NftMarketplaceAction::AllowCreateCollection(true);
 
@@ -155,7 +143,7 @@ pub async fn init_marketplace(api: &GearApi) -> Result<(MessageId, ProgramId), (
         )
         .await
         .expect("Error calculate gas");
-    
+
     let (message_id, _) = api
         .send_message(
             program_id,
@@ -185,7 +173,7 @@ pub async fn add_new_collection(
         meta_link: String::from("My Meta"),
         type_name: String::from("Simple NFT"),
         type_description: String::from("My Collection"),
-        allow_create: true
+        allow_create: true,
     };
 
     let gas_info = api
@@ -220,7 +208,7 @@ pub async fn create_collection(
         limit_copies: Some(1),
     };
     let number_of_image = 10_000;
-    let fee = number_of_image * 282_857_142_900; 
+    let fee = number_of_image * 282_857_142_900;
     let img_links_and_data: Vec<(String, ImageData)> = (0..number_of_image)
         .map(|i| (format!("Img-{}", i), img_data.clone()))
         .collect();
@@ -239,6 +227,7 @@ pub async fn create_collection(
             payment_for_mint: 10_000_000_000_000,
             transferable: Some(0),
             sellable: Some(0),
+            variable_meta: false,
         },
         img_links_and_data,
         permission_to_mint: None,
@@ -362,9 +351,7 @@ pub async fn get_new_client(api: &GearApi, name: &str) -> GearApi {
     .await
     .expect("Error transfer");
 
-    api.clone()
-        .with(name)
-        .expect("Unable to change signer.")
+    api.clone().with(name).expect("Unable to change signer.")
 }
 
 pub fn get_program_id_from_u64(u64: u64) -> ProgramId {
@@ -372,4 +359,3 @@ pub fn get_program_id_from_u64(u64: u64) -> ProgramId {
     let list: [u8; 32] = actor_id.into();
     list.into()
 }
-
