@@ -1,12 +1,5 @@
 const LIST = [
   {
-    heading: 'Marketplace',
-    links: [
-      { text: 'Stats', href: '#' },
-      { text: 'Create', href: '#' },
-    ],
-  },
-  {
     heading: 'About Vara',
     links: [
       { text: 'Network', href: 'https://vara.network/' },
