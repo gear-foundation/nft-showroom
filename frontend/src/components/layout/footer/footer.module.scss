@@ -19,6 +19,10 @@
   display: grid;
   grid-template-columns: repeat(3, 1fr);
 
+  &:before {
+    content: '';
+  }
+
   .heading {
     margin-bottom: 16px;
     font-weight: 700;

@@ -1,5 +1,6 @@
 import { useAccount } from '@gear-js/react-hooks';
 import { Identicon } from '@polkadot/react-identicon';
+import { useState } from 'react';
 import { generatePath, useParams } from 'react-router-dom';
 
 import { Breadcrumbs, Container, CopyButton, ResponsiveSquareImage, Skeleton, Tabs } from '@/components';
@@ -11,11 +12,12 @@ import TagSVG from '@/features/marketplace/assets/tag.svg?react';
 import { getIpfsLink } from '@/utils';
 
 import { ListingCard } from './components';
+import FeaturedPlayListSVG from './featured-play-list.svg?react';
 import { useNFT } from './hooks';
 import InfoSVG from './info.svg?react';
+import MarkerSVG from './marker.svg?react';
 import styles from './nft.module.scss';
-
-const TABS = ['Overview', 'Properties', 'Activities'];
+import { parseNFTMetadata } from './utils';
 
 type Params = {
   collectionId: string;
@@ -28,13 +30,30 @@ function NFT() {
   const { collectionId, id } = useParams() as Params;
   const nft = useNFT(collectionId, id);
 
-  const { owner, name, collection, mediaUrl, description, createdAt, sales, auctions } = nft || {};
+  const { owner, name, collection, mediaUrl, description, createdAt, sales, auctions, metadata } = nft || {};
   const { name: collectionName, royalty } = collection || {};
 
   const [sale] = sales || [];
   const [auction] = auctions || [];
 
+  const parsedNFTMetadata = parseNFTMetadata(metadata);
+
   const isOwner = account?.decodedAddress === owner;
+
+  const tabs = [
+    { title: 'Overview' },
+    { title: 'Properties', disabled: !parsedNFTMetadata?.length },
+    { title: 'History', disabled: true },
+  ];
+  const [tabIndex, setTabIndex] = useState(0);
+
+  const renderMetadata = () =>
+    parsedNFTMetadata?.map((value, index) => (
+      <li className={styles.metadataItem} key={index}>
+        <MarkerSVG />
+        <span className={styles.metadataText}>{value}</span>
+      </li>
+    ));
 
   return (
     <Container>
@@ -104,47 +123,68 @@ function NFT() {
           )}
 
           <div>
-            <Tabs list={TABS} size="small" outlined className={styles.tabs} value={0} onChange={() => {}} />
+            <Tabs
+              list={tabs}
+              size="small"
+              outlined
+              className={styles.tabs}
+              value={tabIndex}
+              onChange={(index) => setTabIndex(index)}
+            />
 
-            <div className={styles.card}>
-              <h3 className={styles.heading}>
-                <InfoSVG /> Details
-              </h3>
+            {tabIndex === 0 && (
+              <div className={styles.card}>
+                <h3 className={styles.heading}>
+                  <InfoSVG />
+                  Details
+                </h3>
 
-              <ul className={styles.table}>
-                <li className={styles.row}>
-                  <span>Contract Address:</span>
-                  <span className={styles.value}>
-                    <span className={styles.address}>{collectionId}</span>
-                    <CopyButton value={collectionId} />
-                  </span>
-                </li>
+                <ul className={styles.table}>
+                  <li className={styles.row}>
+                    <span>Contract Address:</span>
+                    <span className={styles.value}>
+                      <span className={styles.address}>{collectionId}</span>
+                      <CopyButton value={collectionId} />
+                    </span>
+                  </li>
 
-                <li className={styles.row}>
-                  <span>Token ID:</span>
-                  <span className={styles.value}>{id}</span>
-                </li>
+                  <li className={styles.row}>
+                    <span>Token ID:</span>
+                    <span className={styles.value}>{id}</span>
+                  </li>
 
-                <li className={styles.row}>
-                  <span>Token Standart:</span>
-                  <span className={styles.value}>gNFT</span>
-                </li>
+                  <li className={styles.row}>
+                    <span>Token Standart:</span>
+                    <span className={styles.value}>gNFT</span>
+                  </li>
 
-                <li className={styles.row}>
-                  <span>Mint Date:</span>
-                  <span className={styles.value}>
-                    {createdAt ? new Date(createdAt).toLocaleString() : <Skeleton width="25%" borderRadius="4px" />}
-                  </span>
-                </li>
+                  <li className={styles.row}>
+                    <span>Mint Date:</span>
+                    <span className={styles.value}>
+                      {createdAt ? new Date(createdAt).toLocaleString() : <Skeleton width="25%" borderRadius="4px" />}
+                    </span>
+                  </li>
 
-                <li className={styles.row}>
-                  <span>Creator Earnings:</span>
-                  <span className={styles.value}>
-                    {royalty !== undefined ? `${royalty}%` : <Skeleton width="25%" borderRadius="4px" />}
-                  </span>
-                </li>
-              </ul>
-            </div>
+                  <li className={styles.row}>
+                    <span>Creator Earnings:</span>
+                    <span className={styles.value}>
+                      {royalty !== undefined ? `${royalty}%` : <Skeleton width="25%" borderRadius="4px" />}
+                    </span>
+                  </li>
+                </ul>
+              </div>
+            )}
+
+            {tabIndex === 1 && Boolean(parsedNFTMetadata?.length) && (
+              <div className={styles.card}>
+                <h3 className={styles.heading}>
+                  <FeaturedPlayListSVG />
+                  NFT Details
+                </h3>
+
+                <ul className={styles.metadata}>{renderMetadata()}</ul>
+              </div>
+            )}
           </div>
         </div>
       </div>

@@ -58,14 +58,14 @@
 }
 
 .card {
-  padding: 24px 16px;
+  padding: 20px 16px;
 
   background-color: #fff;
   box-shadow: 0px 4px 100px 0px #cacaca33;
   border-radius: 15px;
 
   .heading {
-    margin-bottom: 20px;
+    margin-bottom: 18px;
 
     font-size: 16px;
     font-weight: 700;
@@ -73,7 +73,9 @@
     letter-spacing: 0.02em;
 
     svg {
-      margin-right: 10px;
+      margin: 2px 10px 2px 2px;
+      height: 24px;
+      width: 24px;
     }
   }
 
@@ -106,5 +108,41 @@
 
     overflow: hidden;
     text-overflow: ellipsis;
+  }
+
+  .metadata {
+    padding: 2.5px 12px 1.5px 0;
+    margin-right: -12px;
+    max-height: 292px;
+    overflow-y: auto;
+    &Item {
+      position: relative;
+      display: flex;
+      gap: 10px;
+      padding: 10px 0;
+
+      svg {
+        min-width: 24px;
+        height: 24px;
+      }
+      &:not(:last-child)::after {
+        position: absolute;
+        bottom: 0px;
+        display: block;
+        content: '';
+        width: 55%;
+        max-width: 296px;
+        height: 0px;
+
+        opacity: 0.2;
+        border-bottom: 1px solid #c4c4c4;
+      }
+    }
+
+    &Text {
+      padding-top: 2px;
+      font-weight: 600;
+      line-height: 16.8px;
+    }
   }
 }
