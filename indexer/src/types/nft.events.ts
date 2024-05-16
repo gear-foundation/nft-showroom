@@ -17,6 +17,9 @@ export enum NftEventType {
   ConfigChanged = 'ConfigChanged',
   ImageChanged = 'ImageChanged',
   MetadataAdded = 'MetadataAdded',
+  MetadataChanged = 'MetadataChanged',
+  MetadataDeleted = 'MetadataDeleted',
+  ImageLinkChanged = 'ImageLinkChanged',
   UsersForMintAdded = 'UsersForMintAdded',
   UserForMintDeleted = 'UserForMintDeleted',
   LiftRestrictionMint = 'LiftRestrictionMint',
@@ -131,6 +134,23 @@ export type LiftRestrictionMintEvent = {
   type: NftEventType.LiftRestrictionMint;
 };
 
+export type MetadataChangedEvent = {
+  type: NftEventType.MetadataChanged;
+  tokenId: number;
+  metadata: string[];
+};
+
+export type MetadataDeletedEvent = {
+  type: NftEventType.MetadataDeleted;
+  tokenId: number;
+};
+
+export type ImageLinkChangedEvent = {
+  type: NftEventType.ImageLinkChanged;
+  nftId: number;
+  imgLink: string;
+};
+
 export type NftEvent =
   | TransferEvent
   | TokenInfoReceivedEvent
@@ -144,7 +164,10 @@ export type NftEvent =
   | MetadataAddedEvent
   | UsersForMintAddedEvent
   | UserForMintDeletedEvent
-  | LiftRestrictionMintEvent;
+  | LiftRestrictionMintEvent
+  | MetadataChangedEvent
+  | MetadataDeletedEvent
+  | ImageLinkChangedEvent;
 
 export interface AdditionalLinkPlain {
   externalUrl: Option<Text>;
@@ -219,7 +242,7 @@ export interface NftEventPlain extends Enum {
     imgLink: Text;
   };
   metadataAdded: {
-    tokenId: u64;
+    nftId: u64;
     metadata: Text;
   };
   usersForMintAdded: {
@@ -228,7 +251,18 @@ export interface NftEventPlain extends Enum {
   userForMintDeleted: {
     user: Hash;
   };
-  liftRestrictionMint: {};
+  liftRestrictionMint: Record<string, never>;
+  metadataChanged: {
+    nftId: u64;
+    metadata: Vec<Text>;
+  };
+  metadataDeleted: {
+    nftId: u64;
+  };
+  imageLinkChanged: {
+    nftId: u64;
+    imgLink: Text;
+  };
 }
 
 export function getNftEvent(event: NftEventPlain): NftEvent | undefined {
@@ -401,7 +435,7 @@ export function getNftEvent(event: NftEventPlain): NftEvent | undefined {
   if (event.metadataAdded) {
     return {
       type: NftEventType.MetadataAdded,
-      tokenId: safeUnwrapToNumber(event.metadataAdded.tokenId)!,
+      tokenId: safeUnwrapToNumber(event.metadataAdded.nftId)!,
       metadata: event.metadataAdded.metadata.toString(),
     };
   }
@@ -420,6 +454,26 @@ export function getNftEvent(event: NftEventPlain): NftEvent | undefined {
   if (event.liftRestrictionMint) {
     return {
       type: NftEventType.LiftRestrictionMint,
+    };
+  }
+  if (event.metadataChanged) {
+    return {
+      type: NftEventType.MetadataChanged,
+      tokenId: safeUnwrapToNumber(event.metadataChanged.nftId)!,
+      metadata: event.metadataChanged.metadata.map((m) => m.toString()),
+    };
+  }
+  if (event.metadataDeleted) {
+    return {
+      type: NftEventType.MetadataDeleted,
+      tokenId: safeUnwrapToNumber(event.metadataDeleted.nftId)!,
+    };
+  }
+  if (event.imageLinkChanged) {
+    return {
+      type: NftEventType.ImageLinkChanged,
+      nftId: safeUnwrapToNumber(event.imageLinkChanged.nftId)!,
+      imgLink: event.imageLinkChanged.imgLink.toString(),
     };
   }
   return undefined;

@@ -1,29 +1,27 @@
-import { MetadataAddedEvent } from '../../types/nft.events';
+import { ImageLinkChangedEvent } from '../../types/nft.events';
 import { EntitiesService } from '../entities.service';
 import { INftEventHandler } from './nft.handler';
 import { Nft } from '../../model';
 import { EventInfo } from '../event-info.type';
 
-export class MetadataAddedHandler implements INftEventHandler {
+export class ImageLinkChangedHandler implements INftEventHandler {
   async handle(
-    event: MetadataAddedEvent,
+    event: ImageLinkChangedEvent,
     { source: collectionAddress, timestamp }: EventInfo,
     storage: EntitiesService,
   ): Promise<void> {
-    const { tokenId, metadata } = event;
-    const nft = await storage.getNft(collectionAddress, tokenId);
+    const { nftId, imgLink } = event;
+    const nft = await storage.getNft(collectionAddress, nftId);
     if (nft === undefined) {
       console.warn(
-        `[MetadataAddedHandler] ${collectionAddress}-${tokenId}: nft is not found`,
+        `[ImageLinkChangedHandler] ${collectionAddress}-${nftId}: nft is not found`,
       );
       return;
     }
-    const oldMeta = JSON.parse(nft.metadata || '[]');
-    const newMeta = [...oldMeta, metadata];
     await storage.setNft(
       new Nft({
         ...nft,
-        metadata: JSON.stringify(newMeta),
+        mediaUrl: imgLink,
         updatedAt: timestamp,
       }),
     );
