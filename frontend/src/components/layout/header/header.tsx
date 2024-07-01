@@ -1,6 +1,7 @@
 import { useAccount } from '@gear-js/react-hooks';
 
 import { ROUTE } from '@/consts';
+import { Search } from '@/features/search';
 import { Wallet, AccountBalance } from '@/features/wallet';
 
 import { LinkButton } from '../../buttons';
@@ -15,7 +16,10 @@ function Header() {
   return (
     <header className={styles.header}>
       <Container className={styles.container}>
-        <Logo />
+        <div className={styles.search}>
+          <Logo />
+          <Search />
+        </div>
 
         <div className={styles.wallet}>
           <AccountBalance />
