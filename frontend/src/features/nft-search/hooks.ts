@@ -2,7 +2,7 @@ import { useSearchParams } from 'react-router-dom';
 
 import { FIELD_NAME } from './consts';
 
-function useSearchParam() {
+function useNFTSearchParam() {
   const [params] = useSearchParams();
   const value = params.get(FIELD_NAME.QUERY) || '';
 
@@ -21,4 +21,4 @@ function useSearchParam() {
   return { value, set, reset };
 }
 
-export { useSearchParam };
+export { useNFTSearchParam };

@@ -7,7 +7,7 @@ import CollectionCardSkeletonSVG from '@/features/collections/assets/collection-
 import NFTCardSkeletonSVG from '@/features/collections/assets/nft-card-skeleton.svg?react';
 import { AccountFilter, GridSize, useAccountFilter, useGridSize } from '@/features/lists';
 import { GRID_SIZE } from '@/features/lists/consts';
-import { useSearchParam } from '@/features/search';
+import { useNFTSearchParam } from '@/features/nft-search';
 import { cx } from '@/utils';
 
 import { useCollections, useNFTs } from './hooks';
@@ -24,10 +24,11 @@ function Lists() {
 
   const { gridSize, setGridSize } = useGridSize();
   const { accountFilterValue, accountFilterAddress, setAccountFilterValue } = useAccountFilter();
+  const nftSearchParam = useNFTSearchParam();
 
-  const nftSearchParam = useSearchParam();
   const [collections, collectionsCount, hasMoreCollections, isCollectionsQueryReady, fetchCollections] =
     useCollections(accountFilterAddress);
+
   const [nfts, nftsCount, hasMoreNFTs, isNFTsQueryReady, fetchNFTs] = useNFTs(
     accountFilterAddress,
     undefined,

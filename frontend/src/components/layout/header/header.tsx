@@ -1,7 +1,7 @@
 import { useAccount } from '@gear-js/react-hooks';
 
 import { ROUTE } from '@/consts';
-import { Search } from '@/features/search';
+import { NFTSearch } from '@/features/nft-search';
 import { Wallet, AccountBalance } from '@/features/wallet';
 
 import { LinkButton } from '../../buttons';
@@ -18,7 +18,7 @@ function Header() {
       <Container className={styles.container}>
         <div className={styles.search}>
           <Logo />
-          <Search />
+          <NFTSearch />
         </div>
 
         <div className={styles.wallet}>

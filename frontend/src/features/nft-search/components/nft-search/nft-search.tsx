@@ -7,10 +7,10 @@ import { ROUTE } from '@/consts';
 
 import SearchSVG from '../../assets/search.svg?react';
 import { FIELD_NAME, SCHEMA } from '../../consts';
-import { useSearchParam } from '../../hooks';
+import { useNFTSearchParam } from '../../hooks';
 
-function Search() {
-  const param = useSearchParam();
+function NFTSearch() {
+  const param = useNFTSearchParam();
 
   const form = useForm({ values: { [FIELD_NAME.QUERY]: param.value }, resolver: zodResolver(SCHEMA) });
   const navigate = useNavigate();
@@ -30,4 +30,4 @@ function Search() {
   );
 }
 
-export { Search };
+export { NFTSearch };
