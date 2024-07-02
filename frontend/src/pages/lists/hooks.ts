@@ -82,8 +82,8 @@ function useTotalNFTsCount(where: NftWhereInput) {
   return [totalCount, isReady, refetch] as const;
 }
 
-function useNFTs(owner: string, collectionId?: string) {
-  const where = useMemo(() => getNftFilters(owner, collectionId), [owner, collectionId]);
+function useNFTs(owner: string, collectionId: string | undefined, query?: string) {
+  const where = useMemo(() => getNftFilters(owner, collectionId, query), [owner, collectionId, query]);
   const [totalCount, isTotalCountReady, refetchTotalNFTsCount] = useTotalNFTsCount(where);
 
   const { data, isFetching, fetchNextPage, refetch } = useInfiniteQuery({

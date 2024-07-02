@@ -1,5 +1,4 @@
-import { decodeAddress } from '@gear-js/api';
-import { useAccount, useAlert } from '@gear-js/react-hooks';
+import { getVaraAddress, useAccount, useAlert } from '@gear-js/react-hooks';
 import { Button, Modal } from '@gear-js/vara-ui';
 
 import CopySVG from '../../assets/copy.svg?react';
@@ -66,10 +65,10 @@ function WalletModal({ close }: Props) {
       };
 
       const handleCopyClick = () => {
-        const decodedAddress = decodeAddress(address);
+        const encodedAddress = getVaraAddress(address);
 
         navigator.clipboard
-          .writeText(decodedAddress)
+          .writeText(encodedAddress)
           .then(() => {
             close();
             alert.success('Copied');

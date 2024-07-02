@@ -1,3 +1,4 @@
+import { getVaraAddress } from '@gear-js/react-hooks';
 import { Identicon } from '@polkadot/react-identicon';
 import { Link, generatePath } from 'react-router-dom';
 
@@ -47,7 +48,7 @@ function CollectionCard({ id, name, collectionBanner, collectionLogo, admin, tok
 
             <div className={styles.user}>
               <Identicon value={admin} size={14} theme="polkadot" />
-              <span className={styles.address}>{admin}</span>
+              <span className={styles.address}>{getVaraAddress(admin)}</span>
             </div>
           </div>
         </div>
