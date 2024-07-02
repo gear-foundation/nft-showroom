@@ -1,4 +1,4 @@
-import { useBalanceFormat } from '@gear-js/react-hooks';
+import { getVaraAddress, useBalanceFormat } from '@gear-js/react-hooks';
 import { Link, generatePath } from 'react-router-dom';
 
 import { PriceInfoCard, InfoCard } from '@/components';
@@ -35,7 +35,7 @@ function NFTCard({ sales, auctions, ...nft }: Props) {
             <h3 className={styles.name}>{name}</h3>
 
             <p className={styles.owner}>
-              Owned by <span className={styles.address}>{owner}</span>
+              Owned by <span className={styles.address}>{getVaraAddress(owner)}</span>
             </p>
           </div>
         </Link>

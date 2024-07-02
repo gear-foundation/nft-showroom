@@ -1,4 +1,4 @@
-import { useAccount } from '@gear-js/react-hooks';
+import { getVaraAddress, useAccount } from '@gear-js/react-hooks';
 import { Identicon } from '@polkadot/react-identicon';
 import { useState } from 'react';
 import { generatePath, useParams } from 'react-router-dom';
@@ -91,7 +91,7 @@ function NFT() {
 
             {owner ? (
               <p className={styles.ownerText}>
-                Owned by <span className={styles.ownerAddress}>{owner}</span>
+                Owned by <span className={styles.ownerAddress}>{getVaraAddress(owner)}</span>
               </p>
             ) : (
               <Skeleton width="100%" borderRadius="4px" />

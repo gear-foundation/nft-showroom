@@ -2,7 +2,7 @@ import { CopyButton, FilterButton, LinkButton } from './buttons';
 import { Form, Input, Checkbox, Radio, Select, Textarea } from './form';
 import { withAccount, withApi, withMarketplaceConfig } from './hocs';
 import { InfoCard, InfoCardProps } from './info-card';
-import { PriceInput, SearchInput } from './inputs';
+import { PriceInput } from './inputs';
 import {
   Container,
   Footer,
@@ -34,7 +34,6 @@ export {
   InfoCard,
   NFTActionFormModal,
   PriceInfoCard,
-  SearchInput,
   FilterButton,
   Breadcrumbs,
   Form,
