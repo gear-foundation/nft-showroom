@@ -1,3 +1,4 @@
+import { getVaraAddress } from '@gear-js/react-hooks';
 import { generatePath, useParams } from 'react-router-dom';
 
 import { Breadcrumbs, Container, InfoCard, List } from '@/components';
@@ -57,7 +58,14 @@ function Collection() {
             <img src={getIpfsLink(collection.collectionLogo)} alt="" className={styles.logo} />
 
             <div className={styles.cards}>
-              <InfoCard heading="Creator" text={collection.admin} SVG={UserSVG} color="light" textOverflow />
+              <InfoCard
+                heading="Creator"
+                text={getVaraAddress(collection.admin)}
+                SVG={UserSVG}
+                color="light"
+                textOverflow
+              />
+
               <MintLimitInfoCard heading={collection.tokensLimit} text={nftsCount} color="light" />
             </div>
           </div>
