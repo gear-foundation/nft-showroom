@@ -5,6 +5,7 @@
 }
 
 .container,
+.search,
 .buttons,
 .wallet {
   display: flex;
@@ -19,6 +20,7 @@
   gap: 12px;
 }
 
+.search,
 .wallet {
   gap: 24px;
 }

@@ -9,11 +9,7 @@ const LIST = [
   },
   {
     heading: 'Legal',
-    links: [
-      { text: 'Community Guidelines', href: '#' },
-      { text: 'Terms', href: '#' },
-      { text: 'Privacy policy', href: '#' },
-    ],
+    links: [{ text: 'Privacy policy', href: 'https://vara.network/privacy-policy' }],
   },
 ];
 

@@ -1,3 +1,4 @@
+import { getVaraAddress } from '@gear-js/react-hooks';
 import { Button, ButtonProps } from '@gear-js/vara-ui';
 import { Identicon } from '@polkadot/react-identicon';
 
@@ -15,7 +16,7 @@ type Props = {
 function AccountButton({ address, name, color, size, block, onClick }: Props) {
   return (
     <Button onClick={onClick} color={color} size={size} block={block} className={styles.button}>
-      <Identicon value={address} size={16} theme="polkadot" /> <span>{name || address}</span>
+      <Identicon value={address} size={16} theme="polkadot" /> <span>{name || getVaraAddress(address)}</span>
     </Button>
   );
 }
