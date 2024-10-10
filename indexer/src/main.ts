@@ -43,7 +43,9 @@ processor.run(new TypeormDatabase(), async (ctx) => {
     localStorage,
     batchService,
     ctx.store,
+    dnsService,
   );
+  await entitiesService.init();
   const processing = new EventsProcessing(entitiesService, localStorage);
   const firstBlockDate = getBlockDate(ctx.blocks[0]);
   console.log(
