@@ -9,6 +9,7 @@ import { EntitiesService } from './processing/entities.service';
 import { getLocalStorage } from './processing/storage/local.storage';
 import { BatchService } from './processing/batch.service';
 import { config } from './config';
+import { DnsService } from './dns/dns.service';
 
 const nftCbPrograms = [config.nfts.cb, config.nfts.vit];
 
@@ -34,10 +35,13 @@ let possibleNftInitializedEvents: {
 }[] = [];
 
 processor.run(new TypeormDatabase(), async (ctx) => {
+  const dnsService = new DnsService(config.dnsApiUrl);
+  await dnsService.init();
   const localStorage = await getLocalStorage(ctx.store);
+  const batchService = new BatchService(ctx.store);
   const entitiesService = new EntitiesService(
     localStorage,
-    new BatchService(ctx.store),
+    batchService,
     ctx.store,
   );
   const processing = new EventsProcessing(entitiesService, localStorage);
@@ -45,6 +49,7 @@ processor.run(new TypeormDatabase(), async (ctx) => {
   console.log(
     `[main] start processing ${ctx.blocks.length} blocks at ${firstBlockDate}.`,
   );
+  const marketplace = await localStorage.getMarketplace();
   for (const block of ctx.blocks) {
     const { events } = block;
     const timestamp = getBlockDate(block);
@@ -66,7 +71,21 @@ processor.run(new TypeormDatabase(), async (ctx) => {
         messageId: id,
         txHash: id,
       };
-      if (localStorage.getMarketplace().address === source) {
+      const dnsEvent = await dnsService.handleEvent(item);
+      if (dnsEvent && config.dnsProgramName === dnsEvent.name) {
+        marketplace.address = dnsEvent.address;
+        await batchService.setMarketplace(marketplace);
+        localStorage.updateMarketplace(marketplace);
+      }
+      const marketplaceAddress = await dnsService.getAddressByName(
+        config.dnsProgramName,
+      );
+      if (marketplaceAddress && marketplace.address !== marketplaceAddress) {
+        marketplace.address = marketplaceAddress;
+        await batchService.setMarketplace(marketplace);
+        localStorage.updateMarketplace(marketplace);
+      }
+      if (marketplaceAddress === source) {
         const marketplaceEvent = await processing.handleMarketplaceEvent(
           payload,
           eventInfo,

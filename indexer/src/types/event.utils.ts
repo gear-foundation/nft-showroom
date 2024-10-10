@@ -1,6 +1,6 @@
 import { Option, u128, u16, u32, u64 } from '@polkadot/types';
-import { Codec } from '@polkadot/types-codec/types/codec';
 import { Hash } from '@polkadot/types/interfaces';
+import { Codec } from '@polkadot/types/types';
 
 export function safeUnwrapToNumber(
   value: number | u16 | u32 | u64 | u128 | null,
