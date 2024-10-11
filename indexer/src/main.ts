@@ -9,7 +9,7 @@ import { EntitiesService } from './processing/entities.service';
 import { getLocalStorage } from './processing/storage/local.storage';
 import { BatchService } from './processing/batch.service';
 import { config } from './config';
-import { DnsService } from './dns/dns.service';
+import { DnsService, getDnsService } from './dns/dns.service';
 
 const nftCbPrograms = [config.nfts.cb, config.nfts.vit];
 
@@ -35,8 +35,7 @@ let possibleNftInitializedEvents: {
 }[] = [];
 
 processor.run(new TypeormDatabase(), async (ctx) => {
-  const dnsService = new DnsService(config.dnsApiUrl);
-  await dnsService.init();
+  const dnsService = await getDnsService(config.dnsApiUrl);
   const localStorage = await getLocalStorage(ctx.store);
   const batchService = new BatchService(ctx.store);
   const entitiesService = new EntitiesService(
