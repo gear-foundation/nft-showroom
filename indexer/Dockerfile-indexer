@@ -5,7 +5,7 @@ RUN npm i -g typescript@5.2.2
 WORKDIR /squid
 ADD package.json .
 ADD package-lock.json .
-RUN npm i @types/node
+RUN npm i @types/node --force
 # remove if needed
 ADD assets assets
 # remove if needed
