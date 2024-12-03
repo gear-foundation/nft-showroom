@@ -11,6 +11,8 @@ const ADDRESS = {
   INDEXER_WS: import.meta.env.VITE_INDEXER_WS_ADDRESS as string,
 };
 
+const GTM_ID = import.meta.env.VITE_GTM_ID as string | undefined;
+
 const ROUTE = {
   HOME: '/',
   CREATE_COLLECTION: '/create',
@@ -27,4 +29,4 @@ const SCHEMA = {
     .transform((value) => decodeAddress(value)),
 };
 
-export { ADDRESS, ROUTE, SCHEMA };
+export { ADDRESS, GTM_ID, ROUTE, SCHEMA };

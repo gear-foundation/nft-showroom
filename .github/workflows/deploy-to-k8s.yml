@@ -79,6 +79,7 @@ jobs:
             VITE_IPFS_GATEWAY_ADDRESS=${{ secrets.VITE_IPFS_GATEWAY_ADDRESS }}
             VITE_INDEXER_ADDRESS=${{ secrets.VITE_INDEXER_ADDRESS }}
             VITE_INDEXER_WS_ADDRESS=${{ secrets.VITE_INDEXER_WS_ADDRESS }}
+            VITE_GTM_ID=${{ secrets.VITE_GTM_ID }}
 
   deploy-to-k8s:
     needs: [prepair, build-and-push-image]
