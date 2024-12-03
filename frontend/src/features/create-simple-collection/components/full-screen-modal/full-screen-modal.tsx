@@ -1,8 +1,8 @@
 import { Button } from '@gear-js/vara-ui';
+import { useAccount, useDeriveBalancesAll } from '@gear-js/react-hooks';
 import { ReactNode, useEffect } from 'react';
 
-import { Container } from '@/components';
-import { AccountBalance } from '@/features/wallet';
+import { Balance, Container } from '@/components';
 import { cx } from '@/utils';
 
 import CrossSVG from '../../assets/cross.svg?react';
@@ -19,6 +19,9 @@ type Props = {
 };
 
 function FullScreenModal({ heading, steps, stepIndex, children, className, close }: Props) {
+  const { account } = useAccount();
+  const { data: balance } = useDeriveBalancesAll({ address: account?.address });
+
   const getStepStatus = (index: number) => {
     if (index > stepIndex) return 'awaiting';
     if (index < stepIndex) return 'complete';
@@ -53,7 +56,7 @@ function FullScreenModal({ heading, steps, stepIndex, children, className, close
           <div className={styles.balanceWrapper}>
             <ul className={styles.progress}>{getSteps()}</ul>
 
-            <AccountBalance />
+            {balance && <Balance value={balance.transferable || balance.availableBalance} />}
           </div>
         </Container>
       </header>

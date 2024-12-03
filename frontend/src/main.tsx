@@ -1,13 +1,16 @@
 import '@gear-js/vara-ui/dist/style.css';
 import React from 'react';
 import ReactDOM from 'react-dom/client';
+import TagManager from 'react-gtm-module';
 import { RouterProvider, createBrowserRouter } from 'react-router-dom';
 
 import { App } from './App';
 import { PrivateRoute } from './components';
-import { ROUTE } from './consts';
+import { GTM_ID, ROUTE } from './consts';
 import { Collection, CreateCollection, NFT, Lists, NotFound } from './pages';
 import './index.scss';
+
+if (GTM_ID) TagManager.initialize({ gtmId: GTM_ID });
 
 const PRIVATE_ROUTES = [
   {
