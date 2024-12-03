@@ -1,6 +1,6 @@
 import {
   ApiProvider as GearApiProvider,
-  AccountProvider,
+  AccountProvider as GearAccountProvider,
   AlertProvider as GearAlertProvider,
   ProviderProps,
 } from '@gear-js/react-hooks';
@@ -13,6 +13,10 @@ import { MarketplaceProvider } from './context';
 
 function ApiProvider({ children }: ProviderProps) {
   return <GearApiProvider initialArgs={{ endpoint: ADDRESS.NODE }}>{children}</GearApiProvider>;
+}
+
+function AccountProvider({ children }: ProviderProps) {
+  return <GearAccountProvider appName="Vara NFT Showroom">{children}</GearAccountProvider>;
 }
 
 function AlertProvider({ children }: ProviderProps) {
