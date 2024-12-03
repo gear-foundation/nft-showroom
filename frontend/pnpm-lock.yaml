@@ -12,8 +12,8 @@ importers:
         specifier: 0.39.0
         version: 0.39.0(@polkadot/api@14.3.1)(@polkadot/wasm-crypto@7.4.1(@polkadot/util@13.2.3)(@polkadot/x-randomvalues@13.2.3(@polkadot/util@13.2.3)(@polkadot/wasm-util@7.4.1(@polkadot/util@13.2.3))))(rxjs@7.8.1)
       '@gear-js/react-hooks':
-        specifier: 0.14.0
-        version: 0.14.0(@gear-js/api@0.39.0(@polkadot/api@14.3.1)(@polkadot/wasm-crypto@7.4.1(@polkadot/util@13.2.3)(@polkadot/x-randomvalues@13.2.3(@polkadot/util@13.2.3)(@polkadot/wasm-util@7.4.1(@polkadot/util@13.2.3))))(rxjs@7.8.1))(@polkadot/api@14.3.1)(@tanstack/react-query@5.62.2(react@18.2.0))(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(sails-js-types@0.0.1)(sails-js@0.3.0(@gear-js/api@0.39.0(@polkadot/api@14.3.1)(@polkadot/wasm-crypto@7.4.1(@polkadot/util@13.2.3)(@polkadot/x-randomvalues@13.2.3(@polkadot/util@13.2.3)(@polkadot/wasm-util@7.4.1(@polkadot/util@13.2.3))))(rxjs@7.8.1))(@polkadot/api@14.3.1)(@polkadot/types@14.3.1)(sails-js-types@0.0.1)(sails-js-util@0.0.1))
+        specifier: 0.14.1
+        version: 0.14.1(@gear-js/api@0.39.0(@polkadot/api@14.3.1)(@polkadot/wasm-crypto@7.4.1(@polkadot/util@13.2.3)(@polkadot/x-randomvalues@13.2.3(@polkadot/util@13.2.3)(@polkadot/wasm-util@7.4.1(@polkadot/util@13.2.3))))(rxjs@7.8.1))(@polkadot/api@14.3.1)(@tanstack/react-query@5.62.2(react@18.2.0))(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(sails-js-types@0.0.1)(sails-js@0.3.0(@gear-js/api@0.39.0(@polkadot/api@14.3.1)(@polkadot/wasm-crypto@7.4.1(@polkadot/util@13.2.3)(@polkadot/x-randomvalues@13.2.3(@polkadot/util@13.2.3)(@polkadot/wasm-util@7.4.1(@polkadot/util@13.2.3))))(rxjs@7.8.1))(@polkadot/api@14.3.1)(@polkadot/types@14.3.1)(sails-js-types@0.0.1)(sails-js-util@0.0.1))
       '@gear-js/ui':
         specifier: 0.5.28
         version: 0.5.28(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(sass@1.69.5)
@@ -21,8 +21,8 @@ importers:
         specifier: 0.0.11
         version: 0.0.11(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
       '@gear-js/wallet-connect':
-        specifier: 0.2.0
-        version: 0.2.0(@gear-js/react-hooks@0.14.0(@gear-js/api@0.39.0(@polkadot/api@14.3.1)(@polkadot/wasm-crypto@7.4.1(@polkadot/util@13.2.3)(@polkadot/x-randomvalues@13.2.3(@polkadot/util@13.2.3)(@polkadot/wasm-util@7.4.1(@polkadot/util@13.2.3))))(rxjs@7.8.1))(@polkadot/api@14.3.1)(@tanstack/react-query@5.62.2(react@18.2.0))(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(sails-js-types@0.0.1)(sails-js@0.3.0(@gear-js/api@0.39.0(@polkadot/api@14.3.1)(@polkadot/wasm-crypto@7.4.1(@polkadot/util@13.2.3)(@polkadot/x-randomvalues@13.2.3(@polkadot/util@13.2.3)(@polkadot/wasm-util@7.4.1(@polkadot/util@13.2.3))))(rxjs@7.8.1))(@polkadot/api@14.3.1)(@polkadot/types@14.3.1)(sails-js-types@0.0.1)(sails-js-util@0.0.1)))(@gear-js/ui@0.5.28(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(sass@1.69.5))(@gear-js/vara-ui@0.0.11(react-dom@18.2.0(react@18.2.0))(react@18.2.0))
+        specifier: 0.2.1
+        version: 0.2.1(@gear-js/react-hooks@0.14.1(@gear-js/api@0.39.0(@polkadot/api@14.3.1)(@polkadot/wasm-crypto@7.4.1(@polkadot/util@13.2.3)(@polkadot/x-randomvalues@13.2.3(@polkadot/util@13.2.3)(@polkadot/wasm-util@7.4.1(@polkadot/util@13.2.3))))(rxjs@7.8.1))(@polkadot/api@14.3.1)(@tanstack/react-query@5.62.2(react@18.2.0))(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(sails-js-types@0.0.1)(sails-js@0.3.0(@gear-js/api@0.39.0(@polkadot/api@14.3.1)(@polkadot/wasm-crypto@7.4.1(@polkadot/util@13.2.3)(@polkadot/x-randomvalues@13.2.3(@polkadot/util@13.2.3)(@polkadot/wasm-util@7.4.1(@polkadot/util@13.2.3))))(rxjs@7.8.1))(@polkadot/api@14.3.1)(@polkadot/types@14.3.1)(sails-js-types@0.0.1)(sails-js-util@0.0.1)))(@gear-js/ui@0.5.28(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(sass@1.69.5))(@gear-js/vara-ui@0.0.11(react-dom@18.2.0(react@18.2.0))(react@18.2.0))
       '@hookform/resolvers':
         specifier: 3.3.3
         version: 3.3.3(react-hook-form@7.49.2(react@18.2.0))
@@ -622,8 +622,8 @@ packages:
       '@polkadot/wasm-crypto': 7.4.1
       rxjs: 7.8.1
 
-  '@gear-js/react-hooks@0.14.0':
-    resolution: {integrity: sha512-4aaDNh6xH8C2fMu76PpkAp1zOaacERjtsvEEJdLmWv79eDy0yyLzdaY8O7Cleiyh7rNcTMPt/9z/2Jjd0PG4qQ==}
+  '@gear-js/react-hooks@0.14.1':
+    resolution: {integrity: sha512-gXaHr0VPD9flfffJ6LOP1wEZbi6k1bGbMAO/c9oIcSHCxUUmEqF1CFva/TLK9Y5a3egXzO4UCXp77L+z+nR3Iw==}
     peerDependencies:
       '@gear-js/api': 0.39.0
       '@polkadot/api': 14.3.1
@@ -645,10 +645,10 @@ packages:
       react: ^18.2.0
       react-dom: ^18.2.0
 
-  '@gear-js/wallet-connect@0.2.0':
-    resolution: {integrity: sha512-ghUWXd/FDbusjmjj7j6yJEDo8bOjN6qYISutdaqj6UQUeFWqrjrUxRGeKm1/zzhMN7+naOUy4o2Oc7TnEKm6Sw==}
+  '@gear-js/wallet-connect@0.2.1':
+    resolution: {integrity: sha512-+6ewm0XuGo+EvTmM2O5NtnBwoAeCStHLhHEgcC7i7z7imQcDalaZ18i9wj49NQrUboULR6BhGg3c5X27AYZJ1w==}
     peerDependencies:
-      '@gear-js/react-hooks': ^0.14.0
+      '@gear-js/react-hooks': ^0.14.1
       '@gear-js/ui': ^0.5.28
       '@gear-js/vara-ui': ^0.0.11
     peerDependenciesMeta:
@@ -4319,7 +4319,7 @@ snapshots:
       '@polkadot/wasm-crypto': 7.4.1(@polkadot/util@13.2.3)(@polkadot/x-randomvalues@13.2.3(@polkadot/util@13.2.3)(@polkadot/wasm-util@7.4.1(@polkadot/util@13.2.3)))
       rxjs: 7.8.1
 
-  '@gear-js/react-hooks@0.14.0(@gear-js/api@0.39.0(@polkadot/api@14.3.1)(@polkadot/wasm-crypto@7.4.1(@polkadot/util@13.2.3)(@polkadot/x-randomvalues@13.2.3(@polkadot/util@13.2.3)(@polkadot/wasm-util@7.4.1(@polkadot/util@13.2.3))))(rxjs@7.8.1))(@polkadot/api@14.3.1)(@tanstack/react-query@5.62.2(react@18.2.0))(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(sails-js-types@0.0.1)(sails-js@0.3.0(@gear-js/api@0.39.0(@polkadot/api@14.3.1)(@polkadot/wasm-crypto@7.4.1(@polkadot/util@13.2.3)(@polkadot/x-randomvalues@13.2.3(@polkadot/util@13.2.3)(@polkadot/wasm-util@7.4.1(@polkadot/util@13.2.3))))(rxjs@7.8.1))(@polkadot/api@14.3.1)(@polkadot/types@14.3.1)(sails-js-types@0.0.1)(sails-js-util@0.0.1))':
+  '@gear-js/react-hooks@0.14.1(@gear-js/api@0.39.0(@polkadot/api@14.3.1)(@polkadot/wasm-crypto@7.4.1(@polkadot/util@13.2.3)(@polkadot/x-randomvalues@13.2.3(@polkadot/util@13.2.3)(@polkadot/wasm-util@7.4.1(@polkadot/util@13.2.3))))(rxjs@7.8.1))(@polkadot/api@14.3.1)(@tanstack/react-query@5.62.2(react@18.2.0))(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(sails-js-types@0.0.1)(sails-js@0.3.0(@gear-js/api@0.39.0(@polkadot/api@14.3.1)(@polkadot/wasm-crypto@7.4.1(@polkadot/util@13.2.3)(@polkadot/x-randomvalues@13.2.3(@polkadot/util@13.2.3)(@polkadot/wasm-util@7.4.1(@polkadot/util@13.2.3))))(rxjs@7.8.1))(@polkadot/api@14.3.1)(@polkadot/types@14.3.1)(sails-js-types@0.0.1)(sails-js-util@0.0.1))':
     dependencies:
       '@gear-js/api': 0.39.0(@polkadot/api@14.3.1)(@polkadot/wasm-crypto@7.4.1(@polkadot/util@13.2.3)(@polkadot/x-randomvalues@13.2.3(@polkadot/util@13.2.3)(@polkadot/wasm-util@7.4.1(@polkadot/util@13.2.3))))(rxjs@7.8.1)
       '@polkadot/api': 14.3.1
@@ -4352,9 +4352,9 @@ snapshots:
       react: 18.2.0
       react-dom: 18.2.0(react@18.2.0)
 
-  '@gear-js/wallet-connect@0.2.0(@gear-js/react-hooks@0.14.0(@gear-js/api@0.39.0(@polkadot/api@14.3.1)(@polkadot/wasm-crypto@7.4.1(@polkadot/util@13.2.3)(@polkadot/x-randomvalues@13.2.3(@polkadot/util@13.2.3)(@polkadot/wasm-util@7.4.1(@polkadot/util@13.2.3))))(rxjs@7.8.1))(@polkadot/api@14.3.1)(@tanstack/react-query@5.62.2(react@18.2.0))(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(sails-js-types@0.0.1)(sails-js@0.3.0(@gear-js/api@0.39.0(@polkadot/api@14.3.1)(@polkadot/wasm-crypto@7.4.1(@polkadot/util@13.2.3)(@polkadot/x-randomvalues@13.2.3(@polkadot/util@13.2.3)(@polkadot/wasm-util@7.4.1(@polkadot/util@13.2.3))))(rxjs@7.8.1))(@polkadot/api@14.3.1)(@polkadot/types@14.3.1)(sails-js-types@0.0.1)(sails-js-util@0.0.1)))(@gear-js/ui@0.5.28(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(sass@1.69.5))(@gear-js/vara-ui@0.0.11(react-dom@18.2.0(react@18.2.0))(react@18.2.0))':
+  '@gear-js/wallet-connect@0.2.1(@gear-js/react-hooks@0.14.1(@gear-js/api@0.39.0(@polkadot/api@14.3.1)(@polkadot/wasm-crypto@7.4.1(@polkadot/util@13.2.3)(@polkadot/x-randomvalues@13.2.3(@polkadot/util@13.2.3)(@polkadot/wasm-util@7.4.1(@polkadot/util@13.2.3))))(rxjs@7.8.1))(@polkadot/api@14.3.1)(@tanstack/react-query@5.62.2(react@18.2.0))(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(sails-js-types@0.0.1)(sails-js@0.3.0(@gear-js/api@0.39.0(@polkadot/api@14.3.1)(@polkadot/wasm-crypto@7.4.1(@polkadot/util@13.2.3)(@polkadot/x-randomvalues@13.2.3(@polkadot/util@13.2.3)(@polkadot/wasm-util@7.4.1(@polkadot/util@13.2.3))))(rxjs@7.8.1))(@polkadot/api@14.3.1)(@polkadot/types@14.3.1)(sails-js-types@0.0.1)(sails-js-util@0.0.1)))(@gear-js/ui@0.5.28(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(sass@1.69.5))(@gear-js/vara-ui@0.0.11(react-dom@18.2.0(react@18.2.0))(react@18.2.0))':
     dependencies:
-      '@gear-js/react-hooks': 0.14.0(@gear-js/api@0.39.0(@polkadot/api@14.3.1)(@polkadot/wasm-crypto@7.4.1(@polkadot/util@13.2.3)(@polkadot/x-randomvalues@13.2.3(@polkadot/util@13.2.3)(@polkadot/wasm-util@7.4.1(@polkadot/util@13.2.3))))(rxjs@7.8.1))(@polkadot/api@14.3.1)(@tanstack/react-query@5.62.2(react@18.2.0))(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(sails-js-types@0.0.1)(sails-js@0.3.0(@gear-js/api@0.39.0(@polkadot/api@14.3.1)(@polkadot/wasm-crypto@7.4.1(@polkadot/util@13.2.3)(@polkadot/x-randomvalues@13.2.3(@polkadot/util@13.2.3)(@polkadot/wasm-util@7.4.1(@polkadot/util@13.2.3))))(rxjs@7.8.1))(@polkadot/api@14.3.1)(@polkadot/types@14.3.1)(sails-js-types@0.0.1)(sails-js-util@0.0.1))
+      '@gear-js/react-hooks': 0.14.1(@gear-js/api@0.39.0(@polkadot/api@14.3.1)(@polkadot/wasm-crypto@7.4.1(@polkadot/util@13.2.3)(@polkadot/x-randomvalues@13.2.3(@polkadot/util@13.2.3)(@polkadot/wasm-util@7.4.1(@polkadot/util@13.2.3))))(rxjs@7.8.1))(@polkadot/api@14.3.1)(@tanstack/react-query@5.62.2(react@18.2.0))(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(sails-js-types@0.0.1)(sails-js@0.3.0(@gear-js/api@0.39.0(@polkadot/api@14.3.1)(@polkadot/wasm-crypto@7.4.1(@polkadot/util@13.2.3)(@polkadot/x-randomvalues@13.2.3(@polkadot/util@13.2.3)(@polkadot/wasm-util@7.4.1(@polkadot/util@13.2.3))))(rxjs@7.8.1))(@polkadot/api@14.3.1)(@polkadot/types@14.3.1)(sails-js-types@0.0.1)(sails-js-util@0.0.1))
     optionalDependencies:
       '@gear-js/ui': 0.5.28(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(sass@1.69.5)
       '@gear-js/vara-ui': 0.0.11(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
@@ -7879,7 +7879,7 @@ snapshots:
 
   smoldot@2.0.34:
     dependencies:
-      ws: 8.16.0
+      ws: 8.18.0
     transitivePeerDependencies:
       - bufferutil
       - utf-8-validate
