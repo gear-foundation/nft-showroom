@@ -8,6 +8,7 @@ import { ROUTE } from '@/consts';
 import SearchSVG from '../../assets/search.svg?react';
 import { FIELD_NAME, SCHEMA } from '../../consts';
 import { useNFTSearchParam } from '../../hooks';
+import styles from './nft-search.module.scss';
 
 function NFTSearch() {
   const param = useNFTSearchParam();
@@ -24,7 +25,13 @@ function NFTSearch() {
   return (
     <FormProvider {...form}>
       <form onSubmit={handleSubmit}>
-        <Input name={FIELD_NAME.QUERY} icon={SearchSVG} label="NFT name/Account address" size="small" />
+        <Input
+          name={FIELD_NAME.QUERY}
+          icon={SearchSVG}
+          label="NFT name/Account address"
+          size="small"
+          className={styles.input}
+        />
       </form>
     </FormProvider>
   );
