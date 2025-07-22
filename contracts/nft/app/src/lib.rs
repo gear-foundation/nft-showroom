@@ -178,12 +178,14 @@ impl NftService {
         )
         .expect("Error during send to owner `Event::Initialized`");
 
-        msg::reply(
+        msg::send_with_gas(
+            0.into(),
             Event::Initialized {
                 config,
                 total_number_of_tokens,
                 permission_to_mint,
             },
+            0,
             msg_value,
         )
         .expect("Error during send reply `Event::Initialized`");

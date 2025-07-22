@@ -42,7 +42,7 @@ pub enum Event {
     },
     NewCollectionAdded {
         code_id: CodeId,
-        meta_link: String,
+        idl_link: String,
         type_name: String,
         type_description: String,
     },
@@ -134,6 +134,9 @@ pub enum Event {
     ValueSent,
     AllowMessageChanged,
     AllowCreateCollectionChanged,
+    CollectionTypeDeleted {
+        type_name: String,
+    }
 }
 
 #[allow(static_mut_refs)]
@@ -179,7 +182,8 @@ impl NftShowroomSailsService {
         };
         unsafe { STORAGE = Some(nft_marketplace) };
 
-        msg::reply(
+        msg::send_with_gas(
+            0.into(),
             Event::Initialized {
                 time_between_create_collections,
                 royalty_to_marketplace_for_trade,
@@ -189,6 +193,7 @@ impl NftShowroomSailsService {
                 max_creator_royalty,
                 max_number_of_images,
             },
+            0,
             0,
         )
         .expect("Failed to encode or reply with `Event`.");
@@ -214,7 +219,7 @@ impl NftShowroomSailsService {
     pub fn add_new_collection(
         &mut self,
         code_id: CodeId,
-        meta_link: String,
+        idl_link: String,
         type_name: String,
         type_description: String,
         allow_create: bool,
@@ -225,7 +230,7 @@ impl NftShowroomSailsService {
 
         let collection_info = TypeCollectionInfo {
             code_id,
-            meta_link: meta_link.clone(),
+            idl_link: idl_link.clone(),
             type_description: type_description.clone(),
             allow_create,
         };
@@ -235,9 +240,27 @@ impl NftShowroomSailsService {
 
         self.emit_event(Event::NewCollectionAdded {
             code_id,
-            meta_link,
+            idl_link,
             type_name,
             type_description,
+        })
+        .expect("Event Invocation Error");
+    }
+
+    pub fn delete_collection_type(
+        &mut self,
+        type_name: String,
+    ) {
+        let storage = self.get_mut();
+        let msg_src = msg::source();
+        check_admin(storage, &msg_src);
+
+        storage
+            .type_collections
+            .remove(&type_name);
+
+        self.emit_event(Event::CollectionTypeDeleted {
+            type_name,
         })
         .expect("Event Invocation Error");
     }
@@ -1071,15 +1094,15 @@ impl NftShowroomSailsService {
         let storage = self.get();
         let collection_to_owner = storage.collection_to_owner.get(&collection_address);
         if let Some((type_name, owner)) = collection_to_owner {
-            let meta_link = &storage
+            let idl_link = &storage
                 .type_collections
                 .get(type_name)
                 .expect("This collection type name must exist")
-                .meta_link;
+                .idl_link;
             let collection_info = CollectionInfo {
                 owner: *owner,
                 type_name: type_name.clone(),
-                meta_link: meta_link.clone(),
+                idl_link: idl_link.clone(),
             };
             Some(collection_info)
         } else {

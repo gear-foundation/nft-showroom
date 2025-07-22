@@ -68,14 +68,14 @@ pub struct Config {
 
 /// * code_id - code_id is used to create a collection by that CodeId,
 ///   the admin should preload the NFT contract and specify in the marketplace so that regular users can use it
-/// * meta_link -  it is necessary to set a reference where the meta of this collection type will be stored for further interaction with the contract
+/// * idl_link -  it is necessary to set a reference where the idl of this collection type will be stored for further interaction with the contract
 /// * type_description - description of this type of collection
 #[derive(Debug, Encode, Decode, TypeInfo, Clone)]
 #[codec(crate = sails_rs::scale_codec)]
 #[scale_info(crate = sails_rs::scale_info)]
 pub struct TypeCollectionInfo {
     pub code_id: CodeId,
-    pub meta_link: String,
+    pub idl_link: String,
     pub type_description: String,
     pub allow_create: bool,
 }
@@ -86,7 +86,7 @@ pub struct TypeCollectionInfo {
 pub struct CollectionInfo {
     pub owner: ActorId,
     pub type_name: String,
-    pub meta_link: String,
+    pub idl_link: String,
 }
 
 pub fn currency_transfer(
