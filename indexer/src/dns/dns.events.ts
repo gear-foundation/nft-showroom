@@ -30,7 +30,7 @@ export class DnsEventsParser {
   async init() {
     const parser = await SailsIdlParser.new();
     this.sails = new Sails(parser);
-    const idlPath = join(__dirname, './assets/dns.idl');
+    const idlPath = join(__dirname, '../../assets/dns.idl');
     const idl = readFileSync(idlPath, 'utf8');
     this.sails.parseIdl(idl);
   }
