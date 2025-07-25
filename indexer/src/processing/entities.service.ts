@@ -18,13 +18,27 @@ import { Store } from '@subsquid/typeorm-store';
 import { EventInfo } from './event-info.type';
 import { getCollectionDescription, getCollectionName } from './utils/helpers';
 import { ProgramMetadata } from '@gear-js/api';
+import { DnsService } from '../dns/dns.service';
+import { config } from '../config';
 
 export class EntitiesService {
   constructor(
     private readonly storage: IStorage,
     private readonly batchService: BatchService,
     private readonly store: Store,
+    private readonly dnsService: DnsService,
   ) {}
+
+  async init() {
+    const marketplace = await this.storage.getMarketplace();
+    const dnsAddress = await this.dnsService.getAddressByName(
+      config.dnsProgramName,
+    );
+    if (dnsAddress && marketplace.address !== dnsAddress) {
+      marketplace.address = dnsAddress;
+      await this.setMarketplace(marketplace);
+    }
+  }
 
   getMarketplace(): Marketplace {
     return this.storage.getMarketplace();
