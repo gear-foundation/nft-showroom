@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from 'uuid';
-import { OfferCreated } from '../../types/marketplace.events';
+import { OfferCreated } from '../../parsers/marketplace.parser';
 import { EntitiesService } from '../entities.service';
 import { INftMarketplaceEventHandler } from './nft-marketplace.handler';
 import { OfferStatus } from '../../model/types';

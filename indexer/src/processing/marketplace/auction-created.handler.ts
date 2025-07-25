@@ -1,4 +1,4 @@
-import { AuctionCreated } from '../../types/marketplace.events';
+import { AuctionCreated } from '../../parsers/marketplace.parser';
 import { EntitiesService } from '../entities.service';
 import { INftMarketplaceEventHandler } from './nft-marketplace.handler';
 import { Auction } from '../../model';

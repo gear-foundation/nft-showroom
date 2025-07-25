@@ -4,11 +4,15 @@ import { processor } from './processor';
 import { EventsProcessing } from './processing/events.processing';
 import { EventInfo } from './processing/event-info.type';
 import { Block } from '@subsquid/substrate-processor';
-import { NftMarketplaceEventType } from './types/marketplace.events';
-import { EntitiesService } from './processing/entities.service';
 import { getLocalStorage } from './processing/storage/local.storage';
 import { BatchService } from './processing/batch.service';
 import { config } from './config';
+import {
+  getMarketplaceParser,
+  NftMarketplaceEventType,
+} from './parsers/marketplace.parser';
+import { getNftParser } from './parsers/nft.parser';
+import { EntitiesService } from './processing/entities.service';
 
 const nftCbPrograms = [config.nfts.cb, config.nfts.vit];
 
@@ -40,7 +44,13 @@ processor.run(new TypeormDatabase(), async (ctx) => {
     new BatchService(ctx.store),
     ctx.store,
   );
-  const processing = new EventsProcessing(entitiesService, localStorage);
+  const marketplaceParser = await getMarketplaceParser();
+  const nftParser = await getNftParser();
+  const processing = new EventsProcessing(
+    entitiesService,
+    marketplaceParser,
+    nftParser,
+  );
   const firstBlockDate = getBlockDate(ctx.blocks[0]);
   console.log(
     `[main] start processing ${ctx.blocks.length} blocks at ${firstBlockDate}.`,

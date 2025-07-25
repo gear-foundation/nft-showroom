@@ -2,7 +2,7 @@ import { EntitiesService } from '../entities.service';
 import { INftEventHandler } from './nft.handler';
 import { Collection } from '../../model';
 import { EventInfo } from '../event-info.type';
-import { LiftRestrictionMintEvent } from '../../types/nft.events';
+import { LiftRestrictionMintEvent } from '../../parsers/nft.parser';
 
 export class LiftRestrictionMintHandler implements INftEventHandler {
   async handle(

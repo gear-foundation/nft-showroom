@@ -1,4 +1,4 @@
-import { InitializedEvent } from '../../types/nft.events';
+import { InitializedEvent } from '../../parsers/nft.parser';
 import { EntitiesService } from '../entities.service';
 import { INftEventHandler } from './nft.handler';
 import { AdditionalLinks, Collection } from '../../model';

@@ -1,4 +1,4 @@
-import { CollectionCreated } from '../../types/marketplace.events';
+import { CollectionCreated } from '../../parsers/marketplace.parser';
 import { EntitiesService } from '../entities.service';
 import { INftMarketplaceEventHandler } from './nft-marketplace.handler';
 import { Collection } from '../../model';

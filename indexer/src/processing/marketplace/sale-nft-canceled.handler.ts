@@ -1,4 +1,4 @@
-import { AuctionCanceled } from '../../types/marketplace.events';
+import { AuctionCanceled } from '../../parsers/marketplace.parser';
 import { EntitiesService } from '../entities.service';
 import { INftMarketplaceEventHandler } from './nft-marketplace.handler';
 import { AuctionStatus, SaleStatus } from '../../model/types';

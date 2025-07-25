@@ -1,4 +1,4 @@
-import { OfferAccepted } from '../../types/marketplace.events';
+import { OfferAccepted } from '../../parsers/marketplace.parser';
 import { EntitiesService } from '../entities.service';
 import { INftMarketplaceEventHandler } from './nft-marketplace.handler';
 import { OfferStatus } from '../../model/types';
