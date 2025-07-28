@@ -1,5 +1,5 @@
-import { Button } from '@gear-js/vara-ui';
 import { useAccount, useDeriveBalancesAll } from '@gear-js/react-hooks';
+import { Button } from '@gear-js/vara-ui';
 import { ReactNode, useEffect } from 'react';
 
 import { Balance, Container } from '@/components';
@@ -56,7 +56,13 @@ function FullScreenModal({ heading, steps, stepIndex, children, className, close
           <div className={styles.balanceWrapper}>
             <ul className={styles.progress}>{getSteps()}</ul>
 
-            {balance && <Balance value={balance.transferable || balance.availableBalance} />}
+            {balance && (
+              <Balance
+                value={
+                  (balance.transferable || balance.availableBalance)?.toBigInt()
+                }
+              />
+            )}
           </div>
         </Container>
       </header>

@@ -1,5 +1,5 @@
 import { CopyButton, FilterButton, LinkButton } from './buttons';
-import { Form, Input, Checkbox, Radio, Select, Textarea } from './form';
+import { Form, SearchInput, Checkbox, Radio, Select, Textarea } from './form';
 import { withAccount, withApi, withMarketplaceConfig } from './hocs';
 import { InfoCard, InfoCardProps } from './info-card';
 import { PriceInput } from './inputs';
@@ -38,7 +38,7 @@ export {
   Breadcrumbs,
   Form,
   withApi,
-  Input,
+  SearchInput,
   Checkbox,
   Radio,
   Select,

@@ -57,7 +57,7 @@ function Component({ collection, owner, approvedAccount, ...nft }: Props) {
 
   return isOwner && collection.sellable ? (
     <>
-      <Button icon={BidSVG} text="Start auction" size="small" color="dark" onClick={open} />
+      <Button icon={BidSVG} text="Start auction" size="small" color="contrast" onClick={open} />
 
       {isOpen && (
         <NFTActionFormModal modal={modalProps} form={formProps} nft={nft} collection={collection}>

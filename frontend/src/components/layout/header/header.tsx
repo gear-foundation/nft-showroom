@@ -24,7 +24,9 @@ function Header() {
         </div>
 
         <div className={styles.wallet}>
-          {balance && <Balance value={balance.transferable || balance.availableBalance} />}
+          {balance && <Balance value={
+            (balance.transferable || balance.availableBalance)?.toBigInt()
+          } />}
 
           <div className={styles.buttons}>
             {account && <LinkButton to={ROUTE.CREATE_COLLECTION} text="Create" />}

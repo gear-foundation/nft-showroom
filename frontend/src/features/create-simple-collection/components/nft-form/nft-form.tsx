@@ -102,7 +102,7 @@ function NFTForm({ defaultValues, isLoading, onSubmit, onBack }: Props) {
               multiple
             />
 
-            <Button text="Select File" size="small" color="dark" onClick={handleInputClick} />
+            <Button text="Select File" size="small" color="contrast" onClick={handleInputClick} />
 
             <p>File formats: .jpg, .jpeg, .png. Max size: 5mb</p>
           </div>

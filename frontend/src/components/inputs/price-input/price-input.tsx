@@ -1,9 +1,9 @@
 import VaraSVG from '@/assets/vara.svg?react';
 
-import { Input, InputProps } from '../../form';
+import { SearchInput, InputProps } from '../../form';
 
 function PriceInput(props: Omit<InputProps, 'type' | 'icon'>) {
-  return <Input type="number" step="any" icon={VaraSVG} {...props} />;
+  return <SearchInput type="number" step="any" icon={VaraSVG} {...props} />;
 }
 
 export { PriceInput };

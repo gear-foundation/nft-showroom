@@ -75,7 +75,7 @@ function SummaryForm({ defaultValues, onSubmit, onBack }: Props) {
                   <p>File formats: .jpg, .jpeg, .png. Max size: 5mb</p>
                 </div>
 
-                <Button text="Select File" size="small" color="dark" onClick={cover.handleClick} />
+                <Button text="Select File" size="small" color="contrast" onClick={cover.handleClick} />
               </>
             )}
 
