@@ -3,7 +3,15 @@
 
 import { GearApi, Program, HexString, decodeAddress } from '@gear-js/api';
 import { TypeRegistry } from '@polkadot/types';
-import { TransactionBuilder, throwOnErrorReply, getServiceNamePrefix, getFnNamePrefix, ZERO_ADDRESS } from 'sails-js';
+import {
+  TransactionBuilder,
+  throwOnErrorReply,
+  getServiceNamePrefix,
+  getFnNamePrefix,
+  ZERO_ADDRESS,
+  ActorId,
+  CodeId,
+} from 'sails-js';
 
 export class SailsProgram {
   public readonly registry: TypeRegistry;

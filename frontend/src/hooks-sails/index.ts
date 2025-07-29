@@ -1,14 +1,9 @@
-// Export main classes and types
+// Export main classes
 export { SailsProgram } from './lib';
 
 // Export hooks
 export {
-  useSailsProgram,
-  useProgramState,
-  useConfig,
-  useCollectionInfo,
-  useAllCollections,
-  useCollectionsInfo,
-  useSendTransaction,
-  useProgramEvents,
+  useProgramInstance,
+  useSendMintTransaction,
+  useSendSellTransaction,
 } from './api';
