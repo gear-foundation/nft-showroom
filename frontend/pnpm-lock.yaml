@@ -13,7 +13,7 @@ importers:
         version: 0.42.0(@polkadot/api@16.4.2)(@polkadot/wasm-crypto@7.4.1(@polkadot/util@13.5.3)(@polkadot/x-randomvalues@13.5.3(@polkadot/util@13.5.3)(@polkadot/wasm-util@7.4.1(@polkadot/util@13.5.3))))(rxjs@7.8.1)
       '@gear-js/react-hooks':
         specifier: 0.17.0
-        version: 0.17.0(@gear-js/api@0.42.0(@polkadot/api@16.4.2)(@polkadot/wasm-crypto@7.4.1(@polkadot/util@13.5.3)(@polkadot/x-randomvalues@13.5.3(@polkadot/util@13.5.3)(@polkadot/wasm-util@7.4.1(@polkadot/util@13.5.3))))(rxjs@7.8.1))(@polkadot/api@16.4.2)(@tanstack/react-query@5.62.2(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sails-js@0.3.0(@gear-js/api@0.42.0(@polkadot/api@16.4.2)(@polkadot/wasm-crypto@7.4.1(@polkadot/util@13.5.3)(@polkadot/x-randomvalues@13.5.3(@polkadot/util@13.5.3)(@polkadot/wasm-util@7.4.1(@polkadot/util@13.5.3))))(rxjs@7.8.1))(@polkadot/api@16.4.2)(@polkadot/types@16.4.2)(sails-js-types@0.4.2)(sails-js-util@0.0.1))
+        version: 0.17.0(@gear-js/api@0.42.0(@polkadot/api@16.4.2)(@polkadot/wasm-crypto@7.4.1(@polkadot/util@13.5.3)(@polkadot/x-randomvalues@13.5.3(@polkadot/util@13.5.3)(@polkadot/wasm-util@7.4.1(@polkadot/util@13.5.3))))(rxjs@7.8.1))(@polkadot/api@16.4.2)(@tanstack/react-query@5.62.2(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sails-js@0.4.2(@gear-js/api@0.42.0(@polkadot/api@16.4.2)(@polkadot/wasm-crypto@7.4.1(@polkadot/util@13.5.3)(@polkadot/x-randomvalues@13.5.3(@polkadot/util@13.5.3)(@polkadot/wasm-util@7.4.1(@polkadot/util@13.5.3))))(rxjs@7.8.1))(@polkadot/api@16.4.2))
       '@gear-js/ui':
         specifier: 0.7.0
         version: 0.7.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.89.2)
@@ -22,7 +22,7 @@ importers:
         version: 0.3.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@gear-js/wallet-connect':
         specifier: 0.4.1
-        version: 0.4.1(c7c85200507e2fd72f96896dfc943517)
+        version: 0.4.1(003525539326be7aea934bf635dd64c1)
       '@hookform/resolvers':
         specifier: 3.10.0
         version: 3.10.0(react-hook-form@7.61.1(react@18.3.1))
@@ -59,7 +59,7 @@ importers:
     devDependencies:
       '@graphql-codegen/cli':
         specifier: 5.0.2
-        version: 5.0.2(@parcel/watcher@2.5.1)(graphql@16.11.0)(typescript@5.3.3)
+        version: 5.0.2(@parcel/watcher@2.5.1)(graphql@16.11.0)(typescript@5.7.3)
       '@graphql-codegen/client-preset':
         specifier: 4.2.4
         version: 4.2.4(graphql@16.11.0)
@@ -80,10 +80,10 @@ importers:
         version: 2.0.4
       '@typescript-eslint/eslint-plugin':
         specifier: 6.21.0
-        version: 6.21.0(@typescript-eslint/parser@6.21.0(eslint@8.55.0)(typescript@5.3.3))(eslint@8.55.0)(typescript@5.3.3)
+        version: 6.21.0(@typescript-eslint/parser@6.21.0(eslint@8.55.0)(typescript@5.7.3))(eslint@8.55.0)(typescript@5.7.3)
       '@typescript-eslint/parser':
         specifier: 6.21.0
-        version: 6.21.0(eslint@8.55.0)(typescript@5.3.3)
+        version: 6.21.0(eslint@8.55.0)(typescript@5.7.3)
       '@vitejs/plugin-react':
         specifier: 4.7.0
         version: 4.7.0(vite@7.0.6(jiti@1.21.0)(sass@1.89.2))
@@ -98,7 +98,7 @@ importers:
         version: 3.10.1(eslint-plugin-import@2.32.0)(eslint@8.55.0)
       eslint-plugin-import:
         specifier: 2.32.0
-        version: 2.32.0(@typescript-eslint/parser@6.21.0(eslint@8.55.0)(typescript@5.3.3))(eslint-import-resolver-typescript@3.10.1)(eslint@8.55.0)
+        version: 2.32.0(@typescript-eslint/parser@6.21.0(eslint@8.55.0)(typescript@5.7.3))(eslint-import-resolver-typescript@3.10.1)(eslint@8.55.0)
       eslint-plugin-jsx-a11y:
         specifier: 6.10.2
         version: 6.10.2(eslint@8.55.0)
@@ -114,24 +114,33 @@ importers:
       graphql:
         specifier: 16.11.0
         version: 16.11.0
+      prettier:
+        specifier: 3.6.2
+        version: 3.6.2
+      sails-js:
+        specifier: 0.4.2
+        version: 0.4.2(@gear-js/api@0.42.0(@polkadot/api@16.4.2)(@polkadot/wasm-crypto@7.4.1(@polkadot/util@13.5.3)(@polkadot/x-randomvalues@13.5.3(@polkadot/util@13.5.3)(@polkadot/wasm-util@7.4.1(@polkadot/util@13.5.3))))(rxjs@7.8.1))(@polkadot/api@16.4.2)
+      sails-js-cli:
+        specifier: 0.4.2
+        version: 0.4.2
       sass:
         specifier: 1.89.2
         version: 1.89.2
       typescript:
-        specifier: 5.3.3
-        version: 5.3.3
+        specifier: 5.7.3
+        version: 5.7.3
       vite:
         specifier: 7.0.6
         version: 7.0.6(jiti@1.21.0)(sass@1.89.2)
       vite-plugin-checker:
         specifier: 0.10.1
-        version: 0.10.1(eslint@8.55.0)(typescript@5.3.3)(vite@7.0.6(jiti@1.21.0)(sass@1.89.2))
+        version: 0.10.1(eslint@8.55.0)(typescript@5.7.3)(vite@7.0.6(jiti@1.21.0)(sass@1.89.2))
       vite-plugin-node-polyfills:
         specifier: 0.24.0
         version: 0.24.0(rollup@4.46.1)(vite@7.0.6(jiti@1.21.0)(sass@1.89.2))
       vite-plugin-svgr:
         specifier: 4.3.0
-        version: 4.3.0(rollup@4.46.1)(typescript@5.3.3)(vite@7.0.6(jiti@1.21.0)(sass@1.89.2))
+        version: 4.3.0(rollup@4.46.1)(typescript@5.7.3)(vite@7.0.6(jiti@1.21.0)(sass@1.89.2))
 
 packages:
 
@@ -3679,6 +3688,11 @@ packages:
     resolution: {integrity: sha512-vkcDPrRZo1QZLbn5RLGPpg/WmIQ65qoWWhcGKf/b5eplkkarX0m9z8ppCat4mlOqUsWpyNuYgO3VRyrYHSzX5g==}
     engines: {node: '>= 0.8.0'}
 
+  prettier@3.6.2:
+    resolution: {integrity: sha512-I7AIg5boAr5R0FFtJ6rCfD+LFsWHp81dolrFD8S79U9tb8Az2nGrJncnMSnys+bpQJfRUzqs9hnA81OAA3hCuQ==}
+    engines: {node: '>=14'}
+    hasBin: true
+
   process-nextick-args@2.0.1:
     resolution: {integrity: sha512-3ouUOpQhtgrbOa17J7+uxOTpITYWaGP7/AhoR3+A+/1e9skrzelGi/dXzEYyvbxubEF6Wn2ypscTKiKJFFn1ag==}
 
@@ -3908,24 +3922,24 @@ packages:
   safer-buffer@2.1.2:
     resolution: {integrity: sha512-YZo3K82SD7Riyi0E1EQPojLz7kpepnSQI9IyPbHHg1XXXevb5dJI7tpyN2ADxGcQbHG7vcyRHk0cbwqcQriUtg==}
 
+  sails-js-cli@0.4.2:
+    resolution: {integrity: sha512-pIm/zY+hHa/BhRc3LFRlBkAzet8XHo0Mu01+o/A94YTPEqk2CBGDC4nSq+REBjAI1gt110HMgRY7h+OXQIRECQ==}
+    hasBin: true
+
   sails-js-parser@0.4.2:
     resolution: {integrity: sha512-zstPDqaxNBJCz1X+a37txJbc6eh9utP9d1ensW1xxqblQQEe0wdDVI6MDhSvZWRCj63cGpcJ43tLgmU4mDPLJQ==}
 
   sails-js-types@0.4.2:
     resolution: {integrity: sha512-q/nkPclXG/JqZAq/ufN8SE0kqIYGgZGvHscb9fpGsqkjsndT7fepK9DAh63UcQiwZ6LiNm5t+T7C6ypyzZDQNQ==}
 
-  sails-js-util@0.0.1:
-    resolution: {integrity: sha512-Hyc7WaqpKVpFSr0AnQrKVqyHcwh1HlGvrouGLnaVq0xTTMH8/NgWasP3PuAZ0/W0k0kaK77Nt5J1rwZGlWpx2Q==}
+  sails-js-util@0.4.2:
+    resolution: {integrity: sha512-21w3N0uydu8LVPx0hpE6NU0ZqzCWKP8u5OwU88li2a6f6hS3cPwNFIxrPfMJfAoReQX0TDVP97Av6MttgPhDuQ==}
 
-  sails-js@0.3.0:
-    resolution: {integrity: sha512-GyxWBguS5GTqqfuLDERiMHPVVgt5cKNKy2HLQYrbXPUwkCRkfQ03sHptIt+uSyBNoYnzXkXqcGXmvW1GyEal+w==}
-    hasBin: true
+  sails-js@0.4.2:
+    resolution: {integrity: sha512-Lv7BhOS9pmsiPKgjHUBGqUize7pj3bAELfimEjFhSR5e53HO6yXRlCah0YKYqyLbqP25RbyzyCDB2lsQZ2ojyQ==}
     peerDependencies:
-      '@gear-js/api': 0.38.3
-      '@polkadot/api': 13.2.1
-      '@polkadot/types': 13.2.1
-      sails-js-types: 0.0.1
-      sails-js-util: 0.0.1
+      '@gear-js/api': ^0.42.0
+      '@polkadot/api': ^15.9.1
 
   sass@1.89.2:
     resolution: {integrity: sha512-xCmtksBKd/jdJ9Bt9p7nPKiuqrlBMBuuGkQlkhZjjQk3Ty48lv93k5Dq6OPkKt4XwxDJ7tvlfrTa1MPA9bf+QA==}
@@ -4268,8 +4282,8 @@ packages:
     resolution: {integrity: sha512-3KS2b+kL7fsuk/eJZ7EQdnEmQoaho/r6KUef7hxvltNA5DR8NAUM+8wJMbJyZ4G9/7i3v5zPBIMN5aybAh2/Jg==}
     engines: {node: '>= 0.4'}
 
-  typescript@5.3.3:
-    resolution: {integrity: sha512-pXWcraxM0uxAS+tN0AG/BF2TyqmHO014Z070UsJ+pFvYuRSq8KH8DmWpnbXe0pEPDHXZV3FcAbJkijJ5oNEnWw==}
+  typescript@5.7.3:
+    resolution: {integrity: sha512-84MVSjMEHP+FQRPy3pX9sTVV/INIex71s9TL2Gm5FG/WG1SqXeKyZ0k7/blY/4FdOzI12CBy1vGc4og/eus0fw==}
     engines: {node: '>=14.17'}
     hasBin: true
 
@@ -5170,7 +5184,7 @@ snapshots:
       '@polkadot/wasm-crypto': 7.4.1(@polkadot/util@13.5.3)(@polkadot/x-randomvalues@13.5.3(@polkadot/util@13.5.3)(@polkadot/wasm-util@7.4.1(@polkadot/util@13.5.3)))
       rxjs: 7.8.1
 
-  '@gear-js/react-hooks@0.17.0(@gear-js/api@0.42.0(@polkadot/api@16.4.2)(@polkadot/wasm-crypto@7.4.1(@polkadot/util@13.5.3)(@polkadot/x-randomvalues@13.5.3(@polkadot/util@13.5.3)(@polkadot/wasm-util@7.4.1(@polkadot/util@13.5.3))))(rxjs@7.8.1))(@polkadot/api@16.4.2)(@tanstack/react-query@5.62.2(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sails-js@0.3.0(@gear-js/api@0.42.0(@polkadot/api@16.4.2)(@polkadot/wasm-crypto@7.4.1(@polkadot/util@13.5.3)(@polkadot/x-randomvalues@13.5.3(@polkadot/util@13.5.3)(@polkadot/wasm-util@7.4.1(@polkadot/util@13.5.3))))(rxjs@7.8.1))(@polkadot/api@16.4.2)(@polkadot/types@16.4.2)(sails-js-types@0.4.2)(sails-js-util@0.0.1))':
+  '@gear-js/react-hooks@0.17.0(@gear-js/api@0.42.0(@polkadot/api@16.4.2)(@polkadot/wasm-crypto@7.4.1(@polkadot/util@13.5.3)(@polkadot/x-randomvalues@13.5.3(@polkadot/util@13.5.3)(@polkadot/wasm-util@7.4.1(@polkadot/util@13.5.3))))(rxjs@7.8.1))(@polkadot/api@16.4.2)(@tanstack/react-query@5.62.2(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sails-js@0.4.2(@gear-js/api@0.42.0(@polkadot/api@16.4.2)(@polkadot/wasm-crypto@7.4.1(@polkadot/util@13.5.3)(@polkadot/x-randomvalues@13.5.3(@polkadot/util@13.5.3)(@polkadot/wasm-util@7.4.1(@polkadot/util@13.5.3))))(rxjs@7.8.1))(@polkadot/api@16.4.2))':
     dependencies:
       '@gear-js/api': 0.42.0(@polkadot/api@16.4.2)(@polkadot/wasm-crypto@7.4.1(@polkadot/util@13.5.3)(@polkadot/x-randomvalues@13.5.3(@polkadot/util@13.5.3)(@polkadot/wasm-util@7.4.1(@polkadot/util@13.5.3))))(rxjs@7.8.1)
       '@polkadot/api': 16.4.2
@@ -5184,7 +5198,7 @@ snapshots:
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
       react-transition-group: 4.4.5(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      sails-js: 0.3.0(@gear-js/api@0.42.0(@polkadot/api@16.4.2)(@polkadot/wasm-crypto@7.4.1(@polkadot/util@13.5.3)(@polkadot/x-randomvalues@13.5.3(@polkadot/util@13.5.3)(@polkadot/wasm-util@7.4.1(@polkadot/util@13.5.3))))(rxjs@7.8.1))(@polkadot/api@16.4.2)(@polkadot/types@16.4.2)(sails-js-types@0.4.2)(sails-js-util@0.0.1)
+      sails-js: 0.4.2(@gear-js/api@0.42.0(@polkadot/api@16.4.2)(@polkadot/wasm-crypto@7.4.1(@polkadot/util@13.5.3)(@polkadot/x-randomvalues@13.5.3(@polkadot/util@13.5.3)(@polkadot/wasm-util@7.4.1(@polkadot/util@13.5.3))))(rxjs@7.8.1))(@polkadot/api@16.4.2)
       sails-js-parser: 0.4.2
     transitivePeerDependencies:
       - bufferutil
@@ -5203,9 +5217,9 @@ snapshots:
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
 
-  '@gear-js/wallet-connect@0.4.1(c7c85200507e2fd72f96896dfc943517)':
+  '@gear-js/wallet-connect@0.4.1(003525539326be7aea934bf635dd64c1)':
     dependencies:
-      '@gear-js/react-hooks': 0.17.0(@gear-js/api@0.42.0(@polkadot/api@16.4.2)(@polkadot/wasm-crypto@7.4.1(@polkadot/util@13.5.3)(@polkadot/x-randomvalues@13.5.3(@polkadot/util@13.5.3)(@polkadot/wasm-util@7.4.1(@polkadot/util@13.5.3))))(rxjs@7.8.1))(@polkadot/api@16.4.2)(@tanstack/react-query@5.62.2(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sails-js@0.3.0(@gear-js/api@0.42.0(@polkadot/api@16.4.2)(@polkadot/wasm-crypto@7.4.1(@polkadot/util@13.5.3)(@polkadot/x-randomvalues@13.5.3(@polkadot/util@13.5.3)(@polkadot/wasm-util@7.4.1(@polkadot/util@13.5.3))))(rxjs@7.8.1))(@polkadot/api@16.4.2)(@polkadot/types@16.4.2)(sails-js-types@0.4.2)(sails-js-util@0.0.1))
+      '@gear-js/react-hooks': 0.17.0(@gear-js/api@0.42.0(@polkadot/api@16.4.2)(@polkadot/wasm-crypto@7.4.1(@polkadot/util@13.5.3)(@polkadot/x-randomvalues@13.5.3(@polkadot/util@13.5.3)(@polkadot/wasm-util@7.4.1(@polkadot/util@13.5.3))))(rxjs@7.8.1))(@polkadot/api@16.4.2)(@tanstack/react-query@5.62.2(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sails-js@0.4.2(@gear-js/api@0.42.0(@polkadot/api@16.4.2)(@polkadot/wasm-crypto@7.4.1(@polkadot/util@13.5.3)(@polkadot/x-randomvalues@13.5.3(@polkadot/util@13.5.3)(@polkadot/wasm-util@7.4.1(@polkadot/util@13.5.3))))(rxjs@7.8.1))(@polkadot/api@16.4.2))
       '@polkadot/react-identicon': 3.15.2(@polkadot/keyring@13.5.3(@polkadot/util-crypto@13.5.3(@polkadot/util@13.5.3))(@polkadot/util@13.5.3))(@polkadot/networks@13.5.3)(@polkadot/util-crypto@13.5.3(@polkadot/util@13.5.3))(@polkadot/util@13.5.3)(react-dom@18.3.1(react@18.3.1))(react-is@18.2.0)(react@18.3.1)
       clsx: 2.1.1
       react: 18.3.1
@@ -5220,7 +5234,7 @@ snapshots:
       graphql: 16.11.0
       tslib: 2.6.2
 
-  '@graphql-codegen/cli@5.0.2(@parcel/watcher@2.5.1)(graphql@16.11.0)(typescript@5.3.3)':
+  '@graphql-codegen/cli@5.0.2(@parcel/watcher@2.5.1)(graphql@16.11.0)(typescript@5.7.3)':
     dependencies:
       '@babel/generator': 7.23.6
       '@babel/template': 7.24.0
@@ -5240,11 +5254,11 @@ snapshots:
       '@graphql-tools/utils': 10.1.1(graphql@16.11.0)
       '@whatwg-node/fetch': 0.8.8
       chalk: 4.1.2
-      cosmiconfig: 8.3.6(typescript@5.3.3)
+      cosmiconfig: 8.3.6(typescript@5.7.3)
       debounce: 1.2.1
       detect-indent: 6.1.0
       graphql: 16.11.0
-      graphql-config: 5.0.3(graphql@16.11.0)(typescript@5.3.3)
+      graphql-config: 5.0.3(graphql@16.11.0)(typescript@5.7.3)
       inquirer: 8.2.6
       is-glob: 4.0.3
       jiti: 1.21.0
@@ -6499,12 +6513,12 @@ snapshots:
       '@svgr/babel-plugin-transform-react-native-svg': 8.1.0(@babel/core@7.24.0)
       '@svgr/babel-plugin-transform-svg-component': 8.0.0(@babel/core@7.24.0)
 
-  '@svgr/core@8.1.0(typescript@5.3.3)':
+  '@svgr/core@8.1.0(typescript@5.7.3)':
     dependencies:
       '@babel/core': 7.24.0
       '@svgr/babel-preset': 8.1.0(@babel/core@7.24.0)
       camelcase: 6.3.0
-      cosmiconfig: 8.3.6(typescript@5.3.3)
+      cosmiconfig: 8.3.6(typescript@5.7.3)
       snake-case: 3.0.4
     transitivePeerDependencies:
       - supports-color
@@ -6515,11 +6529,11 @@ snapshots:
       '@babel/types': 7.24.0
       entities: 4.5.0
 
-  '@svgr/plugin-jsx@8.1.0(@svgr/core@8.1.0(typescript@5.3.3))':
+  '@svgr/plugin-jsx@8.1.0(@svgr/core@8.1.0(typescript@5.7.3))':
     dependencies:
       '@babel/core': 7.24.0
       '@svgr/babel-preset': 8.1.0(@babel/core@7.24.0)
-      '@svgr/core': 8.1.0(typescript@5.3.3)
+      '@svgr/core': 8.1.0(typescript@5.7.3)
       '@svgr/hast-util-to-babel-ast': 8.0.0
       svg-parser: 2.0.4
     transitivePeerDependencies:
@@ -6597,13 +6611,13 @@ snapshots:
     dependencies:
       '@types/node': 20.11.26
 
-  '@typescript-eslint/eslint-plugin@6.21.0(@typescript-eslint/parser@6.21.0(eslint@8.55.0)(typescript@5.3.3))(eslint@8.55.0)(typescript@5.3.3)':
+  '@typescript-eslint/eslint-plugin@6.21.0(@typescript-eslint/parser@6.21.0(eslint@8.55.0)(typescript@5.7.3))(eslint@8.55.0)(typescript@5.7.3)':
     dependencies:
       '@eslint-community/regexpp': 4.10.0
-      '@typescript-eslint/parser': 6.21.0(eslint@8.55.0)(typescript@5.3.3)
+      '@typescript-eslint/parser': 6.21.0(eslint@8.55.0)(typescript@5.7.3)
       '@typescript-eslint/scope-manager': 6.21.0
-      '@typescript-eslint/type-utils': 6.21.0(eslint@8.55.0)(typescript@5.3.3)
-      '@typescript-eslint/utils': 6.21.0(eslint@8.55.0)(typescript@5.3.3)
+      '@typescript-eslint/type-utils': 6.21.0(eslint@8.55.0)(typescript@5.7.3)
+      '@typescript-eslint/utils': 6.21.0(eslint@8.55.0)(typescript@5.7.3)
       '@typescript-eslint/visitor-keys': 6.21.0
       debug: 4.3.4
       eslint: 8.55.0
@@ -6611,22 +6625,22 @@ snapshots:
       ignore: 5.3.1
       natural-compare: 1.4.0
       semver: 7.6.0
-      ts-api-utils: 1.3.0(typescript@5.3.3)
+      ts-api-utils: 1.3.0(typescript@5.7.3)
     optionalDependencies:
-      typescript: 5.3.3
+      typescript: 5.7.3
     transitivePeerDependencies:
       - supports-color
 
-  '@typescript-eslint/parser@6.21.0(eslint@8.55.0)(typescript@5.3.3)':
+  '@typescript-eslint/parser@6.21.0(eslint@8.55.0)(typescript@5.7.3)':
     dependencies:
       '@typescript-eslint/scope-manager': 6.21.0
       '@typescript-eslint/types': 6.21.0
-      '@typescript-eslint/typescript-estree': 6.21.0(typescript@5.3.3)
+      '@typescript-eslint/typescript-estree': 6.21.0(typescript@5.7.3)
       '@typescript-eslint/visitor-keys': 6.21.0
       debug: 4.3.4
       eslint: 8.55.0
     optionalDependencies:
-      typescript: 5.3.3
+      typescript: 5.7.3
     transitivePeerDependencies:
       - supports-color
 
@@ -6635,21 +6649,21 @@ snapshots:
       '@typescript-eslint/types': 6.21.0
       '@typescript-eslint/visitor-keys': 6.21.0
 
-  '@typescript-eslint/type-utils@6.21.0(eslint@8.55.0)(typescript@5.3.3)':
+  '@typescript-eslint/type-utils@6.21.0(eslint@8.55.0)(typescript@5.7.3)':
     dependencies:
-      '@typescript-eslint/typescript-estree': 6.21.0(typescript@5.3.3)
-      '@typescript-eslint/utils': 6.21.0(eslint@8.55.0)(typescript@5.3.3)
+      '@typescript-eslint/typescript-estree': 6.21.0(typescript@5.7.3)
+      '@typescript-eslint/utils': 6.21.0(eslint@8.55.0)(typescript@5.7.3)
       debug: 4.3.4
       eslint: 8.55.0
-      ts-api-utils: 1.3.0(typescript@5.3.3)
+      ts-api-utils: 1.3.0(typescript@5.7.3)
     optionalDependencies:
-      typescript: 5.3.3
+      typescript: 5.7.3
     transitivePeerDependencies:
       - supports-color
 
   '@typescript-eslint/types@6.21.0': {}
 
-  '@typescript-eslint/typescript-estree@6.21.0(typescript@5.3.3)':
+  '@typescript-eslint/typescript-estree@6.21.0(typescript@5.7.3)':
     dependencies:
       '@typescript-eslint/types': 6.21.0
       '@typescript-eslint/visitor-keys': 6.21.0
@@ -6658,20 +6672,20 @@ snapshots:
       is-glob: 4.0.3
       minimatch: 9.0.3
       semver: 7.6.0
-      ts-api-utils: 1.3.0(typescript@5.3.3)
+      ts-api-utils: 1.3.0(typescript@5.7.3)
     optionalDependencies:
-      typescript: 5.3.3
+      typescript: 5.7.3
     transitivePeerDependencies:
       - supports-color
 
-  '@typescript-eslint/utils@6.21.0(eslint@8.55.0)(typescript@5.3.3)':
+  '@typescript-eslint/utils@6.21.0(eslint@8.55.0)(typescript@5.7.3)':
     dependencies:
       '@eslint-community/eslint-utils': 4.4.0(eslint@8.55.0)
       '@types/json-schema': 7.0.15
       '@types/semver': 7.5.8
       '@typescript-eslint/scope-manager': 6.21.0
       '@typescript-eslint/types': 6.21.0
-      '@typescript-eslint/typescript-estree': 6.21.0(typescript@5.3.3)
+      '@typescript-eslint/typescript-estree': 6.21.0(typescript@5.7.3)
       eslint: 8.55.0
       semver: 7.6.0
     transitivePeerDependencies:
@@ -7282,14 +7296,14 @@ snapshots:
 
   core-util-is@1.0.3: {}
 
-  cosmiconfig@8.3.6(typescript@5.3.3):
+  cosmiconfig@8.3.6(typescript@5.7.3):
     dependencies:
       import-fresh: 3.3.0
       js-yaml: 4.1.0
       parse-json: 5.2.0
       path-type: 4.0.0
     optionalDependencies:
-      typescript: 5.3.3
+      typescript: 5.7.3
 
   create-ecdh@4.0.4:
     dependencies:
@@ -7716,22 +7730,22 @@ snapshots:
       tinyglobby: 0.2.14
       unrs-resolver: 1.11.1
     optionalDependencies:
-      eslint-plugin-import: 2.32.0(@typescript-eslint/parser@6.21.0(eslint@8.55.0)(typescript@5.3.3))(eslint-import-resolver-typescript@3.10.1)(eslint@8.55.0)
+      eslint-plugin-import: 2.32.0(@typescript-eslint/parser@6.21.0(eslint@8.55.0)(typescript@5.7.3))(eslint-import-resolver-typescript@3.10.1)(eslint@8.55.0)
     transitivePeerDependencies:
       - supports-color
 
-  eslint-module-utils@2.12.1(@typescript-eslint/parser@6.21.0(eslint@8.55.0)(typescript@5.3.3))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.10.1)(eslint@8.55.0):
+  eslint-module-utils@2.12.1(@typescript-eslint/parser@6.21.0(eslint@8.55.0)(typescript@5.7.3))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.10.1)(eslint@8.55.0):
     dependencies:
       debug: 3.2.7
     optionalDependencies:
-      '@typescript-eslint/parser': 6.21.0(eslint@8.55.0)(typescript@5.3.3)
+      '@typescript-eslint/parser': 6.21.0(eslint@8.55.0)(typescript@5.7.3)
       eslint: 8.55.0
       eslint-import-resolver-node: 0.3.9
       eslint-import-resolver-typescript: 3.10.1(eslint-plugin-import@2.32.0)(eslint@8.55.0)
     transitivePeerDependencies:
       - supports-color
 
-  eslint-plugin-import@2.32.0(@typescript-eslint/parser@6.21.0(eslint@8.55.0)(typescript@5.3.3))(eslint-import-resolver-typescript@3.10.1)(eslint@8.55.0):
+  eslint-plugin-import@2.32.0(@typescript-eslint/parser@6.21.0(eslint@8.55.0)(typescript@5.7.3))(eslint-import-resolver-typescript@3.10.1)(eslint@8.55.0):
     dependencies:
       '@rtsao/scc': 1.1.0
       array-includes: 3.1.9
@@ -7742,7 +7756,7 @@ snapshots:
       doctrine: 2.1.0
       eslint: 8.55.0
       eslint-import-resolver-node: 0.3.9
-      eslint-module-utils: 2.12.1(@typescript-eslint/parser@6.21.0(eslint@8.55.0)(typescript@5.3.3))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.10.1)(eslint@8.55.0)
+      eslint-module-utils: 2.12.1(@typescript-eslint/parser@6.21.0(eslint@8.55.0)(typescript@5.7.3))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.10.1)(eslint@8.55.0)
       hasown: 2.0.2
       is-core-module: 2.16.1
       is-glob: 4.0.3
@@ -7754,7 +7768,7 @@ snapshots:
       string.prototype.trimend: 1.0.9
       tsconfig-paths: 3.15.0
     optionalDependencies:
-      '@typescript-eslint/parser': 6.21.0(eslint@8.55.0)(typescript@5.3.3)
+      '@typescript-eslint/parser': 6.21.0(eslint@8.55.0)(typescript@5.7.3)
     transitivePeerDependencies:
       - eslint-import-resolver-typescript
       - eslint-import-resolver-webpack
@@ -8117,7 +8131,7 @@ snapshots:
 
   graphemer@1.4.0: {}
 
-  graphql-config@5.0.3(graphql@16.11.0)(typescript@5.3.3):
+  graphql-config@5.0.3(graphql@16.11.0)(typescript@5.7.3):
     dependencies:
       '@graphql-tools/graphql-file-loader': 8.0.1(graphql@16.11.0)
       '@graphql-tools/json-file-loader': 8.0.1(graphql@16.11.0)
@@ -8125,7 +8139,7 @@ snapshots:
       '@graphql-tools/merge': 9.0.3(graphql@16.11.0)
       '@graphql-tools/url-loader': 8.0.2(graphql@16.11.0)
       '@graphql-tools/utils': 10.1.1(graphql@16.11.0)
-      cosmiconfig: 8.3.6(typescript@5.3.3)
+      cosmiconfig: 8.3.6(typescript@5.7.3)
       graphql: 16.11.0
       jiti: 1.21.0
       minimatch: 4.2.3
@@ -9009,6 +9023,8 @@ snapshots:
 
   prelude-ls@1.2.1: {}
 
+  prettier@3.6.2: {}
+
   process-nextick-args@2.0.1: {}
 
   process@0.11.10: {}
@@ -9285,21 +9301,24 @@ snapshots:
 
   safer-buffer@2.1.2: {}
 
+  sails-js-cli@0.4.2: {}
+
   sails-js-parser@0.4.2:
     optionalDependencies:
       sails-js-types: 0.4.2
 
-  sails-js-types@0.4.2: {}
+  sails-js-types@0.4.2:
+    optional: true
 
-  sails-js-util@0.0.1: {}
+  sails-js-util@0.4.2: {}
 
-  sails-js@0.3.0(@gear-js/api@0.42.0(@polkadot/api@16.4.2)(@polkadot/wasm-crypto@7.4.1(@polkadot/util@13.5.3)(@polkadot/x-randomvalues@13.5.3(@polkadot/util@13.5.3)(@polkadot/wasm-util@7.4.1(@polkadot/util@13.5.3))))(rxjs@7.8.1))(@polkadot/api@16.4.2)(@polkadot/types@16.4.2)(sails-js-types@0.4.2)(sails-js-util@0.0.1):
+  sails-js@0.4.2(@gear-js/api@0.42.0(@polkadot/api@16.4.2)(@polkadot/wasm-crypto@7.4.1(@polkadot/util@13.5.3)(@polkadot/x-randomvalues@13.5.3(@polkadot/util@13.5.3)(@polkadot/wasm-util@7.4.1(@polkadot/util@13.5.3))))(rxjs@7.8.1))(@polkadot/api@16.4.2):
     dependencies:
       '@gear-js/api': 0.42.0(@polkadot/api@16.4.2)(@polkadot/wasm-crypto@7.4.1(@polkadot/util@13.5.3)(@polkadot/x-randomvalues@13.5.3(@polkadot/util@13.5.3)(@polkadot/wasm-util@7.4.1(@polkadot/util@13.5.3))))(rxjs@7.8.1)
       '@polkadot/api': 16.4.2
-      '@polkadot/types': 16.4.2
+      sails-js-util: 0.4.2
+    optionalDependencies:
       sails-js-types: 0.4.2
-      sails-js-util: 0.0.1
 
   sass@1.89.2:
     dependencies:
@@ -9638,9 +9657,9 @@ snapshots:
 
   tr46@0.0.3: {}
 
-  ts-api-utils@1.3.0(typescript@5.3.3):
+  ts-api-utils@1.3.0(typescript@5.7.3):
     dependencies:
-      typescript: 5.3.3
+      typescript: 5.7.3
 
   ts-log@2.2.5: {}
 
@@ -9732,7 +9751,7 @@ snapshots:
       possible-typed-array-names: 1.0.0
       reflect.getprototypeof: 1.0.10
 
-  typescript@5.3.3: {}
+  typescript@5.7.3: {}
 
   ua-parser-js@1.0.37: {}
 
@@ -9829,7 +9848,7 @@ snapshots:
 
   value-or-promise@1.0.12: {}
 
-  vite-plugin-checker@0.10.1(eslint@8.55.0)(typescript@5.3.3)(vite@7.0.6(jiti@1.21.0)(sass@1.89.2)):
+  vite-plugin-checker@0.10.1(eslint@8.55.0)(typescript@5.7.3)(vite@7.0.6(jiti@1.21.0)(sass@1.89.2)):
     dependencies:
       '@babel/code-frame': 7.27.1
       chokidar: 4.0.3
@@ -9843,7 +9862,7 @@ snapshots:
       vscode-uri: 3.1.0
     optionalDependencies:
       eslint: 8.55.0
-      typescript: 5.3.3
+      typescript: 5.7.3
 
   vite-plugin-node-polyfills@0.24.0(rollup@4.46.1)(vite@7.0.6(jiti@1.21.0)(sass@1.89.2)):
     dependencies:
@@ -9853,11 +9872,11 @@ snapshots:
     transitivePeerDependencies:
       - rollup
 
-  vite-plugin-svgr@4.3.0(rollup@4.46.1)(typescript@5.3.3)(vite@7.0.6(jiti@1.21.0)(sass@1.89.2)):
+  vite-plugin-svgr@4.3.0(rollup@4.46.1)(typescript@5.7.3)(vite@7.0.6(jiti@1.21.0)(sass@1.89.2)):
     dependencies:
       '@rollup/pluginutils': 5.2.0(rollup@4.46.1)
-      '@svgr/core': 8.1.0(typescript@5.3.3)
-      '@svgr/plugin-jsx': 8.1.0(@svgr/core@8.1.0(typescript@5.3.3))
+      '@svgr/core': 8.1.0(typescript@5.7.3)
+      '@svgr/plugin-jsx': 8.1.0(@svgr/core@8.1.0(typescript@5.7.3))
       vite: 7.0.6(jiti@1.21.0)(sass@1.89.2)
     transitivePeerDependencies:
       - rollup

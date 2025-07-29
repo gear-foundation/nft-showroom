@@ -35,7 +35,7 @@ function MarketplaceProvider({ children }: ProviderProps) {
     const getMetadata = (value: string) => ProgramMetadata.from(`0x${value}`);
 
     // TODO: performance
-    // upload each .txt in a one folder to retrive them in a single request?
+    // upload each .txt in a one folder to retrieve them in a single request?
     Promise.all(collectionURLs)
       .then((responses) => responses.map((response) => response.text()))
       .then((textPromises) => Promise.all(textPromises))

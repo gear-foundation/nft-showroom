@@ -56,13 +56,7 @@ function FullScreenModal({ heading, steps, stepIndex, children, className, close
           <div className={styles.balanceWrapper}>
             <ul className={styles.progress}>{getSteps()}</ul>
 
-            {balance && (
-              <Balance
-                value={
-                  (balance.transferable || balance.availableBalance)?.toBigInt()
-                }
-              />
-            )}
+            {balance && <Balance value={(balance.transferable || balance.availableBalance)?.toBigInt()} />}
           </div>
         </Container>
       </header>

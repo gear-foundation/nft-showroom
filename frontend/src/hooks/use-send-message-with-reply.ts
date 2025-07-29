@@ -21,20 +21,20 @@ type Payload =
 type Reply<T> = T extends CreateCollectionPayload
   ? CreateCollectionReply
   : T extends BuyNFTPayload
-  ? { nftSold: unknown }
-  : T extends MakeBidPayload
-  ? { bidAdded: unknown }
-  : T extends StartAuctionPayload
-  ? { auctionCreated: unknown }
-  : T extends StartSalePayload
-  ? { saleNft: unknown }
-  : T extends MintNFTPayload
-  ? { minted: unknown }
-  : T extends TransferNFTPayload
-  ? { transferred: unknown }
-  : T extends ApproveNFTPayload
-  ? { approved: unknown }
-  : AnyJson;
+    ? { nftSold: unknown }
+    : T extends MakeBidPayload
+      ? { bidAdded: unknown }
+      : T extends StartAuctionPayload
+        ? { auctionCreated: unknown }
+        : T extends StartSalePayload
+          ? { saleNft: unknown }
+          : T extends MintNFTPayload
+            ? { minted: unknown }
+            : T extends TransferNFTPayload
+              ? { transferred: unknown }
+              : T extends ApproveNFTPayload
+                ? { approved: unknown }
+                : AnyJson;
 
 const useSendMessageWithReply = (programId: HexString, metadata: ProgramMetadata | undefined) => {
   const { api, isApiReady } = useApi();
