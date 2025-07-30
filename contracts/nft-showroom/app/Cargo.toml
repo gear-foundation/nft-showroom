@@ -5,5 +5,5 @@ edition = "2024"
 
 [dependencies]
 sails-rs = "0.8.1"
-gstd = "=1.8.1"
+gstd = { version = "=1.8.1", features = ["debug"] }
 nft-client = { path = "../../nft/client"}

@@ -3247,6 +3247,7 @@ dependencies = [
 name = "nft-showroom"
 version = "0.1.0"
 dependencies = [
+ "nft-client",
  "nft-showroom",
  "nft-showroom-app",
  "nft-showroom-client",

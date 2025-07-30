@@ -99,7 +99,6 @@ impl NftService {
         let picture_fee = FEE_PER_UPLOADED_FILE * img_links_and_data.len() as u128;
 
         let existential_deposit = exec::env_vars().existential_deposit;
-
         if picture_fee < existential_deposit && msg_value != existential_deposit
             || picture_fee >= existential_deposit && msg_value != picture_fee
         {

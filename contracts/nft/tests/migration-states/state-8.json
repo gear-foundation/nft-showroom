@@ -1,0 +1,64 @@
+{
+  "All": {
+    "tokens": [
+      [
+        "0",
+        {
+          "owner": "0x3e5ed9dcfb3a7cb636e57980f1b016fd706ceed9155426758506e59de8b8445a",
+          "name": "VaraNetwork India - 0",
+          "description": "Collection for members from VaraNetwork India",
+          "metadata": [],
+          "mediaUrl": "ipfs://QmVZQSyhmP7t7AavgiPGtZxvLwvw4jZYY4CPSax1VqkCgG",
+          "mintTime": "1,753,304,112,001"
+        }
+      ]
+    ],
+    "owners": [
+      [
+        "0x3e5ed9dcfb3a7cb636e57980f1b016fd706ceed9155426758506e59de8b8445a",
+        [
+          "0"
+        ]
+      ]
+    ],
+    "tokenApprovals": [],
+    "config": {
+      "name": "VaraNetwork India",
+      "description": "Collection for members from VaraNetwork India",
+      "collectionTags": [
+        "Hero"
+      ],
+      "collectionBanner": "ipfs://QmTzwaQyApWyuUu1xwMpcsyrq4prv1D2Srm2nn9Y6gF58x",
+      "collectionLogo": "ipfs://QmVZQSyhmP7t7AavgiPGtZxvLwvw4jZYY4CPSax1VqkCgG",
+      "userMintLimit": "1",
+      "additionalLinks": {
+        "externalUrl": "",
+        "telegram": "",
+        "xcom": "",
+        "medium": "",
+        "discord": ""
+      },
+      "royalty": "10",
+      "paymentForMint": "0",
+      "transferable": "0",
+      "sellable": "0",
+      "variableMeta": false
+    },
+    "nonce": "1",
+    "imgLinksAndData": [
+      [
+        "ipfs://QmVZQSyhmP7t7AavgiPGtZxvLwvw4jZYY4CPSax1VqkCgG",
+        {
+          "limitCopies": "99"
+        }
+      ]
+    ],
+    "collectionOwner": "0x3e5ed9dcfb3a7cb636e57980f1b016fd706ceed9155426758506e59de8b8445a",
+    "totalNumberOfTokens": "100",
+    "permissionToMint": null,
+    "marketplaceAddress": "0xa81328dbfc2cfa9a9a88cf7b2216ae0a3a964f7974a236a52d10153e698cf5c2",
+    "admins": [
+      "0x3e5ed9dcfb3a7cb636e57980f1b016fd706ceed9155426758506e59de8b8445a"
+    ]
+  }
+}

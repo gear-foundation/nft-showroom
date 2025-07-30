@@ -19,6 +19,7 @@ sails-idl-gen = "0.8.1"
 [dev-dependencies]
 nft-showroom = { path = ".", features = ["wasm-binary"] }
 nft-showroom-client = { path = "client" }
+nft-client = { path = "../nft/client" }
 sails-rs = { version = "0.8.1", features = ["gtest"] }
 tokio = { version = "1.41", features = ["rt", "macros"] }
 

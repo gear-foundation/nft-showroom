@@ -113,20 +113,8 @@ pub enum Event {
         user: ActorId,
     },
     ConfigUpdated {
-        gas_for_creation: Option<u64>,
-        gas_for_mint: Option<u64>,
-        gas_for_transfer_token: Option<u64>,
-        gas_for_close_auction: Option<u64>,
-        gas_for_delete_collection: Option<u64>,
-        gas_for_get_info: Option<u64>,
-        time_between_create_collections: Option<u64>,
-        royalty_to_marketplace_for_trade: Option<u16>,
-        royalty_to_marketplace_for_mint: Option<u16>,
-        ms_in_block: Option<u32>,
-        minimum_value_for_trade: Option<u128>,
-        fee_per_uploaded_file: Option<u128>,
-        max_creator_royalty: Option<u16>,
-        max_number_of_images: Option<u64>,
+        config: Config,
+        minimum_value_for_trade: u128,
     },
     BalanceHasBeenWithdrawn {
         value: u128,
@@ -136,11 +124,11 @@ pub enum Event {
     AllowCreateCollectionChanged,
     CollectionTypeDeleted {
         type_name: String,
-    }
+    },
 }
 
 #[allow(static_mut_refs)]
-impl NftShowroomSailsService {
+impl NftShowroomService {
     pub fn init(config: Config) -> Self {
         let Config {
             gas_for_creation,
@@ -207,11 +195,11 @@ impl NftShowroomSailsService {
     }
 }
 
-struct NftShowroomSailsService(());
+struct NftShowroomService(());
 
 #[sails_rs::service(events = Event)]
 #[allow(clippy::too_many_arguments)]
-impl NftShowroomSailsService {
+impl NftShowroomService {
     pub fn new() -> Self {
         Self(())
     }
@@ -247,22 +235,15 @@ impl NftShowroomSailsService {
         .expect("Event Invocation Error");
     }
 
-    pub fn delete_collection_type(
-        &mut self,
-        type_name: String,
-    ) {
+    pub fn delete_collection_type(&mut self, type_name: String) {
         let storage = self.get_mut();
         let msg_src = msg::source();
         check_admin(storage, &msg_src);
 
-        storage
-            .type_collections
-            .remove(&type_name);
+        storage.type_collections.remove(&type_name);
 
-        self.emit_event(Event::CollectionTypeDeleted {
-            type_name,
-        })
-        .expect("Event Invocation Error");
+        self.emit_event(Event::CollectionTypeDeleted { type_name })
+            .expect("Event Invocation Error");
     }
 
     pub async fn create_collection(&mut self, type_name: String, payload: Vec<u8>) {
@@ -309,7 +290,7 @@ impl NftShowroomSailsService {
         .expect("Event Invocation Error");
     }
 
-    pub async fn mint(&mut self, collection_address: ActorId) {
+    pub async fn mint(&mut self, collection_address: ActorId, img_link_id: Option<u64>) {
         let storage = self.get_mut();
         let msg_src = msg::source();
         let msg_value = msg::value();
@@ -339,7 +320,7 @@ impl NftShowroomSailsService {
             panic("Wrong value");
         }
 
-        let request = nft_io::Mint::encode_call(msg_src, None);
+        let request = nft_io::Mint::encode_call(msg_src, img_link_id);
 
         msg::send_bytes_with_gas_for_reply(
             collection_address,
@@ -418,87 +399,20 @@ impl NftShowroomSailsService {
             .expect("Event Invocation Error");
     }
 
-    pub fn update_config(
-        &mut self,
-        gas_for_creation: Option<u64>,
-        gas_for_mint: Option<u64>,
-        gas_for_transfer_token: Option<u64>,
-        gas_for_close_auction: Option<u64>,
-        gas_for_delete_collection: Option<u64>,
-        gas_for_get_info: Option<u64>,
-        time_between_create_collections: Option<u64>,
-        royalty_to_marketplace_for_trade: Option<u16>,
-        royalty_to_marketplace_for_mint: Option<u16>,
-        ms_in_block: Option<u32>,
-        fee_per_uploaded_file: Option<u128>,
-        max_creator_royalty: Option<u16>,
-        max_number_of_images: Option<u64>,
-    ) {
+    pub fn update_config(&mut self, config: Config) {
         let storage = self.get_mut();
         let msg_src = msg::source();
         check_admin(storage, &msg_src);
 
-        if let Some(gas) = gas_for_creation {
-            storage.config.gas_for_creation = gas;
-        }
-        if let Some(gas) = gas_for_mint {
-            storage.config.gas_for_mint = gas;
-        }
-        if let Some(gas) = gas_for_transfer_token {
-            storage.config.gas_for_transfer_token = gas;
-        }
-        if let Some(gas) = gas_for_close_auction {
-            storage.config.gas_for_close_auction = gas;
-        }
-        if let Some(gas) = gas_for_delete_collection {
-            storage.config.gas_for_delete_collection = gas;
-        }
-        if let Some(gas) = gas_for_get_info {
-            storage.config.gas_for_get_info = gas;
-        }
-        if let Some(time) = time_between_create_collections {
-            storage.config.time_between_create_collections = time;
-        }
-        let minimum_value_for_trade = if let Some(royalty) = royalty_to_marketplace_for_trade {
-            storage.config.royalty_to_marketplace_for_trade = royalty;
-            let existential_deposit = exec::env_vars().existential_deposit;
-            storage.minimum_value_for_trade =
-                existential_deposit * 10_000 / (10_000 - royalty) as u128;
-            Some(storage.minimum_value_for_trade)
-        } else {
-            None
-        };
-        if let Some(royalty) = royalty_to_marketplace_for_mint {
-            storage.config.royalty_to_marketplace_for_mint = royalty;
-        }
-        if let Some(ms_in_block) = ms_in_block {
-            storage.config.ms_in_block = ms_in_block;
-        }
-        if let Some(fee) = fee_per_uploaded_file {
-            storage.config.fee_per_uploaded_file = fee;
-        }
-        if let Some(royalty) = max_creator_royalty {
-            storage.config.max_creator_royalty = royalty;
-        }
-        if let Some(max_number_of_images) = max_number_of_images {
-            storage.config.max_number_of_images = max_number_of_images;
-        }
+        storage.config = config.clone();
+
+        let existential_deposit = exec::env_vars().existential_deposit;
+        storage.minimum_value_for_trade = existential_deposit * 10_000
+            / (10_000 - storage.config.royalty_to_marketplace_for_trade) as u128;
 
         self.emit_event(Event::ConfigUpdated {
-            gas_for_creation,
-            gas_for_mint,
-            gas_for_transfer_token,
-            gas_for_close_auction,
-            gas_for_delete_collection,
-            gas_for_get_info,
-            time_between_create_collections,
-            royalty_to_marketplace_for_trade,
-            royalty_to_marketplace_for_mint,
-            ms_in_block,
-            minimum_value_for_trade,
-            fee_per_uploaded_file,
-            max_creator_royalty,
-            max_number_of_images,
+            config,
+            minimum_value_for_trade: storage.minimum_value_for_trade,
         })
         .expect("Event Invocation Error");
     }
@@ -622,7 +536,7 @@ impl NftShowroomSailsService {
             });
 
         let request = [
-            "NftShowroomSails".encode(),
+            "NftShowroom".encode(),
             "CloseAuction".to_string().encode(),
             (collection_address, token_id).encode(),
         ]
@@ -1121,12 +1035,12 @@ pub struct NftShowroomProgram(());
 impl NftShowroomProgram {
     // Program's constructor
     pub fn new(config: Config) -> Self {
-        NftShowroomSailsService::init(config);
+        NftShowroomService::init(config);
         Self(())
     }
 
     // Exposed service
-    pub fn nft_showroom(&self) -> NftShowroomSailsService {
-        NftShowroomSailsService::new()
+    pub fn nft_showroom(&self) -> NftShowroomService {
+        NftShowroomService::new()
     }
 }
