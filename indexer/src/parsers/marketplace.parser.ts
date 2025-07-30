@@ -462,22 +462,11 @@ export class MarketplaceParser {
         };
       }
       case 'ConfigUpdated': {
-        const event = ev as {
-          gas_for_creation: number | string | bigint | null;
-          gas_for_mint: number | string | bigint | null;
-          gas_for_transfer_token: number | string | bigint | null;
-          gas_for_close_auction: number | string | bigint | null;
-          gas_for_delete_collection: number | string | bigint | null;
-          gas_for_get_info: number | string | bigint | null;
-          time_between_create_collections: number | string | bigint | null;
-          royalty_to_marketplace_for_trade: number | null;
-          royalty_to_marketplace_for_mint: number | null;
-          ms_in_block: number | null;
-          minimum_value_for_trade: number | string | bigint | null;
-          fee_per_uploaded_file: number | string | bigint | null;
-          max_creator_royalty: number | null;
-          max_number_of_images: number | string | bigint | null;
+        const ss = ev as {
+          config: Config;
+          minimum_value_for_trade: number | string | bigint;
         };
+        const event = ss.config;
         return {
           type: NftMarketplaceEventType.ConfigUpdated,
           gasForCreation: event.gas_for_creation
@@ -517,16 +506,16 @@ export class MarketplaceParser {
             : null,
           royaltyToMarketplaceForTrade: event.royalty_to_marketplace_for_trade,
           royaltyToMarketplaceForMint: event.royalty_to_marketplace_for_mint,
-          minimumTransferValue: event.minimum_value_for_trade
-            ? typeof event.minimum_value_for_trade === 'bigint'
-              ? event.minimum_value_for_trade
-              : BigInt(event.minimum_value_for_trade)
+          minimumTransferValue: ss.minimum_value_for_trade
+            ? typeof ss.minimum_value_for_trade === 'bigint'
+              ? ss.minimum_value_for_trade
+              : BigInt(ss.minimum_value_for_trade)
             : null,
           msInBlock: event.ms_in_block,
-          minimumValueForTrade: event.minimum_value_for_trade
-            ? typeof event.minimum_value_for_trade === 'bigint'
-              ? event.minimum_value_for_trade
-              : BigInt(event.minimum_value_for_trade)
+          minimumValueForTrade: ss.minimum_value_for_trade
+            ? typeof ss.minimum_value_for_trade === 'bigint'
+              ? ss.minimum_value_for_trade
+              : BigInt(ss.minimum_value_for_trade)
             : null,
           minimumValueForMint: null,
           maxCreatorRoyalty: event.max_creator_royalty,

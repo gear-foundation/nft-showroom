@@ -427,14 +427,17 @@ export class NftShowroom {
     );
   }
 
-  public mint(collection_address: ActorId): TransactionBuilder<null> {
+  public mint(
+    collection_address: ActorId,
+    img_link_id: number | string | bigint | null,
+  ): TransactionBuilder<null> {
     if (!this._program.programId) throw new Error('Program ID is not set');
     return new TransactionBuilder<null>(
       this._program.api,
       this._program.registry,
       'send_message',
-      ['NftShowroom', 'Mint', collection_address],
-      '(String, String, [u8;32])',
+      ['NftShowroom', 'Mint', collection_address, img_link_id],
+      '(String, String, [u8;32], Option<u64>)',
       'Null',
       this._program.programId,
     );
@@ -457,44 +460,14 @@ export class NftShowroom {
     );
   }
 
-  public updateConfig(
-    gas_for_creation: number | string | bigint | null,
-    gas_for_mint: number | string | bigint | null,
-    gas_for_transfer_token: number | string | bigint | null,
-    gas_for_close_auction: number | string | bigint | null,
-    gas_for_delete_collection: number | string | bigint | null,
-    gas_for_get_info: number | string | bigint | null,
-    time_between_create_collections: number | string | bigint | null,
-    royalty_to_marketplace_for_trade: number | null,
-    royalty_to_marketplace_for_mint: number | null,
-    ms_in_block: number | null,
-    fee_per_uploaded_file: number | string | bigint | null,
-    max_creator_royalty: number | null,
-    max_number_of_images: number | string | bigint | null,
-  ): TransactionBuilder<null> {
+  public updateConfig(config: Config): TransactionBuilder<null> {
     if (!this._program.programId) throw new Error('Program ID is not set');
     return new TransactionBuilder<null>(
       this._program.api,
       this._program.registry,
       'send_message',
-      [
-        'NftShowroom',
-        'UpdateConfig',
-        gas_for_creation,
-        gas_for_mint,
-        gas_for_transfer_token,
-        gas_for_close_auction,
-        gas_for_delete_collection,
-        gas_for_get_info,
-        time_between_create_collections,
-        royalty_to_marketplace_for_trade,
-        royalty_to_marketplace_for_mint,
-        ms_in_block,
-        fee_per_uploaded_file,
-        max_creator_royalty,
-        max_number_of_images,
-      ],
-      '(String, String, Option<u64>, Option<u64>, Option<u64>, Option<u64>, Option<u64>, Option<u64>, Option<u64>, Option<u16>, Option<u16>, Option<u32>, Option<u128>, Option<u16>, Option<u64>)',
+      ['NftShowroom', 'UpdateConfig', config],
+      '(String, String, Config)',
       'Null',
       this._program.programId,
     );
@@ -1395,20 +1368,8 @@ export class NftShowroom {
 
   public subscribeToConfigUpdatedEvent(
     callback: (data: {
-      gas_for_creation: number | string | bigint | null;
-      gas_for_mint: number | string | bigint | null;
-      gas_for_transfer_token: number | string | bigint | null;
-      gas_for_close_auction: number | string | bigint | null;
-      gas_for_delete_collection: number | string | bigint | null;
-      gas_for_get_info: number | string | bigint | null;
-      time_between_create_collections: number | string | bigint | null;
-      royalty_to_marketplace_for_trade: number | null;
-      royalty_to_marketplace_for_mint: number | null;
-      ms_in_block: number | null;
-      minimum_value_for_trade: number | string | bigint | null;
-      fee_per_uploaded_file: number | string | bigint | null;
-      max_creator_royalty: number | null;
-      max_number_of_images: number | string | bigint | null;
+      config: Config;
+      minimum_value_for_trade: number | string | bigint;
     }) => void | Promise<void>,
   ): Promise<() => void> {
     return this._program.api.gearEvents.subscribeToGearEvent(
@@ -1427,27 +1388,14 @@ export class NftShowroom {
           getFnNamePrefix(payload) === 'ConfigUpdated'
         ) {
           callback(
-            // @ts-ignore
             this._program.registry
               .createType(
-                '(String, String, {"gas_for_creation":"Option<u64>","gas_for_mint":"Option<u64>","gas_for_transfer_token":"Option<u64>","gas_for_close_auction":"Option<u64>","gas_for_delete_collection":"Option<u64>","gas_for_get_info":"Option<u64>","time_between_create_collections":"Option<u64>","royalty_to_marketplace_for_trade":"Option<u16>","royalty_to_marketplace_for_mint":"Option<u16>","ms_in_block":"Option<u32>","minimum_value_for_trade":"Option<u128>","fee_per_uploaded_file":"Option<u128>","max_creator_royalty":"Option<u16>","max_number_of_images":"Option<u64>"})',
+                '(String, String, {"config":"Config","minimum_value_for_trade":"u128"})',
                 message.payload,
               )[2]
               .toJSON() as unknown as {
-              gas_for_creation: number | string | bigint | null;
-              gas_for_mint: number | string | bigint | null;
-              gas_for_transfer_token: number | string | bigint | null;
-              gas_for_close_auction: number | string | bigint | null;
-              gas_for_delete_collection: number | string | bigint | null;
-              gas_for_get_info: number | string | bigint | null;
-              time_between_create_collections: number | string | bigint | null;
-              royalty_to_marketplace_for_trade: number | null;
-              royalty_to_marketplace_for_mint: number | null;
-              ms_in_block: number | null;
-              minimum_value_for_trade: number | string | bigint | null;
-              fee_per_uploaded_file: number | string | bigint | null;
-              max_creator_royalty: number | null;
-              max_number_of_images: number | string | bigint | null;
+              config: Config;
+              minimum_value_for_trade: number | string | bigint;
             },
           );
         }
