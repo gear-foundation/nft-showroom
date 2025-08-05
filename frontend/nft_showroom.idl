@@ -92,9 +92,9 @@ service NftShowroom {
   DeleteAdmin : (user: actor_id) -> null;
   DeleteCollection : (collection_address: actor_id) -> null;
   DeleteCollectionType : (type_name: str) -> null;
-  Mint : (collection_address: actor_id) -> null;
+  Mint : (collection_address: actor_id, img_link_id: opt u64) -> null;
   Sell : (collection_address: actor_id, token_id: u64, price: u128) -> null;
-  UpdateConfig : (gas_for_creation: opt u64, gas_for_mint: opt u64, gas_for_transfer_token: opt u64, gas_for_close_auction: opt u64, gas_for_delete_collection: opt u64, gas_for_get_info: opt u64, time_between_create_collections: opt u64, royalty_to_marketplace_for_trade: opt u16, royalty_to_marketplace_for_mint: opt u16, ms_in_block: opt u32, fee_per_uploaded_file: opt u128, max_creator_royalty: opt u16, max_number_of_images: opt u64) -> null;
+  UpdateConfig : (config: Config) -> null;
   query All : () -> StorageState;
   query GetAdmins : () -> vec actor_id;
   query GetAllCollections : () -> vec struct { actor_id, struct { str, actor_id } };
@@ -188,20 +188,8 @@ service NftShowroom {
       user: actor_id
     };
     ConfigUpdated: struct {
-      gas_for_creation: opt u64,
-      gas_for_mint: opt u64,
-      gas_for_transfer_token: opt u64,
-      gas_for_close_auction: opt u64,
-      gas_for_delete_collection: opt u64,
-      gas_for_get_info: opt u64,
-      time_between_create_collections: opt u64,
-      royalty_to_marketplace_for_trade: opt u16,
-      royalty_to_marketplace_for_mint: opt u16,
-      ms_in_block: opt u32,
-      minimum_value_for_trade: opt u128,
-      fee_per_uploaded_file: opt u128,
-      max_creator_royalty: opt u16,
-      max_number_of_images: opt u64,
+      config: Config,
+      minimum_value_for_trade: u128,
     };
     BalanceHasBeenWithdrawn: struct {
       value: u128
