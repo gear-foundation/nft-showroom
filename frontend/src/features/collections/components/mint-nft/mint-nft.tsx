@@ -5,7 +5,7 @@ import { withAccount, withApi } from '@/components';
 import { useMarketplace } from '@/context';
 import { Collection } from '@/graphql/graphql';
 import { useIsOwner } from '@/hooks';
-import { useSendMintTransaction } from '@/hooks/sails/api';
+import { useSendMintTransaction } from '@/hooks/sails/showroom/api.ts';
 
 import { useMintedNFTsCount } from '../../hooks';
 

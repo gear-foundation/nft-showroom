@@ -4,7 +4,7 @@ import request from 'graphql-request';
 
 import { ADDRESS } from '@/consts.ts';
 import { MARKETPLACE_QUERY } from '@/context/marketplace/consts.ts';
-import { SailsProgram } from '@/hooks/sails/lib.ts';
+import { SailsProgram } from '@/hooks/sails/showroom/lib.ts';
 
 export function useProgramInstance() {
   const { data } = useQuery({ queryKey: ['marketplace'], queryFn: () => request(ADDRESS.INDEXER, MARKETPLACE_QUERY) });
@@ -31,5 +31,41 @@ export function useSendSellTransaction() {
     program,
     serviceName: 'nftShowroom',
     functionName: 'sell',
+  });
+}
+
+export function useSendBuyTransaction() {
+  const { data: program } = useProgramInstance();
+  return useSendProgramTransaction({
+    program,
+    serviceName: 'nftShowroom',
+    functionName: 'buy',
+  });
+}
+
+export function useSendAddBidTransaction() {
+  const { data: program } = useProgramInstance();
+  return useSendProgramTransaction({
+    program,
+    serviceName: 'nftShowroom',
+    functionName: 'addBid',
+  });
+}
+
+export function useSendCreateCollectionTransaction() {
+  const { data: program } = useProgramInstance();
+  return useSendProgramTransaction({
+    program,
+    serviceName: 'nftShowroom',
+    functionName: 'createCollection',
+  });
+}
+
+export function useSendCreateAuctionTransaction() {
+  const { data: program } = useProgramInstance();
+  return useSendProgramTransaction({
+    program,
+    serviceName: 'nftShowroom',
+    functionName: 'createAuction',
   });
 }

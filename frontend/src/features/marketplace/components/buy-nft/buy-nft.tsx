@@ -3,7 +3,8 @@ import { Button } from '@gear-js/vara-ui';
 
 import { withAccount } from '@/components';
 import { Collection, Nft, Sale } from '@/graphql/graphql';
-import { useIsOwner, useLoading, useMarketplaceMessage } from '@/hooks';
+import { useIsOwner } from '@/hooks';
+import { useSendBuyTransaction } from '@/hooks/sails/showroom/api.ts';
 
 type Props = Pick<Nft, 'idInCollection' | 'owner'> & {
   collection: Pick<Collection, 'id'>;
@@ -12,27 +13,31 @@ type Props = Pick<Nft, 'idInCollection' | 'owner'> & {
 };
 
 function Component({ idInCollection, owner, collection, sale }: Props) {
-  const sendMessage = useMarketplaceMessage();
+  const { sendTransactionAsync: sendBuyTransaction, isPending } = useSendBuyTransaction();
   const isOwner = useIsOwner(owner);
   const alert = useAlert();
-  const [isLoading, enableLoading, disableLoading] = useLoading();
 
-  const handleClick = () => {
-    enableLoading();
+  const handleClick = async () => {
+    try {
+      const tokenId = idInCollection;
+      const collectionAddress = collection.id as `0x${string}`;
 
-    const tokenId = idInCollection;
-    const collectionAddress = collection.id;
+      const value = sale.price;
 
-    const payload = { BuyNFT: { tokenId, collectionAddress } };
-    const value = sale.price;
+      // TODO: what is the value? Is it connected to the transaction?
+      console.log(value);
 
-    const onSuccess = () => alert.success('NFT bought');
-    const onFinally = disableLoading;
+      await sendBuyTransaction({ args: [collectionAddress, tokenId], value: undefined });
+      alert.success('NFT bought');
 
-    sendMessage({ payload, value, onSuccess, onFinally });
+      // sendMessage({ payload, value, onSuccess, onFinally });
+    } catch (e) {
+      console.log(e);
+      alert.error(e instanceof Error ? e.message : String(e));
+    }
   };
 
-  return !isOwner ? <Button text="Buy" size="small" onClick={handleClick} isLoading={isLoading} /> : null;
+  return !isOwner ? <Button text="Buy" size="small" onClick={handleClick} isLoading={isPending} /> : null;
 }
 
 const BuyNFT = withAccount(Component);

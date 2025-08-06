@@ -6,7 +6,7 @@ import { generatePath, useNavigate } from 'react-router-dom';
 import { Container } from '@/components';
 import { ROUTE } from '@/consts';
 import { useMarketplace } from '@/context';
-import { useLoading, useMarketplaceMessage } from '@/hooks';
+import { useSendCreateCollectionTransaction } from '@/hooks/sails/showroom/api.ts';
 
 import {
   COLLECTION_TYPE_NAME,
@@ -27,7 +27,6 @@ function CreateSimpleCollectionModal({ close }: Pick<ModalProps, 'close'>) {
   const [stepIndex, setStepIndex] = useState(0);
   const [summaryValues, setSummaryValues] = useState(DEFAULT_SUMMARY_VALUES);
   const [parametersValues, setParametersValues] = useState(DEFAULT_PARAMETERS_VALUES);
-  const [isLoading, enableLoading, disableLoading] = useLoading();
 
   const { account } = useAccount();
   const { getChainBalanceValue } = useBalanceFormat();
@@ -35,7 +34,7 @@ function CreateSimpleCollectionModal({ close }: Pick<ModalProps, 'close'>) {
   const navigate = useNavigate();
 
   const { marketplace, collectionsMetadata } = useMarketplace();
-  const sendMessage = useMarketplaceMessage();
+  const { sendTransactionAsync: sendCreateCollection, isPending } = useSendCreateCollectionTransaction();
 
   const nextStep = () => setStepIndex((prevIndex) => prevIndex + 1);
   const prevStep = () => setStepIndex((prevIndex) => prevIndex - 1);
@@ -77,8 +76,16 @@ function CreateSimpleCollectionModal({ close }: Pick<ModalProps, 'close'>) {
     const { feePerUploadedFile } = marketplace?.config || {};
 
     const { cover, logo, name, description, telegram, medium, discord, url: externalUrl, x: xcom } = summaryValues;
-    const { mintPermission, isTransferable, isSellable, isMetadataChangesAllowed, tags, royalty, mintLimit, mintPrice } =
-      parametersValues;
+    const {
+      mintPermission,
+      isTransferable,
+      isSellable,
+      isMetadataChangesAllowed,
+      tags,
+      royalty,
+      mintLimit,
+      mintPrice,
+    } = parametersValues;
 
     if (!cover || !logo) throw new Error('Cover and logo are required');
     const [collectionBanner, collectionLogo] = await uploadToIpfs([cover, logo]);
@@ -129,28 +136,30 @@ function CreateSimpleCollectionModal({ close }: Pick<ModalProps, 'close'>) {
   };
 
   const handleNFTsSubmit = async ({ nfts }: NFTsValues, fee: bigint) => {
-    const onFinally = disableLoading;
-
     try {
-      enableLoading();
-
       const formPayload = await getFormPayload(nfts);
       const bytesPayload = getBytesPayload(formPayload);
-      const payload = { CreateCollection: { typeName: COLLECTION_TYPE_NAME.SIMPLE, payload: bytesPayload } };
-      const value = fee.toString();
+      // const payload = { CreateCollection: { typeName: COLLECTION_TYPE_NAME.SIMPLE, payload: bytesPayload } };
+      // const value = fee.toString();
+      //
+      // const onSuccess = ({ collectionCreated }: CreateCollectionReply) => {
+      //   const id = collectionCreated.collectionAddress;
+      //   const url = generatePath(ROUTE.COLLECTION, { id });
+      //
+      //   navigate(url);
+      //   alert.success('Collection created');
+      // };
 
-      const onSuccess = ({ collectionCreated }: CreateCollectionReply) => {
-        const id = collectionCreated.collectionAddress;
-        const url = generatePath(ROUTE.COLLECTION, { id });
+      // const resData = await sendCreateCollection({ args: [COLLECTION_TYPE_NAME.SIMPLE, bytesPayload] });
 
-        navigate(url);
-        alert.success('Collection created');
-      };
+      // console.log({ resData });
+      // const url = generatePath(ROUTE.COLLECTION, { id: response.collectionCreated.collectionAddress });
+      // navigate(url);
+      alert.success('Collection created');
 
-      sendMessage({ payload, onSuccess, onFinally, value });
+      // sendMessage({ payload, onSuccess, onFinally, value });
     } catch (error) {
       alert.error(error instanceof Error ? error.message : String(error));
-      onFinally();
     }
   };
 
@@ -166,7 +175,7 @@ function CreateSimpleCollectionModal({ close }: Pick<ModalProps, 'close'>) {
             defaultValues={DEFAULT_NFTS_VALUES}
             onBack={prevStep}
             onSubmit={handleNFTsSubmit}
-            isLoading={isLoading}
+            isLoading={isPending}
           />
         );
 

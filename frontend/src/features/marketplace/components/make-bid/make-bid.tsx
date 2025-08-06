@@ -5,6 +5,7 @@ import { z } from 'zod';
 import { NFTActionFormModal, PriceInput, withAccount, withApi, withMarketplaceConfig } from '@/components';
 import { Auction, Collection, Nft } from '@/graphql/graphql';
 import { useIsOwner, useLoading, useMarketplaceMessage, useModal } from '@/hooks';
+import { useSendAddBidTransaction } from '@/hooks/sails/showroom/api.ts';
 
 import { usePriceSchema } from '../../hooks';
 
@@ -20,34 +21,33 @@ const defaultValues = {
 
 function Component({ collection, auction, ...nft }: Props) {
   const [isOpen, open, close] = useModal();
-  const sendMessage = useMarketplaceMessage();
+  const { sendTransactionAsync, isPending } = useSendAddBidTransaction();
   const isOwner = useIsOwner(nft.owner);
   const alert = useAlert();
-  const [isLoading, enableLoading, disableLoading] = useLoading();
 
   const { getPriceSchema } = usePriceSchema();
   const schema = z.object({ value: getPriceSchema(auction.lastPrice || auction.minPrice, Boolean(auction.lastPrice)) });
 
-  const onSubmit = ({ value }: typeof defaultValues) => {
-    enableLoading();
+  const onSubmit = async ({ value }: typeof defaultValues) => {
+    try {
+      const tokenId = nft.idInCollection;
+      const collectionAddress = collection.id as `0x${string}`;
 
-    const tokenId = nft.idInCollection;
-    const collectionAddress = collection.id;
+      // TODO: what is the value? Is it connected to the transaction?
+      console.log(value);
 
-    const payload = { AddBid: { tokenId, collectionAddress } };
-
-    const onSuccess = () => {
+      await sendTransactionAsync({ args: [collectionAddress, tokenId], value: undefined });
       alert.success('Bid made');
       close();
-    };
-
-    const onFinally = disableLoading;
-
-    sendMessage({ payload, value, onSuccess, onFinally });
+      // sendMessage({ payload, value, onSuccess, onFinally });
+    } catch (e) {
+      console.log(e);
+      alert.error(e instanceof Error ? e.message : typeof e === 'string' ? e : 'Error while making bid');
+    }
   };
 
   const modalProps = { heading: 'Make bid', close };
-  const formProps = { defaultValues, schema, isLoading, onSubmit };
+  const formProps = { defaultValues, schema, isLoading: isPending, onSubmit };
 
   return !isOwner ? (
     <>

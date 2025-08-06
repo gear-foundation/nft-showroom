@@ -4,11 +4,13 @@ import { z } from 'zod';
 
 import { NFTActionFormModal, PriceInput, withAccount, withApi, withMarketplaceConfig } from '@/components';
 import { useMarketplace } from '@/context';
+import { usePriceSchema } from '@/features/marketplace/hooks';
 import { Nft, Collection, CollectionType } from '@/graphql/graphql';
-import { useApproveMessage, useIsOwner, useLoading, useMarketplaceMessage, useModal } from '@/hooks';
+import { useIsOwner, useModal } from '@/hooks';
+import { useStartApproveTransaction } from '@/hooks/sails/nft/api.ts';
+import { useSendSellTransaction } from '@/hooks/sails/showroom';
 
 import TagSVG from '../../assets/tag.svg?react';
-import { usePriceSchema } from '../../hooks';
 
 type Props = Pick<Nft, 'idInCollection' | 'name' | 'mediaUrl' | 'owner' | 'approvedAccount'> & {
   collection: Pick<Collection, 'id' | 'name' | 'sellable'> & {
@@ -24,7 +26,6 @@ function Component({ collection, owner, approvedAccount, ...nft }: Props) {
   const [isOpen, open, close] = useModal();
   const isOwner = useIsOwner(owner);
   const alert = useAlert();
-  const [isLoading, enableLoading, disableLoading] = useLoading();
 
   const { marketplace } = useMarketplace();
   const isApprovedToMarketplace = approvedAccount === marketplace?.address;
@@ -32,31 +33,30 @@ function Component({ collection, owner, approvedAccount, ...nft }: Props) {
   const { getPriceSchema } = usePriceSchema();
   const schema = z.object({ price: getPriceSchema() });
 
-  const sendMarketplaceMessage = useMarketplaceMessage();
-  const sendApprovedMessage = useApproveMessage(collection.id, collection.type.type);
+  const { sendTransactionAsync: sendSellTransaction, isPending } = useSendSellTransaction();
+  const { startApproveTransaction, isPendingApprove } = useStartApproveTransaction(collection.id as `0x${string}`);
 
-  const onSubmit = ({ price }: typeof defaultValues) => {
-    enableLoading();
-
+  const onSubmit = async ({ price }: typeof defaultValues) => {
     const tokenId = nft.idInCollection;
-    const collectionAddress = collection.id;
-    const payload = { SaleNft: { price, collectionAddress, tokenId } };
+    const collectionAddress = collection.id as `0x${string}`;
 
-    const onSuccess = () => {
-      alert.success('Sale started');
-      close();
+    const startSale = async () => {
+      try {
+        await sendSellTransaction({ args: [collectionAddress, tokenId, price] });
+        alert.success('Sale started');
+        close();
+      } catch (e) {
+        console.log(e);
+        alert.error(e instanceof Error ? e.message : String(e));
+      }
     };
 
-    const onFinally = disableLoading;
-    const startSale = () => sendMarketplaceMessage({ payload, onSuccess, onFinally });
-
-    if (isApprovedToMarketplace) return startSale();
-
-    sendApprovedMessage(tokenId, startSale, onFinally);
+    if (!isApprovedToMarketplace) await startApproveTransaction(tokenId);
+    await startSale();
   };
 
   const modalProps = { heading: 'Start Sale', close };
-  const formProps = { defaultValues, schema, isLoading, onSubmit };
+  const formProps = { defaultValues, schema, isLoading: isPending || isPendingApprove, onSubmit };
 
   return isOwner && collection.sellable ? (
     <>
