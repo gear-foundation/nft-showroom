@@ -148,9 +148,9 @@ pub fn check_variable_meta(storage: &Storage) {
     }
 }
 
-pub fn check_mint(user: &ActorId, storage: &Storage) {
+pub fn check_mint(source: &ActorId, user: &ActorId, storage: &Storage) {
     if let Some(permission_to_mint) = &storage.permission_to_mint {
-        if !permission_to_mint.contains(user) {
+        if !permission_to_mint.contains(source) {
             panic("Access denied");
         }
     }

@@ -215,14 +215,13 @@ impl NftService {
         // check if there are tokens for mint
         check_available_amount_of_tokens(storage);
 
-        if msg_source == storage.marketplace_address {
-            // check if a user can make a mint:
-            // - quantity limit
-            // - user-specific limit
-            check_mint(&minter, storage);
-            // value check on mint
-            payment_for_mint(msg_value, storage);
-        }
+        // check if a user can make a mint:
+        // - quantity limit
+        // - user-specific limit
+        check_mint(&msg_source, &minter, storage);
+        // value check on mint
+        payment_for_mint(msg_value, storage);
+        
         let Some(next_nft_nonce) = storage.nonce.checked_add(1) else {
             panic("Math overflow");
         };
@@ -600,6 +599,32 @@ impl NftService {
 
     pub fn all(&self) -> NftState {
         self.get().into()
+    }
+
+    pub fn get_tokens_id_by_owner(&self, owner_id: ActorId) -> Vec<NftId> {
+        let mut tokens: Vec<NftId> = self
+            .get()
+            .owners
+            .get(&owner_id)
+            .unwrap_or(&HashSet::new())
+            .iter()
+            .cloned()
+            .collect();
+        
+        tokens.sort();
+        tokens
+    }
+
+    pub fn get_tokens_info_by_owner(&self, owner_id: ActorId) -> Vec<NftData> {
+        let s = self.get();
+        let mut pairs: Vec<(NftId, NftData)> = s.owners.get(&owner_id)
+            .into_iter()
+            .flat_map(|ids| ids.iter())
+            .filter_map(|id| s.tokens.get(id).cloned().map(|d| (*id, d)))
+            .collect();
+
+        pairs.sort_by_key(|(id, _)| *id);
+        pairs.into_iter().map(|(_, d)| d).collect()
     }
 }
 
