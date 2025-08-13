@@ -20,7 +20,7 @@ type Values = {
 
 const schema = z
   .object({
-    value: z.string(),
+    value: z.enum(['any', 'admin', 'custom']),
     address: SCHEMA.ADDRESS,
     addresses: z.array(z.object({ value: z.string() })),
   })

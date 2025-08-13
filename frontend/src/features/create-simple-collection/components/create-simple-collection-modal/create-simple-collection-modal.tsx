@@ -182,7 +182,7 @@ function CreateSimpleCollectionModal({ close }: Pick<ModalProps, 'close'>) {
       default:
         return (
           <Container>
-            <p>Unexpected error occured.</p>
+            <p>Unexpected error occurred.</p>
           </Container>
         );
     }

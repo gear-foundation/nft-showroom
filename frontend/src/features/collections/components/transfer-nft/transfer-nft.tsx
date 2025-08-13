@@ -2,7 +2,7 @@ import { useAlert } from '@gear-js/react-hooks';
 import { Button } from '@gear-js/vara-ui';
 import { z } from 'zod';
 
-import { SearchInput, NFTActionFormModal, withAccount } from '@/components';
+import { Input, NFTActionFormModal, withAccount } from '@/components';
 import { SCHEMA } from '@/consts';
 import { Collection, CollectionType, Nft } from '@/graphql/graphql';
 import { useCollectionMessage, useIsOwner, useLoading, useModal } from '@/hooks';
@@ -58,7 +58,7 @@ function Component({ collection, owner, ...nft }: Props) {
 
       {isOpen && (
         <NFTActionFormModal modal={modalProps} form={formProps} nft={nft} collection={collection}>
-          <SearchInput label="Account address" name="address" />
+          <Input label="Account address" name="address" />
         </NFTActionFormModal>
       )}
     </>

@@ -2,7 +2,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { FormProvider, useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 
-import { SearchInput } from '@/components';
+import { Input } from '@/components';
 import { ROUTE } from '@/consts';
 
 import SearchSVG from '../../assets/search.svg?react';
@@ -26,7 +26,7 @@ function NFTSearch() {
   return (
     <FormProvider {...form}>
       <form onSubmit={handleSubmit}>
-        <SearchInput
+        <Input
           name={FIELD_NAME.QUERY}
           icon={SearchSVG}
           label="NFT name/Account address"

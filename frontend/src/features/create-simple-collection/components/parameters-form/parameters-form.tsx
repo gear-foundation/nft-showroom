@@ -1,12 +1,12 @@
 import { useApi, useBalanceFormat } from '@gear-js/react-hooks';
-import { Button, Checkbox, Input, Select } from '@gear-js/vara-ui';
+import { Button } from '@gear-js/vara-ui';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { ChangeEvent } from 'react';
+import { useCallback, useEffect } from 'react';
 import { useFieldArray, useForm, useWatch } from 'react-hook-form';
 import { z } from 'zod';
 
 import VaraSVG from '@/assets/vara.svg?react';
-import { Container } from '@/components';
+import { Checkbox, Container, Form, Input, Select } from '@/components';
 import { useChangeEffect } from '@/hooks';
 
 import PercentSVG from '../../assets/percent.svg?react';
@@ -34,7 +34,7 @@ function ParametersForm({ defaultValues, onSubmit, onBack }: Props) {
   const schema = z
     .object({
       mintPermission: z.object({
-        value: z.string(),
+        value: z.enum(['any', 'admin', 'custom']),
         addresses: z.array(z.object({ value: z.string() })),
       }),
       mintLimit: z.string().trim(),
@@ -48,14 +48,14 @@ function ParametersForm({ defaultValues, onSubmit, onBack }: Props) {
         .refine((value) => value.isInteger(), 'Maximum amount of decimal places exceeded')
         .transform((value) => getFormattedBalanceValue(value.toFixed()).toFixed()),
 
-      tags: z.array(z.object({ value: z.string() })),
+      tags: z.object({ value: z.string() }).array().default([]),
       royalty: z.coerce
         .number()
         .max(10)
         .transform((value) => value.toString()),
-      isSellable: z.boolean(),
-      isTransferable: z.boolean(),
-      isMetadataChangesAllowed: z.boolean(),
+      isSellable: z.boolean().default(false),
+      isTransferable: z.boolean().default(false),
+      isMetadataChangesAllowed: z.boolean().default(false),
     })
     .refine(({ mintPermission }) => mintPermission.value !== 'custom' || mintPermission.addresses.length, {
       message: 'No specifed address',
@@ -64,9 +64,13 @@ function ParametersForm({ defaultValues, onSubmit, onBack }: Props) {
 
   const resolver = zodResolver(schema);
 
-  const { control, formState, register, handleSubmit, setValue, clearErrors } = useForm({ defaultValues, resolver });
+  const { control, formState, setValue, clearErrors, watch } = useForm({
+    defaultValues,
+    resolver,
+  });
   const { errors } = formState;
-  const isSellable = useWatch({ control, name: 'isSellable' });
+
+  const { isSellable, tags: tagsValue } = watch();
 
   useChangeEffect(() => {
     setValue('royalty', '0');
@@ -74,13 +78,20 @@ function ParametersForm({ defaultValues, onSubmit, onBack }: Props) {
   }, [isSellable, setValue]);
 
   const { fields, append, remove } = useFieldArray({ control, name: 'tags' });
-  const isTagSelected = (value: string) => fields.some((tag) => value === tag.value);
-  const options = TAGS.filter((value) => !isTagSelected(value)).map((value) => ({ value, label: value }));
 
-  const handleTagChange = ({ target }: ChangeEvent<HTMLSelectElement>) => {
-    append({ value: target.value });
-    target.value = ''; // reset to placeholder value, since selected options will be deleted
-  };
+  const isTagSelected = useCallback((value: string) => fields.some((tag) => value === tag.value), [fields]);
+
+  const options = TAGS.filter((value) => !isTagSelected(value)).map((value) => ({
+    value,
+    label: value,
+  }));
+
+  useEffect(() => {
+    if (tagsValue && typeof tagsValue === 'string' && tagsValue !== '' && !isTagSelected(tagsValue)) {
+      append({ value: tagsValue });
+      setValue('tags', []);
+    }
+  }, [tagsValue, append, setValue, isTagSelected]);
 
   const renderTags = () =>
     fields.map(({ value }, index) => (
@@ -104,31 +115,26 @@ function ParametersForm({ defaultValues, onSubmit, onBack }: Props) {
           error={errors.mintPermission?.value?.message}
         />
 
-        <form onSubmit={handleSubmit(onSubmit)} className={styles.form}>
-          <Input type="number" step="any" label="Minting limit per user" {...register('mintLimit')} />
-          <Input
-            type="number"
-            step="any"
-            icon={VaraSVG}
-            label={'Minting price'}
-            {...register('mintPrice')}
-            error={errors.mintPrice?.message}
-          />
+        <Form
+          onSubmit={(data) => {
+            onSubmit(data);
+          }}
+          schema={schema}
+          defaultValues={defaultValues}
+          className={styles.form}
+        >
+          <Input type="number" step="any" label="Minting limit per user" name={'mintLimit'} />
+          <Input type="number" step="any" icon={VaraSVG} label={'Minting price'} name={'mintLimit'} />
 
           <div>
-            <Select
-              label="Tags"
-              options={[PLACEHOLDER_TAG, ...options]}
-              onChange={handleTagChange}
-              disabled={!options.length}
-            />
+            <Select name={'tags'} label="Tags" options={[PLACEHOLDER_TAG, ...options]} disabled={!options.length} />
 
             {Boolean(fields.length) && <ul className={styles.tags}>{renderTags()}</ul>}
           </div>
 
-          <Checkbox label="Allow metadata changes" type="switch" {...register('isMetadataChangesAllowed')} />
-          <Checkbox label="Allow transferring" type="switch" {...register('isTransferable')} disabled={isSellable} />
-          <Checkbox label="Allow selling" type="switch" {...register('isSellable')} />
+          <Checkbox label="Allow metadata changes" type="switch" name={'isMetadataChangesAllowed'} />
+          <Checkbox label="Allow transferring" type="switch" name={'isTransferable'} disabled={isSellable} />
+          <Checkbox label="Allow selling" type="switch" name={'isSellable'} />
 
           <Input
             type="number"
@@ -136,15 +142,14 @@ function ParametersForm({ defaultValues, onSubmit, onBack }: Props) {
             icon={PercentSVG}
             label="Creator royalties"
             disabled={!isSellable}
-            {...register('royalty')}
-            error={errors.royalty?.message}
+            name={'royalty'}
           />
 
           <div className={styles.buttons}>
             <Button text="Back" color="grey" onClick={onBack} />
             <Button type="submit" text="Continue" isLoading={!api} />
           </div>
-        </form>
+        </Form>
       </div>
     </Container>
   );

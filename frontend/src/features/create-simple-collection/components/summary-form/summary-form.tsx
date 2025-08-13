@@ -1,7 +1,5 @@
 import { useAlert } from '@gear-js/react-hooks';
-import { Button, Input, Textarea } from '@gear-js/vara-ui';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm } from 'react-hook-form';
+import { Button } from '@gear-js/vara-ui';
 import { z } from 'zod';
 
 import DiscordSVG from '@/assets/discord.svg?react';
@@ -9,7 +7,7 @@ import MediumSVG from '@/assets/medium.svg?react';
 import TelegramSVG from '@/assets/telegram.svg?react';
 import TwitterSVG from '@/assets/twitter.svg?react';
 import WebSVG from '@/assets/web.svg?react';
-import { Container } from '@/components';
+import { Container, Input, Form, Textarea } from '@/components';
 
 import CameraSVG from '../../assets/camera.svg?react';
 import PlaceholderSVG from '../../assets/placeholder.svg?react';
@@ -28,22 +26,17 @@ type Props = {
 };
 
 const schema = z.object({
-  name: z.string().trim().min(1),
-  description: z.string().trim().min(1),
-  url: z.string().trim(),
-  telegram: z.string().trim(),
-  x: z.string().trim(),
-  medium: z.string().trim(),
-  discord: z.string().trim(),
+  name: z.string().trim().min(1, 'Name is required'),
+  description: z.string().trim().min(1, 'Description is required'),
+  url: z.string().trim().optional().or(z.literal('')),
+  telegram: z.string().trim().optional().or(z.literal('')),
+  x: z.string().trim().optional().or(z.literal('')),
+  medium: z.string().trim().optional().or(z.literal('')),
+  discord: z.string().trim().optional().or(z.literal('')),
 });
-
-const resolver = zodResolver(schema);
 
 function SummaryForm({ defaultValues, onSubmit, onBack }: Props) {
   const alert = useAlert();
-
-  const { register, handleSubmit, formState } = useForm({ defaultValues, resolver });
-  const { errors } = formState;
 
   const cover = useImageInput(defaultValues.cover, IMAGE_TYPES);
   const coverStyle = cover.value ? { backgroundImage: `url(${getFileUrl(cover.value)})` } : undefined;
@@ -52,12 +45,14 @@ function SummaryForm({ defaultValues, onSubmit, onBack }: Props) {
   const logoStyle = logo.value ? { backgroundImage: `url(${getFileUrl(logo.value)})` } : undefined;
 
   return (
-    <form
-      onSubmit={handleSubmit((data) => {
+    <Form
+      defaultValues={defaultValues}
+      schema={schema}
+      onSubmit={(data) => {
         if (!cover.value || !logo.value) return alert.error('Cover and logo are required');
 
         onSubmit({ ...data, cover: cover.value, logo: logo.value });
-      })}
+      }}
       className={styles.form}>
       <Container>
         <header className={styles.header}>
@@ -97,19 +92,19 @@ function SummaryForm({ defaultValues, onSubmit, onBack }: Props) {
 
       <Container maxWidth="sm">
         <div className={styles.inputs}>
-          <Input label="Name" {...register('name')} error={errors.name?.message} />
+          <Input name="name" label="Name" />
 
-          <Textarea label="Description" rows={2} {...register('description')} error={errors.description?.message} />
+          <Textarea name="description" label="Description" rows={2} />
         </div>
 
         <div className={styles.inputs}>
           <h4 className={styles.heading}>Links (optional):</h4>
 
-          <Input icon={WebSVG} label="URL" {...register('url')} />
-          <Input icon={TelegramSVG} label="Telegram" {...register('telegram')} />
-          <Input icon={TwitterSVG} label="X.com" {...register('x')} />
-          <Input icon={MediumSVG} label="Medium" {...register('medium')} />
-          <Input icon={DiscordSVG} label="Discord" {...register('discord')} />
+          <Input name="url" icon={WebSVG} label="URL" />
+          <Input name="telegram" icon={TelegramSVG} label="Telegram" />
+          <Input name="x" icon={TwitterSVG} label="X.com" />
+          <Input name="medium" icon={MediumSVG} label="Medium" />
+          <Input name="discord" icon={DiscordSVG} label="Discord" />
 
           <div className={styles.buttons}>
             <Button text="Cancel" color="grey" onClick={onBack} />
@@ -117,7 +112,7 @@ function SummaryForm({ defaultValues, onSubmit, onBack }: Props) {
           </div>
         </div>
       </Container>
-    </form>
+    </Form>
   );
 }
 
