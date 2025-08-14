@@ -1,12 +1,12 @@
 import { useApi, useBalanceFormat } from '@gear-js/react-hooks';
-import { Button } from '@gear-js/vara-ui';
+import { Button, Select, Checkbox } from '@gear-js/vara-ui';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useCallback, useEffect } from 'react';
-import { useFieldArray, useForm, useWatch } from 'react-hook-form';
+import { useCallback, ChangeEvent } from 'react';
+import { useFieldArray, useForm, Controller } from 'react-hook-form';
 import { z } from 'zod';
 
 import VaraSVG from '@/assets/vara.svg?react';
-import { Checkbox, Container, Form, Input, Select } from '@/components';
+import { Container, Form, Input } from '@/components';
 import { useChangeEffect } from '@/hooks';
 
 import PercentSVG from '../../assets/percent.svg?react';
@@ -70,7 +70,7 @@ function ParametersForm({ defaultValues, onSubmit, onBack }: Props) {
   });
   const { errors } = formState;
 
-  const { isSellable, tags: tagsValue } = watch();
+  const { isSellable } = watch();
 
   useChangeEffect(() => {
     setValue('royalty', '0');
@@ -86,12 +86,10 @@ function ParametersForm({ defaultValues, onSubmit, onBack }: Props) {
     label: value,
   }));
 
-  useEffect(() => {
-    if (tagsValue && typeof tagsValue === 'string' && tagsValue !== '' && !isTagSelected(tagsValue)) {
-      append({ value: tagsValue });
-      setValue('tags', []);
-    }
-  }, [tagsValue, append, setValue, isTagSelected]);
+  const handleTagChange = ({ target }: ChangeEvent<HTMLSelectElement>) => {
+    append({ value: target.value });
+    target.value = ''; // reset to placeholder value, since selected options will be deleted
+  };
 
   const renderTags = () =>
     fields.map(({ value }, index) => (
@@ -124,17 +122,46 @@ function ParametersForm({ defaultValues, onSubmit, onBack }: Props) {
           className={styles.form}
         >
           <Input type="number" step="any" label="Minting limit per user" name={'mintLimit'} />
-          <Input type="number" step="any" icon={VaraSVG} label={'Minting price'} name={'mintLimit'} />
+          <Input type="number" step="any" icon={VaraSVG} label={'Minting price'} name={'mintPrice'} />
 
           <div>
-            <Select name={'tags'} label="Tags" options={[PLACEHOLDER_TAG, ...options]} disabled={!options.length} />
+            <Select
+              label="Tags"
+              options={[PLACEHOLDER_TAG, ...options]}
+              disabled={!options.length}
+              onChange={handleTagChange}
+            />
 
             {Boolean(fields.length) && <ul className={styles.tags}>{renderTags()}</ul>}
           </div>
 
-          <Checkbox label="Allow metadata changes" type="switch" name={'isMetadataChangesAllowed'} />
-          <Checkbox label="Allow transferring" type="switch" name={'isTransferable'} disabled={isSellable} />
-          <Checkbox label="Allow selling" type="switch" name={'isSellable'} />
+          <Controller
+            name="isMetadataChangesAllowed"
+            control={control}
+            render={({ field }) => (
+              <Checkbox label="Allow metadata changes" type="switch" checked={field.value} onChange={field.onChange} />
+            )}
+          />
+          <Controller
+            name="isTransferable"
+            control={control}
+            render={({ field }) => (
+              <Checkbox
+                label="Allow transferring"
+                type="switch"
+                checked={field.value}
+                onChange={field.onChange}
+                disabled={isSellable}
+              />
+            )}
+          />
+          <Controller
+            name="isSellable"
+            control={control}
+            render={({ field }) => (
+              <Checkbox label="Allow selling" type="switch" checked={field.value} onChange={field.onChange} />
+            )}
+          />
 
           <Input
             type="number"
@@ -143,6 +170,7 @@ function ParametersForm({ defaultValues, onSubmit, onBack }: Props) {
             label="Creator royalties"
             disabled={!isSellable}
             name={'royalty'}
+            className={styles.sellableInput}
           />
 
           <div className={styles.buttons}>
