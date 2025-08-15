@@ -2,7 +2,7 @@ import { useAlert, useApi } from '@gear-js/react-hooks';
 import { Button } from '@gear-js/vara-ui';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { ChangeEvent, useRef } from 'react';
-import { useFieldArray, useForm } from 'react-hook-form';
+import { useFieldArray, useForm, FormProvider } from 'react-hook-form';
 import { z } from 'zod';
 
 import { Balance, Container } from '@/components';
@@ -10,7 +10,7 @@ import { useMarketplace } from '@/context';
 
 import { IMAGE_TYPES, MAX } from '../../consts';
 import { NFTsValues } from '../../types';
-import { getBytes, getFileUrl } from '../../utils';
+import { getBytes } from '../../utils';
 import { NFT } from '../nft';
 
 import styles from './nft-form.module.scss';
@@ -34,7 +34,8 @@ const schema = z.object({
 const resolver = zodResolver(schema);
 
 function NFTForm({ defaultValues, isLoading, onSubmit, onBack }: Props) {
-  const { control, register, setValue, handleSubmit } = useForm({ defaultValues, resolver });
+  const methods = useForm({ defaultValues, resolver });
+  const { control, setValue, handleSubmit } = methods;
   const { fields, append, remove } = useFieldArray({ control, name: 'nfts' });
   const nftsCount = fields.length;
 
@@ -61,21 +62,6 @@ function NFTForm({ defaultValues, isLoading, onSubmit, onBack }: Props) {
     target.value = '';
   };
 
-  const renderNfts = () =>
-    fields.map(({ id, file }, index) => {
-      const inputName = `nfts.${index}.limit` as const;
-
-      return (
-        <NFT
-          key={id}
-          src={getFileUrl(file)}
-          inputProps={register(inputName)}
-          onDelete={() => remove(index)}
-          onCheckboxChange={() => setValue(inputName, '')}
-        />
-      );
-    });
-
   // TODO: better to calculate only if loaded?
   const { marketplace } = useMarketplace();
   const feePerUploadedFile = marketplace?.config.feePerUploadedFile || '0';
@@ -87,52 +73,73 @@ function NFTForm({ defaultValues, isLoading, onSubmit, onBack }: Props) {
   const fee = potentialFee > BigInt(existentialDeposit) ? potentialFee : BigInt(existentialDeposit);
 
   return (
-    <form onSubmit={handleSubmit((values) => onSubmit(values, fee))} className={styles.form}>
-      <Container>
-        <header className={styles.header}>
-          <h4 className={styles.heading}>NFTs added: {nftsCount}</h4>
+    <FormProvider {...methods}>
+      <form
+        onSubmit={handleSubmit((values) => {
+          onSubmit(values, fee);
+        })}
+        className={styles.form}
+      >
+        <Container>
+          <header className={styles.header}>
+            <h4 className={styles.heading}>NFTs added: {nftsCount}</h4>
 
-          <div className={styles.file}>
-            <input
-              type="file"
-              className={styles.fileInput}
-              ref={inputRef}
-              onChange={handleInputChange}
-              accept={IMAGE_TYPES.join(',')}
-              multiple
-            />
+            <div className={styles.file}>
+              <input
+                type="file"
+                className={styles.fileInput}
+                ref={inputRef}
+                onChange={handleInputChange}
+                accept={IMAGE_TYPES.join(',')}
+                multiple
+              />
 
-            <Button text="Select File" size="small" color="contrast" onClick={handleInputClick} />
+              <Button text="Select File" size="small" color="contrast" onClick={handleInputClick} />
 
-            <p>File formats: .jpg, .jpeg, .png. Max size: 5mb</p>
-          </div>
-        </header>
-        <ul className={styles.nfts}>{renderNfts()}</ul>
-      </Container>
-
-      <footer className={styles.footer}>
-        <Container className={styles.buttons}>
-          <Button text="Back" color="grey" onClick={onBack} />
-
-          <div className={styles.submit}>
-            <div>
-              <h4 className={styles.submitHeading}>
-                Creation fee: <Balance value={fee} />
-              </h4>
-
-              <p className={styles.submitText}>Calculated based on the number of unique images.</p>
+              <p>File formats: .jpg, .jpeg, .png. Max size: 5mb</p>
             </div>
+          </header>
+          <ul className={styles.nfts}>
+            {fields.map(({ id, file }, index) => {
+              const inputName = `nfts.${index}.limit` as const;
 
-            <Button
-              type="submit"
-              text={isLoading ? 'Uploading...' : 'Submit'}
-              isLoading={isLoading}
-              disabled={nftsCount === 0}
-            />
-          </div>
+              return (
+                <NFT
+                  key={id}
+                  file={file}
+                  index={index}
+                  onDelete={() => remove(index)}
+                  onCheckboxChange={() => setValue(inputName, '')}
+                />
+              );
+            })}
+          </ul>
         </Container>
-      </footer>
-    </form>
+
+        <footer className={styles.footer}>
+          <Container className={styles.buttons}>
+            <Button text="Back" color="grey" onClick={onBack} />
+
+            <div className={styles.submit}>
+              <div>
+                <h4 className={styles.submitHeading}>
+                  Creation fee: <Balance value={fee} />
+                </h4>
+
+                <p className={styles.submitText}>Calculated based on the number of unique images.</p>
+              </div>
+
+              <Button
+                type="submit"
+                text={isLoading ? 'Uploading...' : 'Submit'}
+                isLoading={isLoading}
+                disabled={nftsCount === 0}
+              />
+            </div>
+          </Container>
+        </footer>
+      </form>
+    </FormProvider>
   );
 }
 

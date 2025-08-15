@@ -23,6 +23,7 @@ type AdditionalLinks = struct {
 
 type ImageData = struct {
   limit_copies: opt u32,
+  name: opt str,
 };
 
 type NftState = struct {

@@ -43,7 +43,7 @@ export class SailsProgram {
         medium: 'Option<String>',
         discord: 'Option<String>',
       },
-      ImageData: { limit_copies: 'Option<u32>' },
+      ImageData: { limit_copies: 'Option<u32>', name: 'Option<String>' },
       NftState: {
         tokens: 'Vec<(u64, NftData)>',
         owners: 'Vec<([u8;32], Vec<u64>)>',

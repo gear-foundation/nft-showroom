@@ -26,6 +26,7 @@ declare global {
 
   export interface ImageData {
     limit_copies: number | null;
+    name: string | null;
   }
 
   export interface NftState {
@@ -58,4 +59,4 @@ declare global {
     collection_owner: ActorId;
     royalty: number;
   }
-};
+}
