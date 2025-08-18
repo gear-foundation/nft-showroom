@@ -22,15 +22,9 @@ function Component({ idInCollection, owner, collection, sale }: Props) {
       const tokenId = idInCollection;
       const collectionAddress = collection.id as `0x${string}`;
 
-      const value = sale.price;
-
-      // TODO: what is the value? Is it connected to the transaction?
-      console.log(value);
-
-      await sendBuyTransaction({ args: [collectionAddress, tokenId], value: undefined });
+      const value = BigInt(sale.price);
+      await sendBuyTransaction({ args: [collectionAddress, tokenId], value });
       alert.success('NFT bought');
-
-      // sendMessage({ payload, value, onSuccess, onFinally });
     } catch (e) {
       console.log(e);
       alert.error(e instanceof Error ? e.message : String(e));

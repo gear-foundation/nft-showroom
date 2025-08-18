@@ -169,6 +169,8 @@ function CreateSimpleCollectionModal({ close }: Pick<ModalProps, 'close'>) {
         args: [COLLECTION_TYPE_NAME.SIMPLE, bytesPayload],
         value: fee,
       });
+      // Wait for 1s before navigation to collection page
+      await new Promise((resolve) => setTimeout(resolve, 1000));
       const url = generatePath(ROUTE.COLLECTION, { id: response.collection_address });
       navigate(url);
       alert.success('Collection created');

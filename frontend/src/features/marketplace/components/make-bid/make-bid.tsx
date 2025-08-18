@@ -33,7 +33,9 @@ function Component({ collection, auction, ...nft }: Props) {
       const tokenId = nft.idInCollection;
       const collectionAddress = collection.id as `0x${string}`;
 
-      await sendTransactionAsync({ args: [collectionAddress, tokenId], value });
+      console.log('calculated make-bid fee value: ', value, BigInt(value));
+
+      await sendTransactionAsync({ args: [collectionAddress, tokenId], value: BigInt(value) });
       alert.success('Bid made');
       close();
     } catch (e) {
