@@ -216,8 +216,9 @@ function CreateSimpleCollectionModal({ close }: Pick<ModalProps, 'close'>) {
 
       // const formPayload = await getFormPayload(nfts);
       // const bytesPayload = getBytesPayload(formPayload);
-      // const resData = await sendCreateCollection({ args: [COLLECTION_TYPE_NAME.SIMPLE, bytesPayload], value: fee });
+      const resData = await sendCreateCollection({ args: [COLLECTION_TYPE_NAME.SIMPLE, bytesPayload], value: fee });
       // console.log({ resData });
+      const test = resData.response.collection_address;
       // const url = generatePath(ROUTE.COLLECTION, { id: response.collectionCreated.collectionAddress });
       // navigate(url);
       alert.success('Collection created');

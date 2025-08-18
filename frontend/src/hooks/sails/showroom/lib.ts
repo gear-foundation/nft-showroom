@@ -39,6 +39,7 @@ export class SailsProgram {
         max_number_of_images: 'u64',
       },
       Offer: { collection_address: '[u8;32]', token_id: 'u64', creator: '[u8;32]' },
+      CreateCollectionReply: { type_name: 'String', collection_address: '[u8;32]' },
       StorageState: {
         admins: 'Vec<[u8;32]>',
         collection_to_owner: 'Vec<([u8;32], (String, [u8;32]))>',
@@ -52,12 +53,7 @@ export class SailsProgram {
         allow_message: 'bool',
         allow_create_collection: 'bool',
       },
-      TypeCollectionInfo: {
-        code_id: '[u8;32]',
-        idl_link: 'String',
-        type_description: 'String',
-        allow_create: 'bool',
-      },
+      TypeCollectionInfo: { code_id: '[u8;32]', idl_link: 'String', type_description: 'String', allow_create: 'bool' },
       NftInfoForSale: { price: 'u128', token_owner: '[u8;32]', collection_owner: '[u8;32]', royalty: 'u16' },
       Auction: {
         owner: '[u8;32]',
@@ -315,15 +311,15 @@ export class NftShowroom {
     );
   }
 
-  public createCollection(type_name: string, payload: `0x${string}`): TransactionBuilder<null> {
+  public createCollection(type_name: string, payload: `0x${string}`): TransactionBuilder<CreateCollectionReply> {
     if (!this._program.programId) throw new Error('Program ID is not set');
-    return new TransactionBuilder<null>(
+    return new TransactionBuilder<CreateCollectionReply>(
       this._program.api,
       this._program.registry,
       'send_message',
       ['NftShowroom', 'CreateCollection', type_name, payload],
       '(String, String, String, Vec<u8>)',
-      'Null',
+      'CreateCollectionReply',
       this._program.programId,
     );
   }
@@ -668,12 +664,7 @@ export class NftShowroom {
               '(String, String, {"code_id":"[u8;32]","idl_link":"String","type_name":"String","type_description":"String"})',
               message.payload,
             )[2]
-            .toJSON() as unknown as {
-            code_id: CodeId;
-            idl_link: string;
-            type_name: string;
-            type_description: string;
-          },
+            .toJSON() as unknown as { code_id: CodeId; idl_link: string; type_name: string; type_description: string },
         );
       }
     });
@@ -692,10 +683,7 @@ export class NftShowroom {
         callback(
           this._program.registry
             .createType('(String, String, {"type_name":"String","collection_address":"[u8;32]"})', message.payload)[2]
-            .toJSON() as unknown as {
-            type_name: string;
-            collection_address: ActorId;
-          },
+            .toJSON() as unknown as { type_name: string; collection_address: ActorId },
         );
       }
     });
@@ -714,10 +702,7 @@ export class NftShowroom {
         callback(
           this._program.registry
             .createType('(String, String, {"collection_address":"[u8;32]","minter":"[u8;32]"})', message.payload)[2]
-            .toJSON() as unknown as {
-            collection_address: ActorId;
-            minter: ActorId;
-          },
+            .toJSON() as unknown as { collection_address: ActorId; minter: ActorId },
         );
       }
     });
@@ -768,10 +753,7 @@ export class NftShowroom {
         callback(
           this._program.registry
             .createType('(String, String, {"collection_address":"[u8;32]","token_id":"u64"})', message.payload)[2]
-            .toJSON() as unknown as {
-            collection_address: ActorId;
-            token_id: number | string | bigint;
-          },
+            .toJSON() as unknown as { collection_address: ActorId; token_id: number | string | bigint },
         );
       }
     });
@@ -916,10 +898,7 @@ export class NftShowroom {
         callback(
           this._program.registry
             .createType('(String, String, {"collection_address":"[u8;32]","token_id":"u64"})', message.payload)[2]
-            .toJSON() as unknown as {
-            collection_address: ActorId;
-            token_id: number | string | bigint;
-          },
+            .toJSON() as unknown as { collection_address: ActorId; token_id: number | string | bigint },
         );
       }
     });
@@ -968,10 +947,7 @@ export class NftShowroom {
         callback(
           this._program.registry
             .createType('(String, String, {"collection_address":"[u8;32]","token_id":"u64"})', message.payload)[2]
-            .toJSON() as unknown as {
-            collection_address: ActorId;
-            token_id: number | string | bigint;
-          },
+            .toJSON() as unknown as { collection_address: ActorId; token_id: number | string | bigint },
         );
       }
     });
@@ -990,9 +966,7 @@ export class NftShowroom {
         callback(
           this._program.registry
             .createType('(String, String, {"offer":"Offer"})', message.payload)[2]
-            .toJSON() as unknown as {
-            offer: Offer;
-          },
+            .toJSON() as unknown as { offer: Offer },
         );
       }
     });
@@ -1011,9 +985,7 @@ export class NftShowroom {
         callback(
           this._program.registry
             .createType('(String, String, {"collection_address":"[u8;32]"})', message.payload)[2]
-            .toJSON() as unknown as {
-            collection_address: ActorId;
-          },
+            .toJSON() as unknown as { collection_address: ActorId },
         );
       }
     });
@@ -1032,9 +1004,7 @@ export class NftShowroom {
         callback(
           this._program.registry
             .createType('(String, String, {"users":"Vec<[u8;32]>"})', message.payload)[2]
-            .toJSON() as unknown as {
-            users: Array<ActorId>;
-          },
+            .toJSON() as unknown as { users: Array<ActorId> },
         );
       }
     });
@@ -1053,9 +1023,7 @@ export class NftShowroom {
         callback(
           this._program.registry
             .createType('(String, String, {"user":"[u8;32]"})', message.payload)[2]
-            .toJSON() as unknown as {
-            user: ActorId;
-          },
+            .toJSON() as unknown as { user: ActorId },
         );
       }
     });
@@ -1074,10 +1042,7 @@ export class NftShowroom {
         callback(
           this._program.registry
             .createType('(String, String, {"config":"Config","minimum_value_for_trade":"u128"})', message.payload)[2]
-            .toJSON() as unknown as {
-            config: Config;
-            minimum_value_for_trade: number | string | bigint;
-          },
+            .toJSON() as unknown as { config: Config; minimum_value_for_trade: number | string | bigint },
         );
       }
     });
@@ -1096,9 +1061,7 @@ export class NftShowroom {
         callback(
           this._program.registry
             .createType('(String, String, {"value":"u128"})', message.payload)[2]
-            .toJSON() as unknown as {
-            value: number | string | bigint;
-          },
+            .toJSON() as unknown as { value: number | string | bigint },
         );
       }
     });
@@ -1161,9 +1124,7 @@ export class NftShowroom {
         callback(
           this._program.registry
             .createType('(String, String, {"type_name":"String"})', message.payload)[2]
-            .toJSON() as unknown as {
-            type_name: string;
-          },
+            .toJSON() as unknown as { type_name: string },
         );
       }
     });

@@ -23,6 +23,11 @@ declare global {
     creator: ActorId;
   }
 
+  export interface CreateCollectionReply {
+    type_name: string;
+    collection_address: ActorId;
+  }
+
   export interface StorageState {
     admins: Array<ActorId>;
     collection_to_owner: Array<[ActorId, [string, ActorId]]>;
@@ -42,7 +47,7 @@ declare global {
    * the admin should preload the NFT contract and specify in the marketplace so that regular users can use it
    * * idl_link -  it is necessary to set a reference where the idl of this collection type will be stored for further interaction with the contract
    * * type_description - description of this type of collection
-  */
+   */
   export interface TypeCollectionInfo {
     code_id: CodeId;
     idl_link: string;
@@ -72,4 +77,4 @@ declare global {
     type_name: string;
     idl_link: string;
   }
-};
+}

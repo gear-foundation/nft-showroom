@@ -20,6 +20,11 @@ type Offer = struct {
   creator: actor_id,
 };
 
+type CreateCollectionReply = struct {
+  type_name: str,
+  collection_address: actor_id,
+};
+
 type StorageState = struct {
   admins: vec actor_id,
   collection_to_owner: vec struct { actor_id, struct { str, actor_id } },
@@ -87,7 +92,7 @@ service NftShowroom {
   CancelSale : (collection_address: actor_id, token_id: u64) -> null;
   CloseAuction : (collection_address: actor_id, token_id: u64) -> null;
   CreateAuction : (collection_address: actor_id, token_id: u64, min_price: u128, duration: u32) -> null;
-  CreateCollection : (type_name: str, payload: vec u8) -> null;
+  CreateCollection : (type_name: str, payload: vec u8) -> CreateCollectionReply;
   CreateOffer : (collection_address: actor_id, token_id: u64) -> null;
   DeleteAdmin : (user: actor_id) -> null;
   DeleteCollection : (collection_address: actor_id) -> null;
