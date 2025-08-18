@@ -1,16 +1,14 @@
 import { useAccount, useAlert, useBalanceFormat } from '@gear-js/react-hooks';
-import { Button, ModalProps } from '@gear-js/vara-ui';
+import { ModalProps } from '@gear-js/vara-ui';
 import { useState } from 'react';
 import { generatePath, useNavigate } from 'react-router-dom';
 
 import { Container } from '@/components';
 import { ROUTE } from '@/consts';
 import { useMarketplace } from '@/context';
+import { useLoading } from '@/hooks';
 import { useProgramInstance as useNFTProgram } from '@/hooks/sails/nft';
-import {
-  useSendCreateCollectionTransaction,
-  useProgramInstance as useShowroomProgram,
-} from '@/hooks/sails/showroom/api.ts';
+import { useSendCreateCollectionTransaction } from '@/hooks/sails/showroom/api.ts';
 
 import {
   COLLECTION_TYPE_NAME,
@@ -20,7 +18,7 @@ import {
   MAX,
   STEPS,
 } from '../../consts';
-import { CreateCollectionReply, NFT, NFTsValues, ParametersValues, SummaryValues } from '../../types';
+import { NFT, NFTsValues, ParametersValues, SummaryValues } from '../../types';
 import { getBytes, getFileChunks, uploadToIpfs } from '../../utils';
 import { FullScreenModal } from '../full-screen-modal';
 import { NFTForm } from '../nft-form';
@@ -38,7 +36,8 @@ function CreateSimpleCollectionModal({ close }: Pick<ModalProps, 'close'>) {
   const navigate = useNavigate();
 
   const { marketplace } = useMarketplace();
-  const { sendTransactionAsync: sendCreateCollection, isPending } = useSendCreateCollectionTransaction();
+  const { sendTransactionAsync: sendCreateCollection } = useSendCreateCollectionTransaction();
+  const [isLoading, enableLoading, disableLoading] = useLoading();
 
   // Get the code_id for Simple NFT Collection from marketplace
   // const simpleCollectionType = marketplace?.collectionTypes?.find((type) => type.type === COLLECTION_TYPE_NAME.SIMPLE);
@@ -72,10 +71,10 @@ function CreateSimpleCollectionModal({ close }: Pick<ModalProps, 'close'>) {
     const getNftPayload = (url: string, index: number) => {
       const { limit } = nfts[index]; // order of requests is important
 
-      const limitCopies = limit || null;
-      const autoChangingRules = null;
+      const limit_copies = limit || null;
+      const name = null;
 
-      return [url, { limitCopies, autoChangingRules }];
+      return [url, { limit_copies, name }];
     };
 
     return urls.map((cid, index) => getNftPayload(cid, index));
@@ -112,22 +111,22 @@ function CreateSimpleCollectionModal({ close }: Pick<ModalProps, 'close'>) {
     const imgLinksAndData = await getNftsPayload(nfts);
 
     const permissionToMint = ['admin', 'custom'].includes(mintPermission.value)
-      ? mintPermission.addresses.map(({ value }) => value)
+      ? mintPermission.addresses.map(({ value }) => value as `0x${string}`)
       : null;
 
     const config = {
       name,
       description,
-      collectionBanner,
-      collectionLogo,
-      additionalLinks,
-      userMintLimit,
-      royalty,
-      paymentForMint,
-      variableMeta,
+      collection_tags: collectionTags,
+      collection_banner: collectionBanner,
+      collection_logo: collectionLogo,
+      user_mint_limit: userMintLimit,
+      additional_links: additionalLinks,
+      royalty: parseInt(royalty),
+      payment_for_mint: parseInt(paymentForMint),
       transferable,
       sellable,
-      collectionTags,
+      variable_meta: variableMeta,
     };
 
     return { collectionOwner, config, imgLinksAndData, permissionToMint, feePerUploadedFile };
@@ -138,68 +137,22 @@ function CreateSimpleCollectionModal({ close }: Pick<ModalProps, 'close'>) {
 
     const { collectionOwner, config, imgLinksAndData, permissionToMint } = payload;
 
+    // Ensure collectionOwner is in the correct format (hex string)
+    const formattedCollectionOwner = collectionOwner as `0x${string}`;
+
     // Create the payload structure that matches the collection's init function
     // According to IDL: New : (collection_owner: actor_id, config: Config, img_links_and_data: vec struct { str, ImageData }, permission_to_mint: opt vec actor_id)
-    const collectionPayload = [collectionOwner, config, imgLinksAndData, permissionToMint];
+    const collectionPayload = [formattedCollectionOwner, config, imgLinksAndData, permissionToMint];
 
     // Encode as ("New", payload) like in Rust
     const request = ['New', collectionPayload];
 
-    // Use sails-js registry to properly encode the payload
+    // Use sails-js registry to properly encode the payload with the correct type structure
     const encoded = nftProgram.registry
       .createType('(String, ([u8;32], Config, Vec<(String, ImageData)>, Option<Vec<[u8;32]>>))', request)
       .toU8a();
 
-    return `0x${Array.from(encoded)
-      .map((byte: number) => byte.toString(16).padStart(2, '0'))
-      .join('')}`;
-  };
-
-  // Test function to verify encoding with the same values as Rust developer
-  const testEncoding = (): `0x${string}` | undefined => {
-    if (!nftProgram) return;
-
-    console.log('NFT Program found');
-
-    const testPayload = [
-      '0x041071d04513c136396ca4e62eaf2c59d021a2720ba6be071a1a8363ec5f3d59', // ActorId
-      {
-        name: 'name',
-        description: 'description',
-        collection_tags: [],
-        collection_banner: 'collection_banner',
-        collection_logo: 'collection_logo',
-        user_mint_limit: null,
-        additional_links: null,
-        royalty: 0,
-        payment_for_mint: 0,
-        transferable: null,
-        sellable: null,
-        variable_meta: false,
-      },
-      [['link_1', { limit_copies: null, name: null }]], // img_links_and_data
-      null, // permission_to_mint
-    ];
-
-    // Encode as ("New", payload) like in Rust
-    const request = ['New', testPayload];
-
-    console.log('request formed');
-    const encoded = nftProgram.registry
-      .createType('(String, ([u8;32], Config, Vec<(String, ImageData)>, Option<Vec<[u8;32]>>))', request)
-      .toU8a();
-
-    console.log('Test encoding result:', Array.from(encoded));
-    console.log(
-      'Expected from Rust:',
-      [
-        12, 78, 101, 119, 4, 16, 113, 208, 69, 19, 193, 54, 57, 108, 164, 230, 46, 175, 44, 89, 208, 33, 162, 114, 11,
-        166, 190, 7, 26, 26, 131, 99, 236, 95, 61, 89, 16, 110, 97, 109, 101, 44, 100, 101, 115, 99, 114, 105, 112, 116,
-        105, 111, 110, 0, 68, 99, 111, 108, 108, 101, 99, 116, 105, 111, 110, 95, 98, 97, 110, 110, 101, 114, 60, 99,
-        111, 108, 108, 101, 99, 116, 105, 111, 110, 95, 108, 111, 103, 111, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-        0, 0, 0, 0, 0, 0, 0, 0, 4, 24, 108, 105, 110, 107, 95, 49, 0, 0, 0,
-      ],
-    );
+    console.log('bytes: ', Array.from(encoded));
 
     return `0x${Array.from(encoded)
       .map((byte: number) => byte.toString(16).padStart(2, '0'))
@@ -208,22 +161,22 @@ function CreateSimpleCollectionModal({ close }: Pick<ModalProps, 'close'>) {
 
   const handleNFTsSubmit = async ({ nfts }: NFTsValues, fee: bigint) => {
     try {
-      // Test encoding first
-      console.log('Testing encoding with Rust values...');
-      testEncoding();
+      enableLoading();
+      const formPayload = await getFormPayload(nfts);
+      const bytesPayload = getBytesPayload(formPayload);
 
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
-      // const formPayload = await getFormPayload(nfts);
-      // const bytesPayload = getBytesPayload(formPayload);
-      const resData = await sendCreateCollection({ args: [COLLECTION_TYPE_NAME.SIMPLE, bytesPayload], value: fee });
-      // console.log({ resData });
-      const test = resData.response.collection_address;
-      // const url = generatePath(ROUTE.COLLECTION, { id: response.collectionCreated.collectionAddress });
-      // navigate(url);
+      const { response } = await sendCreateCollection({
+        args: [COLLECTION_TYPE_NAME.SIMPLE, bytesPayload],
+        value: fee,
+      });
+      const url = generatePath(ROUTE.COLLECTION, { id: response.collection_address });
+      navigate(url);
       alert.success('Collection created');
     } catch (error) {
+      console.error('Error creating collection:', error);
       alert.error(error instanceof Error ? error.message : String(error));
+    } finally {
+      disableLoading();
     }
   };
 
@@ -239,7 +192,7 @@ function CreateSimpleCollectionModal({ close }: Pick<ModalProps, 'close'>) {
             defaultValues={DEFAULT_NFTS_VALUES}
             onBack={prevStep}
             onSubmit={handleNFTsSubmit}
-            isLoading={isPending}
+            isLoading={isLoading}
           />
         );
 
@@ -254,18 +207,6 @@ function CreateSimpleCollectionModal({ close }: Pick<ModalProps, 'close'>) {
 
   return (
     <FullScreenModal heading="Create Simple NFT Collection" steps={STEPS} stepIndex={stepIndex} close={close}>
-      <Button
-        onClick={() => {
-          try {
-            console.log('Testing encoding with Rust values...');
-            testEncoding();
-          } catch (error) {
-            alert.error(error instanceof Error ? error.message : String(error));
-          }
-        }}
-      >
-        click me
-      </Button>
       {getForm()}
     </FullScreenModal>
   );
