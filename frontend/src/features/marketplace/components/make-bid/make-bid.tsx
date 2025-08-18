@@ -4,7 +4,7 @@ import { z } from 'zod';
 
 import { NFTActionFormModal, PriceInput, withAccount, withApi, withMarketplaceConfig } from '@/components';
 import { Auction, Collection, Nft } from '@/graphql/graphql';
-import { useIsOwner, useLoading, useMarketplaceMessage, useModal } from '@/hooks';
+import { useIsOwner, useModal } from '@/hooks';
 import { useSendAddBidTransaction } from '@/hooks/sails/showroom/api.ts';
 
 import { usePriceSchema } from '../../hooks';
@@ -33,13 +33,9 @@ function Component({ collection, auction, ...nft }: Props) {
       const tokenId = nft.idInCollection;
       const collectionAddress = collection.id as `0x${string}`;
 
-      // TODO: what is the value? Is it connected to the transaction?
-      console.log(value);
-
-      await sendTransactionAsync({ args: [collectionAddress, tokenId], value: undefined });
+      await sendTransactionAsync({ args: [collectionAddress, tokenId], value });
       alert.success('Bid made');
       close();
-      // sendMessage({ payload, value, onSuccess, onFinally });
     } catch (e) {
       console.log(e);
       alert.error(e instanceof Error ? e.message : typeof e === 'string' ? e : 'Error while making bid');

@@ -4,12 +4,12 @@ import { ReactNode } from 'react';
 import { DefaultValues, FieldValues } from 'react-hook-form';
 import { ZodType } from 'zod';
 
+import { PriceInfoCard } from '@/components';
 import { Nft, Collection, Auction } from '@/graphql/graphql';
 import { getIpfsLink } from '@/utils';
 
 import { Form } from '../form';
 import { InfoCard } from '../info-card';
-import { PriceInfoCard } from '../price-info-card';
 
 import CalendarSVG from './calendar.svg?react';
 import styles from './nft-action-form-modal.module.scss';

@@ -19,6 +19,15 @@ export function useSendApproveTransaction(programId: `0x${string}`) {
   });
 }
 
+export function useSendTransferTransaction(programId: `0x${string}`) {
+  const { data: program } = useProgramInstance(programId);
+  return useSendProgramTransaction({
+    program,
+    serviceName: 'nft',
+    functionName: 'transferFrom',
+  });
+}
+
 export function useStartApproveTransaction(programId: `0x${string}`) {
   const { marketplace } = useMarketplace();
   const alert = useAlert();
