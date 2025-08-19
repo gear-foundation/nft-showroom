@@ -1,7 +1,7 @@
 import { decodeAddress } from '@gear-js/api';
 
-import { ADDRESS } from './consts';
-import { Entries } from './types';
+import { ADDRESS } from '@/consts';
+import { Entries } from '@/types';
 
 const cx = (...args: unknown[]) =>
   args

@@ -6,7 +6,9 @@ import { generatePath, useNavigate } from 'react-router-dom';
 import { Container } from '@/components';
 import { ROUTE } from '@/consts';
 import { useMarketplace } from '@/context';
-import { useLoading, useMarketplaceMessage } from '@/hooks';
+import { useLoading } from '@/hooks';
+import { useProgramInstance as useNFTProgram } from '@/hooks/sails/nft';
+import { useSendCreateCollectionTransaction } from '@/hooks/sails/showroom/api.ts';
 
 import {
   COLLECTION_TYPE_NAME,
@@ -16,7 +18,7 @@ import {
   MAX,
   STEPS,
 } from '../../consts';
-import { CreateCollectionReply, NFT, NFTsValues, ParametersValues, SummaryValues } from '../../types';
+import { NFT, NFTsValues, ParametersValues, SummaryValues } from '../../types';
 import { getBytes, getFileChunks, uploadToIpfs } from '../../utils';
 import { FullScreenModal } from '../full-screen-modal';
 import { NFTForm } from '../nft-form';
@@ -27,15 +29,21 @@ function CreateSimpleCollectionModal({ close }: Pick<ModalProps, 'close'>) {
   const [stepIndex, setStepIndex] = useState(0);
   const [summaryValues, setSummaryValues] = useState(DEFAULT_SUMMARY_VALUES);
   const [parametersValues, setParametersValues] = useState(DEFAULT_PARAMETERS_VALUES);
-  const [isLoading, enableLoading, disableLoading] = useLoading();
 
   const { account } = useAccount();
   const { getChainBalanceValue } = useBalanceFormat();
   const alert = useAlert();
   const navigate = useNavigate();
 
-  const { marketplace, collectionsMetadata } = useMarketplace();
-  const sendMessage = useMarketplaceMessage();
+  const { marketplace } = useMarketplace();
+  const { sendTransactionAsync: sendCreateCollection } = useSendCreateCollectionTransaction();
+  const [isLoading, enableLoading, disableLoading] = useLoading();
+
+  // Get the code_id for Simple NFT Collection from marketplace
+  // const simpleCollectionType = marketplace?.collectionTypes?.find((type) => type.type === COLLECTION_TYPE_NAME.SIMPLE);
+  // For now, we'll use a placeholder. In real implementation, you'd get the actual code_id from marketplace
+  const nftCodeId = '0x00';
+  const { data: nftProgram } = useNFTProgram(nftCodeId as `0x${string}`);
 
   const nextStep = () => setStepIndex((prevIndex) => prevIndex + 1);
   const prevStep = () => setStepIndex((prevIndex) => prevIndex - 1);
@@ -63,10 +71,10 @@ function CreateSimpleCollectionModal({ close }: Pick<ModalProps, 'close'>) {
     const getNftPayload = (url: string, index: number) => {
       const { limit } = nfts[index]; // order of requests is important
 
-      const limitCopies = limit || null;
-      const autoChangingRules = null;
+      const limit_copies = limit || null;
+      const name = null;
 
-      return [url, { limitCopies, autoChangingRules }];
+      return [url, { limit_copies, name }];
     };
 
     return urls.map((cid, index) => getNftPayload(cid, index));
@@ -77,8 +85,16 @@ function CreateSimpleCollectionModal({ close }: Pick<ModalProps, 'close'>) {
     const { feePerUploadedFile } = marketplace?.config || {};
 
     const { cover, logo, name, description, telegram, medium, discord, url: externalUrl, x: xcom } = summaryValues;
-    const { mintPermission, isTransferable, isSellable, isMetadataChangesAllowed, tags, royalty, mintLimit, mintPrice } =
-      parametersValues;
+    const {
+      mintPermission,
+      isTransferable,
+      isSellable,
+      isMetadataChangesAllowed,
+      tags,
+      royalty,
+      mintLimit,
+      mintPrice,
+    } = parametersValues;
 
     if (!cover || !logo) throw new Error('Cover and logo are required');
     const [collectionBanner, collectionLogo] = await uploadToIpfs([cover, logo]);
@@ -95,62 +111,72 @@ function CreateSimpleCollectionModal({ close }: Pick<ModalProps, 'close'>) {
     const imgLinksAndData = await getNftsPayload(nfts);
 
     const permissionToMint = ['admin', 'custom'].includes(mintPermission.value)
-      ? mintPermission.addresses.map(({ value }) => value)
+      ? mintPermission.addresses.map(({ value }) => value as `0x${string}`)
       : null;
 
     const config = {
       name,
       description,
-      collectionBanner,
-      collectionLogo,
-      additionalLinks,
-      userMintLimit,
-      royalty,
-      paymentForMint,
-      variableMeta,
+      collection_tags: collectionTags,
+      collection_banner: collectionBanner,
+      collection_logo: collectionLogo,
+      user_mint_limit: userMintLimit,
+      additional_links: additionalLinks,
+      royalty: parseInt(royalty),
+      payment_for_mint: parseInt(paymentForMint),
       transferable,
       sellable,
-      collectionTags,
+      variable_meta: variableMeta,
     };
 
     return { collectionOwner, config, imgLinksAndData, permissionToMint, feePerUploadedFile };
   };
 
-  const getBytesPayload = (payload: Awaited<ReturnType<typeof getFormPayload>>) => {
-    const collectionMetadata = collectionsMetadata?.[COLLECTION_TYPE_NAME.SIMPLE];
-    if (!collectionMetadata) throw new Error('Collection metadata not found');
+  const getBytesPayload = (payload: Awaited<ReturnType<typeof getFormPayload>>): `0x${string}` => {
+    if (!nftProgram) throw new Error('NFT Program is not initialized');
 
-    const initTypeIndex = collectionMetadata.types.init.input;
-    if (initTypeIndex == null) throw new Error('init.input type index not found in NFT metadata');
+    const { collectionOwner, config, imgLinksAndData, permissionToMint } = payload;
 
-    const encoded = collectionMetadata.createType(initTypeIndex, payload).toU8a();
+    // Ensure collectionOwner is in the correct format (hex string)
+    const formattedCollectionOwner = collectionOwner as `0x${string}`;
 
-    return Array.from(encoded);
+    // Create the payload structure that matches the collection's init function
+    // According to IDL: New : (collection_owner: actor_id, config: Config, img_links_and_data: vec struct { str, ImageData }, permission_to_mint: opt vec actor_id)
+    const collectionPayload = [formattedCollectionOwner, config, imgLinksAndData, permissionToMint];
+
+    // Encode as ("New", payload) like in Rust
+    const request = ['New', collectionPayload];
+
+    // Use sails-js registry to properly encode the payload with the correct type structure
+    const encoded = nftProgram.registry
+      .createType('(String, ([u8;32], Config, Vec<(String, ImageData)>, Option<Vec<[u8;32]>>))', request)
+      .toU8a();
+
+    return `0x${Array.from(encoded)
+      .map((byte: number) => byte.toString(16).padStart(2, '0'))
+      .join('')}`;
   };
 
   const handleNFTsSubmit = async ({ nfts }: NFTsValues, fee: bigint) => {
-    const onFinally = disableLoading;
-
     try {
       enableLoading();
-
       const formPayload = await getFormPayload(nfts);
       const bytesPayload = getBytesPayload(formPayload);
-      const payload = { CreateCollection: { typeName: COLLECTION_TYPE_NAME.SIMPLE, payload: bytesPayload } };
-      const value = fee.toString();
 
-      const onSuccess = ({ collectionCreated }: CreateCollectionReply) => {
-        const id = collectionCreated.collectionAddress;
-        const url = generatePath(ROUTE.COLLECTION, { id });
-
-        navigate(url);
-        alert.success('Collection created');
-      };
-
-      sendMessage({ payload, onSuccess, onFinally, value });
+      const { response } = await sendCreateCollection({
+        args: [COLLECTION_TYPE_NAME.SIMPLE, bytesPayload],
+        value: fee,
+      });
+      // Wait for 1s before navigation to collection page
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+      const url = generatePath(ROUTE.COLLECTION, { id: response.collection_address });
+      navigate(url);
+      alert.success('Collection created');
     } catch (error) {
+      console.error('Error creating collection:', error);
       alert.error(error instanceof Error ? error.message : String(error));
-      onFinally();
+    } finally {
+      disableLoading();
     }
   };
 
@@ -173,7 +199,7 @@ function CreateSimpleCollectionModal({ close }: Pick<ModalProps, 'close'>) {
       default:
         return (
           <Container>
-            <p>Unexpected error occured.</p>
+            <p>Unexpected error occurred.</p>
           </Container>
         );
     }

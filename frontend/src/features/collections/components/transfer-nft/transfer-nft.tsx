@@ -1,3 +1,4 @@
+import { HexString } from '@gear-js/api';
 import { useAlert } from '@gear-js/react-hooks';
 import { Button } from '@gear-js/vara-ui';
 import { z } from 'zod';
@@ -5,7 +6,8 @@ import { z } from 'zod';
 import { Input, NFTActionFormModal, withAccount } from '@/components';
 import { SCHEMA } from '@/consts';
 import { Collection, CollectionType, Nft } from '@/graphql/graphql';
-import { useCollectionMessage, useIsOwner, useLoading, useModal } from '@/hooks';
+import { useIsOwner, useModal } from '@/hooks';
+import { useSendTransferTransaction } from '@/hooks/sails/nft/api.ts';
 
 import PlaneSVG from '../../assets/plane.svg?react';
 
@@ -27,34 +29,28 @@ function Component({ collection, owner, ...nft }: Props) {
   const [isOpen, open, close] = useModal();
   const isOwner = useIsOwner(owner);
   const alert = useAlert();
-  const [isLoading, enableLoading, disableLoading] = useLoading();
 
-  const sendMessage = useCollectionMessage(collection.id, collection.type.type);
+  const { sendTransactionAsync, isPending } = useSendTransferTransaction(collection.id as HexString);
 
-  const onSubmit = ({ address }: typeof defaultValues) => {
-    enableLoading();
+  const onSubmit = async ({ address: addressTo }: typeof defaultValues) => {
+    try {
+      const tokenId = nft.idInCollection;
 
-    const tokenId = nft.idInCollection;
-    const to = address;
-
-    const payload = { Transfer: { tokenId, to } };
-
-    const onSuccess = () => {
+      await sendTransactionAsync({ args: [owner as HexString, addressTo as HexString, tokenId] });
       alert.success('NFT transferred');
       close();
-    };
-
-    const onFinally = disableLoading;
-
-    sendMessage({ payload, onSuccess, onFinally });
+    } catch (e) {
+      console.error('error', e);
+      alert.error(e instanceof Error ? e.message : String(e));
+    }
   };
 
   const modalProps = { heading: 'Transfer NFT', close };
-  const formProps = { defaultValues, schema, isLoading, onSubmit };
+  const formProps = { defaultValues, schema, isLoading: isPending, onSubmit };
 
   return isOwner && collection.transferable ? (
     <>
-      <Button icon={PlaneSVG} text="Transfer" size="small" color="dark" onClick={open} />
+      <Button icon={PlaneSVG} text="Transfer" size="small" color="contrast" onClick={open} />
 
       {isOpen && (
         <NFTActionFormModal modal={modalProps} form={formProps} nft={nft} collection={collection}>

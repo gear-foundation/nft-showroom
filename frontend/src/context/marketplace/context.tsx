@@ -14,6 +14,11 @@ const MarketplaceContext = createContext<Value>(DEFAULT_VALUE);
 const { Provider } = MarketplaceContext;
 const useMarketplace = () => useContext(MarketplaceContext);
 
+// Helper function to validate metaUrl
+const isValidMetaUrl = (metaUrl: string): boolean => {
+  return Boolean(metaUrl) && metaUrl !== 'idl_link' && metaUrl.trim().length > 0;
+};
+
 function MarketplaceProvider({ children }: ProviderProps) {
   const alert = useAlert();
 
@@ -30,17 +35,20 @@ function MarketplaceProvider({ children }: ProviderProps) {
     logPublicEnvs();
 
     const { metadata, collectionTypes } = marketplace;
-    const collectionURLs = collectionTypes.map(({ metaUrl }) => fetch(getIpfsLink(metaUrl)));
+    
+    // Filter out collections with invalid metaUrl
+    const validCollections = collectionTypes.filter(({ metaUrl }) => isValidMetaUrl(metaUrl));
+    const collectionURLs = validCollections.map(({ metaUrl }) => fetch(getIpfsLink(metaUrl)));
 
     const getMetadata = (value: string) => ProgramMetadata.from(`0x${value}`);
 
     // TODO: performance
-    // upload each .txt in a one folder to retrive them in a single request?
+    // upload each .txt in a one folder to retrieve them in a single request?
     Promise.all(collectionURLs)
       .then((responses) => responses.map((response) => response.text()))
       .then((textPromises) => Promise.all(textPromises))
       .then((texts) => {
-        const entries = texts.map((text, index) => [collectionTypes[index].type, getMetadata(text)] as const);
+        const entries = texts.map((text, index) => [validCollections[index].type, getMetadata(text)] as const);
 
         setMarketplaceMetadata(getMetadata(metadata));
         setCollectionsMetadata(Object.fromEntries(entries));

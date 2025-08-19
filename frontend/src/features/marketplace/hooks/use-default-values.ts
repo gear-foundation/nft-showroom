@@ -16,7 +16,7 @@ function useDefaultValues() {
       const dayNumber = index + 1;
 
       const label = `${dayNumber} ${dayNumber === 1 ? 'day' : 'days'}`;
-      const value = (blocksPerDay * dayNumber).toString();
+      const value = blocksPerDay * dayNumber;
 
       return { label, value };
     });

@@ -1,0 +1,155 @@
+type Config = struct {
+  name: str,
+  description: str,
+  collection_tags: vec str,
+  collection_banner: str,
+  collection_logo: str,
+  user_mint_limit: opt u32,
+  additional_links: opt AdditionalLinks,
+  royalty: u16,
+  payment_for_mint: u128,
+  transferable: opt u64,
+  sellable: opt u64,
+  variable_meta: bool,
+};
+
+type AdditionalLinks = struct {
+  external_url: opt str,
+  telegram: opt str,
+  xcom: opt str,
+  medium: opt str,
+  discord: opt str,
+};
+
+type ImageData = struct {
+  limit_copies: opt u32,
+  name: opt str,
+};
+
+type NftState = struct {
+  tokens: vec struct { u64, NftData },
+  owners: vec struct { actor_id, vec u64 },
+  token_approvals: vec struct { u64, actor_id },
+  config: Config,
+  nonce: u64,
+  img_links_and_data: vec struct { str, ImageData },
+  collection_owner: actor_id,
+  total_number_of_tokens: opt u64,
+  permission_to_mint: opt vec actor_id,
+  marketplace_address: actor_id,
+  admins: vec actor_id,
+};
+
+type NftData = struct {
+  owner: actor_id,
+  name: str,
+  description: str,
+  metadata: vec str,
+  media_url: str,
+  mint_time: u64,
+};
+
+type TokenInfo = struct {
+  token_owner: actor_id,
+  approval: opt actor_id,
+  sellable: bool,
+  collection_owner: actor_id,
+  royalty: u16,
+};
+
+constructor {
+  New : (collection_owner: actor_id, config: Config, img_links_and_data: vec struct { str, ImageData }, permission_to_mint: opt vec actor_id);
+};
+
+service Nft {
+  AddAdmin : (admin: actor_id) -> null;
+  AddMetadata : (nft_id: u64, metadata: str) -> null;
+  AddUsersForMint : (users: vec actor_id) -> null;
+  Approve : (to: actor_id, token_id: u64) -> null;
+  ChangeConfig : (config: Config) -> null;
+  ChangeImgLink : (nft_id: u64, img_link: str) -> null;
+  ChangeMetadata : (nft_id: u64, metadata: vec str) -> null;
+  DeleteMetadata : (nft_id: u64) -> null;
+  DeleteUserForMint : (user: actor_id) -> null;
+  Expand : (additional_links: vec struct { str, ImageData }) -> null;
+  LiftRestrictionsMint : () -> null;
+  Mint : (minter: actor_id, img_link_id: opt u64) -> null;
+  RemoveAdmin : (admin: actor_id) -> null;
+  RevokeApprove : (token_id: u64) -> null;
+  TransferFrom : (from: actor_id, to: actor_id, token_id: u64) -> null;
+  query All : () -> NftState;
+  query CanDelete : () -> bool;
+  query CollectionOwner : () -> actor_id;
+  query Config : () -> Config;
+  query Description : () -> str;
+  query GetPaymentForMint : () -> u128;
+  query GetTokenInfo : (token_id: u64) -> TokenInfo;
+  query GetTokensIdByOwner : (owner_id: actor_id) -> vec u64;
+  query GetTokensInfoByOwner : (owner_id: actor_id) -> vec NftData;
+  query ImgLinksAndData : () -> vec struct { str, ImageData };
+  query MarketplaceAddress : () -> actor_id;
+  query Name : () -> str;
+  query Nonce : () -> u64;
+  query PermissionToMint : () -> opt vec actor_id;
+  query TotalNumberOfTokens : () -> opt u64;
+
+  events {
+    Transferred: struct {
+      owner: actor_id,
+      recipient: actor_id,
+      token_id: u64,
+    };
+    Minted: struct {
+      token_id: u64,
+      nft_data: NftData,
+    };
+    Initialized: struct {
+      config: Config,
+      total_number_of_tokens: opt u64,
+      permission_to_mint: opt vec actor_id,
+    };
+    Approved: struct {
+      to: actor_id,
+      token_id: u64,
+    };
+    ApprovalRevoked: struct {
+      token_id: u64
+    };
+    Expanded: struct {
+      additional_links: vec struct { str, ImageData },
+      total_number_of_tokens: opt u64,
+    };
+    ConfigChanged: struct {
+      config: Config
+    };
+    UsersForMintAdded: struct {
+      users: vec actor_id
+    };
+    UserForMintDeleted: struct {
+      user: actor_id
+    };
+    LiftRestrictionMint;
+    AdminAdded: struct {
+      admin: actor_id
+    };
+    AdminRemoved: struct {
+      admin: actor_id
+    };
+    MetadataAdded: struct {
+      nft_id: u64,
+      metadata: str,
+    };
+    ImageLinkChanged: struct {
+      nft_id: u64,
+      img_link: str,
+    };
+    MetadataChanged: struct {
+      nft_id: u64,
+      metadata: vec str,
+    };
+    MetadataDeleted: struct {
+      nft_id: u64
+    };
+  }
+};
+

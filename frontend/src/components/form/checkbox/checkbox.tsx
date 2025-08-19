@@ -1,12 +1,26 @@
 import { Checkbox as VaraCheckbox, CheckboxProps } from '@gear-js/vara-ui';
-import { useFormContext } from 'react-hook-form';
+import * as React from 'react';
+import { useFormContext, Controller } from 'react-hook-form';
 
 import { Props } from '../types';
 
-function Checkbox({ name, ...props }: Props<CheckboxProps>) {
-  const { register } = useFormContext();
+const Checkbox = React.forwardRef<HTMLInputElement, Props<CheckboxProps>>(({ name, ...props }, ref) => {
+  const { control } = useFormContext();
 
-  return <VaraCheckbox {...props} {...register(name)} />;
-}
+  return (
+    <Controller
+      name={name}
+      control={control}
+      render={({ field }) => (
+        <VaraCheckbox
+          {...props}
+          {...field}
+          ref={ref}
+        />
+      )}
+    />
+  );
+});
+Checkbox.displayName = 'Checkbox';
 
 export { Checkbox };

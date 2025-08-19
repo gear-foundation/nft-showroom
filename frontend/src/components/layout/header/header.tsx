@@ -1,14 +1,14 @@
 import { useAccount, useDeriveBalancesAll } from '@gear-js/react-hooks';
 import { Wallet } from '@gear-js/wallet-connect';
 
+import { LinkButton } from '@/components';
 import { ROUTE } from '@/consts';
 import { NFTSearch } from '@/features/nft-search';
 
-import { LinkButton } from '../../buttons';
+import { Balance } from '../balance';
 import { Container } from '../container';
 import { Logo } from '../logo';
 
-import { Balance } from '../balance';
 import styles from './header.module.scss';
 
 function Header() {
@@ -24,12 +24,12 @@ function Header() {
         </div>
 
         <div className={styles.wallet}>
-          {balance && <Balance value={balance.transferable || balance.availableBalance} />}
+          {balance && <Balance value={(balance.transferable || balance.availableBalance)?.toBigInt()} />}
 
           <div className={styles.buttons}>
-            {account && <LinkButton to={ROUTE.CREATE_COLLECTION} text="Create" />}
+            {account && <LinkButton to={ROUTE.CREATE_COLLECTION} text="Create" className={styles.button} />}
 
-            <Wallet displayBalance={false} />
+            <Wallet displayBalance={false} accountButtonClassName={styles.button} />
           </div>
         </div>
       </Container>

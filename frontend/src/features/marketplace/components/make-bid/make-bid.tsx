@@ -4,7 +4,8 @@ import { z } from 'zod';
 
 import { NFTActionFormModal, PriceInput, withAccount, withApi, withMarketplaceConfig } from '@/components';
 import { Auction, Collection, Nft } from '@/graphql/graphql';
-import { useIsOwner, useLoading, useMarketplaceMessage, useModal } from '@/hooks';
+import { useIsOwner, useModal } from '@/hooks';
+import { useSendAddBidTransaction } from '@/hooks/sails/showroom/api.ts';
 
 import { usePriceSchema } from '../../hooks';
 
@@ -20,42 +21,39 @@ const defaultValues = {
 
 function Component({ collection, auction, ...nft }: Props) {
   const [isOpen, open, close] = useModal();
-  const sendMessage = useMarketplaceMessage();
+  const { sendTransactionAsync, isPending } = useSendAddBidTransaction();
   const isOwner = useIsOwner(nft.owner);
   const alert = useAlert();
-  const [isLoading, enableLoading, disableLoading] = useLoading();
 
   const { getPriceSchema } = usePriceSchema();
   const schema = z.object({ value: getPriceSchema(auction.lastPrice || auction.minPrice, Boolean(auction.lastPrice)) });
 
-  const onSubmit = ({ value }: typeof defaultValues) => {
-    enableLoading();
+  const onSubmit = async ({ value }: typeof defaultValues) => {
+    try {
+      const tokenId = nft.idInCollection;
+      const collectionAddress = collection.id as `0x${string}`;
 
-    const tokenId = nft.idInCollection;
-    const collectionAddress = collection.id;
+      // console.log('calculated make-bid fee value: ', value, BigInt(value));
 
-    const payload = { AddBid: { tokenId, collectionAddress } };
-
-    const onSuccess = () => {
+      await sendTransactionAsync({ args: [collectionAddress, tokenId], value: BigInt(value) });
       alert.success('Bid made');
       close();
-    };
-
-    const onFinally = disableLoading;
-
-    sendMessage({ payload, value, onSuccess, onFinally });
+    } catch (e) {
+      console.log(e);
+      alert.error(e instanceof Error ? e.message : typeof e === 'string' ? e : 'Error while making bid');
+    }
   };
 
-  const modalProps = { heading: 'Make bid', close };
-  const formProps = { defaultValues, schema, isLoading, onSubmit };
+  const modalProps = { heading: 'Place a bid', close };
+  const formProps = { defaultValues, schema, isLoading: isPending, onSubmit };
 
   return !isOwner ? (
     <>
-      <Button text="Make bid" size="small" onClick={open} />
+      <Button text="Place a bid" size="small" onClick={open} />
 
       {isOpen && (
         <NFTActionFormModal modal={modalProps} form={formProps} nft={nft} collection={collection} auction={auction}>
-          <PriceInput label="Value" name="value" />
+          <PriceInput label="Value" name="value" placeholder={`${formProps.defaultValues.value || 0}`} />
         </NFTActionFormModal>
       )}
     </>

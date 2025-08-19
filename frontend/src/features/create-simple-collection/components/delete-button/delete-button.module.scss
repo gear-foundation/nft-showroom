@@ -1,9 +1,13 @@
 .button {
-  width: 36px;
-  height: 36px;
+  padding: 9px;
 
+  color: white;
   background-color: #130c1a26;
-
   border-radius: 50%;
-  backdrop-filter: blur(5px);
+  backdrop-filter: blur(10px);
+
+  svg {
+    width: 18px;
+    height: 18px;
+  }
 }
