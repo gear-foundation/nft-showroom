@@ -26,6 +26,7 @@ pub struct NftData {
 #[scale_info(crate = sails_rs::scale_info)]
 pub struct ImageData {
     pub limit_copies: Option<u32>,
+    pub name: Option<String>,
 }
 
 #[derive(Debug, Clone, Encode, Decode, TypeInfo)]

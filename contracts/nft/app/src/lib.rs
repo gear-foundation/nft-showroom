@@ -96,6 +96,7 @@ impl NftService {
         mut permission_to_mint: Option<Vec<ActorId>>,
     ) -> Self {
         let msg_value = msg::value();
+        let msg_source = msg::source();
         let picture_fee = FEE_PER_UPLOADED_FILE * img_links_and_data.len() as u128;
 
         let existential_deposit = exec::env_vars().existential_deposit;
@@ -166,26 +167,18 @@ impl NftService {
                 admins,
             })
         };
-        msg::send(
-            collection_owner,
-            Event::Initialized {
-                config: config.clone(),
-                total_number_of_tokens,
-                permission_to_mint: permission_to_mint.clone(),
-            },
-            0,
-        )
-        .expect("Error during send to owner `Event::Initialized`");
 
-        msg::send_with_gas(
+        msg::send_with_gas(msg_source, (), 0, msg_value).expect("Error during send value");
+
+        msg::send_bytes(
             0.into(),
-            Event::Initialized {
-                config,
-                total_number_of_tokens,
-                permission_to_mint,
-            },
+            (
+                "Nft",
+                "Initialized",
+                (config, total_number_of_tokens, permission_to_mint),
+            )
+                .encode(),
             0,
-            msg_value,
         )
         .expect("Error during send reply `Event::Initialized`");
 
@@ -221,7 +214,7 @@ impl NftService {
         check_mint(&msg_source, &minter, storage);
         // value check on mint
         payment_for_mint(msg_value, storage);
-        
+
         let Some(next_nft_nonce) = storage.nonce.checked_add(1) else {
             panic("Math overflow");
         };
@@ -244,6 +237,12 @@ impl NftService {
 
         let img_link = link.clone();
 
+        let name = if let Some(name) = &img_info.name {
+            format!("{} - {}", name, token_id)
+        } else {
+            format!("{} - {}", storage.config.name, token_id)
+        };
+
         // if there are 0 copies of this token left, then delete this token
         if let Some(0) = img_info.limit_copies {
             storage.img_links_and_data.remove(image_id as usize);
@@ -257,7 +256,6 @@ impl NftService {
             })
             .or_insert_with(|| HashSet::from([token_id]));
 
-        let name = format!("{} - {}", storage.config.name, token_id);
         let nft_data = NftData {
             owner: minter,
             name,
@@ -610,14 +608,16 @@ impl NftService {
             .iter()
             .cloned()
             .collect();
-        
+
         tokens.sort();
         tokens
     }
 
     pub fn get_tokens_info_by_owner(&self, owner_id: ActorId) -> Vec<NftData> {
         let s = self.get();
-        let mut pairs: Vec<(NftId, NftData)> = s.owners.get(&owner_id)
+        let mut pairs: Vec<(NftId, NftData)> = s
+            .owners
+            .get(&owner_id)
             .into_iter()
             .flat_map(|ids| ids.iter())
             .filter_map(|id| s.tokens.get(id).cloned().map(|d| (*id, d)))

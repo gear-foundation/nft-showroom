@@ -127,6 +127,14 @@ pub enum Event {
     },
 }
 
+#[derive(Encode, Decode, Debug, TypeInfo)]
+#[codec(crate = sails_rs::scale_codec)]
+#[scale_info(crate = sails_rs::scale_info)]
+struct CreateCollectionReply {
+    type_name: String,
+    collection_address: ActorId,
+}
+
 #[allow(static_mut_refs)]
 impl NftShowroomService {
     pub fn init(config: Config) -> Self {
@@ -246,7 +254,11 @@ impl NftShowroomService {
             .expect("Event Invocation Error");
     }
 
-    pub async fn create_collection(&mut self, type_name: String, payload: Vec<u8>) {
+    pub async fn create_collection(
+        &mut self,
+        type_name: String,
+        payload: Vec<u8>,
+    ) -> CreateCollectionReply {
         let storage = self.get_mut();
         let msg_src = msg::source();
         let msg_value = msg::value();
@@ -284,10 +296,15 @@ impl NftShowroomService {
             .insert(exec::block_timestamp());
 
         self.emit_event(Event::CollectionCreated {
-            type_name,
+            type_name: type_name.clone(),
             collection_address: address,
         })
         .expect("Event Invocation Error");
+
+        CreateCollectionReply {
+            type_name,
+            collection_address: address,
+        }
     }
 
     pub async fn mint(&mut self, collection_address: ActorId, img_link_id: Option<u64>) {
