@@ -28,7 +28,7 @@ function Component({ collection, owner, approvedAccount, ...nft }: Props) {
 
   const { defaultValues, defaultOptions } = useDefaultValues();
   const { getPriceSchema } = usePriceSchema();
-  const schema = z.object({ minPrice: getPriceSchema(), duration: z.string() });
+  const schema = z.object({ minPrice: getPriceSchema(), duration: z.number() });
 
   const { sendTransactionAsync: sendCreateAuctionTransaction, isPending } = useSendCreateAuctionTransaction();
   const { startApproveTransaction, isPendingApprove } = useStartApproveTransaction(collection.id as `0x${string}`);

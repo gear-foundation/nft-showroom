@@ -1,9 +1,10 @@
 .button {
   &:not(.active) {
-    background-color: transparent;
+    --background-color: transparent !important;
+    --color: #93989a;
 
     &:hover {
-      opacity: 0.75;
+      --color: rgba(0, 0, 0, 0.75);
     }
   }
 

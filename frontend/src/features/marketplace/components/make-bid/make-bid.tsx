@@ -33,7 +33,7 @@ function Component({ collection, auction, ...nft }: Props) {
       const tokenId = nft.idInCollection;
       const collectionAddress = collection.id as `0x${string}`;
 
-      console.log('calculated make-bid fee value: ', value, BigInt(value));
+      // console.log('calculated make-bid fee value: ', value, BigInt(value));
 
       await sendTransactionAsync({ args: [collectionAddress, tokenId], value: BigInt(value) });
       alert.success('Bid made');
@@ -44,16 +44,16 @@ function Component({ collection, auction, ...nft }: Props) {
     }
   };
 
-  const modalProps = { heading: 'Make bid', close };
+  const modalProps = { heading: 'Place a bid', close };
   const formProps = { defaultValues, schema, isLoading: isPending, onSubmit };
 
   return !isOwner ? (
     <>
-      <Button text="Make bid" size="small" onClick={open} />
+      <Button text="Place a bid" size="small" onClick={open} />
 
       {isOpen && (
         <NFTActionFormModal modal={modalProps} form={formProps} nft={nft} collection={collection} auction={auction}>
-          <PriceInput label="Value" name="value" />
+          <PriceInput label="Value" name="value" placeholder={`${formProps.defaultValues.value || 0}`} />
         </NFTActionFormModal>
       )}
     </>

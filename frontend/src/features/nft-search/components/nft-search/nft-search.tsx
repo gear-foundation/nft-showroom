@@ -29,8 +29,9 @@ function NFTSearch() {
         <Input
           name={FIELD_NAME.QUERY}
           icon={SearchSVG}
-          label="NFT name/Account address"
-          size="small"
+          // label="NFT name/Account address"
+          // size="small"
+          placeholder="NFT name/Account address"
           className={styles.input}
         />
       </form>
