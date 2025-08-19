@@ -53,7 +53,8 @@ function SummaryForm({ defaultValues, onSubmit, onBack }: Props) {
 
         onSubmit({ ...data, cover: cover.value, logo: logo.value });
       }}
-      className={styles.form}>
+      className={styles.form}
+    >
       <Container>
         <header className={styles.header}>
           <div className={styles.cover} style={coverStyle}>
@@ -92,19 +93,24 @@ function SummaryForm({ defaultValues, onSubmit, onBack }: Props) {
 
       <Container maxWidth="sm">
         <div className={styles.inputs}>
-          <Input name="name" label="Name" />
+          <Input name="name" label="Name" placeholder="Short collection name" />
 
-          <Textarea name="description" label="Description" rows={2} />
+          <Textarea
+            name="description"
+            label="Description"
+            placeholder="Tell the world the story of your collection"
+            rows={2}
+          />
         </div>
 
         <div className={styles.inputs}>
           <h4 className={styles.heading}>Links (optional):</h4>
 
-          <Input name="url" icon={WebSVG} label="URL" />
-          <Input name="telegram" icon={TelegramSVG} label="Telegram" />
-          <Input name="x" icon={TwitterSVG} label="X.com" />
-          <Input name="medium" icon={MediumSVG} label="Medium" />
-          <Input name="discord" icon={DiscordSVG} label="Discord" />
+          <Input name="url" placeholder="https://example.com" icon={WebSVG} label="External URL" />
+          <Input name="telegram" placeholder="@username" icon={TelegramSVG} label="Telegram" />
+          <Input name="x" placeholder="@username" icon={TwitterSVG} label="X.com" />
+          <Input name="medium" placeholder="@username" icon={MediumSVG} label="Medium" />
+          <Input name="discord" placeholder="@username" icon={DiscordSVG} label="Discord" />
 
           <div className={styles.buttons}>
             <Button text="Cancel" color="grey" onClick={onBack} />
