@@ -291,33 +291,37 @@ export class NftParser {
             collectionTags: event.config.collection_tags,
             collectionBanner: event.config.collection_banner,
             collectionLogo: event.config.collection_logo,
-            userMintLimit: event.config.user_mint_limit
-              ? BigInt(event.config.user_mint_limit)
-              : null,
+            userMintLimit:
+              event.config.user_mint_limit == null
+                ? null
+                : BigInt(event.config.user_mint_limit),
             additionalLinks: event.config.additional_links,
             royalty: event.config.royalty,
             paymentForMint:
               typeof event.config.payment_for_mint === 'bigint'
                 ? event.config.payment_for_mint
                 : BigInt(event.config.payment_for_mint),
-            transferable: event.config.transferable
-              ? typeof event.config.transferable === 'bigint'
+            transferable:
+              event.config.transferable == null
+                ? null
+                : typeof event.config.transferable === 'bigint'
                 ? event.config.transferable
-                : BigInt(event.config.transferable)
-              : null,
+                : BigInt(event.config.transferable),
             approvable: true,
             burnable: true,
-            sellable: event.config.sellable
-              ? typeof event.config.sellable === 'bigint'
+            sellable:
+              event.config.sellable == null
+                ? null
+                : typeof event.config.sellable === 'bigint'
                 ? event.config.sellable
-                : BigInt(event.config.sellable)
-              : null,
+                : BigInt(event.config.sellable),
             attendable: true,
-            totalNumberOfTokens: event.total_number_of_tokens
-              ? typeof event.total_number_of_tokens === 'bigint'
+            totalNumberOfTokens:
+              event.total_number_of_tokens == null
+                ? null
+                : typeof event.total_number_of_tokens === 'bigint'
                 ? event.total_number_of_tokens
-                : BigInt(event.total_number_of_tokens)
-              : null,
+                : BigInt(event.total_number_of_tokens),
             permissionToMint: event.permission_to_mint,
           },
         };
@@ -383,27 +387,30 @@ export class NftParser {
             collectionTags: event.config.collection_tags,
             collectionBanner: event.config.collection_banner,
             collectionLogo: event.config.collection_logo,
-            userMintLimit: event.config.user_mint_limit
-              ? BigInt(event.config.user_mint_limit)
-              : null,
+            userMintLimit:
+              event.config.user_mint_limit == null
+                ? null
+                : BigInt(event.config.user_mint_limit),
             additionalLinks: event.config.additional_links,
             royalty: event.config.royalty,
             paymentForMint:
               typeof event.config.payment_for_mint === 'bigint'
                 ? event.config.payment_for_mint
                 : BigInt(event.config.payment_for_mint),
-            transferable: event.config.transferable
-              ? typeof event.config.transferable === 'bigint'
+            transferable:
+              event.config.transferable == null
+                ? null
+                : typeof event.config.transferable === 'bigint'
                 ? event.config.transferable
-                : BigInt(event.config.transferable)
-              : null,
+                : BigInt(event.config.transferable),
             approvable: true,
             burnable: true,
-            sellable: event.config.sellable
-              ? typeof event.config.sellable === 'bigint'
+            sellable:
+              event.config.sellable == null
+                ? null
+                : typeof event.config.sellable === 'bigint'
                 ? event.config.sellable
-                : BigInt(event.config.sellable)
-              : null,
+                : BigInt(event.config.sellable),
             attendable: true,
             totalNumberOfTokens: null,
             permissionToMint: null,
