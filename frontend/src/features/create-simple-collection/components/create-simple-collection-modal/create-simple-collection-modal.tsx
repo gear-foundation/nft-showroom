@@ -152,8 +152,6 @@ function CreateSimpleCollectionModal({ close }: Pick<ModalProps, 'close'>) {
       .createType('(String, ([u8;32], Config, Vec<(String, ImageData)>, Option<Vec<[u8;32]>>))', request)
       .toU8a();
 
-    console.log('bytes: ', Array.from(encoded));
-
     return `0x${Array.from(encoded)
       .map((byte: number) => byte.toString(16).padStart(2, '0'))
       .join('')}`;
