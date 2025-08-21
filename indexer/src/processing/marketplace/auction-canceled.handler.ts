@@ -27,6 +27,7 @@ export class AuctionCanceledHandler implements INftMarketplaceEventHandler {
     }
     await storage.setAuction({
       ...auction,
+      nft,
       status: AuctionStatus.Canceled,
       updatedAt: eventInfo.timestamp,
       endTimestamp: eventInfo.timestamp,

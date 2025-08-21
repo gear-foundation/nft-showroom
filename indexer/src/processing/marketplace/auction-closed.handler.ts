@@ -29,6 +29,7 @@ export class AuctionClosedHandler implements INftMarketplaceEventHandler {
     }
     await storage.setAuction({
       ...auction,
+      nft,
       status: AuctionStatus.Closed,
       newOwner: currentOwner,
       lastPrice: price,

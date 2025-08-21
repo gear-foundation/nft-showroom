@@ -21,9 +21,9 @@ export class OfferCreatedHandler implements INftMarketplaceEventHandler {
       return;
     }
     const offer = await storage.getOffer(nft, eventInfo.destination);
-    if (offer?.status !== OfferStatus.Open) {
+    if (offer?.status === OfferStatus.Open) {
       console.warn(
-        `[OfferCreatedHandler] ${collectionAddress}-${tokenId}: offer is not found or not active`,
+        `[OfferCreatedHandler] ${collectionAddress}-${tokenId}: open offer already exists`,
       );
       return;
     }

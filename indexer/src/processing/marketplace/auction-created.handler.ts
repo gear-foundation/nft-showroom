@@ -42,7 +42,7 @@ export class AuctionCreatedHandler implements INftMarketplaceEventHandler {
         minPrice,
         durationMs,
         endTimestamp: new Date(eventInfo.timestamp.getTime() + durationMs),
-        status: SaleStatus.Open,
+        status: AuctionStatus.Open,
         blockNumber: eventInfo.blockNumber,
         timestamp: eventInfo.timestamp,
         updatedAt: eventInfo.timestamp,

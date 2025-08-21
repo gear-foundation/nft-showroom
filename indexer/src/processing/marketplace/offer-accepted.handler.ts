@@ -32,6 +32,7 @@ export class OfferAcceptedHandler implements INftMarketplaceEventHandler {
     await storage.setOffer(
       new Offer({
         ...offer,
+        nft,
         status: OfferStatus.Accepted,
         updatedAt: eventInfo.timestamp,
         blockNumber: eventInfo.blockNumber,

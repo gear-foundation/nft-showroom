@@ -27,6 +27,7 @@ export class OfferCanceledHandler implements INftMarketplaceEventHandler {
     }
     await storage.setOffer({
       ...offer,
+      nft,
       status: OfferStatus.Canceled,
       updatedAt: eventInfo.timestamp,
     });
