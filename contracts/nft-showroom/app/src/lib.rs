@@ -1048,7 +1048,7 @@ impl NftShowroomService {
 
 pub struct NftShowroomProgram(());
 
-#[sails_rs::program]
+#[sails_rs::program(payable)]
 impl NftShowroomProgram {
     // Program's constructor
     pub fn new(config: Config) -> Self {

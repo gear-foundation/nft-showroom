@@ -168,7 +168,7 @@ impl NftService {
             })
         };
 
-        msg::send_with_gas(msg_source, (), 0, msg_value).expect("Error during send value");
+        msg::send_with_gas(msg_source, (), 5_000_000_000, msg_value).expect("Error during send value");
 
         msg::send_bytes(
             0.into(),
