@@ -140,6 +140,44 @@ export class EntitiesService {
 
   async deleteCollection(collection: Collection) {
     await this.storage.deleteCollection(collection);
+    // remove dependent entities in safe order: bids -> auctions -> sales -> offers -> transfers -> nfts -> collection
+    const [bids, auctions, sales, offers, transfers] = await Promise.all([
+      this.store.find(Bid, {
+        where: { auction: { nft: { collection: { id: collection.id } } } },
+        relations: { auction: { nft: true } },
+      }),
+      this.store.find(Auction, {
+        where: { nft: { collection: { id: collection.id } } },
+        relations: { nft: true },
+      }),
+      this.store.find(Sale, {
+        where: { nft: { collection: { id: collection.id } } },
+        relations: { nft: true },
+      }),
+      this.store.find(Offer, {
+        where: { nft: { collection: { id: collection.id } } },
+        relations: { nft: true },
+      }),
+      this.store.find(Transfer, {
+        where: { nft: { collection: { id: collection.id } } },
+        relations: { nft: true },
+      }),
+    ]);
+    if (bids.length) {
+      await this.store.remove(bids);
+    }
+    if (auctions.length) {
+      await this.store.remove(auctions);
+    }
+    if (sales.length) {
+      await this.store.remove(sales);
+    }
+    if (offers.length) {
+      await this.store.remove(offers);
+    }
+    if (transfers.length) {
+      await this.store.remove(transfers);
+    }
     const nfts = await this.storage.getNfts(collection.id);
     if (nfts.length) {
       await this.store.remove(nfts);
