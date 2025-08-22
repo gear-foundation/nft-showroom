@@ -8,13 +8,11 @@ function useNFTSearchParam() {
 
   const set = (query: string) => {
     params.set(FIELD_NAME.QUERY, query);
-
     return params.toString();
   };
 
   const reset = () => {
     params.delete(FIELD_NAME.QUERY);
-
     return '';
   };
 

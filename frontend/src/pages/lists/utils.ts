@@ -17,14 +17,20 @@ const getNftFilters = (owner: string | null, collectionId: string | undefined, q
 
   if (query) {
     try {
-      const accountAddress = decodeAddress(query);
+      const address = decodeAddress(query);
 
       if (owner) {
-        where.AND = [{ owner_eq: accountAddress } as NftWhereInput];
+        // If there's an owner filter (My), search only by collection
+        where.collection = { id_eq: address } as CollectionWhereInput;
       } else {
-        where.owner_eq = accountAddress;
+        // If there's no owner filter (All), search by collection AND by owner
+        where.OR = [
+          { collection: { id_eq: address } as CollectionWhereInput } as NftWhereInput,
+          { owner_eq: address } as NftWhereInput,
+        ];
       }
     } catch {
+      // If query is not a valid address, search by NFT name
       where.name_containsInsensitive = query;
     }
   }
