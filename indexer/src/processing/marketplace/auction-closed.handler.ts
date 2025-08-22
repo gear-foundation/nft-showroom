@@ -5,6 +5,7 @@ import { AuctionStatus } from '../../model/types';
 import { EventInfo } from '../event-info.type';
 import { Nft, Transfer } from '../../model';
 import { v4 as uuidv4 } from 'uuid';
+import { Auction } from '../../model';
 
 export class AuctionClosedHandler implements INftMarketplaceEventHandler {
   async handle(
@@ -36,6 +37,18 @@ export class AuctionClosedHandler implements INftMarketplaceEventHandler {
       updatedAt: eventInfo.timestamp,
       endTimestamp: eventInfo.timestamp,
     });
+    await storage.setAuction(
+      new Auction({
+        ...auction,
+        nft,
+        status: AuctionStatus.Closed,
+        newOwner: currentOwner,
+        lastPrice: price,
+        updatedAt: eventInfo.timestamp,
+        endTimestamp: eventInfo.timestamp,
+        }),
+      );
+
     if (currentOwner !== null && currentOwner !== auction.owner) {
       storage.addTransfer(
         new Transfer({

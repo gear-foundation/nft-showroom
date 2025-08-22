@@ -3,6 +3,7 @@ import { EntitiesService } from '../entities.service';
 import { INftMarketplaceEventHandler } from './nft-marketplace.handler';
 import { AuctionStatus } from '../../model/types';
 import { EventInfo } from '../event-info.type';
+import { Auction } from '../../model';
 
 export class AuctionCanceledHandler implements INftMarketplaceEventHandler {
   async handle(
@@ -25,12 +26,15 @@ export class AuctionCanceledHandler implements INftMarketplaceEventHandler {
       );
       return;
     }
-    await storage.setAuction({
-      ...auction,
-      nft,
-      status: AuctionStatus.Canceled,
-      updatedAt: eventInfo.timestamp,
-      endTimestamp: eventInfo.timestamp,
-    });
+    await storage.setAuction(
+      new Auction({
+        ...auction,
+        nft,
+        status: AuctionStatus.Canceled,
+        updatedAt: eventInfo.timestamp,
+        endTimestamp: eventInfo.timestamp,
+      }),
+    );
+
   }
 }
