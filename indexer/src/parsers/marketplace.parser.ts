@@ -199,18 +199,6 @@ export class MarketplaceParser {
     }
     const serviceName = getServiceNamePrefix(payload);
     const functionName = getFnNamePrefix(payload);
-
-    const svc = this.sails.services?.[serviceName];
-    const evDesc = svc?.events?.[functionName];
-    console.debug('[parseEvent] incoming', {
-      serviceName,
-      functionNameRaw: functionName,
-      hasService: !!svc,
-      knownEvents: Object.keys(svc?.events ?? {}),
-      hasEventExact: !!evDesc,
-    });
-
-
     if (!this.sails.services[serviceName].events[functionName]) {
       return undefined;
     }

@@ -11,10 +11,6 @@ export class AuctionCanceledHandler implements INftMarketplaceEventHandler {
     storage: EntitiesService,
   ): Promise<void> {
     const { collectionAddress, tokenId } = event;
-    console.debug('[AuctionCanceledHandler] start', {
-      collectionAddress, tokenId, ts: eventInfo.timestamp,
-      block: eventInfo.blockNumber, tx: eventInfo.txHash
-    });
     const nft = await storage.getNft(collectionAddress, tokenId);
     if (nft === undefined) {
       console.warn(
