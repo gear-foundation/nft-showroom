@@ -5,5 +5,3 @@ function AccountProvider({ children }: ProviderProps) {
 }
 
 export { AccountProvider };
-
-

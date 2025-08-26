@@ -10,5 +10,3 @@ function AlertProvider({ children }: ProviderProps) {
 }
 
 export { AlertProvider };
-
-

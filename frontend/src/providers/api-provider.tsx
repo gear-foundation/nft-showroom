@@ -1,4 +1,5 @@
 import { ApiProvider as GearApiProvider, ProviderProps } from '@gear-js/react-hooks';
+
 import { ADDRESS } from '@/consts';
 
 function ApiProvider({ children }: ProviderProps) {
@@ -6,5 +7,3 @@ function ApiProvider({ children }: ProviderProps) {
 }
 
 export { ApiProvider };
-
-
