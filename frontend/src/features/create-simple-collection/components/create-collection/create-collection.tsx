@@ -14,7 +14,7 @@ type Props = {
   text: string;
   SVG: SVGComponent;
   isActive: boolean;
-  modal: (props: Pick<ModalProps, 'close'>) => JSX.Element;
+  modal: (props: Pick<ModalProps, 'close'>) => React.ReactElement;
 };
 
 function CreateCollection({ heading, tag, text, SVG, isActive, modal: Modal }: Props) {

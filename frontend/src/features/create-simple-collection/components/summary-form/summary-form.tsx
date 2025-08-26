@@ -53,8 +53,7 @@ function SummaryForm({ defaultValues, onSubmit, onBack }: Props) {
 
         onSubmit({ ...data, cover: cover.value, logo: logo.value });
       }}
-      className={styles.form}
-    >
+      className={styles.form}>
       <Container>
         <header className={styles.header}>
           <div className={styles.cover} style={coverStyle}>
