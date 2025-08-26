@@ -80,8 +80,7 @@ function NFTForm({ defaultValues, isLoading, onSubmit, onBack }: Props) {
         onSubmit={handleSubmit((values) => {
           onSubmit(values, fee);
         })}
-        className={styles.form}
-      >
+        className={styles.form}>
         <Container>
           <header className={styles.header}>
             <h4 className={styles.heading}>NFTs added: {nftsCount}</h4>

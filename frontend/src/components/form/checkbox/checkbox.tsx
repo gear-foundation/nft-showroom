@@ -11,13 +11,7 @@ const Checkbox = React.forwardRef<HTMLInputElement, Props<CheckboxProps>>(({ nam
     <Controller
       name={name}
       control={control}
-      render={({ field }) => (
-        <VaraCheckbox
-          {...props}
-          {...field}
-          ref={ref}
-        />
-      )}
+      render={({ field }) => <VaraCheckbox {...props} {...field} ref={ref} />}
     />
   );
 });

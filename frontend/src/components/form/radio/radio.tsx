@@ -8,17 +8,7 @@ const Radio = React.forwardRef<HTMLInputElement, Props<RadioProps>>(({ name, ...
   const { control } = useFormContext();
 
   return (
-    <Controller
-      name={name}
-      control={control}
-      render={({ field }) => (
-        <VaraRadio
-          {...props}
-          {...field}
-          ref={ref}
-        />
-      )}
-    />
+    <Controller name={name} control={control} render={({ field }) => <VaraRadio {...props} {...field} ref={ref} />} />
   );
 });
 Radio.displayName = 'Radio';

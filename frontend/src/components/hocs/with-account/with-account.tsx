@@ -1,8 +1,8 @@
 import { useAccount } from '@gear-js/react-hooks';
-import { FunctionComponent } from 'react';
+import React, { FunctionComponent } from 'react';
 
-function withAccount<T>(Component: FunctionComponent<T>) {
-  return function WithAccount(props: T & JSX.IntrinsicAttributes) {
+function withAccount<P extends Record<string, unknown>>(Component: FunctionComponent<P>): React.FC<P> {
+  return function WithAccount(props: P) {
     const { account, isAccountReady } = useAccount();
 
     return isAccountReady && account ? <Component {...props} /> : null;

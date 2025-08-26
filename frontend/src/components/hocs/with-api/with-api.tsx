@@ -1,8 +1,8 @@
 import { useApi } from '@gear-js/react-hooks';
-import { FunctionComponent } from 'react';
+import React, { FunctionComponent } from 'react';
 
-function withApi<T>(Component: FunctionComponent<T>) {
-  return function WithApi(props: T & JSX.IntrinsicAttributes) {
+function withApi<P extends Record<string, unknown>>(Component: FunctionComponent<P>): React.FC<P> {
+  return function WithApi(props: P) {
     const { isApiReady } = useApi();
 
     return isApiReady ? <Component {...props} /> : null;

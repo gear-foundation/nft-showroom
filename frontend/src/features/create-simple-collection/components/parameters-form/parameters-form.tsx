@@ -175,8 +175,7 @@ function ParametersForm({ defaultValues, onSubmit, onBack }: Props) {
           }}
           schema={schema}
           defaultValues={defaultValues}
-          className={styles.form}
-        >
+          className={styles.form}>
           <ParametersFormContent />
 
           <div className={styles.buttons}>

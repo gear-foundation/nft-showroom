@@ -14,14 +14,7 @@ const Textarea = React.forwardRef<HTMLTextAreaElement, Props<TextareaProps>>(({ 
     <Controller
       name={name}
       control={control}
-      render={({ field }) => (
-        <VaraTextarea
-          {...props}
-          {...field}
-          error={error}
-          ref={ref}
-        />
-      )}
+      render={({ field }) => <VaraTextarea {...props} {...field} error={error} ref={ref} />}
     />
   );
 });

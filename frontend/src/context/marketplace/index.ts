@@ -1,3 +1,2 @@
-import { MarketplaceProvider, useMarketplace } from './context';
-
-export { MarketplaceProvider, useMarketplace };
+export { MarketplaceProvider, MarketplaceContext } from './context';
+export { useMarketplace } from './useMarketplace';

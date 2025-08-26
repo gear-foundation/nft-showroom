@@ -2,8 +2,6 @@ import { graphql } from '@/graphql';
 
 const DEFAULT_VALUE = {
   marketplace: undefined,
-  marketplaceMetadata: undefined,
-  collectionsMetadata: undefined,
 };
 
 const MARKETPLACE_QUERY = graphql(`
