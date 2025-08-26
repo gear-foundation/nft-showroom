@@ -1,6 +1,8 @@
-import { Checkbox, Input } from '@gear-js/vara-ui';
-import { useEffect, useState } from 'react';
-import { Controller, useFormContext } from 'react-hook-form';
+import { Checkbox as VaraCheckbox } from '@gear-js/vara-ui';
+import { useEffect } from 'react';
+import { useFormContext } from 'react-hook-form';
+
+import { Input } from '@/components';
 
 import { NFTsValues } from '../../types';
 import { getFileUrl } from '../../utils';
@@ -16,48 +18,45 @@ type Props = {
 };
 
 function NFT({ file, index, onDelete, onCheckboxChange }: Props) {
-  const { control } = useFormContext<NFTsValues>();
+  const { setValue, watch } = useFormContext<NFTsValues>();
   const inputName = `nfts.${index}.limit` as const;
-  const [isLimitChecked, setIsLimitChecked] = useState(false);
+  const limitValue = watch(inputName);
+  const isLimitChecked = Boolean(limitValue);
 
   useEffect(() => {
     if (!isLimitChecked) onCheckboxChange();
   }, [isLimitChecked, onCheckboxChange]);
 
+  const handleCheckboxChange = () => {
+    const newValue = !isLimitChecked;
+    if (!newValue) {
+      setValue(inputName, '');
+    } else {
+      setValue(inputName, '1');
+    }
+  };
+
   return (
-    <Controller
-      name={inputName}
-      control={control}
-      render={({ field }) => (
-        <li className={styles.nft}>
-          <header className={styles.imageWrapper}>
-            <img src={getFileUrl(file)} alt="" />
-          </header>
+    <li className={styles.nft}>
+      <header className={styles.imageWrapper}>
+        <img src={getFileUrl(file)} alt="" />
+      </header>
 
-          <ul className={styles.options}>
-            <li className={styles.option}>
-              <Checkbox
-                type="switch"
-                label="Limit of copies"
-                checked={isLimitChecked}
-                onChange={() => setIsLimitChecked((prevValue) => !prevValue)}
-              />
+      <ul className={styles.options}>
+        <li className={styles.option}>
+          <VaraCheckbox
+            type="switch"
+            label="Limit of copies"
+            checked={isLimitChecked}
+            onChange={handleCheckboxChange}
+          />
 
-              <Input
-                type="number"
-                className={styles.input}
-                disabled={!isLimitChecked}
-                onChange={field.onChange}
-                value={field.value}
-                name={inputName}
-              />
-            </li>
-          </ul>
-
-          <DeleteButton className={styles.deleteButton} onClick={onDelete} />
+          <Input type="number" className={styles.input} disabled={!isLimitChecked} name={inputName} />
         </li>
-      )}
-    />
+      </ul>
+
+      <DeleteButton className={styles.deleteButton} onClick={onDelete} />
+    </li>
   );
 }
 

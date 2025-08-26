@@ -1,11 +1,11 @@
 import { useApi, useBalanceFormat } from '@gear-js/react-hooks';
-import { Button, Select, Checkbox } from '@gear-js/vara-ui';
+import { Button, Select as VaraSelect } from '@gear-js/vara-ui';
 import { useCallback, ChangeEvent } from 'react';
-import { useFieldArray, Controller, useFormContext } from 'react-hook-form';
+import { useFieldArray, useFormContext } from 'react-hook-form';
 import { z } from 'zod';
 
 import VaraSVG from '@/assets/vara.svg?react';
-import { Container, Form, Input } from '@/components';
+import { Container, Form, Input, Checkbox } from '@/components';
 import { useChangeEffect } from '@/hooks';
 
 import PercentSVG from '../../assets/percent.svg?react';
@@ -57,26 +57,20 @@ function ParametersFormContent() {
 
   return (
     <>
-      <Controller
-        name="mintPermission"
-        control={control}
-        render={({ field }) => (
-          <MintPermissionForm
-            onChange={(value) => {
-              field.onChange(value);
-              clearErrors('mintPermission.value');
-            }}
-            defaultValues={field.value}
-            error={errors.mintPermission?.value?.message}
-          />
-        )}
+      <MintPermissionForm
+        onChange={(value) => {
+          setValue('mintPermission', value);
+          clearErrors('mintPermission.value');
+        }}
+        defaultValues={watch('mintPermission')}
+        error={errors.mintPermission?.value?.message}
       />
 
       <Input type="number" step="any" label="Minting limit per user" name={'mintLimit'} />
       <Input type="number" step="any" icon={VaraSVG} label={'Minting price'} name={'mintPrice'} />
 
       <div>
-        <Select
+        <VaraSelect
           label="Tags"
           options={[PLACEHOLDER_TAG, ...options]}
           disabled={!options.length}
@@ -86,33 +80,9 @@ function ParametersFormContent() {
         {Boolean(fields.length) && <ul className={styles.tags}>{renderTags()}</ul>}
       </div>
 
-      <Controller
-        name="isMetadataChangesAllowed"
-        control={control}
-        render={({ field }) => (
-          <Checkbox label="Allow metadata changes" type="switch" checked={field.value} onChange={field.onChange} />
-        )}
-      />
-      <Controller
-        name="isTransferable"
-        control={control}
-        render={({ field }) => (
-          <Checkbox
-            label="Allow transferring"
-            type="switch"
-            checked={field.value}
-            onChange={field.onChange}
-            disabled={isSellable}
-          />
-        )}
-      />
-      <Controller
-        name="isSellable"
-        control={control}
-        render={({ field }) => (
-          <Checkbox label="Allow selling" type="switch" checked={field.value} onChange={field.onChange} />
-        )}
-      />
+      <Checkbox name="isMetadataChangesAllowed" label="Allow metadata changes" type="switch" />
+      <Checkbox name="isTransferable" label="Allow transferring" type="switch" disabled={isSellable} />
+      <Checkbox name="isSellable" label="Allow selling" type="switch" />
 
       <Input
         type="number"
