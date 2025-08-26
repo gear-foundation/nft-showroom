@@ -29,11 +29,14 @@ ENV VITE_NODE_ADDRESS=${VITE_NODE_ADDRESS} \
 # Set working directory
 WORKDIR /opt
 
-# Copy all files for better compatibility with CI/CD
-COPY . .
+# Copy package files first for better caching
+COPY package.json pnpm-lock.yaml ./
 
 # Install dependencies
 RUN pnpm install --frozen-lockfile
+
+# Copy source code
+COPY . .
 
 # Build the application
 RUN pnpm build
