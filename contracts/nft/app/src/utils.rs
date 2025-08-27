@@ -150,9 +150,14 @@ pub fn check_variable_meta(storage: &Storage) {
 }
 
 pub fn check_mint(source: &ActorId, user: &ActorId, storage: &Storage) {
-    if let Some(permission_to_mint) = &storage.permission_to_mint {
-        if !permission_to_mint.contains(source) {
-            panic("Access denied");
+    if let Some(perm) = &storage.permission_to_mint {
+        let subject = if *source == storage.marketplace_address {
+            user
+        } else {
+            source
+        };
+        if !perm.contains(&subject) {
+            panic!("Access denied");
         }
     }
 

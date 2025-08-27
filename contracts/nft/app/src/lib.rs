@@ -168,7 +168,8 @@ impl NftService {
             })
         };
 
-        msg::send_with_gas(msg_source, (), 5_000_000_000, msg_value).expect("Error during send value");
+        msg::send_with_gas(msg_source, (), 5_000_000_000, msg_value)
+            .expect("Error during send value");
 
         msg::send_bytes(
             0.into(),
@@ -208,12 +209,16 @@ impl NftService {
         // check if there are tokens for mint
         check_available_amount_of_tokens(storage);
 
-        // check if a user can make a mint:
-        // - quantity limit
-        // - user-specific limit
-        check_mint(&msg_source, &minter, storage);
-        // value check on mint
-        payment_for_mint(msg_value, storage);
+        let subject = if msg_source == storage.marketplace_address {
+            &minter
+        } else {
+            &msg_source
+        };
+
+        if !storage.admins.contains(subject) {
+            check_mint(&msg_source, &minter, storage);
+            payment_for_mint(msg_value, storage);
+        }
 
         let Some(next_nft_nonce) = storage.nonce.checked_add(1) else {
             panic("Math overflow");
