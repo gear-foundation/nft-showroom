@@ -9,7 +9,7 @@ import { TransferNFT } from '@/features/collections';
 import { BuyNFT, MakeBid, StartSale, StartAuction } from '@/features/marketplace';
 import BidSVG from '@/features/marketplace/assets/bid.svg?react';
 import TagSVG from '@/features/marketplace/assets/tag.svg?react';
-import { getIpfsLink } from '@/utils';
+import { isValidAddress, getIpfsLink } from '@/utils';
 
 import { ListingCard } from './components';
 import FeaturedPlayListSVG from './featured-play-list.svg?react';
@@ -82,16 +82,23 @@ function NFT() {
 
           <div className={styles.owner}>
             {owner ? (
-              <Identicon value={owner} size={24} theme="polkadot" />
+              isValidAddress(owner) ? (
+                <Identicon value={owner} size={24} theme="polkadot" />
+              ) : (
+                <div style={{ width: 24, height: 24, borderRadius: '50%', backgroundColor: '#ccc' }} />
+              )
             ) : (
               <Skeleton borderRadius="50%">
-                <Identicon value={owner} size={24} theme="polkadot" />
+                <div style={{ width: 24, height: 24, borderRadius: '50%', backgroundColor: '#ccc' }} />
               </Skeleton>
             )}
 
             {owner ? (
               <p className={styles.ownerText}>
-                Owned by <span className={styles.ownerAddress}>{getVaraAddress(owner)}</span>
+                Owned by{' '}
+                <span className={styles.ownerAddress}>
+                  {isValidAddress(owner) ? getVaraAddress(owner) : 'Unknown Owner'}
+                </span>
               </p>
             ) : (
               <Skeleton width="100%" borderRadius="4px" />

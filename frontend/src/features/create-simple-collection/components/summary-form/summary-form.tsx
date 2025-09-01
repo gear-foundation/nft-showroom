@@ -8,6 +8,7 @@ import TelegramSVG from '@/assets/telegram.svg?react';
 import TwitterSVG from '@/assets/twitter.svg?react';
 import WebSVG from '@/assets/web.svg?react';
 import { Container, Input, Form, Textarea } from '@/components';
+import { createUrlValidator, discordRegex, mediumRegex, telegramRegex, twitterRegex, urlRegex } from '@/utils';
 
 import CameraSVG from '../../assets/camera.svg?react';
 import PlaceholderSVG from '../../assets/placeholder.svg?react';
@@ -28,11 +29,47 @@ type Props = {
 const schema = z.object({
   name: z.string().trim().min(1, 'Name is required'),
   description: z.string().trim().min(1, 'Description is required'),
-  url: z.string().trim().optional().or(z.literal('')),
-  telegram: z.string().trim().optional().or(z.literal('')),
-  x: z.string().trim().optional().or(z.literal('')),
-  medium: z.string().trim().optional().or(z.literal('')),
-  discord: z.string().trim().optional().or(z.literal('')),
+  telegram: createUrlValidator(telegramRegex, 'Invalid Telegram', {
+    normalizeInput: (value) => {
+      if (value.startsWith('@')) return `https://t.me/${value.slice(1)}`;
+      if (!value.startsWith('http')) return `https://${value}`;
+      return value;
+    },
+    requireValidUrlSyntax: false,
+  }),
+  x: createUrlValidator(twitterRegex, 'Invalid Twitter/X', {
+    normalizeInput: (value) => {
+      if (value.startsWith('@')) return `https://x.com/${value.slice(1)}`;
+      if (!value.startsWith('http')) return `https://${value.replace('twitter.com', 'x.com')}`;
+      return value.includes('twitter.com') ? value.replace('twitter.com', 'x.com') : value;
+    },
+    requireValidUrlSyntax: false,
+  }),
+  discord: createUrlValidator(discordRegex, 'Insert valid link: discord.gg/... or @username', {
+    normalizeInput: (value) => {
+      value = value.trim();
+      if (value.startsWith('@')) return `https://discord.com/${value}`;
+      if (/^discord\.gg\/[\w]+$/.test(value)) return `https://${value}`;
+      if (value.startsWith('http')) return value;
+      return `https://discord.com/${value.replace(/^\/?/, '/')}`;
+    },
+    requireValidUrlSyntax: true,
+  }),
+  medium: createUrlValidator(mediumRegex, 'Invalid Medium', {
+    normalizeInput: (value) => {
+      if (value.startsWith('@')) return `https://medium.com/${value}`;
+      if (!value.startsWith('http')) return `https://${value}`;
+      return value;
+    },
+    requireValidUrlSyntax: true,
+  }),
+  url: createUrlValidator(urlRegex, 'Invalid URL', {
+    normalizeInput: (value) => {
+      if (!value.startsWith('http')) return `https://${value}`;
+      return value;
+    },
+    requireValidUrlSyntax: true,
+  }),
 });
 
 function SummaryForm({ defaultValues, onSubmit, onBack }: Props) {

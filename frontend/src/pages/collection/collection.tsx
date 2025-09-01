@@ -7,7 +7,7 @@ import { MintLimitInfoCard, MintNFT, NFTCard, Skeleton } from '@/features/collec
 import CollectionHeaderSkeletonSVG from '@/features/collections/assets/collection-header-skeleton.svg?react';
 import NFTCardSkeletonSVG from '@/features/collections/assets/nft-card-skeleton.svg?react';
 import { AccountFilter, GRID_SIZE, GridSize, useAccountFilter, useGridSize } from '@/features/lists';
-import { getIpfsLink } from '@/utils';
+import { isValidAddress, getIpfsLink } from '@/utils';
 
 import { useNFTs } from '../lists/hooks'; // TODO: shared folder
 
@@ -60,7 +60,7 @@ function Collection() {
             <div className={styles.cards}>
               <InfoCard
                 heading="Creator"
-                text={getVaraAddress(collection.admin)}
+                text={isValidAddress(collection.admin) ? getVaraAddress(collection.admin) : 'Unknown Creator'}
                 SVG={UserSVG}
                 color="light"
                 textOverflow

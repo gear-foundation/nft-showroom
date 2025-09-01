@@ -1,7 +1,7 @@
 import { useAlert, useApi, useBalanceFormat } from '@gear-js/react-hooks';
 import { Button } from '@gear-js/vara-ui';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { ChangeEvent, useRef } from 'react';
+import { ChangeEvent, useMemo, useRef } from 'react';
 import { FormProvider, useFieldArray, useForm } from 'react-hook-form';
 import { z } from 'zod';
 
@@ -70,9 +70,11 @@ function NFTForm({ defaultValues, isLoading, onSubmit, onBack }: Props) {
   const { getChainBalanceValue } = useBalanceFormat();
   const existentialDeposit = BigInt(api?.existentialDeposit.toString() || '0');
 
-  const potentialFee = BigInt(feePerUploadedFile) * BigInt(nftsCount);
-  const oneVara = BigInt(getChainBalanceValue(1).toFixed());
-  const fee = oneVara + (potentialFee > existentialDeposit ? potentialFee : existentialDeposit);
+  const fee = useMemo(() => {
+    const potentialFee = BigInt(feePerUploadedFile) * BigInt(nftsCount);
+    const oneVara = BigInt(getChainBalanceValue(1).toFixed());
+    return oneVara + (potentialFee > existentialDeposit ? potentialFee : existentialDeposit);
+  }, [feePerUploadedFile, nftsCount, existentialDeposit, getChainBalanceValue]);
 
   return (
     <FormProvider {...methods}>

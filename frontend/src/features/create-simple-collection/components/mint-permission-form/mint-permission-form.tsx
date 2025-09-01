@@ -2,7 +2,7 @@ import { Button, Radio, Input as VaraInput } from '@gear-js/vara-ui';
 import { useCallback, useState } from 'react';
 
 import { Identicon, TruncatedText } from '@/components';
-import { cx } from '@/utils';
+import { cx, isValidAddress } from '@/utils';
 
 import { Tag } from '../tag';
 
@@ -73,7 +73,11 @@ function MintPermissionForm({ defaultValues, error, onChange }: Props) {
 
       return (
         <Tag key={value} onRemoveClick={handleRemoveClick}>
-          <Identicon value={value} size={16} />
+          {isValidAddress(value) ? (
+            <Identicon value={value} size={16} />
+          ) : (
+            <div style={{ width: 16, height: 16, borderRadius: '50%', backgroundColor: '#ccc' }} />
+          )}
           <TruncatedText value={value} />
         </Tag>
       );

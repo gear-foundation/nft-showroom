@@ -13,6 +13,15 @@ import {
   ZERO_ADDRESS,
 } from 'sails-js';
 
+import { isValidAddress } from '@/utils';
+
+const getSafeOrigin = (originAddress?: string) => {
+  if (!originAddress || !isValidAddress(originAddress)) {
+    return ZERO_ADDRESS;
+  }
+  return decodeAddress(originAddress);
+};
+
 export class SailsProgram {
   public readonly registry: TypeRegistry;
   public readonly nftShowroom: NftShowroom;
@@ -427,7 +436,7 @@ export class NftShowroom {
     const payload = this._program.registry.createType('(String, String)', ['NftShowroom', 'All']).toHex();
     const reply = await this._program.api.message.calculateReply({
       destination: this._program.programId,
-      origin: originAddress ? decodeAddress(originAddress) : ZERO_ADDRESS,
+      origin: getSafeOrigin(originAddress),
       payload,
       value: value || 0,
       gasLimit: this._program.api.blockGasLimit.toBigInt(),
@@ -446,7 +455,7 @@ export class NftShowroom {
     const payload = this._program.registry.createType('(String, String)', ['NftShowroom', 'GetAdmins']).toHex();
     const reply = await this._program.api.message.calculateReply({
       destination: this._program.programId,
-      origin: originAddress ? decodeAddress(originAddress) : ZERO_ADDRESS,
+      origin: getSafeOrigin(originAddress),
       payload,
       value: value || 0,
       gasLimit: this._program.api.blockGasLimit.toBigInt(),
@@ -465,7 +474,7 @@ export class NftShowroom {
     const payload = this._program.registry.createType('(String, String)', ['NftShowroom', 'GetAllCollections']).toHex();
     const reply = await this._program.api.message.calculateReply({
       destination: this._program.programId,
-      origin: originAddress ? decodeAddress(originAddress) : ZERO_ADDRESS,
+      origin: getSafeOrigin(originAddress),
       payload,
       value: value || 0,
       gasLimit: this._program.api.blockGasLimit.toBigInt(),
@@ -489,7 +498,7 @@ export class NftShowroom {
       .toHex();
     const reply = await this._program.api.message.calculateReply({
       destination: this._program.programId,
-      origin: originAddress ? decodeAddress(originAddress) : ZERO_ADDRESS,
+      origin: getSafeOrigin(originAddress),
       payload,
       value: value || 0,
       gasLimit: this._program.api.blockGasLimit.toBigInt(),
@@ -508,7 +517,7 @@ export class NftShowroom {
     const payload = this._program.registry.createType('(String, String)', ['NftShowroom', 'GetAllowMessage']).toHex();
     const reply = await this._program.api.message.calculateReply({
       destination: this._program.programId,
-      origin: originAddress ? decodeAddress(originAddress) : ZERO_ADDRESS,
+      origin: getSafeOrigin(originAddress),
       payload,
       value: value || 0,
       gasLimit: this._program.api.blockGasLimit.toBigInt(),
@@ -530,7 +539,7 @@ export class NftShowroom {
       .toHex();
     const reply = await this._program.api.message.calculateReply({
       destination: this._program.programId,
-      origin: originAddress ? decodeAddress(originAddress) : ZERO_ADDRESS,
+      origin: getSafeOrigin(originAddress),
       payload,
       value: value || 0,
       gasLimit: this._program.api.blockGasLimit.toBigInt(),
@@ -551,7 +560,7 @@ export class NftShowroom {
       .toHex();
     const reply = await this._program.api.message.calculateReply({
       destination: this._program.programId,
-      origin: originAddress ? decodeAddress(originAddress) : ZERO_ADDRESS,
+      origin: getSafeOrigin(originAddress),
       payload,
       value: value || 0,
       gasLimit: this._program.api.blockGasLimit.toBigInt(),
@@ -573,7 +582,7 @@ export class NftShowroom {
     const payload = this._program.registry.createType('(String, String)', ['NftShowroom', 'GetConfig']).toHex();
     const reply = await this._program.api.message.calculateReply({
       destination: this._program.programId,
-      origin: originAddress ? decodeAddress(originAddress) : ZERO_ADDRESS,
+      origin: getSafeOrigin(originAddress),
       payload,
       value: value || 0,
       gasLimit: this._program.api.blockGasLimit.toBigInt(),
@@ -594,7 +603,7 @@ export class NftShowroom {
       .toHex();
     const reply = await this._program.api.message.calculateReply({
       destination: this._program.programId,
-      origin: originAddress ? decodeAddress(originAddress) : ZERO_ADDRESS,
+      origin: getSafeOrigin(originAddress),
       payload,
       value: value || 0,
       gasLimit: this._program.api.blockGasLimit.toBigInt(),
