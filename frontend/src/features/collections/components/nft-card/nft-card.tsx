@@ -5,7 +5,7 @@ import { PriceInfoCard, InfoCard } from '@/components';
 import { ROUTE } from '@/consts';
 import { BuyNFT, MakeBid } from '@/features/marketplace';
 import { Auction, Collection, Nft, Sale } from '@/graphql/graphql';
-import { getIpfsLink } from '@/utils';
+import { getIpfsLink, isValidAddress } from '@/utils';
 
 import styles from './nft-card.module.scss';
 
@@ -35,7 +35,10 @@ function NFTCard({ sales, auctions, ...nft }: Props) {
             <h3 className={styles.name}>{name}</h3>
 
             <p className={styles.owner}>
-              Owned by <span className={styles.address}>{getVaraAddress(owner)}</span>
+              Owned by{' '}
+              <span className={styles.address}>
+                {isValidAddress(owner) ? getVaraAddress(owner) : 'Unknown Owner'}
+              </span>
             </p>
           </div>
         </Link>

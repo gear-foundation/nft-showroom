@@ -12,6 +12,15 @@ import {
   ZERO_ADDRESS,
 } from 'sails-js';
 
+import { isValidAddress } from '@/utils';
+
+const getSafeOrigin = (originAddress?: string) => {
+  if (!originAddress || !isValidAddress(originAddress)) {
+    return ZERO_ADDRESS;
+  }
+  return decodeAddress(originAddress);
+};
+
 export class SailsProgram {
   public readonly registry: TypeRegistry;
   public readonly nft: Nft;
@@ -340,7 +349,7 @@ export class Nft {
     const payload = this._program.registry.createType('(String, String)', ['Nft', 'All']).toHex();
     const reply = await this._program.api.message.calculateReply({
       destination: this._program.programId,
-      origin: originAddress ? decodeAddress(originAddress) : ZERO_ADDRESS,
+      origin: getSafeOrigin(originAddress),
       payload,
       value: value || 0,
       gasLimit: this._program.api.blockGasLimit.toBigInt(),
@@ -359,7 +368,7 @@ export class Nft {
     const payload = this._program.registry.createType('(String, String)', ['Nft', 'CanDelete']).toHex();
     const reply = await this._program.api.message.calculateReply({
       destination: this._program.programId,
-      origin: originAddress ? decodeAddress(originAddress) : ZERO_ADDRESS,
+      origin: getSafeOrigin(originAddress),
       payload,
       value: value || 0,
       gasLimit: this._program.api.blockGasLimit.toBigInt(),
@@ -378,7 +387,7 @@ export class Nft {
     const payload = this._program.registry.createType('(String, String)', ['Nft', 'CollectionOwner']).toHex();
     const reply = await this._program.api.message.calculateReply({
       destination: this._program.programId,
-      origin: originAddress ? decodeAddress(originAddress) : ZERO_ADDRESS,
+      origin: getSafeOrigin(originAddress),
       payload,
       value: value || 0,
       gasLimit: this._program.api.blockGasLimit.toBigInt(),
@@ -397,7 +406,7 @@ export class Nft {
     const payload = this._program.registry.createType('(String, String)', ['Nft', 'Config']).toHex();
     const reply = await this._program.api.message.calculateReply({
       destination: this._program.programId,
-      origin: originAddress ? decodeAddress(originAddress) : ZERO_ADDRESS,
+      origin: getSafeOrigin(originAddress),
       payload,
       value: value || 0,
       gasLimit: this._program.api.blockGasLimit.toBigInt(),
@@ -416,7 +425,7 @@ export class Nft {
     const payload = this._program.registry.createType('(String, String)', ['Nft', 'Description']).toHex();
     const reply = await this._program.api.message.calculateReply({
       destination: this._program.programId,
-      origin: originAddress ? decodeAddress(originAddress) : ZERO_ADDRESS,
+      origin: getSafeOrigin(originAddress),
       payload,
       value: value || 0,
       gasLimit: this._program.api.blockGasLimit.toBigInt(),
@@ -435,7 +444,7 @@ export class Nft {
     const payload = this._program.registry.createType('(String, String)', ['Nft', 'GetPaymentForMint']).toHex();
     const reply = await this._program.api.message.calculateReply({
       destination: this._program.programId,
-      origin: originAddress ? decodeAddress(originAddress) : ZERO_ADDRESS,
+      origin: getSafeOrigin(originAddress),
       payload,
       value: value || 0,
       gasLimit: this._program.api.blockGasLimit.toBigInt(),
@@ -457,7 +466,7 @@ export class Nft {
       .toHex();
     const reply = await this._program.api.message.calculateReply({
       destination: this._program.programId,
-      origin: originAddress ? decodeAddress(originAddress) : ZERO_ADDRESS,
+      origin: getSafeOrigin(originAddress),
       payload,
       value: value || 0,
       gasLimit: this._program.api.blockGasLimit.toBigInt(),
@@ -479,7 +488,7 @@ export class Nft {
       .toHex();
     const reply = await this._program.api.message.calculateReply({
       destination: this._program.programId,
-      origin: originAddress ? decodeAddress(originAddress) : ZERO_ADDRESS,
+      origin: getSafeOrigin(originAddress),
       payload,
       value: value || 0,
       gasLimit: this._program.api.blockGasLimit.toBigInt(),
@@ -501,7 +510,7 @@ export class Nft {
       .toHex();
     const reply = await this._program.api.message.calculateReply({
       destination: this._program.programId,
-      origin: originAddress ? decodeAddress(originAddress) : ZERO_ADDRESS,
+      origin: getSafeOrigin(originAddress),
       payload,
       value: value || 0,
       gasLimit: this._program.api.blockGasLimit.toBigInt(),
@@ -520,7 +529,7 @@ export class Nft {
     const payload = this._program.registry.createType('(String, String)', ['Nft', 'ImgLinksAndData']).toHex();
     const reply = await this._program.api.message.calculateReply({
       destination: this._program.programId,
-      origin: originAddress ? decodeAddress(originAddress) : ZERO_ADDRESS,
+      origin: getSafeOrigin(originAddress),
       payload,
       value: value || 0,
       gasLimit: this._program.api.blockGasLimit.toBigInt(),
@@ -539,7 +548,7 @@ export class Nft {
     const payload = this._program.registry.createType('(String, String)', ['Nft', 'MarketplaceAddress']).toHex();
     const reply = await this._program.api.message.calculateReply({
       destination: this._program.programId,
-      origin: originAddress ? decodeAddress(originAddress) : ZERO_ADDRESS,
+      origin: getSafeOrigin(originAddress),
       payload,
       value: value || 0,
       gasLimit: this._program.api.blockGasLimit.toBigInt(),
@@ -558,7 +567,7 @@ export class Nft {
     const payload = this._program.registry.createType('(String, String)', ['Nft', 'Name']).toHex();
     const reply = await this._program.api.message.calculateReply({
       destination: this._program.programId,
-      origin: originAddress ? decodeAddress(originAddress) : ZERO_ADDRESS,
+      origin: getSafeOrigin(originAddress),
       payload,
       value: value || 0,
       gasLimit: this._program.api.blockGasLimit.toBigInt(),
@@ -577,7 +586,7 @@ export class Nft {
     const payload = this._program.registry.createType('(String, String)', ['Nft', 'Nonce']).toHex();
     const reply = await this._program.api.message.calculateReply({
       destination: this._program.programId,
-      origin: originAddress ? decodeAddress(originAddress) : ZERO_ADDRESS,
+      origin: getSafeOrigin(originAddress),
       payload,
       value: value || 0,
       gasLimit: this._program.api.blockGasLimit.toBigInt(),
@@ -596,7 +605,7 @@ export class Nft {
     const payload = this._program.registry.createType('(String, String)', ['Nft', 'PermissionToMint']).toHex();
     const reply = await this._program.api.message.calculateReply({
       destination: this._program.programId,
-      origin: originAddress ? decodeAddress(originAddress) : ZERO_ADDRESS,
+      origin: getSafeOrigin(originAddress),
       payload,
       value: value || 0,
       gasLimit: this._program.api.blockGasLimit.toBigInt(),
@@ -615,7 +624,7 @@ export class Nft {
     const payload = this._program.registry.createType('(String, String)', ['Nft', 'TotalNumberOfTokens']).toHex();
     const reply = await this._program.api.message.calculateReply({
       destination: this._program.programId,
-      origin: originAddress ? decodeAddress(originAddress) : ZERO_ADDRESS,
+      origin: getSafeOrigin(originAddress),
       payload,
       value: value || 0,
       gasLimit: this._program.api.blockGasLimit.toBigInt(),
