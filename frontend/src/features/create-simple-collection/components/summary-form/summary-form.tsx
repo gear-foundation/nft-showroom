@@ -8,8 +8,7 @@ import TelegramSVG from '@/assets/telegram.svg?react';
 import TwitterSVG from '@/assets/twitter.svg?react';
 import WebSVG from '@/assets/web.svg?react';
 import { Container, Input, Form, Textarea } from '@/components';
-import { createUrlValidator } from '@/utils/create-url-validator.ts';
-import { discordRegex, mediumRegex, telegramRegex, twitterRegex, urlRegex } from '@/utils/regexp.ts';
+import { createUrlValidator, discordRegex, mediumRegex, telegramRegex, twitterRegex, urlRegex } from '@/utils';
 
 import CameraSVG from '../../assets/camera.svg?react';
 import PlaceholderSVG from '../../assets/placeholder.svg?react';

@@ -32,3 +32,5 @@ const isValidAddress = (address: string) => {
 };
 
 export { cx, getTypedEntries, getIpfsLink, isObject, isValidAddress };
+export { createUrlValidator } from './create-url-validator';
+export { discordRegex, mediumRegex, telegramRegex, twitterRegex, urlRegex } from './regexp.ts';
