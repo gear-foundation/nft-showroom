@@ -1,5 +1,5 @@
 import { Checkbox as VaraCheckbox } from '@gear-js/vara-ui';
-import { useEffect } from 'react';
+import { useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 
 import { Input } from '@/components';
@@ -21,16 +21,16 @@ function NFT({ file, index, onDelete, onCheckboxChange }: Props) {
   const { setValue, watch } = useFormContext<NFTsValues>();
   const inputName = `nfts.${index}.limit` as const;
   const limitValue = watch(inputName);
-  const isLimitChecked = Boolean(limitValue);
 
-  useEffect(() => {
-    if (!isLimitChecked) onCheckboxChange();
-  }, [isLimitChecked, onCheckboxChange]);
+  const [isLimitChecked, setIsLimitChecked] = useState(Boolean(limitValue));
 
   const handleCheckboxChange = () => {
     const newValue = !isLimitChecked;
+    setIsLimitChecked(newValue);
+
     if (!newValue) {
       setValue(inputName, '');
+      onCheckboxChange();
     } else {
       setValue(inputName, '1');
     }
