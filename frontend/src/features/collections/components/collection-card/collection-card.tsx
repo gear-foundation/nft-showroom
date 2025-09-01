@@ -56,9 +56,7 @@ function CollectionCard({ id, name, collectionBanner, collectionLogo, admin, tok
               ) : (
                 <div style={{ width: 14, height: 14, borderRadius: '50%', backgroundColor: '#ccc' }} />
               )}
-              <span className={styles.address}>
-                {isValidAddress(admin) ? getVaraAddress(admin) : 'Unknown Admin'}
-              </span>
+              <span className={styles.address}>{isValidAddress(admin) ? getVaraAddress(admin) : 'Unknown Admin'}</span>
             </div>
           </div>
         </div>

@@ -36,9 +36,7 @@ function NFTCard({ sales, auctions, ...nft }: Props) {
 
             <p className={styles.owner}>
               Owned by{' '}
-              <span className={styles.address}>
-                {isValidAddress(owner) ? getVaraAddress(owner) : 'Unknown Owner'}
-              </span>
+              <span className={styles.address}>{isValidAddress(owner) ? getVaraAddress(owner) : 'Unknown Owner'}</span>
             </p>
           </div>
         </Link>
