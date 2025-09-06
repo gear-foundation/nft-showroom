@@ -48,16 +48,16 @@ const schema = z.object({
   discord: createUrlValidator(discordRegex, 'Insert valid link: discord.gg/... or @username', {
     normalizeInput: (value) => {
       value = value.trim();
-      if (value.startsWith('@')) return `https://discord.com/${value}`;
+      if (value.startsWith('@')) return `https://discord.com/users/${value.slice(1)}`;
       if (/^discord\.gg\/[\w]+$/.test(value)) return `https://${value}`;
       if (value.startsWith('http')) return value;
-      return `https://discord.com/${value.replace(/^\/?/, '/')}`;
+      return `https://discord.com/users/${value.replace(/^\/?/, '')}`;
     },
     requireValidUrlSyntax: true,
   }),
   medium: createUrlValidator(mediumRegex, 'Invalid Medium', {
     normalizeInput: (value) => {
-      if (value.startsWith('@')) return `https://medium.com/${value}`;
+      if (value.startsWith('@')) return `https://medium.com/${value.slice(1)}`;
       if (!value.startsWith('http')) return `https://${value}`;
       return value;
     },
