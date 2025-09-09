@@ -42,7 +42,11 @@ function Component(props: Props) {
       if (!paymentForMint) throw new Error('paymentForMint is not found');
       if (royaltyToMarketplaceForMint === undefined) throw new Error('royaltyToMarketplaceForMint is not initialized');
 
-      await sendMint({ args: [id as `0x${string}`, null] });
+      const collectionMintFee = BigInt(paymentForMint);
+      const marketplaceRoyaltyAmount = (collectionMintFee * BigInt(royaltyToMarketplaceForMint)) / BigInt(10000);
+      const totalPayment = collectionMintFee + marketplaceRoyaltyAmount;
+
+      await sendMint({ args: [id as `0x${string}`, null], value: totalPayment });
       alert.success('NFT minted');
       refetch();
       refetchMintedNFTsCount().catch(({ message }: Error) => alert.error(message));
