@@ -53,7 +53,7 @@ const schema = z.object({
       if (value.startsWith('http')) return value;
       return `https://discord.com/users/${value.replace(/^\/?/, '')}`;
     },
-    requireValidUrlSyntax: true,
+    requireValidUrlSyntax: false,
   }),
   medium: createUrlValidator(mediumRegex, 'Invalid Medium', {
     normalizeInput: (value) => {
@@ -61,7 +61,7 @@ const schema = z.object({
       if (!value.startsWith('http')) return `https://${value}`;
       return value;
     },
-    requireValidUrlSyntax: true,
+    requireValidUrlSyntax: false,
   }),
   url: createUrlValidator(urlRegex, 'Invalid URL', {
     normalizeInput: (value) => {
