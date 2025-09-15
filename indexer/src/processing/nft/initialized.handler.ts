@@ -58,6 +58,7 @@ export class NftInitializedHandler implements INftEventHandler {
         userMintLimit: userMintLimit,
         permissionToMint,
         createdAt: timestamp,
+        
       }),
     );
   }
