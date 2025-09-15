@@ -36,8 +36,7 @@ function Component(props: Props) {
   const { marketplace } = useMarketplace();
   const { royaltyToMarketplaceForMint } = marketplace?.config || {};
 
-  const handleClick = async (e: React.MouseEvent<HTMLButtonElement>) => {
-    e.preventDefault();
+  const handleClick = async () => {
     try {
       if (!paymentForMint) throw new Error('paymentForMint is not found');
       if (royaltyToMarketplaceForMint === undefined) throw new Error('royaltyToMarketplaceForMint is not initialized');
