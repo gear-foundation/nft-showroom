@@ -40,11 +40,7 @@ function CreateSimpleCollectionModal({ close }: Pick<ModalProps, 'close'>) {
   const { sendTransactionAsync: sendCreateCollection } = useSendCreateCollectionTransaction();
   const [isLoading, enableLoading, disableLoading] = useLoading();
 
-  // Get the code_id for Simple NFT Collection from marketplace
-  // const simpleCollectionType = marketplace?.collectionTypes?.find((type) => type.type === COLLECTION_TYPE_NAME.SIMPLE);
-  // For now, we'll use a placeholder. In real implementation, you'd get the actual code_id from marketplace
-  const nftCodeId = '0x00';
-  const { data: nftProgram } = useNFTProgram(nftCodeId as HexString);
+  const { data: nftProgram } = useNFTProgram();
 
   const nextStep = () => setStepIndex((prevIndex) => prevIndex + 1);
   const prevStep = () => setStepIndex((prevIndex) => prevIndex - 1);

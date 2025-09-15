@@ -4,7 +4,7 @@ import { useAlert, useProgram, useSendProgramTransaction } from '@gear-js/react-
 import { useMarketplace } from '@/context';
 import { SailsProgram } from '@/hooks/sails/nft';
 
-export function useProgramInstance(programId: HexString | undefined) {
+export function useProgramInstance(programId: HexString | undefined = undefined) {
   return useProgram({
     library: SailsProgram,
     id: programId,
