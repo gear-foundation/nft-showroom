@@ -1,13 +1,13 @@
+import { HexString } from '@gear-js/api';
 import { useAccount, useAlert } from '@gear-js/react-hooks';
 import { Button } from '@gear-js/vara-ui';
 
 import { withAccount, withApi } from '@/components';
 import { useMarketplace } from '@/context';
+import { useMintedNFTsCount } from '@/features/collections/hooks.ts';
 import { Collection } from '@/graphql/graphql';
 import { useIsOwner } from '@/hooks';
 import { useSendMintTransaction } from '@/hooks/sails/showroom/api.ts';
-
-import { useMintedNFTsCount } from '../../hooks';
 
 type Props = Pick<
   Collection,
@@ -46,7 +46,7 @@ function Component(props: Props) {
       const marketplaceRoyaltyAmount = (collectionMintFee * BigInt(royaltyToMarketplaceForMint)) / BigInt(10000);
       const totalPayment = collectionMintFee + marketplaceRoyaltyAmount;
 
-      await sendMint({ args: [id as `0x${string}`, null], value: totalPayment });
+      await sendMint({ args: [id as HexString, null], value: totalPayment });
       alert.success('NFT minted');
       refetch();
       refetchMintedNFTsCount().catch(({ message }: Error) => alert.error(message));

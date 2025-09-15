@@ -1,16 +1,17 @@
+import { HexString } from '@gear-js/api';
 import { useAlert, useProgram, useSendProgramTransaction } from '@gear-js/react-hooks';
 
 import { useMarketplace } from '@/context';
 import { SailsProgram } from '@/hooks/sails/nft';
 
-export function useProgramInstance(programId?: `0x${string}`) {
+export function useProgramInstance(programId?: HexString) {
   return useProgram({
     library: SailsProgram,
     id: programId,
   });
 }
 
-export function useSendApproveTransaction(programId: `0x${string}`) {
+export function useSendApproveTransaction(programId: HexString) {
   const { data: program } = useProgramInstance(programId);
   return useSendProgramTransaction({
     program,
@@ -19,7 +20,7 @@ export function useSendApproveTransaction(programId: `0x${string}`) {
   });
 }
 
-export function useSendTransferTransaction(programId: `0x${string}`) {
+export function useSendTransferTransaction(programId: HexString) {
   const { data: program } = useProgramInstance(programId);
   return useSendProgramTransaction({
     program,
@@ -28,10 +29,10 @@ export function useSendTransferTransaction(programId: `0x${string}`) {
   });
 }
 
-export function useStartApproveTransaction(programId: `0x${string}`) {
+export function useStartApproveTransaction(programId: HexString) {
   const { marketplace } = useMarketplace();
   const alert = useAlert();
-  const marketplaceAddress = marketplace?.address as `0x${string}` | undefined;
+  const marketplaceAddress = marketplace?.address as HexString | undefined;
 
   const { sendTransactionAsync: sendApproveTransaction, isPending: isPendingApprove } =
     useSendApproveTransaction(programId);
