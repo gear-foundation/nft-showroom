@@ -1,4 +1,4 @@
-import { SaleNft } from '../../types/marketplace.events';
+import { SaleNft } from '../../parsers/marketplace.parser';
 import { EntitiesService } from '../entities.service';
 import { INftMarketplaceEventHandler } from './nft-marketplace.handler';
 import { Nft, Sale } from '../../model';

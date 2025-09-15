@@ -1,4 +1,4 @@
-import { BidAdded } from '../../types/marketplace.events';
+import { BidAdded } from '../../parsers/marketplace.parser';
 import { EntitiesService } from '../entities.service';
 import { INftMarketplaceEventHandler } from './nft-marketplace.handler';
 import { Auction, Bid } from '../../model';

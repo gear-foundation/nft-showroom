@@ -1,4 +1,4 @@
-import { NftMarketplaceEvent } from '../../types/marketplace.events';
+import { NftMarketplaceEvent } from '../../parsers/marketplace.parser';
 import { EntitiesService } from '../entities.service';
 import { EventInfo } from '../event-info.type';
 

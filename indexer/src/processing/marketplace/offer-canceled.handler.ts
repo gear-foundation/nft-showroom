@@ -1,8 +1,9 @@
-import { OfferCanceled } from '../../types/marketplace.events';
+import { OfferCanceled } from '../../parsers/marketplace.parser';
 import { EntitiesService } from '../entities.service';
 import { INftMarketplaceEventHandler } from './nft-marketplace.handler';
 import { OfferStatus } from '../../model/types';
 import { EventInfo } from '../event-info.type';
+import { Offer } from '../../model';
 
 export class OfferCanceledHandler implements INftMarketplaceEventHandler {
   async handle(
@@ -25,10 +26,14 @@ export class OfferCanceledHandler implements INftMarketplaceEventHandler {
       );
       return;
     }
-    await storage.setOffer({
-      ...offer,
-      status: OfferStatus.Canceled,
-      updatedAt: eventInfo.timestamp,
-    });
+
+    await storage.setOffer(
+      new Offer({
+        ...offer,
+        nft,
+        status: OfferStatus.Canceled,
+        updatedAt: eventInfo.timestamp,
+      }),
+    );
   }
 }

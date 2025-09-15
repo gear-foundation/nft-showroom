@@ -1,4 +1,4 @@
-import { AdminDeleted } from '../../types/marketplace.events';
+import { AdminDeleted } from '../../parsers/marketplace.parser';
 import { EntitiesService } from '../entities.service';
 import { INftMarketplaceEventHandler } from './nft-marketplace.handler';
 import { Marketplace } from '../../model';

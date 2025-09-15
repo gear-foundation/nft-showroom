@@ -1,0 +1,90 @@
+{
+  "All": {
+    "tokens": [
+      [
+        "0",
+        {
+          "owner": "0xa0aa733bc0e618fa8bc9cbb80f37edf80e4f8e4f03d6a1227261263fc015d863",
+          "name": "Gear Meme Collection - 0",
+          "description": "NFTs for Meme contest winners",
+          "metadata": [],
+          "mediaUrl": "ipfs://QmQVTe4GDTqg4Gmycx6SsZcXDgkpQN1CNp4djWaYRpFPf8",
+          "mintTime": "1,711,533,027,000"
+        }
+      ],
+      [
+        "2",
+        {
+          "owner": "0x38e38ec3aa8922e8fdebfbae4174dc11e19766a525b7a3cf4d7ede3c3b485a02",
+          "name": "Gear Meme Collection - 2",
+          "description": "NFTs for Meme contest winners",
+          "metadata": [],
+          "mediaUrl": "ipfs://QmTUAF5ETT4gdaWzFXjCxNcWHjo88YsMDahd3YUxH6mEdE",
+          "mintTime": "1,711,533,042,000"
+        }
+      ],
+      [
+        "1",
+        {
+          "owner": "0x843a98e92fe295f9dc1d444c49cb6b7797fe390d659429eff29b4c41204df010",
+          "name": "Gear Meme Collection - 1",
+          "description": "NFTs for Meme contest winners",
+          "metadata": [],
+          "mediaUrl": "ipfs://QmbXujdtAxTWRi76HWLhcrHiPGyHvaXVKKBuf67huumPrA",
+          "mintTime": "1,711,533,033,001"
+        }
+      ]
+    ],
+    "owners": [
+      [
+        "0xa0aa733bc0e618fa8bc9cbb80f37edf80e4f8e4f03d6a1227261263fc015d863",
+        [
+          "0"
+        ]
+      ],
+      [
+        "0x843a98e92fe295f9dc1d444c49cb6b7797fe390d659429eff29b4c41204df010",
+        [
+          "1"
+        ]
+      ],
+      [
+        "0x38e38ec3aa8922e8fdebfbae4174dc11e19766a525b7a3cf4d7ede3c3b485a02",
+        [
+          "2"
+        ]
+      ]
+    ],
+    "tokenApprovals": [],
+    "config": {
+      "name": "Gear Meme Collection",
+      "description": "NFTs for Meme contest winners",
+      "collectionTags": [],
+      "collectionBanner": "ipfs://QmSZgKSeBieTzhdZuCkizT2P2LJJYkqaD3qqMDQSorJyhm",
+      "collectionLogo": "ipfs://QmRtnbtLiyXEXGov6W89wwZtK8yhSXR4ULKD2RFLAcGkDA",
+      "userMintLimit": null,
+      "additionalLinks": {
+        "externalUrl": "",
+        "telegram": "",
+        "xcom": "",
+        "medium": "",
+        "discord": ""
+      },
+      "royalty": "0",
+      "paymentForMint": "0",
+      "transferable": "0",
+      "sellable": null
+    },
+    "nonce": "3",
+    "imgLinksAndData": [],
+    "collectionOwner": "0x46517ac536e39f93184971036283dead3c4a1bd7602490d5e6acf3946db31606",
+    "totalNumberOfTokens": "3",
+    "permissionToMint": [
+      "0x46517ac536e39f93184971036283dead3c4a1bd7602490d5e6acf3946db31606"
+    ],
+    "marketplaceAddress": "0xa81328dbfc2cfa9a9a88cf7b2216ae0a3a964f7974a236a52d10153e698cf5c2",
+    "admins": [
+      "0x46517ac536e39f93184971036283dead3c4a1bd7602490d5e6acf3946db31606"
+    ]
+  }
+}

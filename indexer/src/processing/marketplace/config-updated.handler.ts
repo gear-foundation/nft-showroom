@@ -1,4 +1,4 @@
-import { ConfigUpdated } from '../../types/marketplace.events';
+import { ConfigUpdated } from '../../parsers/marketplace.parser';
 import { EntitiesService } from '../entities.service';
 import { INftMarketplaceEventHandler } from './nft-marketplace.handler';
 import { MarketplaceConfig } from '../../model';

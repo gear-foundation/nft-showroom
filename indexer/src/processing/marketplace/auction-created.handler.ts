@@ -1,4 +1,4 @@
-import { AuctionCreated } from '../../types/marketplace.events';
+import { AuctionCreated } from '../../parsers/marketplace.parser';
 import { EntitiesService } from '../entities.service';
 import { INftMarketplaceEventHandler } from './nft-marketplace.handler';
 import { Auction } from '../../model';
@@ -42,7 +42,7 @@ export class AuctionCreatedHandler implements INftMarketplaceEventHandler {
         minPrice,
         durationMs,
         endTimestamp: new Date(eventInfo.timestamp.getTime() + durationMs),
-        status: SaleStatus.Open,
+        status: AuctionStatus.Open,
         blockNumber: eventInfo.blockNumber,
         timestamp: eventInfo.timestamp,
         updatedAt: eventInfo.timestamp,
