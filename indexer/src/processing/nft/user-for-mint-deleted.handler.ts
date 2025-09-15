@@ -1,4 +1,4 @@
-import { UserForMintDeletedEvent } from '../../types/nft.events';
+import { UserForMintDeletedEvent } from '../../parsers/nft.parser';
 import { EntitiesService } from '../entities.service';
 import { INftEventHandler } from './nft.handler';
 import { Collection } from '../../model';

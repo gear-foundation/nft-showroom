@@ -1,15 +1,9 @@
 import {
-  getMarketplaceEvent,
+  getMarketplaceParser,
   NftMarketplaceEvent,
-  NftMarketplaceEventPlain,
   NftMarketplaceEventType,
-} from '../types/marketplace.events';
-import {
-  getNftEvent,
-  NftEvent,
-  NftEventPlain,
-  NftEventType,
-} from '../types/nft.events';
+} from '../parsers/marketplace.parser';
+import { getNftParser, NftEvent, NftEventType } from '../parsers/nft.parser';
 import { INftMarketplaceEventHandler } from './marketplace/nft-marketplace.handler';
 import { NewCollectionAddedHandler } from './marketplace/new-collection-added.handler';
 import { AuctionCreatedHandler } from './marketplace/auction-created.handler';
@@ -39,7 +33,7 @@ import { MetadataAddedHandler } from './nft/metadata-added.handler';
 import { EventInfo } from './event-info.type';
 import { EntitiesService } from './entities.service';
 import { IStorage } from './storage/storage.inteface';
-import { ProgramMetadata } from '@gear-js/api';
+import { HexString, ProgramMetadata } from '@gear-js/api';
 import { LiftRestrictionMintHandler } from './nft/lift-restriction-mint.handler';
 import { UserForMintDeletedHandler } from './nft/user-for-mint-deleted.handler';
 import { UsersForMintAddedHandler } from './nft/users-for-mint-added.handler';
@@ -72,6 +66,8 @@ import { DraftMeta } from './draft-nft/DraftMeta';
 import { MetadataDeletedHandler } from './nft/metadata-deleted.handler';
 import { MetadataChangedHandler } from './nft/metadata-changed.handler';
 import { ImageLinkChangedHandler } from './nft/img-link-changed.handler';
+import { MarketplaceParser } from '../parsers/marketplace.parser';
+import { NftParser } from '../parsers/nft.parser';
 
 const marketplaceEventsToHandler: Record<
   NftMarketplaceEventType,
@@ -144,17 +140,11 @@ const DraftNftEventsToHandler: Record<
 };
 
 export class EventsProcessing {
-  private readonly marketplaceMeta: ProgramMetadata;
-  private readonly nftMeta: ProgramMetadata;
-
   constructor(
     private readonly entitiesService: EntitiesService,
-    private readonly storage: IStorage,
-  ) {
-    const marketplace = this.storage.getMarketplace();
-    this.marketplaceMeta = ProgramMetadata.from(marketplace.metadata);
-    this.nftMeta = ProgramMetadata.from(marketplace.nftMetadata);
-  }
+    private readonly marketplaceParser: MarketplaceParser,
+    private readonly nftParser: NftParser,
+  ) {}
 
   saveAll() {
     return this.entitiesService.saveAll();
@@ -166,23 +156,12 @@ export class EventsProcessing {
   ): Promise<NftMarketplaceEvent | null> {
     const { blockNumber, messageId } = eventInfo;
     try {
-      console.log(`${blockNumber}-${messageId}: handling marketplace event`);
-      const data = this.marketplaceMeta.createType<NftMarketplaceEventPlain>(
-        this.marketplaceMeta.types.handle.output!,
-        payload,
-      );
-      const parsed = data.toJSON() as { ok: NftMarketplaceEventPlain } | null;
-      if (!parsed || !parsed.ok) {
-        return null;
-      }
-      console.log(
-        `${blockNumber}-${messageId}: extracting marketplace event ${JSON.stringify(
-          parsed.ok,
-        )}`,
-      );
-      const event = getMarketplaceEvent(parsed.ok);
+      const event = this.marketplaceParser.parseEvent(payload as HexString);
       if (!event) {
-        console.warn(`${blockNumber}-${messageId}: unknown event type`, parsed);
+        console.warn(
+          `${blockNumber}-${messageId}: unknown event type`,
+          payload,
+        );
         return null;
       }
       console.log(
@@ -229,30 +208,11 @@ export class EventsProcessing {
   ): Promise<NftEvent | null> {
     const { blockNumber, messageId } = eventInfo;
     try {
-      console.log(`${blockNumber}-${messageId}: handling nft event`);
-      const data = this.nftMeta.createType<NftEventPlain>(
-        this.nftMeta.types.handle.output!,
-        payload,
-      );
-      const parsed = data.toJSON() as { ok: NftEventPlain } | null;
-      if (!parsed || !parsed.ok) {
-        console.warn(
-          `${blockNumber}-${messageId}: failed to parse event`,
-          parsed,
-          payload,
-        );
-        return null;
-      }
-      console.log(
-        `${blockNumber}-${messageId}: extracting nft event ${JSON.stringify(
-          parsed.ok,
-        )}`,
-      );
-      const event = getNftEvent(parsed.ok);
+      const event = this.nftParser.parseEvent(payload as HexString);
       if (!event) {
         console.warn(
           `${blockNumber}-${messageId}: unknown nft event type`,
-          parsed,
+          payload,
         );
         return null;
       }

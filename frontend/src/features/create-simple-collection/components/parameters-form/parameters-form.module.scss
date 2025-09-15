@@ -42,13 +42,17 @@
     display: flex;
     align-items: center;
     gap: 8px;
-
     padding: 6px 12px;
-
     font-size: 12px;
-
     background-color: #e7e9eb;
-
     border-radius: 20px;
+  }
+}
+
+.sellableInput {
+  svg {
+    width: 16px;
+    height: 16px;
+    align-self: center;
   }
 }

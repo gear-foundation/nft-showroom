@@ -1,13 +1,13 @@
-import { AuctionCanceled } from '../../types/marketplace.events';
+import { SaleNftCanceled } from '../../parsers/marketplace.parser';
 import { EntitiesService } from '../entities.service';
 import { INftMarketplaceEventHandler } from './nft-marketplace.handler';
-import { AuctionStatus, SaleStatus } from '../../model/types';
+import { SaleStatus } from '../../model/types';
 import { Nft, Sale } from '../../model';
 import { EventInfo } from '../event-info.type';
 
 export class SaleNftCanceledHandler implements INftMarketplaceEventHandler {
   async handle(
-    event: AuctionCanceled,
+    event: SaleNftCanceled,
     eventInfo: EventInfo,
     storage: EntitiesService,
   ): Promise<void> {
@@ -20,15 +20,16 @@ export class SaleNftCanceledHandler implements INftMarketplaceEventHandler {
       return;
     }
     const sale = await storage.getSale(nft);
-    if (sale?.status !== AuctionStatus.Open) {
+    if (sale?.status !== SaleStatus.Open) {
       console.warn(
-        `[SaleCanceledHandler] ${collectionAddress}-${tokenId}: auction is not found or not open`,
+        `[SaleCanceledHandler] ${collectionAddress}-${tokenId}: sale is not found or not open`,
       );
       return;
     }
     await storage.setSale(
       new Sale({
         ...sale,
+        nft,
         status: SaleStatus.Canceled,
         updatedAt: eventInfo.timestamp,
       }),

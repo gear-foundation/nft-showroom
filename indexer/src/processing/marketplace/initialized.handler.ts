@@ -2,7 +2,7 @@ import { EntitiesService } from '../entities.service';
 import { INftMarketplaceEventHandler } from './nft-marketplace.handler';
 import { Marketplace, MarketplaceConfig } from '../../model';
 import { EventInfo } from '../event-info.type';
-import { Initialized } from '../../types/marketplace.events';
+import { Initialized } from '../../parsers/marketplace.parser';
 
 export class MarketplaceInitializedHandler
   implements INftMarketplaceEventHandler

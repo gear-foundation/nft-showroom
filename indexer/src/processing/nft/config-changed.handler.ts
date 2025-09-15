@@ -1,4 +1,4 @@
-import { ConfigChangedEvent } from '../../types/nft.events';
+import { ConfigChangedEvent } from '../../parsers/nft.parser';
 import { EntitiesService } from '../entities.service';
 import { INftEventHandler } from './nft.handler';
 import { Collection } from '../../model';

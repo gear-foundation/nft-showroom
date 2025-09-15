@@ -1,3 +1,1 @@
-import { NFTForm } from './nft-form';
-
-export { NFTForm };
+export { NFTForm } from './nft-form';

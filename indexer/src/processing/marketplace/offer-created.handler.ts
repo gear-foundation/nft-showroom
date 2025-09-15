@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from 'uuid';
-import { OfferCreated } from '../../types/marketplace.events';
+import { OfferCreated } from '../../parsers/marketplace.parser';
 import { EntitiesService } from '../entities.service';
 import { INftMarketplaceEventHandler } from './nft-marketplace.handler';
 import { OfferStatus } from '../../model/types';
@@ -21,9 +21,9 @@ export class OfferCreatedHandler implements INftMarketplaceEventHandler {
       return;
     }
     const offer = await storage.getOffer(nft, eventInfo.destination);
-    if (offer?.status !== OfferStatus.Open) {
+    if (offer?.status === OfferStatus.Open) {
       console.warn(
-        `[OfferCreatedHandler] ${collectionAddress}-${tokenId}: offer is not found or not active`,
+        `[OfferCreatedHandler] ${collectionAddress}-${tokenId}: open offer already exists`,
       );
       return;
     }

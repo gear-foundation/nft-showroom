@@ -1,35 +1,12 @@
-import { Input, Button, Radio } from '@gear-js/vara-ui';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useFieldArray, useForm, useWatch } from 'react-hook-form';
-import { z } from 'zod';
+import { Button, Radio, Input as VaraInput } from '@gear-js/vara-ui';
+import { useCallback, useState } from 'react';
 
 import { Identicon, TruncatedText } from '@/components';
-import { SCHEMA } from '@/consts';
-import { useChangeEffect } from '@/hooks';
-import { cx } from '@/utils';
+import { cx, isValidAddress } from '@/utils';
 
 import { Tag } from '../tag';
 
 import styles from './mint-permission-form.module.scss';
-
-type Values = {
-  value: 'any' | 'admin' | 'custom';
-  address: string;
-  addresses: { value: string }[];
-};
-
-const schema = z
-  .object({
-    value: z.string(),
-    address: SCHEMA.ADDRESS,
-    addresses: z.array(z.object({ value: z.string() })),
-  })
-  .refine(({ address, addresses }) => !addresses.find(({ value }) => value === address), {
-    message: 'Address already exists',
-    path: ['address'],
-  });
-
-const resolver = zodResolver(schema);
 
 type Props = {
   defaultValues: {
@@ -41,72 +18,114 @@ type Props = {
 };
 
 function MintPermissionForm({ defaultValues, error, onChange }: Props) {
-  const { control, formState, register, handleSubmit, resetField, clearErrors, setValue } = useForm<Values>({
-    defaultValues: { ...defaultValues, address: '' },
-    resolver,
-  });
-  const { errors } = formState;
+  const [selectedValue, setSelectedValue] = useState(defaultValues.value);
+  const [addresses, setAddresses] = useState(defaultValues.addresses);
+  const [address, setAddress] = useState('');
+  const [addressError, setAddressError] = useState<string | undefined>();
 
-  const selectedValue = useWatch({ control, name: 'value' });
+  const handleValueChange = useCallback(
+    (value: 'any' | 'admin' | 'custom') => {
+      setSelectedValue(value);
+      setAddress('');
+      setAddressError(undefined);
+      onChange({ value, addresses });
+    },
+    [addresses, onChange],
+  );
 
-  const { fields, append, remove } = useFieldArray({ control, name: 'addresses' });
+  const handleAddAddress = useCallback(
+    (e: React.FormEvent) => {
+      e.preventDefault();
 
-  useChangeEffect(() => {
-    resetField('address');
+      if (!address.trim()) {
+        setAddressError('Address is required');
+        return;
+      }
 
-    // resetField doesn't work for useFieldArray with no registered fields
-    // see: https://github.com/orgs/react-hook-form/discussions/8299
-    setValue('addresses', []);
-  }, [selectedValue]);
+      if (addresses.some((addr) => addr.value === address)) {
+        setAddressError('Address already exists');
+        return;
+      }
 
-  useChangeEffect(() => {
-    onChange({ value: selectedValue, addresses: fields });
-  }, [selectedValue, fields]);
+      const newAddresses = [...addresses, { value: address }];
+      setAddresses(newAddresses);
+      setAddress('');
+      setAddressError(undefined);
+      onChange({ value: selectedValue, addresses: newAddresses });
+    },
+    [address, addresses, selectedValue, onChange],
+  );
 
-  const onSubmit = (values: Values) => {
-    append({ value: values.address });
-    resetField('address');
-  };
+  const handleRemoveAddress = useCallback(
+    (index: number) => {
+      const newAddresses = addresses.filter((_, i) => i !== index);
+      setAddresses(newAddresses);
+      onChange({ value: selectedValue, addresses: newAddresses });
+    },
+    [addresses, selectedValue, onChange],
+  );
 
   const renderAddresses = () =>
-    fields.map(({ value }, index) => {
+    addresses.map(({ value }, index) => {
       const handleRemoveClick = () => {
-        remove(index);
-        clearErrors();
+        handleRemoveAddress(index);
       };
 
       return (
         <Tag key={value} onRemoveClick={handleRemoveClick}>
-          <Identicon value={value} size={16} />
+          {isValidAddress(value) ? (
+            <Identicon value={value} size={16} />
+          ) : (
+            <div style={{ width: 16, height: 16, borderRadius: '50%', backgroundColor: '#ccc' }} />
+          )}
           <TruncatedText value={value} />
         </Tag>
       );
     });
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
-      {/* TODO: fieldset from @gear-js/vara-ui */}
+    <>
       <fieldset className={cx(styles.fieldset, error && styles.error)}>
         <legend className={styles.legend}>Who can mint</legend>
-
         <div className={styles.radios}>
-          <Radio label="Everyone" value="any" {...register('value')} />
-          <Radio label="Admin only" value="admin" {...register('value')} />
-          <Radio label="Specify" value="custom" {...register('value')} />
+          <Radio
+            label="Everyone"
+            value="any"
+            checked={selectedValue === 'any'}
+            onChange={() => handleValueChange('any')}
+          />
+          <Radio
+            label="Admin only"
+            value="admin"
+            checked={selectedValue === 'admin'}
+            onChange={() => handleValueChange('admin')}
+          />
+          <Radio
+            label="Specify"
+            value="custom"
+            checked={selectedValue === 'custom'}
+            onChange={() => handleValueChange('custom')}
+          />
         </div>
 
         {selectedValue === 'custom' && (
-          <div className={styles.addAddress}>
-            <Input label="Address" size="small" {...register('address')} error={errors?.address?.message} block />
-            <Button text="Add" size="small" color="border" type="submit" />
-          </div>
+          <form onSubmit={handleAddAddress} className={styles.addAddress}>
+            <VaraInput
+              label="Address"
+              size="small"
+              value={address}
+              onChange={(e) => setAddress(e.target.value)}
+              error={addressError}
+              block
+            />
+            <Button text="Add" size="small" color="border" type="submit" className={styles.addButton} />
+          </form>
         )}
-
-        {Boolean(fields.length) && <ul className={styles.addresses}>{renderAddresses()}</ul>}
+        {Boolean(addresses.length) && <ul className={styles.addresses}>{renderAddresses()}</ul>}
       </fieldset>
 
       <p className={styles.errorMessage}>{error}</p>
-    </form>
+    </>
   );
 }
 

@@ -32,4 +32,7 @@ export const config = {
   },
   marketplaceProgram: checkEnv('MARKETPLACE_PROGRAM'),
   rateLimit: Number.parseInt(checkEnv('RATE_LIMIT', '100')),
+  dnsApiUrl:
+    process.env.DNS_API_URL || 'https://stg-dns-explorer.gear.foundation',
+  dnsProgramName: process.env.DNS_PROGRAM_NAME || 'nft-showroom.vara.network',
 };

@@ -15,16 +15,31 @@ import { v4 as uuidv4 } from 'uuid';
 import { IStorage } from './storage/storage.inteface';
 import { BatchService } from './batch.service';
 import { Store } from '@subsquid/typeorm-store';
+import { In } from 'typeorm';
 import { EventInfo } from './event-info.type';
 import { getCollectionDescription, getCollectionName } from './utils/helpers';
 import { ProgramMetadata } from '@gear-js/api';
+import { DnsService } from '../dns/dns.service';
+import { config } from '../config';
 
 export class EntitiesService {
   constructor(
     private readonly storage: IStorage,
     private readonly batchService: BatchService,
     private readonly store: Store,
+    private readonly dnsService: DnsService,
   ) {}
+
+  async init() {
+    const marketplace = await this.storage.getMarketplace();
+    const dnsAddress = await this.dnsService.getAddressByName(
+      config.dnsProgramName,
+    );
+    if (dnsAddress && marketplace.address !== dnsAddress) {
+      marketplace.address = dnsAddress;
+      await this.setMarketplace(marketplace);
+    }
+  }
 
   getMarketplace(): Marketplace {
     return this.storage.getMarketplace();
@@ -126,7 +141,35 @@ export class EntitiesService {
 
   async deleteCollection(collection: Collection) {
     await this.storage.deleteCollection(collection);
+    // prefetch nfts of the collection once
     const nfts = await this.storage.getNfts(collection.id);
+    const nftIds = nfts.map((n) => n.id);
+    // remove dependent entities in safe order: bids -> auctions -> sales -> offers -> transfers -> nfts -> collection
+    const [auctions, sales, offers, transfers] = await Promise.all([
+      this.store.find(Auction, { where: { nft: { id: In(nftIds) } } }),
+      this.store.find(Sale, { where: { nft: { id: In(nftIds) } } }),
+      this.store.find(Offer, { where: { nft: { id: In(nftIds) } } }),
+      this.store.find(Transfer, { where: { nft: { id: In(nftIds) } } }),
+    ]);
+    const auctionIds = auctions.map((a) => a.id);
+    const bids = auctionIds.length
+      ? await this.store.find(Bid, { where: { auction: { id: In(auctionIds) } } })
+      : [];
+    if (bids.length) {
+      await this.store.remove(bids);
+    }
+    if (auctions.length) {
+      await this.store.remove(auctions);
+    }
+    if (sales.length) {
+      await this.store.remove(sales);
+    }
+    if (offers.length) {
+      await this.store.remove(offers);
+    }
+    if (transfers.length) {
+      await this.store.remove(transfers);
+    }
     if (nfts.length) {
       await this.store.remove(nfts);
     }

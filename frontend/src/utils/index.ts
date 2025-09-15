@@ -1,7 +1,7 @@
 import { decodeAddress } from '@gear-js/api';
 
-import { ADDRESS } from './consts';
-import { Entries } from './types';
+import { ADDRESS } from '@/consts';
+import { Entries } from '@/types';
 
 const cx = (...args: unknown[]) =>
   args
@@ -32,3 +32,5 @@ const isValidAddress = (address: string) => {
 };
 
 export { cx, getTypedEntries, getIpfsLink, isObject, isValidAddress };
+export { createUrlValidator } from './create-url-validator';
+export { discordRegex, mediumRegex, telegramRegex, twitterRegex, urlRegex } from './regexp.ts';

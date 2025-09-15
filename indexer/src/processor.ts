@@ -1,4 +1,3 @@
-import { assertNotNull } from '@subsquid/util-internal';
 import {
   BlockHeader,
   DataHandlerContext,
@@ -11,11 +10,9 @@ import {
 import { config } from './config';
 
 export const processor = new SubstrateBatchProcessor()
-  .setDataSource({
-    chain: {
-      url: assertNotNull(process.env.RPC_ENDPOINT),
-      rateLimit: config.rateLimit,
-    },
+  .setRpcEndpoint({
+    url: process.env.RPC_ENDPOINT || '',
+    rateLimit: config.rateLimit,
   })
   .addEvent({
     name: ['Gear.UserMessageSent'],

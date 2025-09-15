@@ -4,11 +4,13 @@ import { z } from 'zod';
 
 import { NFTActionFormModal, PriceInput, Select, withAccount, withApi, withMarketplaceConfig } from '@/components';
 import { useMarketplace } from '@/context';
+import { useDefaultValues, usePriceSchema } from '@/features/marketplace/hooks';
 import { Collection, CollectionType, Nft } from '@/graphql/graphql';
-import { useApproveMessage, useIsOwner, useLoading, useMarketplaceMessage, useModal } from '@/hooks';
+import { useIsOwner, useModal } from '@/hooks';
+import { useStartApproveTransaction } from '@/hooks/sails/nft/api.ts';
+import { useSendCreateAuctionTransaction } from '@/hooks/sails/showroom/api.ts';
 
 import BidSVG from '../../assets/bid.svg?react';
-import { useDefaultValues, usePriceSchema } from '../../hooks';
 
 type Props = Pick<Nft, 'idInCollection' | 'name' | 'mediaUrl' | 'owner' | 'approvedAccount'> & {
   collection: Pick<Collection, 'id' | 'name' | 'sellable'> & {
@@ -20,44 +22,42 @@ function Component({ collection, owner, approvedAccount, ...nft }: Props) {
   const [isOpen, open, close] = useModal();
   const isOwner = useIsOwner(owner);
   const alert = useAlert();
-  const [isLoading, enableLoading, disableLoading] = useLoading();
 
   const { marketplace } = useMarketplace();
   const isApprovedToMarketplace = approvedAccount === marketplace?.address;
 
   const { defaultValues, defaultOptions } = useDefaultValues();
   const { getPriceSchema } = usePriceSchema();
-  const schema = z.object({ minPrice: getPriceSchema(), duration: z.string() });
+  const schema = z.object({ minPrice: getPriceSchema(), duration: z.number() });
 
-  const sendMarketplaceMessage = useMarketplaceMessage();
-  const sendApproveMessage = useApproveMessage(collection.id, collection.type.type);
+  const { sendTransactionAsync: sendCreateAuctionTransaction, isPending } = useSendCreateAuctionTransaction();
+  const { startApproveTransaction, isPendingApprove } = useStartApproveTransaction(collection.id as `0x${string}`);
 
-  const onSubmit = ({ minPrice, duration }: typeof defaultValues) => {
-    enableLoading();
-
-    const collectionAddress = collection.id;
+  const onSubmit = async ({ minPrice, duration }: typeof defaultValues) => {
+    const collectionAddress = collection.id as `0x${string}`;
     const tokenId = nft.idInCollection;
-    const payload = { CreateAuction: { collectionAddress, tokenId, minPrice, duration } };
 
-    const onSuccess = () => {
-      alert.success('Auction started');
-      close();
+    const startAuction = async () => {
+      try {
+        await sendCreateAuctionTransaction({ args: [collectionAddress, tokenId, minPrice, duration] });
+        alert.success('Auction started');
+        close();
+      } catch (e) {
+        console.log(e);
+        alert.error(e instanceof Error ? e.message : String(e));
+      }
     };
 
-    const onFinally = disableLoading;
-    const startAuction = () => sendMarketplaceMessage({ payload, onSuccess, onFinally });
-
-    if (isApprovedToMarketplace) return startAuction();
-
-    sendApproveMessage(tokenId, startAuction, onFinally);
+    if (!isApprovedToMarketplace) await startApproveTransaction(tokenId);
+    await startAuction();
   };
 
   const modalProps = { heading: 'Start Auction', close };
-  const formProps = { defaultValues, schema, isLoading, onSubmit };
+  const formProps = { defaultValues, schema, isLoading: isPending || isPendingApprove, onSubmit };
 
   return isOwner && collection.sellable ? (
     <>
-      <Button icon={BidSVG} text="Start auction" size="small" color="dark" onClick={open} />
+      <Button icon={BidSVG} text="Start auction" size="small" color="contrast" onClick={open} />
 
       {isOpen && (
         <NFTActionFormModal modal={modalProps} form={formProps} nft={nft} collection={collection}>

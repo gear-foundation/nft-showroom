@@ -4,7 +4,8 @@ import { Button } from '@gear-js/vara-ui';
 import { withAccount, withApi } from '@/components';
 import { useMarketplace } from '@/context';
 import { Collection } from '@/graphql/graphql';
-import { useIsOwner, useLoading, useMarketplaceMessage } from '@/hooks';
+import { useIsOwner } from '@/hooks';
+import { useSendMintTransaction } from '@/hooks/sails/showroom/api.ts';
 
 import { useMintedNFTsCount } from '../../hooks';
 
@@ -19,9 +20,9 @@ type Props = Pick<
 function Component(props: Props) {
   const { id, tokensLimit, paymentForMint, userMintLimit, permissionToMint, admin, nftsCount, refetch } = props;
 
-  const sendMessage = useMarketplaceMessage();
+  const { sendTransactionAsync: sendMint, isPending: mintPending } = useSendMintTransaction();
+
   const alert = useAlert();
-  const [isLoading, enableLoading, disableLoading] = useLoading();
   const isAdmin = useIsOwner(admin);
 
   const { account } = useAccount();
@@ -35,32 +36,28 @@ function Component(props: Props) {
   const { marketplace } = useMarketplace();
   const { royaltyToMarketplaceForMint } = marketplace?.config || {};
 
-  const handleClick = () => {
-    if (!paymentForMint) throw new Error('paymentForMint is not found');
-    if (royaltyToMarketplaceForMint === undefined) throw new Error('royaltyToMarketplaceForMint is not initialized');
+  const handleClick = async (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    try {
+      if (!paymentForMint) throw new Error('paymentForMint is not found');
+      if (royaltyToMarketplaceForMint === undefined) throw new Error('royaltyToMarketplaceForMint is not initialized');
 
-    enableLoading();
+      const collectionMintFee = BigInt(paymentForMint);
+      const marketplaceRoyaltyAmount = (collectionMintFee * BigInt(royaltyToMarketplaceForMint)) / BigInt(10000);
+      const totalPayment = collectionMintFee + marketplaceRoyaltyAmount;
 
-    const payload = { Mint: { collectionAddress: id } };
-
-    const FEE_MULTIPLIER = 10000;
-    const percentage = (BigInt(paymentForMint) * BigInt(200)) / BigInt(FEE_MULTIPLIER);
-    const value = (BigInt(paymentForMint) + percentage).toString();
-
-    const onSuccess = () => {
+      await sendMint({ args: [id as `0x${string}`, null], value: totalPayment });
+      alert.success('NFT minted');
       refetch();
       refetchMintedNFTsCount().catch(({ message }: Error) => alert.error(message));
-
-      alert.success('NFT minted');
-    };
-
-    const onFinally = disableLoading;
-
-    sendMessage({ payload, value, onSuccess, onFinally });
+    } catch (error) {
+      alert.error('Error mint');
+      console.error(error);
+    }
   };
 
   return tokensToMint && (isAdmin || (isAllowedToMint && isUserMintLimitUnmet)) ? (
-    <Button text="Mint NFT" size="small" onClick={handleClick} isLoading={isLoading || !marketplace} block />
+    <Button text="Mint NFT" size="small" onClick={handleClick} isLoading={mintPending || !marketplace} block />
   ) : null;
 }
 
