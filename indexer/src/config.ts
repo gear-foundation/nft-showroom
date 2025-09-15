@@ -14,7 +14,7 @@ export const config = {
   nfts: {
     cb: checkEnv(
       'NFT_CB_PROGRAM',
-      '0x8d7ac116076a6031982ee65f323118b20b3d5a9ed3993a36a1da6e9faf8572c7',
+      '0xcefdca25159fd78f5fd09c77628c4fc6fc6b46414b42949b877849decf048a96',
     ),
     vit: checkEnv(
       'NFT_VIT_PROGRAM',
@@ -33,6 +33,6 @@ export const config = {
   marketplaceProgram: checkEnv('MARKETPLACE_PROGRAM'),
   rateLimit: Number.parseInt(checkEnv('RATE_LIMIT', '100')),
   dnsApiUrl:
-    process.env.DNS_API_URL || 'https://stg-dns-explorer.gear.foundation',
+    process.env.DNS_API_URL || 'https://dns-explorer.gear.foundation',
   dnsProgramName: process.env.DNS_PROGRAM_NAME || 'nft-showroom.vara.network',
 };
