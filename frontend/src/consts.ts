@@ -1,4 +1,4 @@
-import { decodeAddress, HexString } from '@gear-js/api';
+import { decodeAddress } from '@gear-js/api';
 import { z } from 'zod';
 
 import { isValidAddress } from './utils';
@@ -9,7 +9,6 @@ const ADDRESS = {
   IPFS_GATEWAY: import.meta.env.VITE_IPFS_GATEWAY_ADDRESS as string,
   INDEXER: import.meta.env.VITE_INDEXER_ADDRESS as string,
   INDEXER_WS: import.meta.env.VITE_INDEXER_WS_ADDRESS as string,
-  CONTRACT: import.meta.env.VITE_CONTRACT_ADDRESS as HexString,
 };
 
 const GTM_ID = import.meta.env.VITE_GTM_ID as string | undefined;
