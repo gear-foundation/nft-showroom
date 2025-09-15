@@ -28,7 +28,7 @@
     "zod": "3.22.4"
   },
   "devDependencies": {
-    "@gear-js/frontend-configs": "0.1.2",
+    "@gear-js/frontend-configs": "0.2.0",
     "@graphql-codegen/cli": "5.0.7",
     "@graphql-codegen/client-preset": "4.8.3",
     "@graphql-typed-document-node/core": "3.2.0",
@@ -36,7 +36,6 @@
     "@types/react": "19.1.11",
     "@types/react-dom": "19.1.8",
     "@types/react-gtm-module": "2.0.4",
-    "@vitejs/plugin-react": "4.7.0",
     "dotenv": "17.2.1",
     "eslint": "9.35.0",
     "graphql": "16.11.0",
@@ -46,8 +45,7 @@
     "sass": "1.89.2",
     "typescript": "5.7.3",
     "vite": "6.3.6",
-    "vite-plugin-checker": "0.9.1",
     "vite-plugin-node-polyfills": "0.24.0",
-    "vite-plugin-svgr": "4.3.0"
+    "vite-plugin-svgr": "4.5.0"
   }
 }
