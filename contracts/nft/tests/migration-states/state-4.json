@@ -1,0 +1,306 @@
+{
+  "All": {
+    "tokens": [
+      [
+        "11",
+        {
+          "owner": "0xe07f75a7906298822d3cfa6d3fac1a04657cca0635d39237a3cae46b1363c747",
+          "name": "DOTSafari Hackathon 2023 - 11",
+          "description": "This is DOTSafari Hackathon 2023 NFT",
+          "metadata": [],
+          "mediaUrl": "ipfs://Qmd4PagX8GvCmMmzS7gE5VxbQiuHkMU7cLTprVKdzYDMfZ",
+          "mintTime": "1,713,187,431,000"
+        }
+      ],
+      [
+        "7",
+        {
+          "owner": "0xdc4e784ff1e4d94e7bde7d2945073ee53ded9e85a68077a84dd79938f9b4db64",
+          "name": "DOTSafari Hackathon 2023 - 7",
+          "description": "This is DOTSafari Hackathon 2023 NFT",
+          "metadata": [],
+          "mediaUrl": "ipfs://Qmd4PagX8GvCmMmzS7gE5VxbQiuHkMU7cLTprVKdzYDMfZ",
+          "mintTime": "1,711,534,005,000"
+        }
+      ],
+      [
+        "5",
+        {
+          "owner": "0xa4e9e408c8a76875990a8f14928d96853baabb0d228eda3715c843e0af5d2f05",
+          "name": "DOTSafari Hackathon 2023 - 5",
+          "description": "This is DOTSafari Hackathon 2023 NFT",
+          "metadata": [],
+          "mediaUrl": "ipfs://Qmd4PagX8GvCmMmzS7gE5VxbQiuHkMU7cLTprVKdzYDMfZ",
+          "mintTime": "1,711,533,993,000"
+        }
+      ],
+      [
+        "13",
+        {
+          "owner": "0xfa2f4ab71ed777165f1229f32c6b7f59c3d91453f69976f2c855ab749326783c",
+          "name": "DOTSafari Hackathon 2023 - 13",
+          "description": "This is DOTSafari Hackathon 2023 NFT",
+          "metadata": [],
+          "mediaUrl": "ipfs://Qmd4PagX8GvCmMmzS7gE5VxbQiuHkMU7cLTprVKdzYDMfZ",
+          "mintTime": "1,713,990,744,000"
+        }
+      ],
+      [
+        "0",
+        {
+          "owner": "0x5ea5353cbbd7a62e5c05c616746a40767bb9749459b20919b531cc227a7d3b39",
+          "name": "DOTSafari Hackathon 2023 - 0",
+          "description": "This is DOTSafari Hackathon 2023 NFT",
+          "metadata": [],
+          "mediaUrl": "ipfs://Qmd4PagX8GvCmMmzS7gE5VxbQiuHkMU7cLTprVKdzYDMfZ",
+          "mintTime": "1,711,533,825,000"
+        }
+      ],
+      [
+        "2",
+        {
+          "owner": "0xa810f37eedf8256da0890def5d40fe250a2613743215395fe4b761586d087b59",
+          "name": "DOTSafari Hackathon 2023 - 2",
+          "description": "This is DOTSafari Hackathon 2023 NFT",
+          "metadata": [],
+          "mediaUrl": "ipfs://Qmd4PagX8GvCmMmzS7gE5VxbQiuHkMU7cLTprVKdzYDMfZ",
+          "mintTime": "1,711,533,849,000"
+        }
+      ],
+      [
+        "10",
+        {
+          "owner": "0x10a399ac1304b6bf876fc279e6d866992c064607f8b0e630aa2dcc966ee5c856",
+          "name": "DOTSafari Hackathon 2023 - 10",
+          "description": "This is DOTSafari Hackathon 2023 NFT",
+          "metadata": [],
+          "mediaUrl": "ipfs://Qmd4PagX8GvCmMmzS7gE5VxbQiuHkMU7cLTprVKdzYDMfZ",
+          "mintTime": "1,712,236,932,000"
+        }
+      ],
+      [
+        "12",
+        {
+          "owner": "0xfa2f4ab71ed777165f1229f32c6b7f59c3d91453f69976f2c855ab749326783c",
+          "name": "DOTSafari Hackathon 2023 - 12",
+          "description": "This is DOTSafari Hackathon 2023 NFT",
+          "metadata": [],
+          "mediaUrl": "ipfs://Qmd4PagX8GvCmMmzS7gE5VxbQiuHkMU7cLTprVKdzYDMfZ",
+          "mintTime": "1,713,990,573,000"
+        }
+      ],
+      [
+        "3",
+        {
+          "owner": "0x2a6821bd42b8a9447c08b522c8b303f1c208dbd014484d3ff30fe3ababe7f732",
+          "name": "DOTSafari Hackathon 2023 - 3",
+          "description": "This is DOTSafari Hackathon 2023 NFT",
+          "metadata": [],
+          "mediaUrl": "ipfs://Qmd4PagX8GvCmMmzS7gE5VxbQiuHkMU7cLTprVKdzYDMfZ",
+          "mintTime": "1,711,533,858,000"
+        }
+      ],
+      [
+        "9",
+        {
+          "owner": "0x1417f7a06fd911bfa3dac4870c657a2f00b1d16750c977da8d2f44cb03a7db53",
+          "name": "DOTSafari Hackathon 2023 - 9",
+          "description": "This is DOTSafari Hackathon 2023 NFT",
+          "metadata": [],
+          "mediaUrl": "ipfs://Qmd4PagX8GvCmMmzS7gE5VxbQiuHkMU7cLTprVKdzYDMfZ",
+          "mintTime": "1,711,723,176,000"
+        }
+      ],
+      [
+        "14",
+        {
+          "owner": "0xc2fd731f954ac92bf4f22310b1844a74c59223f5159d660434030254b89a7109",
+          "name": "DOTSafari Hackathon 2023 - 14",
+          "description": "This is DOTSafari Hackathon 2023 NFT",
+          "metadata": [],
+          "mediaUrl": "ipfs://Qmd4PagX8GvCmMmzS7gE5VxbQiuHkMU7cLTprVKdzYDMfZ",
+          "mintTime": "1,714,416,201,000"
+        }
+      ],
+      [
+        "1",
+        {
+          "owner": "0x5c8a0b929b7bd63974c15f87157b69ee1d694a1233e53c7939f615f7fed7ff12",
+          "name": "DOTSafari Hackathon 2023 - 1",
+          "description": "This is DOTSafari Hackathon 2023 NFT",
+          "metadata": [],
+          "mediaUrl": "ipfs://Qmd4PagX8GvCmMmzS7gE5VxbQiuHkMU7cLTprVKdzYDMfZ",
+          "mintTime": "1,711,533,843,000"
+        }
+      ],
+      [
+        "15",
+        {
+          "owner": "0xc2fd731f954ac92bf4f22310b1844a74c59223f5159d660434030254b89a7109",
+          "name": "DOTSafari Hackathon 2023 - 15",
+          "description": "This is DOTSafari Hackathon 2023 NFT",
+          "metadata": [],
+          "mediaUrl": "ipfs://Qmd4PagX8GvCmMmzS7gE5VxbQiuHkMU7cLTprVKdzYDMfZ",
+          "mintTime": "1,714,416,249,000"
+        }
+      ],
+      [
+        "8",
+        {
+          "owner": "0xee20998f8b9fcf6c1366f8de1b5f30c08c7bbc2b61ca96a13768dffc07db9b64",
+          "name": "DOTSafari Hackathon 2023 - 8",
+          "description": "This is DOTSafari Hackathon 2023 NFT",
+          "metadata": [],
+          "mediaUrl": "ipfs://Qmd4PagX8GvCmMmzS7gE5VxbQiuHkMU7cLTprVKdzYDMfZ",
+          "mintTime": "1,711,537,950,000"
+        }
+      ],
+      [
+        "6",
+        {
+          "owner": "0x54c15a3e95d10f9bfdcab65f93d3623adaac92bac12346911a3a92eed4fece71",
+          "name": "DOTSafari Hackathon 2023 - 6",
+          "description": "This is DOTSafari Hackathon 2023 NFT",
+          "metadata": [],
+          "mediaUrl": "ipfs://Qmd4PagX8GvCmMmzS7gE5VxbQiuHkMU7cLTprVKdzYDMfZ",
+          "mintTime": "1,711,533,999,001"
+        }
+      ],
+      [
+        "4",
+        {
+          "owner": "0x16b4f74191ad06715e543afb1fb68bf1cde5f543d884f8f757b2e01382c2a75c",
+          "name": "DOTSafari Hackathon 2023 - 4",
+          "description": "This is DOTSafari Hackathon 2023 NFT",
+          "metadata": [],
+          "mediaUrl": "ipfs://Qmd4PagX8GvCmMmzS7gE5VxbQiuHkMU7cLTprVKdzYDMfZ",
+          "mintTime": "1,711,533,987,000"
+        }
+      ]
+    ],
+    "owners": [
+      [
+        "0x5c8a0b929b7bd63974c15f87157b69ee1d694a1233e53c7939f615f7fed7ff12",
+        [
+          "1"
+        ]
+      ],
+      [
+        "0xee20998f8b9fcf6c1366f8de1b5f30c08c7bbc2b61ca96a13768dffc07db9b64",
+        [
+          "8"
+        ]
+      ],
+      [
+        "0xe07f75a7906298822d3cfa6d3fac1a04657cca0635d39237a3cae46b1363c747",
+        [
+          "11"
+        ]
+      ],
+      [
+        "0xa810f37eedf8256da0890def5d40fe250a2613743215395fe4b761586d087b59",
+        [
+          "2"
+        ]
+      ],
+      [
+        "0x5ea5353cbbd7a62e5c05c616746a40767bb9749459b20919b531cc227a7d3b39",
+        [
+          "0"
+        ]
+      ],
+      [
+        "0xdc4e784ff1e4d94e7bde7d2945073ee53ded9e85a68077a84dd79938f9b4db64",
+        [
+          "7"
+        ]
+      ],
+      [
+        "0x16b4f74191ad06715e543afb1fb68bf1cde5f543d884f8f757b2e01382c2a75c",
+        [
+          "4"
+        ]
+      ],
+      [
+        "0xa4e9e408c8a76875990a8f14928d96853baabb0d228eda3715c843e0af5d2f05",
+        [
+          "5"
+        ]
+      ],
+      [
+        "0x1417f7a06fd911bfa3dac4870c657a2f00b1d16750c977da8d2f44cb03a7db53",
+        [
+          "9"
+        ]
+      ],
+      [
+        "0x54c15a3e95d10f9bfdcab65f93d3623adaac92bac12346911a3a92eed4fece71",
+        [
+          "6"
+        ]
+      ],
+      [
+        "0x10a399ac1304b6bf876fc279e6d866992c064607f8b0e630aa2dcc966ee5c856",
+        [
+          "10"
+        ]
+      ],
+      [
+        "0x2a6821bd42b8a9447c08b522c8b303f1c208dbd014484d3ff30fe3ababe7f732",
+        [
+          "3"
+        ]
+      ],
+      [
+        "0xfa2f4ab71ed777165f1229f32c6b7f59c3d91453f69976f2c855ab749326783c",
+        [
+          "12",
+          "13"
+        ]
+      ],
+      [
+        "0xc2fd731f954ac92bf4f22310b1844a74c59223f5159d660434030254b89a7109",
+        [
+          "14",
+          "15"
+        ]
+      ]
+    ],
+    "tokenApprovals": [],
+    "config": {
+      "name": "DOTSafari Hackathon 2023",
+      "description": "This is DOTSafari Hackathon 2023 NFT",
+      "collectionTags": [],
+      "collectionBanner": "ipfs://Qmd3hMmVTUR2tWxiH27he94TEKbCxGS1FnyrEnSm49doWq",
+      "collectionLogo": "ipfs://QmfDM6mbku8FJ8ukFAexScV7QiS7Z3z9BFmRG6uryWBAgN",
+      "userMintLimit": null,
+      "additionalLinks": {
+        "externalUrl": "",
+        "telegram": "",
+        "xcom": "",
+        "medium": "",
+        "discord": ""
+      },
+      "royalty": "0",
+      "paymentForMint": "0",
+      "transferable": "0",
+      "sellable": null
+    },
+    "nonce": "16",
+    "imgLinksAndData": [
+      [
+        "ipfs://Qmd4PagX8GvCmMmzS7gE5VxbQiuHkMU7cLTprVKdzYDMfZ",
+        {
+          "limitCopies": "10"
+        }
+      ]
+    ],
+    "collectionOwner": "0x46517ac536e39f93184971036283dead3c4a1bd7602490d5e6acf3946db31606",
+    "totalNumberOfTokens": "26",
+    "permissionToMint": null,
+    "marketplaceAddress": "0xa81328dbfc2cfa9a9a88cf7b2216ae0a3a964f7974a236a52d10153e698cf5c2",
+    "admins": [
+      "0x46517ac536e39f93184971036283dead3c4a1bd7602490d5e6acf3946db31606"
+    ]
+  }
+}

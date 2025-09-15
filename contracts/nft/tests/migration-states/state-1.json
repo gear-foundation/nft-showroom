@@ -1,0 +1,264 @@
+{
+  "All": {
+    "tokens": [
+      [
+        "0",
+        {
+          "owner": "0x28c7cdb98dedc3fcd9535eb2e0f6fa6a276dc3bd35cecac2fee85b88191a1950",
+          "name": "Vara Woman Madrid NFT collection - 0",
+          "description": "Vara Woman Madrid NFT collection is dedicated to the first ever meetup of VaraWoman in Spain.",
+          "metadata": [],
+          "mediaUrl": "ipfs://QmUnVUZfQwzeUp8ekY1ZPyEq3hehfRy5qN1qjXudWPgYiE",
+          "mintTime": "1,710,870,039,000"
+        }
+      ],
+      [
+        "2",
+        {
+          "owner": "0x5e9ab7a67d118e27d37b0b850e74a6ab0253ec77e1a3da68a8793d7ce4a4095b",
+          "name": "Vara Woman Madrid NFT collection - 2",
+          "description": "Vara Woman Madrid NFT collection is dedicated to the first ever meetup of VaraWoman in Spain.",
+          "metadata": [],
+          "mediaUrl": "ipfs://QmUnVUZfQwzeUp8ekY1ZPyEq3hehfRy5qN1qjXudWPgYiE",
+          "mintTime": "1,710,870,075,000"
+        }
+      ],
+      [
+        "11",
+        {
+          "owner": "0x82451f4fc850dd2e774891d2b807acc144fbd25b0695bb630ca9fbf717e02e20",
+          "name": "Vara Woman Madrid NFT collection - 11",
+          "description": "Vara Woman Madrid NFT collection is dedicated to the first ever meetup of VaraWoman in Spain.",
+          "metadata": [],
+          "mediaUrl": "ipfs://QmUnVUZfQwzeUp8ekY1ZPyEq3hehfRy5qN1qjXudWPgYiE",
+          "mintTime": "1,711,388,202,000"
+        }
+      ],
+      [
+        "10",
+        {
+          "owner": "0x1ccb463ee8e7eb2f9e86c7931a1ff75675624748317a09642ee42007dde05a7b",
+          "name": "Vara Woman Madrid NFT collection - 10",
+          "description": "Vara Woman Madrid NFT collection is dedicated to the first ever meetup of VaraWoman in Spain.",
+          "metadata": [],
+          "mediaUrl": "ipfs://QmUnVUZfQwzeUp8ekY1ZPyEq3hehfRy5qN1qjXudWPgYiE",
+          "mintTime": "1,710,870,165,000"
+        }
+      ],
+      [
+        "7",
+        {
+          "owner": "0xfaab7624817d1adb9134965edfee0d74d3647220ce2262f602a22f3b2aa8a901",
+          "name": "Vara Woman Madrid NFT collection - 7",
+          "description": "Vara Woman Madrid NFT collection is dedicated to the first ever meetup of VaraWoman in Spain.",
+          "metadata": [],
+          "mediaUrl": "ipfs://QmUnVUZfQwzeUp8ekY1ZPyEq3hehfRy5qN1qjXudWPgYiE",
+          "mintTime": "1,710,870,141,001"
+        }
+      ],
+      [
+        "3",
+        {
+          "owner": "0xd445e5de0e95ce1402ad065f3b9c88526e20983e033e70dd2065788325a37b64",
+          "name": "Vara Woman Madrid NFT collection - 3",
+          "description": "Vara Woman Madrid NFT collection is dedicated to the first ever meetup of VaraWoman in Spain.",
+          "metadata": [],
+          "mediaUrl": "ipfs://QmUnVUZfQwzeUp8ekY1ZPyEq3hehfRy5qN1qjXudWPgYiE",
+          "mintTime": "1,710,870,093,000"
+        }
+      ],
+      [
+        "9",
+        {
+          "owner": "0x2a86af6492380fb79bfab3f6e627ac73b084633d54e6c5962dba86d7e6ad9111",
+          "name": "Vara Woman Madrid NFT collection - 9",
+          "description": "Vara Woman Madrid NFT collection is dedicated to the first ever meetup of VaraWoman in Spain.",
+          "metadata": [],
+          "mediaUrl": "ipfs://QmUnVUZfQwzeUp8ekY1ZPyEq3hehfRy5qN1qjXudWPgYiE",
+          "mintTime": "1,710,870,159,000"
+        }
+      ],
+      [
+        "5",
+        {
+          "owner": "0x86eef461b42facb4e9243f452cca8ab1dddc3e835ce7c3e6d58e1cad84ff372d",
+          "name": "Vara Woman Madrid NFT collection - 5",
+          "description": "Vara Woman Madrid NFT collection is dedicated to the first ever meetup of VaraWoman in Spain.",
+          "metadata": [],
+          "mediaUrl": "ipfs://QmUnVUZfQwzeUp8ekY1ZPyEq3hehfRy5qN1qjXudWPgYiE",
+          "mintTime": "1,710,870,111,000"
+        }
+      ],
+      [
+        "12",
+        {
+          "owner": "0x041071d04513c136396ca4e62eaf2c59d021a2720ba6be071a1a8363ec5f3d59",
+          "name": "Vara Woman Madrid NFT collection - 12",
+          "description": "Vara Woman Madrid NFT collection is dedicated to the first ever meetup of VaraWoman in Spain.",
+          "metadata": [],
+          "mediaUrl": "ipfs://QmUnVUZfQwzeUp8ekY1ZPyEq3hehfRy5qN1qjXudWPgYiE",
+          "mintTime": "1,752,049,131,000"
+        }
+      ],
+      [
+        "1",
+        {
+          "owner": "0xe84bb77d4eae241cd573509774b459ae76ae6e6f2866ea15fffbfd28248e0c62",
+          "name": "Vara Woman Madrid NFT collection - 1",
+          "description": "Vara Woman Madrid NFT collection is dedicated to the first ever meetup of VaraWoman in Spain.",
+          "metadata": [],
+          "mediaUrl": "ipfs://QmUnVUZfQwzeUp8ekY1ZPyEq3hehfRy5qN1qjXudWPgYiE",
+          "mintTime": "1,710,870,066,000"
+        }
+      ],
+      [
+        "8",
+        {
+          "owner": "0x2c2911cd2f1fc76844ef827b0aa1c3e05660315e9412d5ac33108a06bc566603",
+          "name": "Vara Woman Madrid NFT collection - 8",
+          "description": "Vara Woman Madrid NFT collection is dedicated to the first ever meetup of VaraWoman in Spain.",
+          "metadata": [],
+          "mediaUrl": "ipfs://QmUnVUZfQwzeUp8ekY1ZPyEq3hehfRy5qN1qjXudWPgYiE",
+          "mintTime": "1,710,870,150,001"
+        }
+      ],
+      [
+        "6",
+        {
+          "owner": "0xe8e349deb090c2dba1a2aeab4228705745e6203d54ca9fbba554eea8549bc276",
+          "name": "Vara Woman Madrid NFT collection - 6",
+          "description": "Vara Woman Madrid NFT collection is dedicated to the first ever meetup of VaraWoman in Spain.",
+          "metadata": [],
+          "mediaUrl": "ipfs://QmUnVUZfQwzeUp8ekY1ZPyEq3hehfRy5qN1qjXudWPgYiE",
+          "mintTime": "1,710,870,132,000"
+        }
+      ],
+      [
+        "4",
+        {
+          "owner": "0x3a4e3d29dd170bef0c4ad95337ad6d6562b848c9f9134cfe58f6edb23d83364f",
+          "name": "Vara Woman Madrid NFT collection - 4",
+          "description": "Vara Woman Madrid NFT collection is dedicated to the first ever meetup of VaraWoman in Spain.",
+          "metadata": [],
+          "mediaUrl": "ipfs://QmUnVUZfQwzeUp8ekY1ZPyEq3hehfRy5qN1qjXudWPgYiE",
+          "mintTime": "1,710,870,099,000"
+        }
+      ]
+    ],
+    "owners": [
+      [
+        "0x1ccb463ee8e7eb2f9e86c7931a1ff75675624748317a09642ee42007dde05a7b",
+        [
+          "10"
+        ]
+      ],
+      [
+        "0x28c7cdb98dedc3fcd9535eb2e0f6fa6a276dc3bd35cecac2fee85b88191a1950",
+        [
+          "0"
+        ]
+      ],
+      [
+        "0x5e9ab7a67d118e27d37b0b850e74a6ab0253ec77e1a3da68a8793d7ce4a4095b",
+        [
+          "2"
+        ]
+      ],
+      [
+        "0xe84bb77d4eae241cd573509774b459ae76ae6e6f2866ea15fffbfd28248e0c62",
+        [
+          "1"
+        ]
+      ],
+      [
+        "0xd445e5de0e95ce1402ad065f3b9c88526e20983e033e70dd2065788325a37b64",
+        [
+          "3"
+        ]
+      ],
+      [
+        "0x3a4e3d29dd170bef0c4ad95337ad6d6562b848c9f9134cfe58f6edb23d83364f",
+        [
+          "4"
+        ]
+      ],
+      [
+        "0xe8e349deb090c2dba1a2aeab4228705745e6203d54ca9fbba554eea8549bc276",
+        [
+          "6"
+        ]
+      ],
+      [
+        "0x2c2911cd2f1fc76844ef827b0aa1c3e05660315e9412d5ac33108a06bc566603",
+        [
+          "8"
+        ]
+      ],
+      [
+        "0x82451f4fc850dd2e774891d2b807acc144fbd25b0695bb630ca9fbf717e02e20",
+        [
+          "11"
+        ]
+      ],
+      [
+        "0x86eef461b42facb4e9243f452cca8ab1dddc3e835ce7c3e6d58e1cad84ff372d",
+        [
+          "5"
+        ]
+      ],
+      [
+        "0x2a86af6492380fb79bfab3f6e627ac73b084633d54e6c5962dba86d7e6ad9111",
+        [
+          "9"
+        ]
+      ],
+      [
+        "0x041071d04513c136396ca4e62eaf2c59d021a2720ba6be071a1a8363ec5f3d59",
+        [
+          "12"
+        ]
+      ],
+      [
+        "0xfaab7624817d1adb9134965edfee0d74d3647220ce2262f602a22f3b2aa8a901",
+        [
+          "7"
+        ]
+      ]
+    ],
+    "tokenApprovals": [],
+    "config": {
+      "name": "Vara Woman Madrid NFT collection",
+      "description": "Vara Woman Madrid NFT collection is dedicated to the first ever meetup of VaraWoman in Spain.",
+      "collectionTags": [],
+      "collectionBanner": "ipfs://QmNuJExt8mpeyujTXvyfPv2U5mbLLZ8jjQL7o8iXYJSYDa",
+      "collectionLogo": "ipfs://QmZHKkYpLxk7rFUErgJWVnzwjrL4qtAWXKizLzERK3cfkU",
+      "userMintLimit": null,
+      "additionalLinks": {
+        "externalUrl": "",
+        "telegram": "",
+        "xcom": "",
+        "medium": "",
+        "discord": ""
+      },
+      "royalty": "0",
+      "paymentForMint": "0",
+      "transferable": "0",
+      "sellable": "0"
+    },
+    "nonce": "13",
+    "imgLinksAndData": [
+      [
+        "ipfs://QmUnVUZfQwzeUp8ekY1ZPyEq3hehfRy5qN1qjXudWPgYiE",
+        {
+          "limitCopies": null
+        }
+      ]
+    ],
+    "collectionOwner": "0x041071d04513c136396ca4e62eaf2c59d021a2720ba6be071a1a8363ec5f3d59",
+    "totalNumberOfTokens": null,
+    "permissionToMint": [
+      "0x041071d04513c136396ca4e62eaf2c59d021a2720ba6be071a1a8363ec5f3d59"
+    ],
+    "marketplaceAddress": "0xa81328dbfc2cfa9a9a88cf7b2216ae0a3a964f7974a236a52d10153e698cf5c2"
+  }
+}

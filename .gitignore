@@ -1,5 +1,5 @@
-/target
-/Cargo.lock
 .binpath
 .DS_Store
 .idea
+contracts/nft/target
+contracts/nft-showroom/target

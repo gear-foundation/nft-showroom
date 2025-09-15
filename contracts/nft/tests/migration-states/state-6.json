@@ -1,0 +1,90 @@
+{
+  "All": {
+    "tokens": [
+      [
+        "0",
+        {
+          "owner": "0x36677e8e5d84c1a25bdac951e9055abff3df4c7a656abd841197a8726ff29a3f",
+          "name": "Loving Vara - 0",
+          "description": "The \"Loving Vara\" NFT collection celebrates the global community's love and appreciation for the Vara Network. Inspired by the highly successful \"Loving Vara Worldwide Contest,\" this collection showcases the passion and creativity of the participants who showcased their affection for Vara through their photographs with their favorite merchandise.",
+          "metadata": [],
+          "mediaUrl": "ipfs://QmdQi9BrLLHkRouV3CGTQmmPLu7akK9aSwDB5ZwiCWNw2p",
+          "mintTime": "1,712,231,811,000"
+        }
+      ],
+      [
+        "2",
+        {
+          "owner": "0x7cd5f5ff9b7eefb11b8b32c1bb1e1fc63c08019d81124b3aa85f24ae8c779a31",
+          "name": "Loving Vara - 2",
+          "description": "The \"Loving Vara\" NFT collection celebrates the global community's love and appreciation for the Vara Network. Inspired by the highly successful \"Loving Vara Worldwide Contest,\" this collection showcases the passion and creativity of the participants who showcased their affection for Vara through their photographs with their favorite merchandise.",
+          "metadata": [],
+          "mediaUrl": "ipfs://Qmabbq9XMntLMvBLM8Mhg1ddpW8NvwJjdiNZHgoPtikJ9h",
+          "mintTime": "1,712,231,946,000"
+        }
+      ],
+      [
+        "1",
+        {
+          "owner": "0xa81328dbfc2cfa9a9a88cf7b2216ae0a3a964f7974a236a52d10153e698cf5c2",
+          "name": "Loving Vara - 1",
+          "description": "The \"Loving Vara\" NFT collection celebrates the global community's love and appreciation for the Vara Network. Inspired by the highly successful \"Loving Vara Worldwide Contest,\" this collection showcases the passion and creativity of the participants who showcased their affection for Vara through their photographs with their favorite merchandise.",
+          "metadata": [],
+          "mediaUrl": "ipfs://QmNr22m2SNBHoa4rATQoF23CqBtwfHe6voytWPkqNU3yJ3",
+          "mintTime": "1,712,231,886,000"
+        }
+      ]
+    ],
+    "owners": [
+      [
+        "0x7cd5f5ff9b7eefb11b8b32c1bb1e1fc63c08019d81124b3aa85f24ae8c779a31",
+        [
+          "2"
+        ]
+      ],
+      [
+        "0x36677e8e5d84c1a25bdac951e9055abff3df4c7a656abd841197a8726ff29a3f",
+        [
+          "0"
+        ]
+      ],
+      [
+        "0xa81328dbfc2cfa9a9a88cf7b2216ae0a3a964f7974a236a52d10153e698cf5c2",
+        [
+          "1"
+        ]
+      ]
+    ],
+    "tokenApprovals": [],
+    "config": {
+      "name": "Loving Vara",
+      "description": "The \"Loving Vara\" NFT collection celebrates the global community's love and appreciation for the Vara Network. Inspired by the highly successful \"Loving Vara Worldwide Contest,\" this collection showcases the passion and creativity of the participants who showcased their affection for Vara through their photographs with their favorite merchandise.",
+      "collectionTags": [],
+      "collectionBanner": "ipfs://QmTWmi55vM3L14PPbd1C8b6iWsS9YKdSSxzmun1QiVGbcD",
+      "collectionLogo": "ipfs://QmVa97ZSsbfbr9gU6sVpLo8dsBpgyjDcVNnJvT99StRXpL",
+      "userMintLimit": "1",
+      "additionalLinks": {
+        "externalUrl": "http://vara.network/",
+        "telegram": "https://t.me/VaraNetwork_Global",
+        "xcom": "https://twitter.com/VaraNetwork",
+        "medium": "https://medium.com/@VaraNetwork",
+        "discord": "https://discord.gg/x8ZeSy6S6K"
+      },
+      "royalty": "0",
+      "paymentForMint": "0",
+      "transferable": "0",
+      "sellable": "0"
+    },
+    "nonce": "3",
+    "imgLinksAndData": [],
+    "collectionOwner": "0xee20998f8b9fcf6c1366f8de1b5f30c08c7bbc2b61ca96a13768dffc07db9b64",
+    "totalNumberOfTokens": "3",
+    "permissionToMint": [
+      "0xee20998f8b9fcf6c1366f8de1b5f30c08c7bbc2b61ca96a13768dffc07db9b64"
+    ],
+    "marketplaceAddress": "0xa81328dbfc2cfa9a9a88cf7b2216ae0a3a964f7974a236a52d10153e698cf5c2",
+    "admins": [
+      "0xee20998f8b9fcf6c1366f8de1b5f30c08c7bbc2b61ca96a13768dffc07db9b64"
+    ]
+  }
+}
