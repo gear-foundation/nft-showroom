@@ -119,14 +119,14 @@ function ParametersForm({ defaultValues, onSubmit, onBack }: Props) {
         .refine((value) => value.isInteger(), 'Maximum amount of decimal places exceeded')
         .transform((value) => getFormattedBalanceValue(value.toFixed()).toFixed()),
 
-      tags: z.object({ value: z.string() }).array().default([]),
+      tags: z.object({ value: z.string() }).array(),
       royalty: z.coerce
         .number()
         .max(10)
         .transform((value) => value.toString()),
-      isSellable: z.boolean().default(false),
-      isTransferable: z.boolean().default(false),
-      isMetadataChangesAllowed: z.boolean().default(false),
+      isSellable: z.boolean(),
+      isTransferable: z.boolean(),
+      isMetadataChangesAllowed: z.boolean(),
     })
     .refine(({ mintPermission }) => mintPermission.value !== 'custom' || mintPermission.addresses.length, {
       message: 'No specifed address',

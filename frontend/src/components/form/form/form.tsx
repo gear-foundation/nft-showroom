@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { ReactNode, useEffect } from 'react';
+import { ReactNode } from 'react';
 import { DefaultValues, FieldValues, FormProvider, SubmitHandler, useForm } from 'react-hook-form';
 import { ZodType } from 'zod';
 
@@ -16,12 +16,6 @@ function Form<T extends FieldValues>({ defaultValues, schema, children, classNam
 
   const methods = useForm<T>({ defaultValues, resolver, mode: 'onChange' });
   const { handleSubmit } = methods;
-
-  const values = methods.watch();
-
-  useEffect(() => {
-    console.log(values);
-  }, [values]);
 
   return (
     <FormProvider {...methods}>

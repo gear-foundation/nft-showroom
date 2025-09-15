@@ -1,3 +1,4 @@
+import { HexString } from '@gear-js/api';
 import { useAlert } from '@gear-js/react-hooks';
 import { Button } from '@gear-js/vara-ui';
 import { z } from 'zod';
@@ -31,7 +32,7 @@ function Component({ collection, auction, ...nft }: Props) {
   const onSubmit = async ({ value }: typeof defaultValues) => {
     try {
       const tokenId = nft.idInCollection;
-      const collectionAddress = collection.id as `0x${string}`;
+      const collectionAddress = collection.id as HexString;
 
       // console.log('calculated make-bid fee value: ', value, BigInt(value));
 
