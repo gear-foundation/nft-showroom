@@ -18,4 +18,5 @@ RUN npm run build
 
 ADD commands.json .
 ENV PROCESSOR_PROMETHEUS_PORT 3000
-CMD ["sqd", "process"]
+#CMD ["sqd", "process"]
+CMD ["sh", "-c", "npx squid-typeorm-migration apply && node -r dotenv/config lib/processor.js"]
