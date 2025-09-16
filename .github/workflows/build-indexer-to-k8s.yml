@@ -109,15 +109,3 @@ jobs:
             rollout status deployment/${{ env.KUBE_DEPLOYMENT_PREFIX }}-${{ env.ENVIRONMENT }} \
             --timeout=240s \
             -n ${{ env.KUBE_NAMESPACE }}
-  run-migration:
-    needs: [deploy-to-k8s]
-    runs-on: ubuntu-latest
-    environment: ${{ github.ref == 'refs/heads/release' && 'prod' || 'stg' }}
-    steps:
-      - name: Run database migration
-        uses: kodermax/kubectl-aws-eks@main
-        with:
-          args: |
-            exec deployment/${{ env.KUBE_DEPLOYMENT_PREFIX }}-${{ env.ENVIRONMENT }} \
-            -n ${{ env.KUBE_NAMESPACE }} -- \
-            npx squid-typeorm-migration apply
