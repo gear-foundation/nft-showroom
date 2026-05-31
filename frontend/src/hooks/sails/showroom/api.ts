@@ -1,3 +1,4 @@
+import { HexString } from '@gear-js/api';
 import { useProgram, useSendProgramTransaction } from '@gear-js/react-hooks';
 import { useQuery } from '@tanstack/react-query';
 import request from 'graphql-request';
@@ -8,7 +9,7 @@ import { SailsProgram } from '@/hooks/sails/showroom/lib.ts';
 
 export function useProgramInstance() {
   const { data } = useQuery({ queryKey: ['marketplace'], queryFn: () => request(ADDRESS.INDEXER, MARKETPLACE_QUERY) });
-  const programId = (data?.marketplaceById?.address || ADDRESS.CONTRACT) as typeof ADDRESS.CONTRACT;
+  const programId = data?.marketplaceById?.address as HexString;
 
   return useProgram({
     library: SailsProgram,

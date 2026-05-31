@@ -1,3 +1,4 @@
+import { HexString } from '@gear-js/api';
 import { useAlert } from '@gear-js/react-hooks';
 import { Button } from '@gear-js/vara-ui';
 import { z } from 'zod';
@@ -34,11 +35,11 @@ function Component({ collection, owner, approvedAccount, ...nft }: Props) {
   const schema = z.object({ price: getPriceSchema() });
 
   const { sendTransactionAsync: sendSellTransaction, isPending } = useSendSellTransaction();
-  const { startApproveTransaction, isPendingApprove } = useStartApproveTransaction(collection.id as `0x${string}`);
+  const { startApproveTransaction, isPendingApprove } = useStartApproveTransaction(collection.id as HexString);
 
   const onSubmit = async ({ price }: typeof defaultValues) => {
     const tokenId = nft.idInCollection;
-    const collectionAddress = collection.id as `0x${string}`;
+    const collectionAddress = collection.id as HexString;
 
     const startSale = async () => {
       try {

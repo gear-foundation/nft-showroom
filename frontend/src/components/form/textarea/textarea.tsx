@@ -7,7 +7,8 @@ const Textarea = ({ name, ...props }: Props<TextareaProps>) => {
   const { register, formState } = useFormContext();
   const { errors } = formState;
 
-  const error = errors[name]?.message?.toString();
+  const errorMessage = errors[name]?.message;
+  const error = typeof errorMessage === 'string' ? errorMessage : undefined;
 
   return <VaraTextarea {...props} {...register(name)} error={error} />;
 };
