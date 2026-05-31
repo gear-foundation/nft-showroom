@@ -30,7 +30,7 @@ ENV VITE_NODE_ADDRESS=${VITE_NODE_ADDRESS} \
 WORKDIR /opt
 
 # Copy package files first for better caching
-COPY package.json pnpm-lock.yaml ./
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 
 # Install dependencies
 RUN pnpm install --frozen-lockfile
