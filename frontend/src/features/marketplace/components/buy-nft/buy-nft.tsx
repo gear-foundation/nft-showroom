@@ -1,3 +1,4 @@
+import { HexString } from '@gear-js/api';
 import { useAlert } from '@gear-js/react-hooks';
 import { Button } from '@gear-js/vara-ui';
 
@@ -20,7 +21,7 @@ function Component({ idInCollection, owner, collection, sale }: Props) {
   const handleClick = async () => {
     try {
       const tokenId = idInCollection;
-      const collectionAddress = collection.id as `0x${string}`;
+      const collectionAddress = collection.id as HexString;
 
       const value = BigInt(sale.price);
       await sendBuyTransaction({ args: [collectionAddress, tokenId], value });

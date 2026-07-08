@@ -3,11 +3,11 @@ type SummaryValues = {
   logo: File | undefined;
   name: string;
   description: string;
-  url?: string | undefined;
-  telegram?: string | undefined;
-  x?: string | undefined;
-  medium?: string | undefined;
-  discord?: string | undefined;
+  url: string;
+  telegram: string;
+  x: string;
+  medium: string;
+  discord: string;
 };
 
 type ParametersValues = {

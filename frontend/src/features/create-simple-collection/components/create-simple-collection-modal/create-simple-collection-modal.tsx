@@ -1,3 +1,4 @@
+import { HexString } from '@gear-js/api';
 import { useAccount, useAlert, useBalanceFormat } from '@gear-js/react-hooks';
 import { ModalProps } from '@gear-js/vara-ui';
 import { useState } from 'react';
@@ -39,11 +40,7 @@ function CreateSimpleCollectionModal({ close }: Pick<ModalProps, 'close'>) {
   const { sendTransactionAsync: sendCreateCollection } = useSendCreateCollectionTransaction();
   const [isLoading, enableLoading, disableLoading] = useLoading();
 
-  // Get the code_id for Simple NFT Collection from marketplace
-  // const simpleCollectionType = marketplace?.collectionTypes?.find((type) => type.type === COLLECTION_TYPE_NAME.SIMPLE);
-  // For now, we'll use a placeholder. In real implementation, you'd get the actual code_id from marketplace
-  const nftCodeId = '0x00';
-  const { data: nftProgram } = useNFTProgram(nftCodeId as `0x${string}`);
+  const { data: nftProgram } = useNFTProgram();
 
   const nextStep = () => setStepIndex((prevIndex) => prevIndex + 1);
   const prevStep = () => setStepIndex((prevIndex) => prevIndex - 1);
@@ -111,7 +108,7 @@ function CreateSimpleCollectionModal({ close }: Pick<ModalProps, 'close'>) {
     const imgLinksAndData = await getNftsPayload(nfts);
 
     const permissionToMint = ['admin', 'custom'].includes(mintPermission.value)
-      ? mintPermission.addresses.map(({ value }) => value as `0x${string}`)
+      ? mintPermission.addresses.map(({ value }) => value as HexString)
       : null;
 
     const config = {
@@ -132,13 +129,13 @@ function CreateSimpleCollectionModal({ close }: Pick<ModalProps, 'close'>) {
     return { collectionOwner, config, imgLinksAndData, permissionToMint, feePerUploadedFile };
   };
 
-  const getBytesPayload = (payload: Awaited<ReturnType<typeof getFormPayload>>): `0x${string}` => {
+  const getBytesPayload = (payload: Awaited<ReturnType<typeof getFormPayload>>): HexString => {
     if (!nftProgram) throw new Error('NFT Program is not initialized');
 
     const { collectionOwner, config, imgLinksAndData, permissionToMint } = payload;
 
     // Ensure collectionOwner is in the correct format (hex string)
-    const formattedCollectionOwner = collectionOwner as `0x${string}`;
+    const formattedCollectionOwner = collectionOwner as HexString;
 
     // Create the payload structure that matches the collection's init function
     // According to IDL: New : (collection_owner: actor_id, config: Config, img_links_and_data: vec struct { str, ImageData }, permission_to_mint: opt vec actor_id)

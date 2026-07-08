@@ -7,7 +7,8 @@ function Input({ name, ...props }: InputProps) {
   const { register, formState } = useFormContext();
   const { errors } = formState;
 
-  const error = errors[name]?.message?.toString();
+  const errorMessage = errors[name]?.message;
+  const error = typeof errorMessage === 'string' ? errorMessage : undefined;
 
   return <VaraInput {...props} {...register(name)} error={error} />;
 }
