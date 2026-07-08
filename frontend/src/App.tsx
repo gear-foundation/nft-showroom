@@ -1,26 +1,18 @@
-import { Outlet, ScrollRestoration } from 'react-router-dom';
+import { Footer, Header } from './components';
+import { Sunset } from './pages/sunset';
 
-import { ErrorBoundary, Footer, Header } from './components';
-import { withProviders } from './providers';
-
-function Component() {
+function App() {
   return (
     <>
       <Header />
 
       <main>
-        <ErrorBoundary>
-          <ScrollRestoration />
-
-          <Outlet />
-        </ErrorBoundary>
+        <Sunset />
       </main>
 
       <Footer />
     </>
   );
 }
-
-const App = withProviders(Component);
 
 export { App };

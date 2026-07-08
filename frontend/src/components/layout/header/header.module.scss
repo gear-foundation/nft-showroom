@@ -8,40 +8,27 @@
 }
 
 .container,
-.search,
-.buttons,
-.wallet {
+.link {
   display: flex;
   align-items: center;
 }
 
 .container {
   justify-content: space-between;
-  gap: 40px;
-}
-
-.buttons {
-  gap: 12px;
-}
-
-.button {
-  --padding: 10px 16px !important;
-
-  > * {
-    --padding: 10px 16px !important;
-  }
-}
-
-
-.search,
-.wallet {
   gap: 24px;
 }
 
-.search {
-  flex: 1;
+.link {
+  min-height: 40px;
+  padding: 0 18px;
+  border-radius: 8px;
+  background-color: #00ffc4;
 
-  form {
-    flex: 1;
+  font-weight: 700;
+  line-height: 18px;
+  color: #000;
+
+  &:hover {
+    opacity: 0.75;
   }
 }
