@@ -1,11 +1,11 @@
 # Build stage
-FROM node:22-alpine AS builder
+FROM node:24.22.3-alpine3.24@sha256:116b800c3754b440ee0aa3ed2f20f5bf3d99a554bfd9adeea09ea8017f6e85f5 AS builder
 
 # Install build dependencies
-RUN apk update && apk add --no-cache xsel
+RUN apk add --no-cache xsel
 
 # Install pnpm globally
-RUN npm install -g pnpm
+RUN npm install -g pnpm@12.21.0
 
 # Set build arguments
 ARG VITE_NODE_ADDRESS
@@ -41,27 +41,10 @@ COPY . .
 # Build the application
 RUN pnpm build
 
-# Production stage
-FROM node:22-alpine AS production
+# Production stage: static files served by nginx as UID 101
+FROM nginxinc/nginx-unprivileged:1.31.7-alpine-slim@sha256:a8cb0f33d51fa107c96fd2bd3a71aaf564ec131e9d2bdf8700944f0ed8b170d7
 
-# Install only serve package globally
-RUN npm install --global serve
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+COPY --from=builder /opt/dist /usr/share/nginx/html
 
-# Create non-root user for security
-RUN addgroup -g 1001 -S nodejs && \
-    adduser -S nextjs -u 1001
-
-# Set working directory
-WORKDIR /app
-
-# Copy built application from builder stage
-COPY --from=builder --chown=nextjs:nodejs /opt/dist ./dist
-
-# Switch to non-root user
-USER nextjs
-
-# Expose port
 EXPOSE 3000
-
-# Start the application
-CMD ["serve", "-s", "/app/dist", "-l", "3000"]
